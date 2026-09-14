@@ -1,0 +1,31 @@
+# HappyBirth — Szkoła Rodzenia Online
+
+> Nowoczesna, cyfrowa szkoła rodzenia online dla przyszłych mam i osób towarzyszących. 52 filmowe lekcje wideo VOD na Cloudflare Stream, 4 Filary Spokoju, Cyfrowa Apteczka Porodowa SOS oraz Licznik Skurczów 5-1-1.
+
+## O Platformie
+- **Nazwa:** HappyBirth (Szkoła Rodzenia Online)
+- **Usługodawca / Właściciel:** KLARSolutions sp. z o.o. (w organizacji)
+- **Siedziba:** ul. Śląska 14, 60-614 Poznań, Polska
+- **Kontakt ogólny:** kontakt@happybirth.pl
+- **Wsparcie kursantek:** pomoc@happybirth.pl
+- **Doświadczenie:** 14 lat dorobku szkoły rodzenia Mama Gaja (od 2012 roku), ponad 18 000 przygotowanych mam
+- **Infrastruktura:** 100% Cloudflare Architecture (Cloudflare Pages, Cloudflare Stream CDN Warszawa, Edge Workers)
+- **Model dostępu:** Płatność jednorazowa (349 zł) bez subskrypcji. Dostęp dla dwojga przez 12 miesięcy od przewidywanej daty porodu.
+
+## Główne Narzędzia i Moduły
+- [Strona Główna (Portal Sprzedażowy)](https://happybirth.pl): Prezentacja programu, 4 Filary Spokoju, opinie rodziców, cennik i sekcja FAQ.
+- [Strefa Kursantki (Kokpit VOD)](https://strefa.happybirth.pl): Zamknięty portal kursantki z 52 lekcjami wideo, kartami pracy PDF i wskaźnikiem postępu.
+- [Katalog 52 Lekcji VOD](https://strefa.happybirth.pl/lekcje): Kompletny spis lekcji podzielonych na 9 etapów od planowania, przez ciążę, po poród i pierwszy rok życia dziecka.
+- [Cyfrowa Apteczka Porodowa SOS](https://strefa.happybirth.pl/apteczka): Błyskawiczna wyszukiwarka i 12 pigułek wiedzy na najczęstsze dolegliwości i pytania okołoporodowe.
+- [Licznik Skurczów 5-1-1](https://strefa.happybirth.pl/licznik): Interaktywne narzędzie porodowe z algorytmem reguły 5-1-1 informujące o optymalnym momencie wyjazdu do szpitala.
+- [Strefa dla Taty / Partnera](https://strefa.happybirth.pl/partner): Dedykowana pigułka wiedzy dla osoby towarzyszącej (punkty ucisku łagodzące ból, masaż krzyżowy, chwyt Rebozo, prawa na sali porodowej).
+- [Standard Merytoryczny & E-E-A-T](https://strefa.happybirth.pl/standard-medyczny): Zgodność ze Standardem Organizacyjnym Opieki Okołoporodowej (Rozporządzenie MZ) oraz Ustawą o zawodach pielęgniarki i położnej.
+- [Program Afiliacyjny B2B](https://partnerzy.happybirth.pl): Dedykowany portal dla położnych środowiskowych, gabinetów ginekologicznych i fizjoterapeutek uroginekologicznych.
+
+## Informacje Prawne i Ochrona Danych
+- [Regulamin Platformy](https://happybirth.pl/regulamin): Warunki zakupu, licencja, prawa konsumenta, procedura reklamacji oraz klauzula z art. 38 pkt 13 ustawy o prawach konsumenta.
+- [Polityka Prywatności (RODO)](https://happybirth.pl/polityka-prywatnosci): Klauzula informacyjna art. 13 RODO, zasady przetwarzania danych oraz gwarancja braku pikseli reklamowych w portalu kursantki.
+
+## Pełna Dokumentacja Programu
+Kompletny sylabus wszystkich 52 lekcji, transkrypcje modułów i szczegóły techniczne znajdują się w pliku:
+- [llms-full.txt](https://happybirth.pl/llms-full.txt)

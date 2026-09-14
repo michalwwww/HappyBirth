@@ -1,0 +1,565 @@
+# HappyBirth — Kompletna Dokumentacja Merytoryczna i Techniczna Platformy
+
+> Dokument przygotowany dla modeli sztucznej inteligencji (LLM), wyszukiwarek semantycznych i agentów AI. Zawiera pełny opis programu szkoły rodzenia online, sylabus 52 lekcji VOD, specyfikację 9 etapów, 4 Filarów Spokoju, procedury medyczne, architekturę techniczną oraz dane formalno-prawne.
+
+---
+
+## 1. DANE FORMALNE I USŁUGODAWCA
+- **Nazwa podmiotu:** KLARSolutions sp. z o.o. (w organizacji)
+- **Siedziba:** ul. Śląska 14, 60-614 Poznań, Polska
+- **Adres e-mail:** kontakt@happybirth.pl
+- **Wsparcie kursantek i reklamacje:** pomoc@happybirth.pl
+- **Domena główna (marketing):** https://happybirth.pl
+- **Subdomena portalu kursantki (VOD):** https://strefa.happybirth.pl
+- **Subdomena programu partnerskiego (B2B):** https://partnerzy.happybirth.pl
+
+---
+
+## 2. FILOZOFIA MERYTORYCZNA: 4 FILARY SPOKOJU HAPPYBIRTH
+Program szkoły rodzenia opiera się na 14 latach doświadczenia szkoły rodzenia Mama Gaja (od 2012 roku), ponad 18 000 przygotowanych porodów oraz 4 Filarach Spokoju:
+
+1. **Filar I: Poród & Oddech (Położnictwo Fizjologiczne & Biomechanika)**
+   - Prowadzenie aktywnego porodu fizjologicznego.
+   - Pozycje wertykalne odciążające kręgosłup i ułatwiające wstawianie się główki w kanał rodny.
+   - Ochrona tkanek krocza, techniki oddechowe torem dolnożebrowym i niefarmakologiczne łagodzenie bólu skurczowego.
+   - Zgodność ze Standardem Organizacyjnym Opieki Okołoporodowej (Rozporządzenie Ministra Zdrowia).
+
+2. **Filar II: Ciało & Dno Miednicy (Fizjoterapia Uroginekologiczna)**
+   - Świadome przygotowanie mięśni dna miednicy do porodu.
+   - Profilaktyka rozejścia mięśnia prostego brzucha (kresa biała).
+   - Techniki masażu kości krzyżowej dla partnera, mobilizacja miednicy chustą Rebozo w trakcie skurczu oraz bezpieczna regeneracja w połogu.
+
+3. **Filar III: Laktacja & Więź (Fizjologia Laktacji & Czułe Karmienie)**
+   - Prawidłowy mechanizm ssania i asymetryczne przystawianie noworodka do piersi.
+   - Skuteczne postępowanie w nawałach pokarmowych, zastojach i bolesności brodawek.
+   - Bezpieczny dobór laktatora oraz karmienie butelką z czułością, bez oceniania i bez presji.
+
+4. **Filar IV: Noworodek & Pierwszy Rok (Opieka Neonatologiczna & Zdrowy Rozsądek)**
+   - Pierwsza kąpiel krok po kroku (pewny chwyt na przedramieniu, temperatura 37°C).
+   - Sucha pielęgnacja kikuta pępowinowego bez alkoholu.
+   - Zasady bezpiecznego snu niemowlęcia (profilaktyka SIDS).
+   - Pierwsza pomoc w zakrztuszeniu i gorączce oraz zdrowy rozsądek o 3:00 w nocy bez paniki.
+
+---
+
+## 3. PRZEGLĄD 9 ETAPÓW PROGRAMU EDUKACYJNEGO
+
+### Etap 01: Zanim
+- **Podtytuł:** Świadome przygotowanie i fundament
+- **Okres ciąży:** Przed ciążą / Planowanie
+- **Opis modułu:** Przygotowanie ciała i głowy, badania wstępne, kalkulator tygodnia i pierwsze decyzje.
+
+### Etap 02: Dwie kreski
+- **Podtytuł:** I Trymestr – początek i wielka zmiana
+- **Okres ciąży:** Tydzień 1 – 14
+- **Opis modułu:** Jak liczyć wiek ciąży, radzenie sobie z mdłościami, aplikacje, wybór lekarza i przełamywanie mitów.
+
+### Etap 03: Wreszcie lepiej
+- **Podtytuł:** II & III Trymestr – zmysły, ciało i profilaktyka
+- **Okres ciąży:** Tydzień 15 – 32
+- **Opis modułu:** Ruchy dziecka, kalendarz badań, higiena intymna, bezpieczny sen na lewym boku i fizjoterapia kręgosłupa.
+
+### Etap 04: Torba spakowana
+- **Podtytuł:** Wyprawka, kącik malucha i domowa apteczka
+- **Okres ciąży:** Tydzień 30 – 37
+- **Opis modułu:** Wybór bezpiecznego wózka i fotelika, materac do łóżeczka, apteczka minimum i lista ubranek na start.
+
+### Etap 05: Zaczęło się
+- **Podtytuł:** Poród naturalny – akcja, oddech i ruch
+- **Okres ciąży:** Tydzień 38 – 42
+- **Opis modułu:** Gdy odejdą wody, pozycje wertykalne, masaż krzyżowy z partnerem, chusta Rebozo i pakowanie do szpitala.
+
+### Etap 06: Plan B
+- **Podtytuł:** Cesarskie cięcie, znieczulenie i nieprzewidziane sytuacje
+- **Okres ciąży:** Poród / Godzina Zero
+- **Opis modułu:** Wszystko o znieczuleniu ZZO, gazie rozweselającym, cięciu cesarskim i radzeniu sobie z kryzysem 7 cm.
+
+### Etap 07: Pierwsza noc w domu
+- **Podtytuł:** Połóg – regeneracja, emocje i powrót do sił
+- **Okres ciąży:** 1 – 6 tydzień po porodzie
+- **Opis modułu:** Pielęgnacja rany po cc i nacięciu, fizjologia połogu, Baby Blues, ćwiczenia dna miednicy i szczere historie mam.
+
+### Etap 08: Karmienie
+- **Podtytuł:** Laktacja bez bólu – technika i wsparcie
+- **Okres ciąży:** Od 1. doby życia
+- **Opis modułu:** Pozycje klasyczne i spod pachy, nawał pokarmowy, bolesne brodawki, dobór laktatora i łagodzenie kolek.
+
+### Etap 09: Nie śpi
+- **Podtytuł:** Noworodek – kąpiel, bezpieczeństwo i pierwsza pomoc
+- **Okres ciąży:** 1 – 12 miesiąc życia
+- **Opis modułu:** Skala Apgar, profilaktyka SIDS, RKO niemowlaka, instruktaż kąpieli, stany przejściowe i szczepienia.
+
+---
+
+## 4. KOMPLETNY SYLABUS 52 LEKCJI WIDEO (VOD CLOUDFLARE STREAM)
+Wszystkie materiały wideo zostały zrealizowane w filmowej jakości i zoptymalizowane pod kątem bezpiecznego, wspierającego języka (zero lękowego żargonu klinicznego).
+
+
+### Lekcja 01: I Trymestr – Początek nowego życia i pierwsze tygodnie
+- **Identyfikator:** `lekcja-01`
+- **Etap:** Dwie kreski
+- **Czas trwania:** 5:33 min (333 s)
+- **Opis merytoryczny:** Jak liczyć wiek ciąży, co dzieje się w Twoim ciele w pierwszych 14 tygodniach i jak radzić sobie z porannymi mdłościami dzięki małym, czułym nawykom.
+- **Lekcja bezpłatna (Demo):** Tak
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-01
+
+### Lekcja 02: II Trymestr – Czas energii, zmysłów i pierwszych ruchów
+- **Identyfikator:** `lekcja-02`
+- **Etap:** Dwie kreski
+- **Czas trwania:** 2:36 min (156 s)
+- **Opis merytoryczny:** Rozwój zmysłów maluszka między 15. a 28. tygodniem, pierwsze delikatne muśnięcia oraz łagodne sposoby na trawienie i zbilansowaną dietę.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-02
+
+### Lekcja 03: III Trymestr – Spokojne odliczanie do narodzin
+- **Identyfikator:** `lekcja-03`
+- **Etap:** Dwie kreski
+- **Czas trwania:** 1:34 min (94 s)
+- **Opis merytoryczny:** Przygotowanie do wielkiego finału (tygodnie 31–40), dojrzewanie maluszka i ten wyjątkowy moment, w którym warto zamknąć walizkę do porodu.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-03
+
+### Lekcja 04: Wielka nowina – jak dzielić się radością z bliskimi
+- **Identyfikator:** `lekcja-04`
+- **Etap:** Dwie kreski
+- **Czas trwania:** 4:18 min (258 s)
+- **Opis merytoryczny:** Kiedy i jak przekazać wieść rodzinie, jak celebrować ten czas we dwoje i stawiać zdrowe granice z uśmiechem.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-04
+
+### Lekcja 05: Cyfrowe wsparcie – sprawdzone aplikacje i obalanie ciążowych mitów
+- **Identyfikator:** `lekcja-05`
+- **Etap:** Dwie kreski
+- **Czas trwania:** 4:16 min (256 s)
+- **Opis merytoryczny:** Które aplikacje ciążowe naprawdę pomagają, a które sieją niepotrzebny chaos. Spokojne fakty zamiast forów internetowych.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-05
+
+### Lekcja 06: Szkoła rodzenia online – Twój bezpieczny i wygodny start
+- **Identyfikator:** `lekcja-06`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 4:19 min (259 s)
+- **Opis merytoryczny:** Jak uczyć się we własnym tempie, o dowolnej porze na kanapie, angażując partnera bez presji i dojazdów.
+- **Lekcja bezpłatna (Demo):** Tak
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-06
+
+### Lekcja 07: Zmiany w ciele przyszłej mamy – co jest w pełni naturalne?
+- **Identyfikator:** `lekcja-07`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 3:15 min (195 s)
+- **Opis merytoryczny:** Powiększający się brzuszek, hormony, zmiana środka ciężkości i sygnały wysyłane przez ciało – dlaczego warto zaufać naturze.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-07
+
+### Lekcja 08: Zmysły na wysokich obrotach – zapachy, smaki i emocje
+- **Identyfikator:** `lekcja-08`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 2:14 min (134 s)
+- **Opis merytoryczny:** Dlaczego ulubiona kawa nagle pachnie inaczej i jak oswajać wahania nastroju z wyrozumiałością dla samej siebie.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-08
+
+### Lekcja 09: Dolegliwości ciążowe – sprawdzone, łagodne sposoby na ulgę
+- **Identyfikator:** `lekcja-09`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 8:57 min (537 s)
+- **Opis merytoryczny:** Zgaga, obrzęki nóg, skurcze łydek – domowe, niefarmakologiczne metody, które przynoszą natychmiastowe wytchnienie.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-09
+
+### Lekcja 10: Czuła troska o ciało – komfort, skóra i kobiecość w ciąży
+- **Identyfikator:** `lekcja-10`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 1:26 min (86 s)
+- **Opis merytoryczny:** Bezpieczna pielęgnacja, nawilżanie brzuszka, dobór bielizny i profilaktyka, która daje poczucie lekkości każdego dnia.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-10
+
+### Lekcja 11: Spokojna ciąża – kalendarz zalecanych badań i spotkań
+- **Identyfikator:** `lekcja-11`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 7:49 min (469 s)
+- **Opis merytoryczny:** Kompletna, czytelna checklista badań i wizyt – wiesz dokładnie, kiedy zaplanować USG i badania krwi bez żadnego stresu.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-11
+
+### Lekcja 12: Kiedy ruszać do szpitala? – sygnały, które warto znać dla spokoju
+- **Identyfikator:** `lekcja-12`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 6:16 min (376 s)
+- **Opis merytoryczny:** Praktyczny przewodnik z położną: jak odróżnić skurcze przepowiadające od porodowych i kiedy spokojnie wziąć torbę.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-12
+
+### Lekcja 13: Ruchy maluszka – czego spodziewać się od 20. tygodnia?
+- **Identyfikator:** `lekcja-13`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 6:16 min (376 s)
+- **Opis merytoryczny:** Od pierwszych motylków w brzuchu po regularne harce – jak poznawać dobowy rytm aktywności i odpoczynku Twojego dziecka.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-13
+
+### Lekcja 14: Regenerujący sen w ciąży – wygoda, mikroklimat i relaks
+- **Identyfikator:** `lekcja-14`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 5:29 min (329 s)
+- **Opis merytoryczny:** Jak przygotować sypialnię, dobrać poduszkę ciążową i wyciszyć gonitwę myśli przed snem, by budzić się wypoczętą.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-14
+
+### Lekcja 15: Pozycje do snu – jak spać wygodnie i bezpiecznie dla malucha
+- **Identyfikator:** `lekcja-15`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 3:26 min (206 s)
+- **Opis merytoryczny:** Dlaczego lewy bok jest tak polecany, jak podpierać biodra i co zrobić, gdy sen przerywają częste wizyty w toalecie.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-15
+
+### Lekcja 16: Ulga dla kręgosłupa – bezpieczne ćwiczenia i rozluźnianie pleców
+- **Identyfikator:** `lekcja-16`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 12:09 min (729 s)
+- **Opis merytoryczny:** Proste, fizjoterapeutyczne ruchy na macie i piłce, które odciążają odcinek lędźwiowy i przynoszą ulgę spiętym mięśniom.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-16
+
+### Lekcja 17: Czas dla siebie – relaks, spacery i bezpieczne podróże
+- **Identyfikator:** `lekcja-17`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 3:56 min (236 s)
+- **Opis merytoryczny:** Aktywność fizyczna dopasowana do trymestru, pasy w samochodzie, wakacje z brzuszkiem i ładowanie baterii przed porodem.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-17
+
+### Lekcja 18: Domowa przestrzeń – jak dbać o swoje siły i kręgosłup
+- **Identyfikator:** `lekcja-18`
+- **Etap:** Wreszcie lepiej
+- **Czas trwania:** 6:43 min (403 s)
+- **Opis merytoryczny:** Zasady ergonomii na co dzień: jak schylać się, nosić zakupy i delegować zadania partnerowi, by chronić dno miednicy.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-18
+
+### Lekcja 19: Bezpieczna podróż – wybór i montaż pierwszego fotelika
+- **Identyfikator:** `lekcja-19`
+- **Etap:** Torba spakowana
+- **Czas trwania:** 7:10 min (430 s)
+- **Opis merytoryczny:** Kąt nachylenia, baza ISOFIX, prawidłowe zapinanie pasów i bezpieczny powrót ze szpitala do domu w pełnym komforcie.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-19
+
+### Lekcja 20: Wózek idealny – praktyczny przewodnik dla przyszłych rodziców
+- **Identyfikator:** `lekcja-20`
+- **Etap:** Torba spakowana
+- **Czas trwania:** 8:44 min (524 s)
+- **Opis merytoryczny:** Gondola, amortyzacja, waga stelaża i koła – na co zwrócić uwagę, dopasowując wózek do Waszego stylu życia i spacerów.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-20
+
+### Lekcja 21: Przytulny kącik maluszka – funkcjonalność, spokój i wygoda
+- **Identyfikator:** `lekcja-21`
+- **Etap:** Torba spakowana
+- **Czas trwania:** 7:24 min (444 s)
+- **Opis merytoryczny:** Przewijak na odpowiedniej wysokości, oświetlenie ułatwiające nocne karmienie i organizacja przestrzeni przyjaznej rodzicom.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-21
+
+### Lekcja 22: Bezpieczne łóżeczko – materac i zasady spokojnego snu maluszka
+- **Identyfikator:** `lekcja-22`
+- **Etap:** Torba spakowana
+- **Czas trwania:** 4:28 min (268 s)
+- **Opis merytoryczny:** Wybór twardego materaca, optymalna temperatura w pokoju i zasady snu, które dają rodzicom pełen spokój w nocy.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-22
+
+### Lekcja 23: Wyprawkowa kosmetyczka i apteczka – co naprawdę warto mieć
+- **Identyfikator:** `lekcja-23`
+- **Etap:** Torba spakowana
+- **Czas trwania:** 6:00 min (360 s)
+- **Opis merytoryczny:** Minimalizm z rozsądkiem: sól fizjologiczna, gaziki, krem ochronny i termometr – bez wydawania fortuny na zbędne gadżety.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-23
+
+### Lekcja 24: Kompletna wyprawka domowa – ubranka, otulacze i tekstylia
+- **Identyfikator:** `lekcja-24`
+- **Etap:** Torba spakowana
+- **Czas trwania:** 8:01 min (481 s)
+- **Opis merytoryczny:** Rozmiary 56 czy 62? Naturalne materiały, pajacyki z suwakiem, rożki i pieluszki bambusowe – lista niezbędników na start.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-24
+
+### Lekcja 25: Kącik kąpielowy – wanienka, komfort i przygotowanie do rytuału
+- **Identyfikator:** `lekcja-25`
+- **Etap:** Torba spakowana
+- **Czas trwania:** 1:59 min (119 s)
+- **Opis merytoryczny:** Stojak na wanienkę, termometr do wody, miękki ręcznik z kapturkiem i tworzenie wieczornego rytuału bliskości.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-25
+
+### Lekcja 26: Twój Plan Porodu – jak stworzyć dokument wspierający Twoje wybory
+- **Identyfikator:** `lekcja-26`
+- **Etap:** Zaczęło się
+- **Czas trwania:** 10:39 min (639 s)
+- **Opis merytoryczny:** Wspólnie przejdziemy przez 16 kluczowych punktów: od ochrony krocza, przez pozycje wertykalne, po dwugodzinny kontakt skóra do skóry.
+- **Lekcja bezpłatna (Demo):** Tak
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-26
+
+### Lekcja 27: Torba do szpitala – pakowanie w 3 strefach bez zbędnego stresu
+- **Identyfikator:** `lekcja-27`
+- **Etap:** Zaczęło się
+- **Czas trwania:** 2:48 min (168 s)
+- **Opis merytoryczny:** Podział bagażu: strefa porodu (woda, pomadka, przekąski), strefa mamy na oddziale i strefa maluszka. Przejrzysta lista.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-27
+
+### Lekcja 28: Drogi narodzin – poród naturalny i cesarskie cięcie bez tajemnic
+- **Identyfikator:** `lekcja-28`
+- **Etap:** Zaczęło się
+- **Czas trwania:** 6:54 min (414 s)
+- **Opis merytoryczny:** Jak przebiega fizjologiczny poród siłami natury, a jak wygląda planowane i nieplanowane cesarskie cięcie. Wiedza, która usuwa lęk.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-28
+
+### Lekcja 29: Gdy odejdą wody – spokojna instrukcja krok po kroku w dniu porodu
+- **Identyfikator:** `lekcja-29`
+- **Etap:** Zaczęło się
+- **Czas trwania:** 2:20 min (140 s)
+- **Opis merytoryczny:** Jak rozpoznać wody płodowe, na jaki kolor zwrócić uwagę, kiedy wziąć ciepły prysznic i bez pośpiechu ruszyć do szpitala.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-29
+
+### Lekcja 30: Aktywny poród – ruch, oddech i naturalne łagodzenie skurczów
+- **Identyfikator:** `lekcja-30`
+- **Etap:** Zaczęło się
+- **Czas trwania:** 7:22 min (442 s)
+- **Opis merytoryczny:** Jak współpracować ze swoim ciałem: pozycje wertykalne, ruchy bioder na piłce, prysznic oraz kojący masaż pleców.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-30
+
+### Lekcja 31: Wsparcie partnera na porodówce – pozycje wertykalne i masaż
+- **Identyfikator:** `lekcja-31`
+- **Etap:** Zaczęło się
+- **Czas trwania:** 4:57 min (297 s)
+- **Opis merytoryczny:** Konkretne techniki dla taty: podtrzymywanie w przysiadzie, masaż kości krzyżowej dłońmi i tworzenie intymnej, bezpiecznej przestrzeni.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-31
+
+### Lekcja 32: Magia chusty Rebozo – techniki odciążania brzucha i pleców z partnerem
+- **Identyfikator:** `lekcja-32`
+- **Etap:** Plan B
+- **Czas trwania:** 2:07 min (127 s)
+- **Opis merytoryczny:** Tradycyjna meksykańska chusta w praktyce: kołysanie miednicy, rozluźnianie mięśni i natychmiastowa ulga w lędźwiach podczas skurczu.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-32
+
+### Lekcja 33: Medyczne wsparcie w skurczach – znieczulenie ZZO, gaz i łagodzenie bólu
+- **Identyfikator:** `lekcja-33`
+- **Etap:** Plan B
+- **Czas trwania:** 9:00 min (540 s)
+- **Opis merytoryczny:** Wszystko o dostępnych metodach szpitalnych: znieczulenie zewnątrzoponowe, gaz rozweselający i zasady bezpiecznego podania.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-33
+
+### Lekcja 34: Fazy narodzin – przewodnik po etapach porodu i kryzysie 7 cm
+- **Identyfikator:** `lekcja-34`
+- **Etap:** Plan B
+- **Czas trwania:** 7:56 min (476 s)
+- **Opis merytoryczny:** Od rozwierania szyjki macicy, przez moment przełomowy, aż po wyczekiwaną chwilę powitania dziecka i pierwsze przytulenie.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-34
+
+### Lekcja 35: Czuła regeneracja po porodzie – gojenie tkanek po cc i ochrona krocza
+- **Identyfikator:** `lekcja-35`
+- **Etap:** Pierwsza noc w domu
+- **Czas trwania:** 2:09 min (129 s)
+- **Opis merytoryczny:** Praktyczne zasady komfortu w połogu: higiena, wietrzenie, delikatna pielęgnacja i bezpieczna mobilizacja blizny.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-35
+
+### Lekcja 36: Pierwsze tygodnie połogu – fizjologia, emocje i oswajanie Baby Blues
+- **Identyfikator:** `lekcja-36`
+- **Etap:** Pierwsza noc w domu
+- **Czas trwania:** 3:16 min (196 s)
+- **Opis merytoryczny:** Czego spodziewać się po powrocie do domu: oczyszczanie macicy, burza hormonalna, czułość dla siebie i wsparcie bliskich.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-36
+
+### Lekcja 37: Bezpieczny powrót do sprawności – ćwiczenia dna miednicy i brzucha
+- **Identyfikator:** `lekcja-37`
+- **Etap:** Pierwsza noc w domu
+- **Czas trwania:** 5:36 min (336 s)
+- **Opis merytoryczny:** Fizjoterapia uroginekologiczna po 6. tygodniu: aktywacja mięśnia poprzecznego, prawidłowy oddech i regeneracja kresy białej.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-37
+
+### Lekcja 38: Szczere historie mam – narodziny przez cesarskie cięcie i powrót do formy
+- **Identyfikator:** `lekcja-38`
+- **Etap:** Pierwsza noc w domu
+- **Czas trwania:** 10:50 min (650 s)
+- **Opis merytoryczny:** Inspirująca opowieść Ani: szybka pionizacja, pierwsze karmienie maluszka i kluczowa rola partnera w pierwszych dobach.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-38
+
+### Lekcja 39: Szczere historie mam – wspierana akcja porodowa i regeneracja w domu
+- **Identyfikator:** `lekcja-39`
+- **Etap:** Pierwsza noc w domu
+- **Czas trwania:** 9:50 min (590 s)
+- **Opis merytoryczny:** Prawdziwa rozmowa o elastyczności planu porodu, radzeniu sobie z nieprzewidzianym scenariuszem i radości z pierwszych chwil razem.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-39
+
+### Lekcja 40: Pierwsze chwile maluszka – wygląd noworodka, skala Apgar i dotyk
+- **Identyfikator:** `lekcja-40`
+- **Etap:** Nie śpi
+- **Czas trwania:** 2:28 min (148 s)
+- **Opis merytoryczny:** Dlaczego maluszek ma rączki w piąstkach, co oznacza maź płodowa i jak ocenia się pierwsze minuty życia w kontakcie skóra do skóry.
+- **Lekcja bezpłatna (Demo):** Tak
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-40
+
+### Lekcja 41: Odruchy i zachowania noworodka – co jest w pełni naturalne?
+- **Identyfikator:** `lekcja-41`
+- **Etap:** Nie śpi
+- **Czas trwania:** 3:11 min (191 s)
+- **Opis merytoryczny:** Czkawka, kichanie, drżenie bródki i odruch Moro – poznaj język ciała niemowlęcia, by z pełnym spokojem patrzeć na jego rozwój.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-41
+
+### Lekcja 42: Bezpieczny sen maluszka – złote zasady spokojnej nocy
+- **Identyfikator:** `lekcja-42`
+- **Etap:** Nie śpi
+- **Czas trwania:** 0:58 min (58 s)
+- **Opis merytoryczny:** Prawidłowa pozycja na plecach, lekki śpiworek zamiast kocyka, czyste łóżeczko i warunki sprzyjające głębokiemu, bezpiecznemu snowi.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-42
+
+### Lekcja 43: Pierwsza pomoc i bezpieczeństwo – praktyczny instruktaż dla rodziców
+- **Identyfikator:** `lekcja-43`
+- **Etap:** Nie śpi
+- **Czas trwania:** 2:34 min (154 s)
+- **Opis merytoryczny:** Krok po kroku: co zrobić w przypadku zakrztuszenia pokarmem, gorączki oraz jak zachować zimną krew i pewność działania.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-43
+
+### Lekcja 44: Pierwsza kąpiel krok po kroku – bezpieczny chwyt i wieczorny rytuał
+- **Identyfikator:** `lekcja-44`
+- **Etap:** Nie śpi
+- **Czas trwania:** 13:13 min (793 s)
+- **Opis merytoryczny:** Temperatura wody 37°C, pewne trzymanie maluszka na przedramieniu, mycie fałdek i sucha pielęgnacja pępka bez stresu.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-44
+
+### Lekcja 45: Spokojne wizyty u pediatry – kalendarz profilaktyki i opieki
+- **Identyfikator:** `lekcja-45`
+- **Etap:** Nie śpi
+- **Czas trwania:** 6:12 min (372 s)
+- **Opis merytoryczny:** Przewodnik po pierwszych wizytach patronażowych, bilansach maluszka i przygotowaniu do szczepień bez pośpiechu.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-45
+
+### Lekcja 46: Pierwsze dni w domu – naturalne adaptacje noworodka bez paniki
+- **Identyfikator:** `lekcja-46`
+- **Etap:** Nie śpi
+- **Czas trwania:** 4:37 min (277 s)
+- **Opis merytoryczny:** Fizjologiczny spadek wagi, adaptacja skóry, żółtaczka fizjologiczna – co jest całkowitą normą w pierwszych dwóch tygodniach.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-46
+
+### Lekcja 47: Codzienna pielęgnacja – ulewanie, ciemieniucha i troska o skórę
+- **Identyfikator:** `lekcja-47`
+- **Etap:** Nie śpi
+- **Czas trwania:** 4:04 min (244 s)
+- **Opis merytoryczny:** Pionizacja po karmieniu, pielęgnacja skóry głowy i naturalne sposoby na małe wyzwania pierwszych miesięcy.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-47
+
+### Lekcja 48: Pytania do położnej – odpowiedzi na najczęstsze wątpliwości o maluszku
+- **Identyfikator:** `lekcja-48`
+- **Etap:** Nie śpi
+- **Czas trwania:** 6:51 min (411 s)
+- **Opis merytoryczny:** Trądzik niemowlęcy, kupki, spacery o każdej porze roku i obcinanie miękkich paznokietków – rozwiewamy codzienne dylematy.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-48
+
+### Lekcja 49: Czułe karmienie piersią – technika, pozycje i prawidłowy chwyt
+- **Identyfikator:** `lekcja-49`
+- **Etap:** Karmienie
+- **Czas trwania:** 5:49 min (349 s)
+- **Opis merytoryczny:** Jak przystawiać dziecko w pozycji klasycznej, krzyżowej i spod pachy (po cesarce), by karmienie było bezbolesne i przyjemne.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-49
+
+### Lekcja 50: Laktacja bez stresu – nawał pokarmowy, zastoje i troska o brodawki
+- **Identyfikator:** `lekcja-50`
+- **Etap:** Karmienie
+- **Czas trwania:** 3:38 min (218 s)
+- **Opis merytoryczny:** Co zrobić w 3.–4. dobie: ciepłe i chłodne okłady, delikatny masaż, pielęgnacja brodawek i wsparcie partnera w karmieniu.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-50
+
+### Lekcja 51: Akcesoria do karmienia – laktatory, butelki i spokojne karmienie
+- **Identyfikator:** `lekcja-51`
+- **Etap:** Karmienie
+- **Czas trwania:** 4:46 min (286 s)
+- **Opis merytoryczny:** Dobór laktatora, butelki wspierające naturalny odruch ssania, przechowywanie mleka i karmienie butelką z czułością i bliskością.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-51
+
+### Lekcja 52: Brzuszkowe dolegliwości niemowląt – kolki, czuły masaż i sposoby na ulgę
+- **Identyfikator:** `lekcja-52`
+- **Etap:** Karmienie
+- **Czas trwania:** 9:47 min (587 s)
+- **Opis merytoryczny:** Jak odróżnić wieczorny płacz ze zmęczenia od bólu brzuszka: masaż Shantala, termofor z pestek wiśni, noszenie i kojący biały szum.
+- **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
+- **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-52
+
+---
+
+## 5. INTERAKTYWNE NARZĘDZIA PLATFORMY
+
+### 1. Licznik Skurczów 5-1-1 (SOS Contraction Counter)
+- **Adres:** https://strefa.happybirth.pl/licznik
+- **Działanie:** Narzędzie mierzy czas trwania każdego skurczu oraz interwały pomiędzy kolejnymi skurczami.
+- **Algorytm reguły 5-1-1:** Gdy w ostatnich 3 skurczach odstęp wynosi ok. 5 minut, a każdy skurcz trwa ok. 60 sekund, aplikacja wyświetla natychmiastowy komunikat zalecający spokojne wzięcie torby i wyjazd na izbę przyjęć.
+
+### 2. Cyfrowa Apteczka Porodowa (Digital Medicine Cabinet)
+- **Adres:** https://strefa.happybirth.pl/apteczka
+- **Działanie:** 12 pigułek wiedzy z natychmiastową wyszukiwarką dolegliwości:
+- **Mdłości i zgaga** (Ciąża · Objawy): Sposoby na poranne mdłości i refluks — Częste małe posiłki, woda z imbirem, unikanie leżenia po jedzeniu i bezpieczne nawyki. (Powiązana lekcja: `lekcja-01`)
+- **Badania i USG** (Zdrowie · Profilaktyka): Kalendarz badań w ciąży i wymaz GBS — Checklista badań od morfologii po test glukozy i kluczowy wymaz GBS przed porodem. (Powiązana lekcja: `lekcja-11`)
+- **Ból pleców** (Fizjoterapia): Zestaw ćwiczeń na kręgosłup i oddech — Mobilizacja miednicy na piłce, bezpieczny klęk podparty i oddech torem dolnożebrowym. (Powiązana lekcja: `lekcja-15`)
+- **Wyprawka szpitalna** (Przygotowanie): Torba do szpitala w 3 strefach — Podział bagażu: strefa porodu, oddział położniczy dla Mamy oraz wyprawka dla Noworodka. (Powiązana lekcja: `lekcja-27`)
+- **Odejście wód** (Poród · Start): Gdy wody odejdą – co robić krok po kroku — Ocena koloru wód, prysznic, chód bociana i zasada 5-1-1 przed wyjazdem na izbę przyjęć. (Powiązana lekcja: `lekcja-29`)
+- **Łagodzenie bólu** (Poród · Niefarmakologiczne): Pozycje wertykalne i masaż krzyża — Ruch ułatwiający wstawianie główki, worki sako, chusta Rebozo i rola partnera. (Powiązana lekcja: `lekcja-30`)
+- **Znieczulenie ZZO** (Poród · Medycyna): Medyczne wsparcie w skurczach – ZZO i gaz — Kiedy podaje się ZZO (4-5 cm), jak działa gaz rozweselający i bezpieczne metody na sali. (Powiązana lekcja: `lekcja-33`)
+- **Regeneracja i gojenie** (Połóg · Regeneracja): Czuła pielęgnacja i regeneracja tkanek po porodzie — Wietrzenie, delikatne mycie, unikanie podrażnień i bezpieczna mobilizacja blizny. (Powiązana lekcja: `lekcja-35`)
+- **Karmienie piersią** (Laktacja): Prawidłowy chwyt i pozycje karmienia — Chwyt asymetryczny brodawki, pozycja spod pachy po cięciu cesarskim i nawał. (Powiązana lekcja: `lekcja-49`)
+- **Kolki niemowlęce** (Noworodek · Dolegliwości): Masaż brzuszka i ulga w kolce — Prawidłowa technika masażu, termofor z pestek wiśni, pionizacja i spokój rodzica. (Powiązana lekcja: `lekcja-52`)
+- **Pierwsza pomoc** (Bezpieczeństwo · SOS): Pierwsza pomoc noworodka i bezpieczne zachłyśnięcia — Praktyczny instruktaż ratowania życia: 5 oddechów, 30 uciśnięć dwoma palcami i zimna krew. (Powiązana lekcja: `lekcja-43`)
+- **Kąpiel i pępek** (Pielęgnacja): Pierwsza kąpiel i delikatna pielęgnacja pępka — Temperatura wody 37°C, pewny chwyt, sucha pielęgnacja pępka bez alkoholu. (Powiązana lekcja: `lekcja-44`)
+
+### 3. Strefa dla Taty (Partner Guide)
+- **Adres:** https://strefa.happybirth.pl/partner
+- **Działanie:** Pigułka wiedzy dla osoby towarzyszącej z konkretnymi zadaniami:
+  - Technika masażu kości krzyżowej dłońmi i piłką tenisową w czasie skurczu.
+  - Chwyt chusty Rebozo do odciążania miednicy.
+  - Pilnowanie praw pacjentki na sali porodowej (kontakt skóra do skóry min. 2h).
+  - Pierwsze formalności urzędowe po narodzinach (zgłoszenie w USC przez internet).
+
+---
+
+## 6. ARCHITEKTURA TECHNICZNA I BEZPIECZEŃSTWO
+- **Hosting & CDN:** 100% Cloudflare Pages (serwery brzegowe z węzłem w Warszawie).
+- **Streaming wideo:** Cloudflare Stream Video CDN (inteligentny adaptacyjny bitrate HLS/DASH).
+- **Baza i Stan:** Next.js 15 App Router ze statycznym eksportem HTML/CSS/JS (`output: 'export'`) i lokalną pamięcią przeglądarki `localStorage`.
+- **Routing subdomenowy:** Natywny Cloudflare Pages Edge Worker (`functions/_middleware.ts`) obsługujący subdomeny `strefa.happybirth.pl`, `partnerzy.happybirth.pl` oraz domenę główną `happybirth.pl`.
+- **Prywatność i RODO:**
+  - Cała Strefa Kursantki wysyła nagłówek `X-Robots-Tag: noindex, nofollow, noarchive`.
+  - Zerowa obecność pikseli śledzących podmiotów trzecich (Meta Pixel, Google Ads) w portalu kursantki.
+  - Fonty serwowane lokalnie przez `next/font/google` bez połączeń z zewnętrznymi serwerami Google.
+
+---
+
+## 7. ASPEKTY PRAWNE I STANDARDY KONSUMENCKIE
+- **Regulamin:** https://happybirth.pl/regulamin
+- **Polityka Prywatności:** https://happybirth.pl/polityka-prywatnosci
+- **Wyłączenie prawa do odstąpienia:** Zgodnie z art. 38 pkt 13 Ustawy o prawach konsumenta, natychmiastowe rozpoczęcie świadczenia treści cyfrowych VOD za zgodą konsumenta skutkuje wyłączeniem 14-dniowego prawa do odstąpienia od umowy.
+- **Nota medyczna:** Materiały edukacyjne nie zastępują indywidualnej opieki lekarskiej ani położniczej. W sytuacjach nagłych (krwawienie, brak ruchów dziecka) bezwzględnie obowiązuje telefon alarmowy 112 lub natychmiastowy wyjazd na Izbę Przyjęć.
