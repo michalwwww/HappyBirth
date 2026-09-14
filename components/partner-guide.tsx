@@ -10,11 +10,11 @@ export function PartnerGuide() {
   const pathname = usePathname();
   const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
   const partnerLessons = [
-    { id: 'lekcja-27', title: 'Torba do szpitala – pakowanie w 3 strefach', role: 'Wiesz dokładnie, gdzie leży pomadka, woda i ubranka' },
-    { id: 'lekcja-30', title: 'Aktywny poród – niefarmakologiczne metody', role: 'Masaż krzyżowy dłońmi i uciskanie kolcami biodrowymi' },
-    { id: 'lekcja-31', title: 'Fizjoterapia na porodówce z partnerem', role: 'Podtrzymywanie w przysiadzie i krążenia miednicą' },
-    { id: 'lekcja-32', title: 'Chusta Rebozo w bólach porodowych', role: 'Odciążanie brzucha mamy chustą w klęku podpartym' },
-    { id: 'lekcja-44', title: 'Kąpiel noworodka krok po kroku', role: 'Bezpieczny chwyt i rola taty w wieczornym rytuale' },
+    { id: 'lekcja-27', title: 'Torba do szpitala – pakowanie w 3 strefach bez stresu', role: 'Wiesz dokładnie, gdzie leży pomadka, woda i ubranka' },
+    { id: 'lekcja-30', title: 'Aktywny poród – ruch, oddech i naturalne łagodzenie skurczów', role: 'Masaż krzyżowy dłońmi i uciskanie kolcami biodrowymi' },
+    { id: 'lekcja-31', title: 'Wsparcie partnera na porodówce – pozycje wertykalne i masaż', role: 'Podtrzymywanie w przysiadzie i krążenia miednicą' },
+    { id: 'lekcja-32', title: 'Magia chusty Rebozo – techniki odciążania brzucha i pleców', role: 'Odciążanie brzucha mamy chustą w klęku podpartym' },
+    { id: 'lekcja-44', title: 'Pierwsza kąpiel krok po kroku – bezpieczny chwyt', role: 'Bezpieczny chwyt i rola taty w wieczornym rytuale' },
   ];
 
   return (
