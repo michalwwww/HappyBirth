@@ -133,14 +133,25 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Notatka odpowiedzialności */}
-        <div className="pt-6 border-t border-[#461643] text-xs text-[#EAD5E5]/60 space-y-2">
+        {/* Notatka odpowiedzialności i dane prawne */}
+        <div className="pt-6 border-t border-[#461643] text-xs text-[#EAD5E5]/60 space-y-3">
           <p>
             <strong className="text-white">Materiały na platformie mają charakter edukacyjny i wspierający.</strong> Służą przygotowaniu do aktywnego, świadomego porodu w oparciu o 4 Filary Spokoju i dorobek położnych Mama Gaja od 2012 roku. Nie zastępują indywidualnej opieki położnej ani lekarza prowadzącego ciążę. <a href={`${strefaUrl}/standard-medyczny`} className="underline hover:text-white transition-colors">Zobacz Standard Merytoryczny & E-E-A-T</a>.
           </p>
-          <p className="text-[11px] text-[#EAD5E5]/40 pt-2">
-            © {new Date().getFullYear()} HappyBirth. Wszelkie prawa zastrzeżone.
-          </p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 text-[11px] text-[#EAD5E5]/50 border-t border-[#461643]/50">
+            <div>
+              <span>Usługodawca: <strong>KLARSolutions sp. z o.o. (w organizacji)</strong>, ul. Śląska 14, 60-614 Poznań · © {new Date().getFullYear()} HappyBirth.</span>
+            </div>
+            <div className="flex items-center space-x-3 text-[#EAD5E5]/80">
+              <Link href="/regulamin" className="hover:text-white transition-colors underline">
+                Regulamin platformy
+              </Link>
+              <span>·</span>
+              <Link href="/polityka-prywatnosci" className="hover:text-white transition-colors underline">
+                Polityka prywatności (RODO)
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

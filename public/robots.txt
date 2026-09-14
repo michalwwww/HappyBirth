@@ -1,0 +1,9 @@
+﻿User-agent: *
+Allow: /
+Allow: /marketing
+Allow: /regulamin
+Allow: /polityka-prywatnosci
+Disallow: /strefa/
+Disallow: /strefa/*
+
+Sitemap: https://happybirth.pl/sitemap.xml

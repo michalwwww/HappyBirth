@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
-
 :root {
   --paper: #FBF8F4;
   --ink: #1A1512;
@@ -26,33 +24,33 @@
 body {
   background-color: var(--paper);
   color: var(--ink);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
   font-size: 18px;
   line-height: 1.62;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-family: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
   font-weight: 500;
   letter-spacing: -0.032em;
   line-height: 1.05;
 }
 
 em.se {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.012em;
 }
 
 .font-brand-display {
-  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-family: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
   letter-spacing: -0.032em;
 }
 
 .font-brand-serif {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
   font-style: italic;
 }
 

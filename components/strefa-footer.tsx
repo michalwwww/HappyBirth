@@ -134,15 +134,19 @@ export function StrefaFooter() {
           </p>
         </div>
 
-        {/* Copyright & Disclaimer */}
+        {/* Copyright & Legal */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#D8C7D5]/60">
           <div>
-            © {new Date().getFullYear()} HappyBirth. Wszelkie prawa zastrzeżone. Materiały edukacyjne zgodne ze Standardem Organizacyjnym Opieki Okołoporodowej (Rozporządzenie MZ).
+            Usługodawca: <strong>KLARSolutions sp. z o.o. (w organizacji)</strong>, ul. Śląska 14, 60-614 Poznań · © {new Date().getFullYear()} HappyBirth. Materiały edukacyjne zgodne ze Standardem MZ.
           </div>
           <div className="flex items-center space-x-4">
-            <span className="hover:text-white transition-colors cursor-pointer">Regulamin platformy</span>
+            <a href="https://happybirth.pl/regulamin" className="hover:text-white transition-colors underline">
+              Regulamin platformy
+            </a>
             <span>·</span>
-            <span className="hover:text-white transition-colors cursor-pointer">Polityka prywatności (RODO)</span>
+            <a href="https://happybirth.pl/polityka-prywatnosci" className="hover:text-white transition-colors underline">
+              Polityka prywatności (RODO)
+            </a>
           </div>
         </div>
       </div>
