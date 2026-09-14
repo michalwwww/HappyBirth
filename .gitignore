@@ -1,0 +1,18 @@
+node_modules/
+.next/
+out/
+dist/
+build/
+.env*.local
+.env
+Filmy vbiałe/
+*.mp4
+*.mhtml
+*.log
+scratch_*.json
+scratch_*.txt
+mapped_cf_videos.json
+course_catalog.json
+LogoHB.jpeg
+.DS_Store
+Thumbs.db
