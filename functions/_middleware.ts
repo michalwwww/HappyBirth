@@ -59,16 +59,17 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   }
 
   // 4. DOMENA GŁÓWNA MARKETINGOWA: happybirth.pl
+  const isMainProdHost = host === 'happybirth.pl' || host === 'www.happybirth.pl';
   const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny'];
   const isStudentRoute = studentRoutes.some((route) => url.pathname.startsWith(route));
 
-  // Przekieruj ścieżki kursantki z domeny głównej do strefy
-  if (isStudentRoute) {
+  // Przekieruj ścieżki kursantki z domeny głównej do strefy (tylko na produkcji)
+  if (isMainProdHost && isStudentRoute) {
     return Response.redirect(`https://strefa.happybirth.pl${url.pathname}${url.search}`, 302);
   }
 
-  // Przekieruj /partnerzy na dedykowaną subdomenę
-  if (url.pathname.startsWith('/partnerzy')) {
+  // Przekieruj /partnerzy na dedykowaną subdomenę (tylko na produkcji)
+  if (isMainProdHost && url.pathname.startsWith('/partnerzy')) {
     return Response.redirect(`https://partnerzy.happybirth.pl${url.pathname.replace(/^\/partnerzy/, '') || '/'}`, 302);
   }
 
