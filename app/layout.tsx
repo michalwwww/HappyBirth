@@ -26,11 +26,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'HAPPYBIRTH · Szkoła Rodzenia Online — 52 Lekcje VOD',
   description:
-    'Nowoczesna szkoła rodzenia online dla przyszłych mam i partnerów. 9 etapów, 52 lekcje wideo Cloudflare Stream, cyfrowa apteczka porodowa i licznik skurczów 5-1-1.',
+    'Nowoczesna szkoła rodzenia online dla przyszłych mam i partnerów. 9 etapów, 52 lekcje wideo w jakości HD, cyfrowa apteczka porodowa i licznik skurczów 5-1-1.',
   metadataBase: new URL('https://happybirth.pl'),
   openGraph: {
     title: 'HAPPYBIRTH · Szkoła Rodzenia Online — 52 Lekcje VOD',
-    description: 'Nowoczesna szkoła rodzenia online dla przyszłych mam i partnerów. 52 filmowe lekcje Cloudflare Stream dla dwojga.',
+    description: 'Nowoczesna szkoła rodzenia online dla przyszłych mam i partnerów. 52 filmowe lekcje VOD dla dwojga.',
     url: 'https://happybirth.pl',
     siteName: 'HappyBirth',
     locale: 'pl_PL',

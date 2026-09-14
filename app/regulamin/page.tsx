@@ -62,7 +62,7 @@ export default function RegulaminPage() {
             <li><strong>Usługodawca / Sprzedawca</strong> – KLARSolutions sp. z o.o. w organizacji z siedzibą w Poznaniu.</li>
             <li><strong>Klient / Użytkownik / Kursantka</strong> – osoba fizyczna, osoba prawna lub jednostka organizacyjna nieposiadająca osobowości prawnej, która zawiera Umowę ze Sprzedawcą.</li>
             <li><strong>Konsument</strong> – osoba fizyczna zawierająca ze Sprzedawcą umowę niezwiązaną bezpośrednio z jej działalnością gospodarczą lub zawodową.</li>
-            <li><strong>Kurs / Treść Cyfrowa</strong> – pakiet materiałów edukacyjnych wideo VOD (52 lekcje w technologii Cloudflare Stream), materiałów PDF i narzędzi interaktywnych dostępnych w Strefie Kursantki.</li>
+            <li><strong>Kurs / Treść Cyfrowa</strong> – pakiet materiałów edukacyjnych wideo VOD (52 autorskie lekcje wideo w jakości Full HD), materiałów PDF i narzędzi interaktywnych dostępnych w Strefie Kursantki.</li>
             <li><strong>Strefa Kursantki</strong> – zabezpieczony obszar Platformy dostępny pod adresem strefa.happybirth.pl po opłaceniu zamówienia.</li>
           </ul>
         </section>

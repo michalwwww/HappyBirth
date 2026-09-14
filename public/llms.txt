@@ -1,6 +1,6 @@
 # HappyBirth — Szkoła Rodzenia Online
 
-> Nowoczesna, cyfrowa szkoła rodzenia online dla przyszłych mam i osób towarzyszących. 52 filmowe lekcje wideo VOD na Cloudflare Stream, 4 Filary Spokoju, Cyfrowa Apteczka Porodowa SOS oraz Licznik Skurczów 5-1-1.
+> Nowoczesna, cyfrowa szkoła rodzenia online dla przyszłych mam i osób towarzyszących. 52 autorskie lekcje wideo w jakości Full HD, 4 Filary Spokoju, Cyfrowa Apteczka Porodowa SOS oraz Licznik Skurczów 5-1-1.
 
 ## O Platformie
 - **Nazwa:** HappyBirth (Szkoła Rodzenia Online)
@@ -9,7 +9,7 @@
 - **Kontakt ogólny:** kontakt@happybirth.pl
 - **Wsparcie kursantek:** pomoc@happybirth.pl
 - **Doświadczenie:** 14 lat dorobku szkoły rodzenia Mama Gaja (od 2012 roku), ponad 18 000 przygotowanych mam
-- **Infrastruktura:** 100% Cloudflare Architecture (Cloudflare Pages, Cloudflare Stream CDN Warszawa, Edge Workers)
+- **Infrastruktura:** Nowoczesna platforma VOD zoptymalizowana pod natychmiastowe odtwarzanie Full HD bez buforowania
 - **Model dostępu:** Płatność jednorazowa (349 zł) bez subskrypcji. Dostęp dla dwojga przez 12 miesięcy od przewidywanej daty porodu.
 
 ## Główne Narzędzia i Moduły

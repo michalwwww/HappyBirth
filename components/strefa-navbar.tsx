@@ -41,7 +41,7 @@ export function StrefaNavbar() {
             </span>
             <span className="text-white/40 hidden md:inline">|</span>
             <span className="text-[#EAD5E5]/80 hidden md:inline">
-              52 lekcje wideo Cloudflare Stream · Dostęp aktywny: 12 msc od terminu porodu dla dwojga
+              52 lekcje wideo w jakości Full HD · Dostęp aktywny: 12 msc od terminu porodu dla dwojga
             </span>
           </div>
 

@@ -44,10 +44,10 @@ export function CloudflarePlayer({
 
         <div className="flex items-center space-x-3 text-[#EAD5E5]/70">
           <span className="flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Cloudflare Stream CDN (Warszawa)
+            <ShieldCheck className="w-3.5 h-3.5 text-[#EC008C]" /> Jakość Full HD · HappyBirth VOD
           </span>
           <span>·</span>
-          <span>Czas: {lesson.durationFormatted} min</span>
+          <span>Czas trwania: {lesson.durationFormatted} min</span>
         </div>
       </div>
 
@@ -64,7 +64,7 @@ export function CloudflarePlayer({
         ) : (
           <div className="flex flex-col items-center justify-center p-8 text-center text-neutral-400">
             <PlayCircle className="w-12 h-12 text-[#EC008C] mb-3 animate-pulse" />
-            <p className="text-sm font-medium">Ładowanie strumienia wideo Cloudflare...</p>
+            <p className="text-sm font-medium text-[#EAD5E5]">Ładowanie lekcji wideo HappyBirth...</p>
           </div>
         )}
       </div>
