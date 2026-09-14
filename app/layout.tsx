@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Navbar } from '@/components/navbar';
-import { Footer } from '@/components/footer';
 
 export const metadata: Metadata = {
   title: 'HAPPYBIRTH · Szkoła Rodzenia Online — 52 Lekcje VOD',
@@ -25,9 +23,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-[#FBF8F4] text-[#1A1512] antialiased selection:bg-[#EC008C]/20">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );

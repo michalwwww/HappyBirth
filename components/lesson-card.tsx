@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Lesson } from '@/lib/types';
 import { Play, CheckCircle2, Clock, Sparkles } from 'lucide-react';
 
+import { usePathname } from 'next/navigation';
+
 interface LessonCardProps {
   lesson: Lesson;
   isCompleted: boolean;
@@ -12,9 +14,12 @@ interface LessonCardProps {
 }
 
 export function LessonCard({ lesson, isCompleted, isActive = false }: LessonCardProps) {
+  const pathname = usePathname();
+  const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
+
   return (
     <Link
-      href={`/lekcja/${lesson.id}`}
+      href={`${prefix}/lekcja/${lesson.id}`}
       className={`group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border transition-all duration-200 ${
         isActive
           ? 'bg-white border-[#EC008C] shadow-md ring-1 ring-[#EC008C]'

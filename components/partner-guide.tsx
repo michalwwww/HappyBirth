@@ -2,10 +2,13 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { HeartHandshake, ShieldCheck, Play, CheckCircle2, AlertCircle } from 'lucide-react';
 import { getLessonById } from '@/lib/course-data';
 
 export function PartnerGuide() {
+  const pathname = usePathname();
+  const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
   const partnerLessons = [
     { id: 'lekcja-27', title: 'Torba do szpitala – pakowanie w 3 strefach', role: 'Wiesz dokładnie, gdzie leży pomadka, woda i ubranka' },
     { id: 'lekcja-30', title: 'Aktywny poród – niefarmakologiczne metody', role: 'Masaż krzyżowy dłońmi i uciskanie kolcami biodrowymi' },
@@ -94,7 +97,7 @@ export function PartnerGuide() {
                 </div>
 
                 <Link
-                  href={`/lekcja/${item.id}`}
+                  href={`${prefix}/lekcja/${item.id}`}
                   className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-full bg-indigo-900 hover:bg-indigo-800 text-white text-xs font-semibold shrink-0 transition-colors shadow-sm"
                 >
                   <Play className="w-3 h-3 fill-current" />

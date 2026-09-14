@@ -1,15 +1,27 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { stages, lessons } from '@/lib/course-data';
 import { LessonCard } from '@/components/lesson-card';
 import { useCourseProgress } from '@/lib/progress';
-import { Search, Filter, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Search, Filter, Sparkles, CheckCircle2, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
-export default function LessonsPage() {
-  const [selectedStage, setSelectedStage] = useState<string>('all');
+function StrefaLessonsContent() {
+  const searchParams = useSearchParams();
+  const initialStage = searchParams.get('stage') || 'all';
+
+  const [selectedStage, setSelectedStage] = useState<string>(initialStage);
   const [search, setSearch] = useState<string>('');
   const { completedLessons, percentCompleted } = useCourseProgress();
+
+  useEffect(() => {
+    const stageParam = searchParams.get('stage');
+    if (stageParam) {
+      setSelectedStage(stageParam);
+    }
+  }, [searchParams]);
 
   const filteredLessons = lessons.filter((l) => {
     const matchesStage = selectedStage === 'all' || l.stageId === selectedStage;
@@ -21,18 +33,24 @@ export default function LessonsPage() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#EAE3DB] pb-8">
         <div>
+          <div className="flex items-center space-x-2 text-xs text-[#867A72] mb-2">
+            <Link href="/strefa" className="hover:text-[#1A1512] transition-colors flex items-center gap-1">
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Wróć do kokpitu</span>
+            </Link>
+          </div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
-            Kompletny program VOD
+            Kompletny program edukacyjny
           </span>
           <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-[#1A1512] mt-1">
-            52 Lekcje Wideo
+            52 Lekcje VOD
           </h1>
           <p className="text-sm text-[#544A44] mt-2 max-w-xl">
-            Od pierwszych objawów, przez badania i aktywny poród, aż po karmienie piersią i pierwszą pomoc noworodka.
+            Od badań w I trymestrze, przez aktywny poród i pozycje wertykalne, aż po karmienie piersią i pierwszą pomoc noworodka.
           </p>
         </div>
 
@@ -60,7 +78,7 @@ export default function LessonsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Szukaj lekcji (np. oddech, kąpiel, ZZO)..."
-            className="w-full pl-10 pr-4 py-2 rounded-full border border-[#EAE3DB] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+            className="w-full pl-10 pr-4 py-2.5 rounded-full border border-[#EAE3DB] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
           />
         </div>
 
@@ -68,15 +86,15 @@ export default function LessonsPage() {
         <div className="w-full sm:w-auto flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
           <button
             onClick={() => setSelectedStage('all')}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
               selectedStage === 'all'
-                ? 'bg-[#1A1512] text-white shadow-sm'
+                ? 'bg-[#250A24] text-white shadow-sm'
                 : 'bg-white border border-[#EAE3DB] text-[#544A44] hover:border-[#867A72]'
             }`}
           >
             Wszystkie (52)
           </button>
-          {stages.slice(1).map((st) => (
+          {stages.map((st) => (
             <button
               key={st.id}
               onClick={() => setSelectedStage(st.id)}
@@ -110,5 +128,17 @@ export default function LessonsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function StrefaLessonsPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center text-[#867A72]">
+        Ładowanie 52 lekcji VOD...
+      </div>
+    }>
+      <StrefaLessonsContent />
+    </Suspense>
   );
 }

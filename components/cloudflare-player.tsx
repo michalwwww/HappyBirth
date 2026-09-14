@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { CheckCircle2, PlayCircle, ShieldCheck, Sparkles, Download, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Lesson } from '@/lib/types';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { CLOUDFLARE_CUSTOMER_DOMAIN } from '@/lib/course-data';
 
 interface CloudflarePlayerProps {
@@ -21,6 +22,9 @@ export function CloudflarePlayer({
   prevLesson,
   nextLesson,
 }: CloudflarePlayerProps) {
+  const pathname = usePathname();
+  const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
+
   // Direct Cloudflare Stream embed URL
   const streamUrl = `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${lesson.cloudflareUid}/iframe?poster=https%3A%2F%2F${CLOUDFLARE_CUSTOMER_DOMAIN}%2F${lesson.cloudflareUid}%2Fthumbnails%2Fthumbnail.jpg&preload=metadata`;
 
@@ -91,7 +95,7 @@ export function CloudflarePlayer({
         <div className="flex items-center space-x-2">
           {prevLesson ? (
             <Link
-              href={`/lekcja/${prevLesson.id}`}
+              href={`${prefix}/lekcja/${prevLesson.id}`}
               className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-[#351034] hover:bg-[#461643] text-[#EAD5E5] text-xs font-medium transition-colors border border-[#461643]"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -101,7 +105,7 @@ export function CloudflarePlayer({
 
           {nextLesson ? (
             <Link
-              href={`/lekcja/${nextLesson.id}`}
+              href={`${prefix}/lekcja/${nextLesson.id}`}
               className="inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-full bg-[#EC008C] hover:bg-[#C80077] text-white text-xs font-semibold transition-colors shadow-sm"
             >
               <span>Następna lekcja</span>

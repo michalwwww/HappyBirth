@@ -2,10 +2,13 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { medicineCabinetItems, getLessonById } from '@/lib/course-data';
 import { Search, Sparkles, ArrowRight, Play, Tag } from 'lucide-react';
 
 export function DigitalMedicineCabinet() {
+  const pathname = usePathname();
+  const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('Wszystko');
 
@@ -103,7 +106,7 @@ export function DigitalMedicineCabinet() {
                 </span>
 
                 <Link
-                  href={`/lekcja/${item.lessonId}`}
+                  href={`${prefix}/lekcja/${item.lessonId}`}
                   className="inline-flex items-center space-x-1.5 font-bold text-[#1A1512] group-hover:text-[#EC008C] transition-colors"
                 >
                   <Play className="w-3 h-3 fill-current" />

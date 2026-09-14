@@ -2,7 +2,7 @@
 
 import React, { use } from 'react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, usePathname } from 'next/navigation';
 import { getLessonById, getAdjacentLessons, getLessonsByStage, getStageById, lessons } from '@/lib/course-data';
 import { CloudflarePlayer } from '@/components/cloudflare-player';
 import { LessonCard } from '@/components/lesson-card';
@@ -13,9 +13,11 @@ interface LessonPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function LessonPage({ params }: LessonPageProps) {
+export default function StrefaLessonPage({ params }: LessonPageProps) {
   const resolvedParams = use(params);
   const lesson = getLessonById(resolvedParams.id);
+  const pathname = usePathname();
+  const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
 
   if (!lesson) {
     notFound();
@@ -32,7 +34,7 @@ export default function LessonPage({ params }: LessonPageProps) {
       {/* Breadcrumb & Navigation */}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#867A72]">
         <div className="flex items-center space-x-2">
-          <Link href="/lekcje" className="hover:text-[#1A1512] transition-colors flex items-center gap-1">
+          <Link href={`${prefix}/lekcje`} className="hover:text-[#1A1512] transition-colors flex items-center gap-1">
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Katalog lekcji</span>
           </Link>
@@ -50,7 +52,7 @@ export default function LessonPage({ params }: LessonPageProps) {
         <div className="flex items-center space-x-2">
           {prev && (
             <Link
-              href={`/lekcja/${prev.id}`}
+              href={`${prefix}/lekcja/${prev.id}`}
               className="hover:text-[#1A1512] transition-colors flex items-center gap-1"
             >
               <span>Poprzednia</span>
@@ -59,7 +61,7 @@ export default function LessonPage({ params }: LessonPageProps) {
           {prev && next && <span>·</span>}
           {next && (
             <Link
-              href={`/lekcja/${next.id}`}
+              href={`${prefix}/lekcja/${next.id}`}
               className="hover:text-[#1A1512] transition-colors flex items-center gap-1 font-semibold text-[#EC008C]"
             >
               <span>Następna</span>
