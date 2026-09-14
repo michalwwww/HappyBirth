@@ -67,9 +67,9 @@ export function StrefaNavbar() {
                     ? 'bg-[#98269C] text-white shadow-sm'
                     : 'text-[#EAD5E5]/70 hover:text-white'
                 }`}
-                title="Widok dla partnera / taty"
+                title="Widok dla partnera / taty na porodówce"
               >
-                <User className="w-2.5 h-2.5" /> Partner
+                <User className="w-2.5 h-2.5" /> Dla Taty
               </button>
               <button
                 onClick={() => changeRole('guest')}
@@ -145,7 +145,7 @@ export function StrefaNavbar() {
               }`}
             >
               <User className="w-4 h-4 text-[#98269C]" />
-              Dla Partnera
+              Strefa dla Taty
             </Link>
             <Link
               href="/strefa/licznik"
@@ -261,7 +261,7 @@ export function StrefaNavbar() {
               >
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4 text-[#98269C]" />
-                  <span>Strefa Partnera</span>
+                  <span>Strefa dla Taty</span>
                 </div>
                 <ChevronRight className="w-4 h-4 opacity-50" />
               </Link>

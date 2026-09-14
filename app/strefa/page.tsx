@@ -19,6 +19,9 @@ import {
   ShieldCheck,
   ChevronRight,
   Heart,
+  Feather,
+  Activity,
+  Baby,
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -50,18 +53,18 @@ export default function StrefaDashboardPage() {
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#EC008C] animate-pulse"></span>
               <span className="text-xs font-bold uppercase tracking-widest text-[#EAD5E5]">
-                {role === 'partner' ? 'Strefa Partnera / Taty' : 'Kokpit Kursantki'}
+                {role === 'partner' ? 'Strefa dla Taty / Osoby Towarzyszącej' : 'Kokpit Kursantki'}
               </span>
             </div>
 
             <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-white tracking-tight leading-tight">
               {role === 'partner'
-                ? 'Witaj w Strefie Partnera!'
+                ? 'Witaj w Strefie dla Taty!'
                 : 'Cześć! Miło Cię widzieć.'}
             </h1>
 
             <p className="text-sm sm:text-base text-[#EAD5E5]/80 leading-relaxed font-sans">
-              Twój program szkoły rodzenia prowadzony przez 4 certyfikowane specjalistki. Oglądaj lekcje we własnym tempie na telefonie, laptopie lub Smart TV.
+              Program szkoły rodzenia oparty o 4 Filary Spokoju HappyBirth, doświadczenie ponad 18 000 mam od 2012 roku i Standard Opieki Okołoporodowej. Oglądaj lekcje we własnym tempie na telefonie, laptopie lub Smart TV.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-[#EAD5E5]/70">
@@ -262,20 +265,20 @@ export default function StrefaDashboardPage() {
             </div>
           </Link>
 
-          {/* Strefa Partnera */}
+          {/* Strefa dla Taty */}
           <Link
             href="/strefa/partner"
             className="p-6 rounded-2xl bg-[#EAD5E5] text-[#1A1512] border border-[#D5B8CF] flex flex-col justify-between min-h-[190px] shadow-sm hover:shadow-lg transition-all group"
           >
             <div>
               <span className="text-[11px] font-bold uppercase tracking-widest text-[#98269C]">
-                Dla Dwojga
+                Wsparcie w Porodzie
               </span>
               <h3 className="font-brand-display font-bold text-2xl mt-2 text-[#1A1512]">
-                Strefa Partnera
+                Strefa dla Taty
               </h3>
               <p className="text-xs text-[#544A44] mt-2 leading-relaxed">
-                Pigułka wiedzy dla taty: masaż krzyżowy, torba, prawa na izbie i formalności.
+                Pigułka wiedzy dla osoby towarzyszącej: masaż krzyżowy, torba, prawa na izbie i zadania na sali.
               </p>
             </div>
 
@@ -386,7 +389,134 @@ export default function StrefaDashboardPage() {
         </div>
       </div>
 
-      {/* 5. PLIKI I CHECKLISTY DO POBRANIA */}
+      {/* 5. 4 FILARY SPOKOJU HAPPYBIRTH & STANDARD MEDYCZNY */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-[#FBF8F4] border border-[#EAE3DB] space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#EC008C]" />
+              <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
+                Metodologia i fundament opieki
+              </span>
+            </div>
+            <h2 className="font-brand-display font-bold text-2xl sm:text-3xl text-[#1A1512] mt-1">
+              4 Filary Spokoju HappyBirth
+            </h2>
+            <p className="text-xs sm:text-sm text-[#544A44] mt-1">
+              Oparte o 14 lat doświadczenia szkoły rodzenia Mama Gaja (od 2012 r.), 18 000 porodów i Standard Opieki Okołoporodowej MZ.
+            </p>
+          </div>
+
+          <Link
+            href="/strefa/standard-medyczny"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#250A24] hover:bg-[#EC008C] text-white text-xs font-semibold transition-colors shrink-0 shadow-sm"
+          >
+            <ShieldCheck className="w-4 h-4 text-[#FCD705]" />
+            <span>Standard merytoryczny & E-E-A-T</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link
+            href="/strefa/lekcje?stage=stage-05"
+            className="p-5 rounded-2xl bg-white border border-[#EAE3DB] hover:border-[#EC008C] transition-all group flex flex-col justify-between"
+          >
+            <div className="space-y-2.5">
+              <div className="w-9 h-9 rounded-xl bg-[#FAE3EB] text-[#EC008C] flex items-center justify-center font-bold">
+                <Feather className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono font-bold text-[#867A72]">FILAR 01</span>
+                <h3 className="font-brand-display font-bold text-base text-[#1A1512] group-hover:text-[#EC008C] transition-colors">
+                  Poród & Oddech
+                </h3>
+              </div>
+              <p className="text-xs text-[#544A44] leading-relaxed">
+                Pozycje wertykalne, oddech przeponowy, niefarmakologiczne łagodzenie bólu i ochrona krocza.
+              </p>
+            </div>
+            <div className="pt-3 border-t border-[#EAE3DB]/70 mt-3 text-[11px] font-semibold text-[#EC008C] flex items-center justify-between">
+              <span>Zobacz lekcje porodu</span>
+              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+
+          <Link
+            href="/strefa/lekcje?stage=stage-03"
+            className="p-5 rounded-2xl bg-white border border-[#EAE3DB] hover:border-[#98269C] transition-all group flex flex-col justify-between"
+          >
+            <div className="space-y-2.5">
+              <div className="w-9 h-9 rounded-xl bg-[#EAD5E5] text-[#98269C] flex items-center justify-center font-bold">
+                <Activity className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono font-bold text-[#867A72]">FILAR 02</span>
+                <h3 className="font-brand-display font-bold text-base text-[#1A1512] group-hover:text-[#98269C] transition-colors">
+                  Ciało & Dno Miednicy
+                </h3>
+              </div>
+              <p className="text-xs text-[#544A44] leading-relaxed">
+                Fizjoterapia uroginekologiczna, masaż krzyżowy z partnerem, mobilność miednicy i bezpieczny połóg.
+              </p>
+            </div>
+            <div className="pt-3 border-t border-[#EAE3DB]/70 mt-3 text-[11px] font-semibold text-[#98269C] flex items-center justify-between">
+              <span>Lekcje fizjoterapii</span>
+              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+
+          <Link
+            href="/strefa/lekcje?stage=stage-08"
+            className="p-5 rounded-2xl bg-white border border-[#EAE3DB] hover:border-[#0088BC] transition-all group flex flex-col justify-between"
+          >
+            <div className="space-y-2.5">
+              <div className="w-9 h-9 rounded-xl bg-[#D0EBF3] text-[#0088BC] flex items-center justify-center font-bold">
+                <Heart className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono font-bold text-[#867A72]">FILAR 03</span>
+                <h3 className="font-brand-display font-bold text-base text-[#1A1512] group-hover:text-[#0088BC] transition-colors">
+                  Laktacja & Więź
+                </h3>
+              </div>
+              <p className="text-xs text-[#544A44] leading-relaxed">
+                Fizjologia karmienia, asymetryczny chwyt, nawały pokarmowe oraz czułe karmienie bez presji.
+              </p>
+            </div>
+            <div className="pt-3 border-t border-[#EAE3DB]/70 mt-3 text-[11px] font-semibold text-[#0088BC] flex items-center justify-between">
+              <span>Lekcje laktacji</span>
+              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+
+          <Link
+            href="/strefa/lekcje?stage=stage-09"
+            className="p-5 rounded-2xl bg-white border border-[#EAE3DB] hover:border-[#347A22] transition-all group flex flex-col justify-between"
+          >
+            <div className="space-y-2.5">
+              <div className="w-9 h-9 rounded-xl bg-[#DFEED4] text-[#347A22] flex items-center justify-center font-bold">
+                <Baby className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono font-bold text-[#867A72]">FILAR 04</span>
+                <h3 className="font-brand-display font-bold text-base text-[#1A1512] group-hover:text-[#347A22] transition-colors">
+                  Noworodek & I Rok
+                </h3>
+              </div>
+              <p className="text-xs text-[#544A44] leading-relaxed">
+                Kąpiel noworodka, kikut pępowinowy, bezpieczny sen, pierwsza pomoc i zdrowy rozsądek o 3:00 w nocy.
+              </p>
+            </div>
+            <div className="pt-3 border-t border-[#EAE3DB]/70 mt-3 text-[11px] font-semibold text-[#347A22] flex items-center justify-between">
+              <span>Opieka nad dzieckiem</span>
+              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      {/* 6. PLIKI I CHECKLISTY DO POBRANIA */}
       <div className="p-6 sm:p-8 rounded-3xl bg-white border border-[#EAE3DB] shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#EAE3DB]">
           <div>
@@ -408,7 +538,7 @@ export default function StrefaDashboardPage() {
               <span className="text-[10px] font-bold text-[#EC008C] uppercase tracking-wider">
                 PDF · 2 strony
               </span>
-              <h4 className="text-sm font-bold text-[#1A1512]">Plan Porodu PTGiP</h4>
+              <h4 className="text-sm font-bold text-[#1A1512]">Plan Porodu (Standard MZ)</h4>
               <p className="text-xs text-[#544A44]">
                 16 kluczowych punktów do przekazania położnej na izbie przyjęć.
               </p>
@@ -442,7 +572,7 @@ export default function StrefaDashboardPage() {
               </span>
               <h4 className="text-sm font-bold text-[#1A1512]">Badania w ciąży</h4>
               <p className="text-xs text-[#544A44]">
-                Tabela obowiązkowych i zalecanych badań laboratoryjnych oraz USG.
+                Tabela badań laboratoryjnych i USG wg Standardu Opieki Okołoporodowej.
               </p>
             </div>
             <button className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] hover:text-[#EC008C]">
@@ -456,9 +586,9 @@ export default function StrefaDashboardPage() {
               <span className="text-[10px] font-bold text-[#98269C] uppercase tracking-wider">
                 PDF · Ściąga
               </span>
-              <h4 className="text-sm font-bold text-[#1A1512]">Pigułka dla partnera</h4>
+              <h4 className="text-sm font-bold text-[#1A1512]">Ściąga dla Taty</h4>
               <p className="text-xs text-[#544A44]">
-                Ściąga na porodówkę: punkty ucisku, pozycje i procedury.
+                Ściąga na porodówkę: punkty ucisku, pozycje i zadania osoby towarzyszącej.
               </p>
             </div>
             <button className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] hover:text-[#98269C]">

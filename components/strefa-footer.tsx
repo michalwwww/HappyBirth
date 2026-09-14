@@ -24,7 +24,7 @@ export function StrefaFooter() {
               </div>
             </div>
             <p className="text-xs text-[#D8C7D5]/80 leading-relaxed">
-              Nowoczesna szkoła rodzenia online prowadzona przez zespół 4 certyfikowanych specjalistek. Dostęp dla dwojga przez 12 miesięcy od terminu porodu.
+              Szkoła rodzenia oparta o 4 Filary Spokoju HappyBirth i 14 lat doświadczenia położnych Mama Gaja od 2012 roku. Dostęp dla dwojga przez 12 miesięcy od terminu porodu.
             </p>
             <div className="flex items-center gap-2 text-xs text-[#EC008C] font-semibold pt-1">
               <Heart className="w-3.5 h-3.5 fill-current" />
@@ -53,7 +53,13 @@ export function StrefaFooter() {
               </li>
               <li>
                 <Link href="/strefa/partner" className="hover:text-white transition-colors">
-                  Strefa Partnera (dla taty)
+                  Strefa dla Taty (Wsparcie w Porodzie)
+                </Link>
+              </li>
+              <li>
+                <Link href="/strefa/standard-medyczny" className="hover:text-white transition-colors flex items-center gap-1 text-[#EC008C] font-semibold">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Standard merytoryczny & E-E-A-T</span>
                 </Link>
               </li>
               <li>
@@ -71,7 +77,7 @@ export function StrefaFooter() {
             <ul className="space-y-2 text-xs">
               <li>
                 <span className="text-[#D8C7D5]/80 hover:text-white transition-colors cursor-pointer">
-                  Plan Porodu (Wzór w 16 punktach PDF)
+                  Plan Porodu (Standard MZ / 16 punktów)
                 </span>
               </li>
               <li>
@@ -81,12 +87,12 @@ export function StrefaFooter() {
               </li>
               <li>
                 <span className="text-[#D8C7D5]/80 hover:text-white transition-colors cursor-pointer">
-                  Kalendarz badań w ciąży PTGiP
+                  Kalendarz badań (Standard Opieki Okołoporodowej)
                 </span>
               </li>
               <li>
                 <span className="text-[#D8C7D5]/80 hover:text-white transition-colors cursor-pointer">
-                  Ściąga dla Partnera na porodówkę
+                  Ściąga dla Taty na porodówkę
                 </span>
               </li>
               <li>
@@ -131,7 +137,7 @@ export function StrefaFooter() {
         {/* Copyright & Disclaimer */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#D8C7D5]/60">
           <div>
-            © {new Date().getFullYear()} HappyBirth. Wszelkie prawa zastrzeżone. Materiały edukacyjne zgodne ze standardem opieki okołoporodowej PTGiP.
+            © {new Date().getFullYear()} HappyBirth. Wszelkie prawa zastrzeżone. Materiały edukacyjne zgodne ze Standardem Organizacyjnym Opieki Okołoporodowej (Rozporządzenie MZ).
           </div>
           <div className="flex items-center space-x-4">
             <span className="hover:text-white transition-colors cursor-pointer">Regulamin platformy</span>

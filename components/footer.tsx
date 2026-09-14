@@ -1,9 +1,15 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Logo } from './logo';
-import { ShieldCheck, Heart, ArrowUpRight } from 'lucide-react';
+import { ShieldCheck, Heart, ArrowUpRight, Sparkles, Users } from 'lucide-react';
 
 export function Footer() {
+  const isDev = typeof window !== 'undefined' && window.location.hostname.includes('localhost');
+  const partnerzyUrl = isDev ? '/partnerzy' : 'https://partnerzy.happybirth.pl';
+  const strefaUrl = isDev ? '/strefa' : 'https://strefa.happybirth.pl';
+
   return (
     <footer className="bg-[#20071F] text-[#EAD5E5] border-t border-[#461643] pt-16 pb-12 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -19,108 +25,121 @@ export function Footer() {
                   HAPPYBIRTH
                 </span>
                 <span className="text-[10px] uppercase font-semibold text-[#EC008C] tracking-wider mt-0.5">
-                  strefa.happybirth.pl
+                  szkoła rodzenia online
                 </span>
               </div>
             </div>
             <p className="text-xs text-[#EAD5E5]/75 leading-relaxed">
-              Szkoła rodzenia online dla przyszłych mam i partnerów. 52 profesjonalne lekcje wideo w 4K, 9 uspokajających etapów, Cyfrowa Apteczka Porodowa i wsparcie na sali porodowej.
+              Nowoczesna szkoła rodzenia dla przyszłych mam i osób towarzyszących. 52 filmowe lekcje wideo, cztery filary spokoju i wsparcie przez cały pierwszy rok życia dziecka.
             </p>
             <div className="flex items-center space-x-2 text-xs text-[#EAD5E5]/90 pt-1">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Hosting wideo Cloudflare Stream (CDN Warszawa)</span>
+              <Sparkles className="w-4 h-4 text-[#FCD705]" />
+              <span>Doświadczenie ponad 18 000 mam od 2012 roku</span>
             </div>
           </div>
 
           {/* Kolumna 2: Nawigacja Kursu */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-white">
-              Strefa kursantki
+              Odkryj HappyBirth
             </h4>
             <ul className="space-y-2 text-xs text-[#EAD5E5]/80">
               <li>
-                <Link href="/#etapy" className="hover:text-white transition-colors flex items-center gap-1">
-                  <span>9 Etapów ciąży i porodu</span>
-                </Link>
+                <a href="#filary" className="hover:text-white transition-colors">
+                  4 Filary Spokoju
+                </a>
               </li>
               <li>
-                <Link href="/lekcje" className="hover:text-white transition-colors flex items-center gap-1">
-                  <span>Katalog 52 lekcji VOD</span>
-                </Link>
+                <a href="#etapy" className="hover:text-white transition-colors">
+                  9 Etapów ciąży i porodu
+                </a>
               </li>
               <li>
-                <Link href="/apteczka" className="hover:text-white transition-colors flex items-center gap-1">
-                  <span>Cyfrowa Apteczka Porodowa</span>
-                </Link>
+                <a href="#narzedzia" className="hover:text-white transition-colors">
+                  Licznik skurczów 5-1-1
+                </a>
               </li>
               <li>
-                <Link href="/partner" className="hover:text-white transition-colors flex items-center gap-1">
-                  <span>Dla Partnera (Rola taty)</span>
-                </Link>
+                <a href="#cena" className="hover:text-white transition-colors">
+                  Cennik i gwarancja dostępu
+                </a>
               </li>
               <li>
-                <Link href="/licznik" className="hover:text-[#EC008C] transition-colors flex items-center gap-1 font-medium">
-                  <span>Licznik skurczów 5-1-1</span>
-                </Link>
+                <a href={strefaUrl} className="hover:text-[#EC008C] transition-colors font-medium">
+                  Wejdź do Strefy Kursantki
+                </a>
+              </li>
+              <li>
+                <a href={`${strefaUrl}/standard-medyczny`} className="hover:text-white transition-colors">
+                  Standard opieki & E-E-A-T
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Kolumna 3: Zasady & Bezpieczeństwo */}
+          {/* Kolumna 3: Współpraca B2B & Afiliacja */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-white">
-              Model i uprawnienia
-            </h4>
-            <ul className="space-y-2 text-xs text-[#EAD5E5]/80">
-              <li>Jednorazowa opłata: <strong className="text-white">349 zł</strong></li>
-              <li>Dostęp: <strong className="text-white">12 miesięcy od terminu porodu</strong></li>
-              <li>Dla dwojga: Partner bez dodatkowych opłat</li>
-              <li>Płatności: Stripe (BLIK, Karta, Apple Pay)</li>
-              <li>Bezpieczna subdomena: <span className="text-[#EC008C] font-mono">strefa.happybirth.pl</span></li>
-            </ul>
-          </div>
-
-          {/* Kolumna 4: Kontakt i Social Media */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
-              Społeczność i kontakt
+              Dla Profesjonalistów
             </h4>
             <ul className="space-y-2 text-xs text-[#EAD5E5]/80">
               <li>
-                <a href="mailto:kontakt@happybirth.pl" className="hover:text-white transition-colors flex items-center gap-1">
-                  <span>Napisz do nas: kontakt@happybirth.pl</span>
+                <a
+                  href={partnerzyUrl}
+                  className="hover:text-[#EC008C] transition-colors flex items-center gap-1 font-semibold text-white"
+                >
+                  <Users className="w-3.5 h-3.5 text-[#EC008C]" />
+                  <span>Strefa Partnera (Program Afiliacyjny)</span>
                   <ArrowUpRight className="w-3 h-3 text-[#EC008C]" />
                 </a>
               </li>
               <li>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-                  Instagram
+                <a href={partnerzyUrl} className="hover:text-white transition-colors">
+                  Dla Położnych i Praktyk
                 </a>
               </li>
               <li>
-                <a href="https://tiktok.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-                  TikTok
+                <a href={partnerzyUrl} className="hover:text-white transition-colors">
+                  Dla Gabinetów i Fizjoterapeutek
                 </a>
               </li>
               <li>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-                  YouTube
+                <a href={partnerzyUrl} className="hover:text-white transition-colors">
+                  Zamów bezpłatne materiały z kodem QR
                 </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Kolumna 4: Kontakt */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+              Kontakt i pomoc
+            </h4>
+            <ul className="space-y-2 text-xs text-[#EAD5E5]/80">
+              <li>
+                <a href="mailto:kontakt@happybirth.pl" className="hover:text-white transition-colors flex items-center gap-1">
+                  <span>kontakt@happybirth.pl</span>
+                  <ArrowUpRight className="w-3 h-3 text-[#EC008C]" />
+                </a>
+              </li>
+              <li>
+                <span className="text-[#EAD5E5]/60">Dostęp aktywny 24/7 na telefonie i TV</span>
+              </li>
+              <li>
+                <span className="text-[#EAD5E5]/60">Płatność jednorazowa BLIK / Karta</span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Notatka medyczna z Netlify */}
+        {/* Notatka odpowiedzialności */}
         <div className="pt-6 border-t border-[#461643] text-xs text-[#EAD5E5]/60 space-y-2">
           <p>
-            <strong className="text-white">Treści mają charakter edukacyjny i nie stanowią porady medycznej, diagnozy ani zalecenia terapeutycznego.</strong> Nie zastępują konsultacji z lekarzem prowadzącym ciążę ani z położną.
-          </p>
-          <p>
-            W przypadku krwawienia, odpływania wód płodowych, silnego bólu głowy z mroczkami przed oczami, nagłych obrzęków lub braku ruchów dziecka skontaktuj się natychmiast z ochroną zdrowia lub jedź do szpitala. Numer alarmowy: <strong>112</strong>.
+            <strong className="text-white">Materiały na platformie mają charakter edukacyjny i wspierający.</strong> Służą przygotowaniu do aktywnego, świadomego porodu w oparciu o 4 Filary Spokoju i dorobek położnych Mama Gaja od 2012 roku. Nie zastępują indywidualnej opieki położnej ani lekarza prowadzącego ciążę. <a href={`${strefaUrl}/standard-medyczny`} className="underline hover:text-white transition-colors">Zobacz Standard Merytoryczny & E-E-A-T</a>.
           </p>
           <p className="text-[11px] text-[#EAD5E5]/40 pt-2">
-            Program zgodny ze standardem organizacyjnym opieki okołoporodowej i wytycznymi PTGiP. © {new Date().getFullYear()} HappyBirth. Wszelkie prawa zastrzeżone.
+            © {new Date().getFullYear()} HappyBirth. Wszelkie prawa zastrzeżone.
           </p>
         </div>
       </div>

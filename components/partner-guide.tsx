@@ -26,7 +26,7 @@ export function PartnerGuide() {
             <HeartHandshake className="w-3.5 h-3.5" /> Dostęp dla dwojga w cenie
           </span>
           <h2 className="font-brand-display font-bold text-2xl sm:text-3xl tracking-tight mb-2">
-            Strefa Partnera: Twoja rola na porodówce i w domu
+            Strefa dla Taty i Partnera: Twoja rola na porodówce i w domu
           </h2>
           <p className="text-sm text-indigo-200 leading-relaxed">
             Nie jesteś tylko obserwatorem. Jesteś tarczą ochronną rodzącej, jej rzecznikiem praw na izbie przyjęć i najważniejszym źródłem poczucia bezpieczeństwa.

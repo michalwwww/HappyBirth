@@ -21,10 +21,10 @@ export default function StrefaPartnerPage() {
           <HeartHandshake className="w-3.5 h-3.5" /> Dostęp dla dwojga w cenie
         </span>
         <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-[#1A1512]">
-          Strefa Partnera
+          Strefa dla Taty i Partnera przy Porodzie
         </h1>
         <p className="text-sm sm:text-base text-[#544A44] leading-relaxed">
-          Praktyczne instruktaże dla przyszłego taty: techniki masażu krzyżowego, zasady postępowania na izbie przyjęć, prawa pacjenta i rola partnera w pierwszych dobach życia noworodka.
+          Praktyczne instruktaże dla przyszłego taty i osoby towarzyszącej: techniki masażu krzyżowego, zasady postępowania na izbie przyjęć, prawa pacjentki i konkretne zadania na sali porodowej oraz w pierwszych dobach życia noworodka.
         </p>
       </div>
 
