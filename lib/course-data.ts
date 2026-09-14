@@ -78,7 +78,7 @@ export const stages: Stage[] = [
     "weeks": "1 – 6 tydzień po porodzie",
     "color": "#be185d",
     "accentBg": "#FCE7F3",
-    "description": "Pielęgnacja rany po cc i nacięciu, fizjologia połogu, Baby Blues, ćwiczenia dna miednicy i szczere historie mam."
+    "description": "Czuła regeneracja po porodzie, gojenie tkanek, fizjologia połogu, Baby Blues, ćwiczenia dna miednicy i szczere historie mam."
   },
   {
     "id": "stage-08",
@@ -89,7 +89,7 @@ export const stages: Stage[] = [
     "weeks": "Od 1. doby życia",
     "color": "#0e7490",
     "accentBg": "#CFFAFE",
-    "description": "Pozycje klasyczne i spod pachy, nawał pokarmowy, bolesne brodawki, dobór laktatora i łagodzenie kolek."
+    "description": "Pozycje klasyczne i spod pachy, nawał pokarmowy, komfort brodawek, dobór laktatora i łagodzenie kolek."
   },
   {
     "id": "stage-09",
@@ -100,7 +100,7 @@ export const stages: Stage[] = [
     "weeks": "1 – 12 miesiąc życia",
     "color": "#4338ca",
     "accentBg": "#E0E7FF",
-    "description": "Skala Apgar, profilaktyka SIDS, RKO niemowlaka, instruktaż kąpieli, stany przejściowe i szczepienia."
+    "description": "Skala Apgar, zasady spokojnego i bezpiecznego snu, pierwsza pomoc w zakrztuszeniu, instruktaż kąpieli, stany adaptacyjne i profilaktyka zdrowia."
   }
 ];
 
@@ -927,7 +927,7 @@ export const lessons: Lesson[] = [
     "lessonNumber": 49,
     "filmNumber": 42,
     "title": "Czułe karmienie piersią – technika, pozycje i prawidłowy chwyt",
-    "description": "Jak przystawiać dziecko w pozycji klasycznej, krzyżowej i spod pachy (po cesarce), by karmienie było bezbolesne i przyjemne.",
+    "description": "Jak przystawiać dziecko w pozycji klasycznej, krzyżowej i spod pachy (po cesarce), by karmienie było w pełni komfortowe i przyjemne.",
     "stageId": "stage-08",
     "stageTitle": "Karmienie",
     "stageColor": "#0e7490",
@@ -949,7 +949,7 @@ export const lessons: Lesson[] = [
     "id": "lekcja-50",
     "lessonNumber": 50,
     "filmNumber": 43,
-    "title": "Laktacja bez stresu – nawał pokarmowy, zastoje i troska o brodawki",
+    "title": "Laktacja bez stresu – nawał pokarmowy, lekkość piersi i troska o brodawki",
     "description": "Co zrobić w 3.–4. dobie: ciepłe i chłodne okłady, delikatny masaż, pielęgnacja brodawek i wsparcie partnera w karmieniu.",
     "stageId": "stage-08",
     "stageTitle": "Karmienie",

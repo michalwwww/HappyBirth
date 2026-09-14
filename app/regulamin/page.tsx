@@ -102,7 +102,7 @@ export default function RegulaminPage() {
               Materiały zawarte na Platformie HappyBirth mają charakter wyłącznie edukacyjny i informacyjny, wspierający przygotowanie do porodu w oparciu o Standard Organizacyjny Opieki Okołoporodowej (Rozporządzenie Ministra Zdrowia).
             </p>
             <p>
-              Materiały te nie stanowią indywidualnej porady lekarskiej, diagnozy ani terapii i nie zastępują bezpośredniego badania ani opieki lekarza ginekologa-położnika lub położnej prowadzącej ciążę. W przypadku wystąpienia jakichkolwiek objawów niepokojących (np. krwawienie, brak ruchów dziecka, silny ból) należy niezwłocznie zgłosić się na izbę przyjęć szpitala lub wezwać pogotowie ratunkowe (tel. 112).
+              Materiały te nie stanowią indywidualnej porady lekarskiej, diagnozy ani terapii i nie zastępują bezpośredniego badania ani opieki lekarza ginekologa-położnika lub położnej prowadzącej ciążę. W przypadku wystąpienia jakichkolwiek objawów nagłych lub budzących niepokój należy niezwłocznie skonsultować się z lekarzem prowadzącym, położną lub zgłosić się do najbliższej placówki ochrony zdrowia.
             </p>
           </div>
         </section>

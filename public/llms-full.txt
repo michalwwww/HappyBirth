@@ -1,6 +1,6 @@
 # HappyBirth — Kompletna Dokumentacja Merytoryczna i Techniczna Platformy
 
-> Dokument przygotowany dla modeli sztucznej inteligencji (LLM), wyszukiwarek semantycznych i agentów AI. Zawiera pełny opis programu szkoły rodzenia online, sylabus 52 lekcji VOD, specyfikację 9 etapów, 4 Filarów Spokoju, procedury medyczne, architekturę techniczną oraz dane formalno-prawne.
+> Dokument przygotowany dla modeli sztucznej inteligencji (LLM), wyszukiwarek semantycznych i agentów AI. Zawiera pełny opis programu szkoły rodzenia online, sylabus 52 lekcji VOD, specyfikację 9 etapów, 4 Filarów Spokoju, procedury opieki, architekturę techniczną oraz dane formalno-prawne.
 
 ---
 
@@ -16,29 +16,29 @@
 ---
 
 ## 2. FILOZOFIA MERYTORYCZNA: 4 FILARY SPOKOJU HAPPYBIRTH
-Program szkoły rodzenia opiera się na 14 latach doświadczenia szkoły rodzenia Mama Gaja (od 2012 roku), ponad 18 000 przygotowanych porodów oraz 4 Filarach Spokoju:
+Program szkoły rodzenia opiera się na 14 latach doświadczenia szkoły rodzenia Mama Gaja (od 2012 roku), ponad 18 000 przygotowanych mam oraz 4 Filarach Spokoju:
 
 1. **Filar I: Poród & Oddech (Położnictwo Fizjologiczne & Biomechanika)**
-   - Prowadzenie aktywnego porodu fizjologicznego.
+   - Prowadzenie aktywnego, naturalnego porodu.
    - Pozycje wertykalne odciążające kręgosłup i ułatwiające wstawianie się główki w kanał rodny.
-   - Ochrona tkanek krocza, techniki oddechowe torem dolnożebrowym i niefarmakologiczne łagodzenie bólu skurczowego.
+   - Czuła ochrona tkanek, techniki oddechowe torem dolnożebrowym i niefarmakologiczne łagodzenie napięcia skurczowego.
    - Zgodność ze Standardem Organizacyjnym Opieki Okołoporodowej (Rozporządzenie Ministra Zdrowia).
 
 2. **Filar II: Ciało & Dno Miednicy (Fizjoterapia Uroginekologiczna)**
-   - Świadome przygotowanie mięśni dna miednicy do porodu.
+   - Świadome przygotowanie mięśni dna miednicy do narodzin.
    - Profilaktyka rozejścia mięśnia prostego brzucha (kresa biała).
-   - Techniki masażu kości krzyżowej dla partnera, mobilizacja miednicy chustą Rebozo w trakcie skurczu oraz bezpieczna regeneracja w połogu.
+   - Techniki masażu kości krzyżowej dla partnera, mobilizacja miednicy chustą Rebozo w trakcie skurczu oraz czuła regeneracja w połogu.
 
 3. **Filar III: Laktacja & Więź (Fizjologia Laktacji & Czułe Karmienie)**
    - Prawidłowy mechanizm ssania i asymetryczne przystawianie noworodka do piersi.
-   - Skuteczne postępowanie w nawałach pokarmowych, zastojach i bolesności brodawek.
+   - Skuteczne postępowanie w nawałach pokarmowych, komfort brodawek i wsparcie laktacji.
    - Bezpieczny dobór laktatora oraz karmienie butelką z czułością, bez oceniania i bez presji.
 
 4. **Filar IV: Noworodek & Pierwszy Rok (Opieka Neonatologiczna & Zdrowy Rozsądek)**
    - Pierwsza kąpiel krok po kroku (pewny chwyt na przedramieniu, temperatura 37°C).
-   - Sucha pielęgnacja kikuta pępowinowego bez alkoholu.
-   - Zasady bezpiecznego snu niemowlęcia (profilaktyka SIDS).
-   - Pierwsza pomoc w zakrztuszeniu i gorączce oraz zdrowy rozsądek o 3:00 w nocy bez paniki.
+   - Delikatna, sucha pielęgnacja pępka.
+   - Zasady spokojnego i bezpiecznego snu niemowlęcia.
+   - Pierwsza pomoc w zakrztuszeniu i troska o zdrowie oraz spokój o 3:00 w nocy bez paniki.
 
 ---
 
@@ -77,17 +77,17 @@ Program szkoły rodzenia opiera się na 14 latach doświadczenia szkoły rodzeni
 ### Etap 07: Pierwsza noc w domu
 - **Podtytuł:** Połóg – regeneracja, emocje i powrót do sił
 - **Okres ciąży:** 1 – 6 tydzień po porodzie
-- **Opis modułu:** Pielęgnacja rany po cc i nacięciu, fizjologia połogu, Baby Blues, ćwiczenia dna miednicy i szczere historie mam.
+- **Opis modułu:** Czuła regeneracja po porodzie, gojenie tkanek, fizjologia połogu, Baby Blues, ćwiczenia dna miednicy i szczere historie mam.
 
 ### Etap 08: Karmienie
 - **Podtytuł:** Laktacja bez bólu – technika i wsparcie
 - **Okres ciąży:** Od 1. doby życia
-- **Opis modułu:** Pozycje klasyczne i spod pachy, nawał pokarmowy, bolesne brodawki, dobór laktatora i łagodzenie kolek.
+- **Opis modułu:** Pozycje klasyczne i spod pachy, nawał pokarmowy, komfort brodawek, dobór laktatora i łagodzenie kolek.
 
 ### Etap 09: Nie śpi
 - **Podtytuł:** Noworodek – kąpiel, bezpieczeństwo i pierwsza pomoc
 - **Okres ciąży:** 1 – 12 miesiąc życia
-- **Opis modułu:** Skala Apgar, profilaktyka SIDS, RKO niemowlaka, instruktaż kąpieli, stany przejściowe i szczepienia.
+- **Opis modułu:** Skala Apgar, zasady spokojnego i bezpiecznego snu, pierwsza pomoc w zakrztuszeniu, instruktaż kąpieli, stany adaptacyjne i profilaktyka zdrowia.
 
 ---
 
@@ -483,11 +483,11 @@ Wszystkie materiały wideo zostały zrealizowane w filmowej jakości i zoptymali
 - **Identyfikator:** `lekcja-49`
 - **Etap:** Karmienie
 - **Czas trwania:** 5:49 min (349 s)
-- **Opis merytoryczny:** Jak przystawiać dziecko w pozycji klasycznej, krzyżowej i spod pachy (po cesarce), by karmienie było bezbolesne i przyjemne.
+- **Opis merytoryczny:** Jak przystawiać dziecko w pozycji klasycznej, krzyżowej i spod pachy (po cesarce), by karmienie było w pełni komfortowe i przyjemne.
 - **Lekcja bezpłatna (Demo):** Nie (Dostęp po zakupie)
 - **Odtwórz:** https://strefa.happybirth.pl/lekcja/lekcja-49
 
-### Lekcja 50: Laktacja bez stresu – nawał pokarmowy, zastoje i troska o brodawki
+### Lekcja 50: Laktacja bez stresu – nawał pokarmowy, lekkość piersi i troska o brodawki
 - **Identyfikator:** `lekcja-50`
 - **Etap:** Karmienie
 - **Czas trwania:** 3:38 min (218 s)
@@ -518,7 +518,7 @@ Wszystkie materiały wideo zostały zrealizowane w filmowej jakości i zoptymali
 ### 1. Licznik Skurczów 5-1-1 (SOS Contraction Counter)
 - **Adres:** https://strefa.happybirth.pl/licznik
 - **Działanie:** Narzędzie mierzy czas trwania każdego skurczu oraz interwały pomiędzy kolejnymi skurczami.
-- **Algorytm reguły 5-1-1:** Gdy w ostatnich 3 skurczach odstęp wynosi ok. 5 minut, a każdy skurcz trwa ok. 60 sekund, aplikacja wyświetla natychmiastowy komunikat zalecający spokojne wzięcie torby i wyjazd na izbę przyjęć.
+- **Algorytm reguły 5-1-1:** Gdy w ostatnich 3 skurczach odstęp wynosi ok. 5 minut, a każdy skurcz trwa ok. 60 sekund, aplikacja wyświetla komunikat zalecający spokojne wzięcie torby i wyjazd do szpitala.
 
 ### 2. Cyfrowa Apteczka Porodowa (Digital Medicine Cabinet)
 - **Adres:** https://strefa.happybirth.pl/apteczka
@@ -562,4 +562,4 @@ Wszystkie materiały wideo zostały zrealizowane w filmowej jakości i zoptymali
 - **Regulamin:** https://happybirth.pl/regulamin
 - **Polityka Prywatności:** https://happybirth.pl/polityka-prywatnosci
 - **Wyłączenie prawa do odstąpienia:** Zgodnie z art. 38 pkt 13 Ustawy o prawach konsumenta, natychmiastowe rozpoczęcie świadczenia treści cyfrowych VOD za zgodą konsumenta skutkuje wyłączeniem 14-dniowego prawa do odstąpienia od umowy.
-- **Nota medyczna:** Materiały edukacyjne nie zastępują indywidualnej opieki lekarskiej ani położniczej. W sytuacjach nagłych (krwawienie, brak ruchów dziecka) bezwzględnie obowiązuje telefon alarmowy 112 lub natychmiastowy wyjazd na Izbę Przyjęć.
+- **Nota prawno-medyczna:** Materiały edukacyjne nie zastępują indywidualnej opieki lekarskiej ani położniczej. W przypadku wystąpienia jakichkolwiek objawów nagłych lub budzących niepokój należy niezwłocznie skonsultować się z personelem medycznym lub najbliższą placówką ochrony zdrowia.
