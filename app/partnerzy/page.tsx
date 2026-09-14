@@ -61,7 +61,7 @@ export default function PartnerzyPage() {
             </Link>
             <a
               href="#formularz"
-              className="px-5 py-2 rounded-full bg-[#250A24] hover:bg-[#EC008C] text-white text-xs font-semibold transition-colors shadow-sm"
+              className="px-5 py-2 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold transition-all shadow-sm shadow-[#EC008C]/25 hover:scale-105"
             >
               Dołącz do programu
             </a>
@@ -91,7 +91,7 @@ export default function PartnerzyPage() {
           <div className="pt-2 flex flex-wrap items-center gap-4">
             <a
               href="#formularz"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#250A24] hover:bg-[#EC008C] text-white font-semibold text-sm sm:text-base transition-all shadow-lg hover:scale-105"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white font-semibold text-sm sm:text-base transition-all shadow-lg shadow-[#EC008C]/25 hover:scale-105"
             >
               <span>Zarejestruj się i odbierz pakiet startowy</span>
               <ArrowRight className="w-4 h-4" />
@@ -320,7 +320,7 @@ export default function PartnerzyPage() {
 
               <button
                 type="submit"
-                className="w-full py-4 rounded-full bg-[#250A24] hover:bg-[#EC008C] text-white font-semibold text-sm transition-all shadow-md mt-4"
+                className="w-full py-4 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white font-semibold text-sm transition-all shadow-md shadow-[#EC008C]/25 mt-4 hover:scale-[1.01]"
               >
                 Wyślij zgłoszenie do programu
               </button>

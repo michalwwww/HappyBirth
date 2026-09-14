@@ -86,8 +86,8 @@ export default function StandardMedycznyPage() {
 
       {/* Hero Header */}
       <div className="space-y-4">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#250A24] text-white text-xs font-semibold">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#EC008C]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] border border-[#F3CAD9] text-[#EC008C] text-xs font-semibold">
+          <ShieldCheck className="w-3.5 h-3.5" />
           <span>Transparentność merytoryczna & E-E-A-T</span>
         </div>
 

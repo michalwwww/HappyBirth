@@ -192,7 +192,7 @@ export default function MarketingPage() {
             <div className="pt-2 flex flex-wrap items-center gap-3.5 sm:gap-4">
               <a
                 href="#cena"
-                className="inline-flex items-center gap-2.5 px-8 sm:px-10 py-4 rounded-full bg-[#250A24] hover:bg-[#EC008C] text-white text-base sm:text-lg font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
+                className="inline-flex items-center gap-2.5 px-8 sm:px-10 py-4 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-base sm:text-lg font-semibold transition-all shadow-xl shadow-[#EC008C]/25 hover:shadow-[#EC008C]/40 hover:scale-[1.03]"
               >
                 <span>Dołącz do kursu · 349 zł</span>
                 <ArrowRight className="w-5 h-5" />
@@ -200,7 +200,7 @@ export default function MarketingPage() {
 
               <a
                 href="#zwiastun"
-                className="inline-flex items-center gap-2 px-6 sm:px-7 py-4 rounded-full bg-white hover:bg-stone-50 text-[#1A1512] border border-[#EAE3DB] text-base font-semibold transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-6 sm:px-7 py-4 rounded-full bg-white hover:bg-stone-50 text-[#1A1512] border border-[#EAE3DB] text-base font-semibold transition-all shadow-sm hover:border-[#EC008C]"
               >
                 <Play className="w-4 h-4 text-[#EC008C] fill-current" />
                 <span>Zobacz bezpłatną lekcję</span>
@@ -312,43 +312,210 @@ export default function MarketingPage() {
       {/* 3. STORYTELLING: PROBLEM VS ROZWIĄZANIE (Dlaczego HappyBirth?) */}
       <section className="py-16 sm:py-24 px-4 sm:px-6 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#EC008C]">
-            Nowoczesne rodzicielstwo
-          </span>
-          <h2 className="font-brand-display font-medium text-3xl sm:text-5xl text-[#1A1512]">
-            Przygotowanie do porodu, które dopasowuje się do Was
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] border border-[#F3CAD9] text-xs font-semibold text-[#EC008C]">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Nowoczesne przygotowanie dla dwojga</span>
+          </div>
+          <h2 className="font-brand-display font-medium text-3xl sm:text-5xl text-[#1A1512] leading-tight">
+            Szkoła rodzenia, która{' '}
+            <em className="font-brand-serif italic font-normal text-[#EC008C]">
+              dopasowuje się do Was.
+            </em>
           </h2>
-          <p className="text-base sm:text-lg text-[#544A44]">
-            Tradycyjna szkoła rodzenia o 18:00 w korkach, czy spokojny wieczór we dwoje we własnym salonie?
+          <p className="text-base sm:text-lg text-[#544A44] leading-relaxed max-w-2xl mx-auto">
+            Porównaj tradycyjne kursy stacjonarne z podejściem HappyBirth. Zobacz, dlaczego ponad 18 000 par wybrało spokój we własnym salonie.
           </p>
         </div>
 
-        {/* Tabela porównawcza */}
-        <div className="bg-white rounded-3xl border border-[#EAE3DB] overflow-hidden shadow-sm">
-          <div className="grid grid-cols-1 md:grid-cols-12 border-b border-[#EAE3DB] bg-[#FAF7F2] p-5 sm:p-6 text-xs font-bold uppercase tracking-wider text-[#867A72]">
-            <div className="md:col-span-4">Obszar przygotowania</div>
-            <div className="md:col-span-4 text-[#867A72]">Tradycyjna szkoła rodzenia</div>
-            <div className="md:col-span-4 text-[#EC008C] flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> HappyBirth Online
+        {/* Karty Porównawcze: Dwa Światy */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+          {/* Karta 1: Tradycyjna Szkoła Stacjonarna */}
+          <div className="rounded-3xl bg-[#F6F2EC] border border-[#E5DFD7] p-8 sm:p-10 flex flex-col justify-between space-y-8">
+            <div className="space-y-6">
+              {/* Header Karty */}
+              <div className="space-y-2 border-b border-[#E5DFD7] pb-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EAE4DC] text-[#786D65] text-xs font-semibold uppercase tracking-wider">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Tradycyjna szkoła stacjonarna</span>
+                </div>
+                <h3 className="font-brand-display font-semibold text-2xl sm:text-3xl text-[#2C2420]">
+                  Sztywny grafik i pośpiech w korkach
+                </h3>
+                <p className="text-xs sm:text-sm text-[#786D65] leading-relaxed">
+                  Często kosztuje 600–900 zł, a po narodzinach dziecka zostajecie sami bez dostępu do wiedzy.
+                </p>
+              </div>
+
+              {/* Lista punktów */}
+              <ul className="space-y-4 text-xs sm:text-sm text-[#544A44]">
+                <li className="flex items-start gap-3.5">
+                  <div className="w-5 h-5 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    ✕
+                  </div>
+                  <div>
+                    <strong className="text-[#1A1512] block mb-0.5">Wtorki o 18:00 na drugim końcu miasta</strong>
+                    <span className="text-[#786D65] leading-relaxed">
+                      Dojazdy w korkach po pracy, pośpiech i zmęczenie w zaawansowanej ciąży. Gdy nie dotrzesz – lekcja bezpowrotnie przepada.
+                    </span>
+                  </div>
+                </li>
+
+                <li className="flex items-start gap-3.5">
+                  <div className="w-5 h-5 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    ✕
+                  </div>
+                  <div>
+                    <strong className="text-[#1A1512] block mb-0.5">Partner jako bierny widz z tyłu sali</strong>
+                    <span className="text-[#786D65] leading-relaxed">
+                      Siedzi skrępowany na niewygodnym krześle. Brak czasu na indywidualne przećwiczenie technik masażu i realnych chwytów.
+                    </span>
+                  </div>
+                </li>
+
+                <li className="flex items-start gap-3.5">
+                  <div className="w-5 h-5 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    ✕
+                  </div>
+                  <div>
+                    <strong className="text-[#1A1512] block mb-0.5">Koniec kursu tuż przed porodem</strong>
+                    <span className="text-[#786D65] leading-relaxed">
+                      Zajęcia kończą się przed narodzinami. Po powrocie ze szpitala o 3:00 w nocy przy pierwszych wyzwaniach zostajecie zdani na fora internetowe.
+                    </span>
+                  </div>
+                </li>
+
+                <li className="flex items-start gap-3.5">
+                  <div className="w-5 h-5 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    ✕
+                  </div>
+                  <div>
+                    <strong className="text-[#1A1512] block mb-0.5">Notatki w zeszycie, które gubią się w torbie</strong>
+                    <span className="text-[#786D65] leading-relaxed">
+                      Stosy kartek i kserówek, których nikt nie czyta w trakcie akcji porodowej ani w szpitalnej sali.
+                    </span>
+                  </div>
+                </li>
+
+                <li className="flex items-start gap-3.5">
+                  <div className="w-5 h-5 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    ✕
+                  </div>
+                  <div>
+                    <strong className="text-[#1A1512] block mb-0.5">Sztywne dogmaty i presja</strong>
+                    <span className="text-[#786D65] leading-relaxed">
+                      Narzucanie jednego idealnego scenariusza, który budzi poczucie winy, gdy poród lub laktacja potoczą się inaczej.
+                    </span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-4 border-t border-[#E5DFD7] text-xs text-[#867A72] flex items-center justify-between">
+              <span>Brak powrotu do materiałów</span>
+              <span className="font-semibold">Ograniczony czas</span>
             </div>
           </div>
 
-          <div className="divide-y divide-[#EAE3DB]">
-            {comparison.map((row, idx) => (
-              <div key={idx} className="grid grid-cols-1 md:grid-cols-12 p-5 sm:p-6 gap-3 text-sm items-center">
-                <div className="md:col-span-4 font-semibold text-[#1A1512]">
-                  {row.feature}
+          {/* Karta 2: HappyBirth Online (Hero Lifestyle Card) */}
+          <div className="relative rounded-3xl bg-gradient-to-b from-white via-[#FFFBFD] to-[#FDF2F7] border-2 border-[#EC008C] p-8 sm:p-10 shadow-2xl shadow-[#EC008C]/15 flex flex-col justify-between space-y-8 overflow-hidden">
+            {/* Ambient glow */}
+            <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#EC008C]/10 rounded-full blur-2xl pointer-events-none" />
+
+            <div className="relative z-10 space-y-6">
+              {/* Header Karty */}
+              <div className="space-y-2 border-b border-[#F3CAD9] pb-6">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EC008C] text-white text-xs font-bold uppercase tracking-wider shadow-sm">
+                  <Sparkles className="w-3.5 h-3.5 text-[#FCD705]" />
+                  <span>HappyBirth Online · Dla Dwojga</span>
                 </div>
-                <div className="md:col-span-4 text-[#867A72] leading-relaxed">
-                  <span className="md:hidden font-bold block text-xs uppercase text-[#867A72] mb-1">Tradycyjna:</span>
-                  {row.traditional}
-                </div>
-                <div className="md:col-span-4 text-[#1A1512] font-medium bg-[#FAE3EB]/40 md:bg-transparent p-3 md:p-0 rounded-xl leading-relaxed">
-                  <span className="md:hidden font-bold block text-xs uppercase text-[#EC008C] mb-1">HappyBirth:</span>
-                  <span className="text-[#250A24] font-semibold">{row.happybirth}</span>
-                </div>
+                <h3 className="font-brand-display font-bold text-2xl sm:text-3xl text-[#1A1512]">
+                  Spokój, czułość i pełna wolność
+                </h3>
+                <p className="text-xs sm:text-sm text-[#544A44] leading-relaxed">
+                  52 filmowe lekcje 4K, do których wracacie przez 12 miesięcy po porodzie – na Smart TV i telefonie.
+                </p>
               </div>
-            ))}
+
+              {/* Lista punktów */}
+              <ul className="space-y-4 text-xs sm:text-sm text-[#342D28]">
+                <li className="flex items-start gap-3.5">
+                  <div className="w-5 h-5 rounded-full bg-[#EC008C] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-sm">
+                    ✓
+                  </div>
+                  <div>
+                    <strong className="text-[#1A1512] block mb-0.5">Ciepła herbata, kanapa i własny salon</strong>
+                    <span className="text-[#544A44] leading-relaxed">
+                      Oglądacie we dwoje o dowolnej porze na Smart TV lub smartfonie. Pauzujecie, wracacie i rozmawiacie we własnym rytmie, bez stresu i dojazdów.
+                    </span>
+                  </div>
+                </li>
+
+                <li className="flex items-start gap-3.5">
+                  <div className="w-5 h-5 rounded-full bg-[#EC008C] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-sm">
+                    ✓
+                  </div>
+                  <div>
+                    <strong className="text-[#1A1512] block mb-0.5">Dedykowana Strefa dla Taty</strong>
+                    <span className="text-[#544A44] leading-relaxed">
+                      Praktyczne wideo-instrukcje dla partnera: masaż krzyżowy, techniki łagodzenia skurczu chustą Rebozo, gotowe zadania i pewność na porodówce.
+                    </span>
+                  </div>
+                </li>
+
+                <li className="flex items-start gap-3.5">
+                  <div className="w-5 h-5 rounded-full bg-[#EC008C] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-sm">
+                    ✓
+                  </div>
+                  <div>
+                    <strong className="text-[#1A1512] block mb-0.5">Dostęp przez 12 miesięcy od narodzin malucha</strong>
+                    <span className="text-[#544A44] leading-relaxed">
+                      Najwięcej wątpliwości pojawia się po powrocie do domu. Włączacie lekcje o laktacji, kąpieli, śnie czy pierwszej pomocy dokładnie wtedy, gdy ich potrzebujecie.
+                    </span>
+                  </div>
+                </li>
+
+                <li className="flex items-start gap-3.5">
+                  <div className="w-5 h-5 rounded-full bg-[#EC008C] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-sm">
+                    ✓
+                  </div>
+                  <div>
+                    <strong className="text-[#1A1512] block mb-0.5">Narzędzia nocne w telefonie (Licznik 5-1-1 & Apteczka)</strong>
+                    <span className="text-[#544A44] leading-relaxed">
+                      Licznik skurczów z algorytmem wyjazdu do szpitala, 16-punktowy Plan Porodu oraz błyskawiczna wyszukiwarka SOS na wyciągnięcie ręki.
+                    </span>
+                  </div>
+                </li>
+
+                <li className="flex items-start gap-3.5">
+                  <div className="w-5 h-5 rounded-full bg-[#EC008C] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-sm">
+                    ✓
+                  </div>
+                  <div>
+                    <strong className="text-[#1A1512] block mb-0.5">Czułość, zero dogmatów i akceptacja</strong>
+                    <span className="text-[#544A44] leading-relaxed">
+                      Wspieramy każdą drogę rodzicielstwa: poród naturalny i cesarskie cięcie, karmienie piersią i butelką – bez poczucia winy, z pełnym zrozumieniem.
+                    </span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* Dolna belka z przyciskiem w karcie */}
+            <div className="relative z-10 pt-6 border-t border-[#F3CAD9] mt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <span className="text-xs text-[#867A72] block">Płatność jednorazowa za dwoje:</span>
+                <span className="font-brand-display text-2xl font-bold text-[#1A1512]">349 zł</span>
+                <span className="text-xs text-[#EC008C] font-semibold ml-2">pełny pakiet na rok</span>
+              </div>
+
+              <a
+                href="#cena"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:scale-105"
+              >
+                <span>Wybierz HappyBirth</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -520,7 +687,7 @@ export default function MarketingPage() {
             <div className="pt-6">
               <a
                 href={strefaUrl ? `${strefaUrl}/partner` : '/strefa/partner'}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#250A24] text-white font-semibold text-sm hover:bg-[#EC008C] transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#98269C] hover:bg-[#801D84] text-white font-semibold text-sm transition-all shadow-md shadow-[#98269C]/25 hover:scale-105"
               >
                 <span>Zobacz ściągę dla taty</span>
                 <ArrowRight className="w-4 h-4" />

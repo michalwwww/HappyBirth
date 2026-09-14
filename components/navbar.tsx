@@ -149,7 +149,7 @@ export function Navbar() {
 
                 <Link
                   href="/lekcja/lekcja-01"
-                  className="inline-flex items-center space-x-1.5 bg-[#250A24] hover:bg-[#EC008C] text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md hover:shadow-lg"
+                  className="inline-flex items-center space-x-1.5 bg-[#EC008C] hover:bg-[#D0007A] text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:shadow-lg"
                 >
                   <span>Strefa VOD</span>
                   <ArrowRight className="w-4 h-4" />
@@ -159,7 +159,7 @@ export function Navbar() {
               <div className="flex items-center space-x-2">
                 <Link
                   href="/#cennik"
-                  className="inline-flex items-center space-x-1.5 bg-[#250A24] hover:bg-[#EC008C] text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md hover:shadow-lg"
+                  className="inline-flex items-center space-x-1.5 bg-[#EC008C] hover:bg-[#D0007A] text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:shadow-lg"
                 >
                   <span>Dołącz · 349 zł</span>
                   <ArrowRight className="w-4 h-4" />

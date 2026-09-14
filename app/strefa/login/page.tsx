@@ -56,7 +56,7 @@ export default function StrefaLoginPage() {
               <div className="pt-2">
                 <button
                   onClick={() => handleQuickDemo('student')}
-                  className="w-full py-3 rounded-full bg-[#250A24] text-white text-xs font-semibold hover:bg-[#EC008C] transition-colors"
+                  className="w-full py-3 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold transition-all shadow-md shadow-[#EC008C]/25"
                 >
                   Przejdź od razu do panelu kursantki (Demo)
                 </button>
@@ -83,7 +83,7 @@ export default function StrefaLoginPage() {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-full bg-[#250A24] hover:bg-[#EC008C] text-white font-semibold text-sm transition-all shadow-md flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white font-semibold text-sm transition-all shadow-md shadow-[#EC008C]/25 flex items-center justify-center gap-2 hover:scale-[1.01]"
               >
                 <span>Wyślij Magic Link do logowania</span>
                 <ArrowRight className="w-4 h-4" />

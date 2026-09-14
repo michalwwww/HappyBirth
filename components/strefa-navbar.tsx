@@ -99,7 +99,7 @@ export function StrefaNavbar() {
                   <span className="font-brand-display font-bold text-sm sm:text-base tracking-tight text-[#1A1512] leading-tight">
                     Szkoła Rodzenia
                   </span>
-                  <span className="bg-[#250A24] text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase">
+                  <span className="bg-[#EC008C] text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase shadow-sm shadow-[#EC008C]/20">
                     Strefa
                   </span>
                 </div>
@@ -179,7 +179,7 @@ export function StrefaNavbar() {
 
             <Link
               href={`/strefa/lekcja/${nextLesson.id}`}
-              className="inline-flex items-center space-x-1.5 bg-[#250A24] hover:bg-[#EC008C] text-white px-4 py-2 rounded-full text-xs font-semibold transition-all shadow-sm hover:shadow-md group"
+              className="inline-flex items-center space-x-1.5 bg-[#EC008C] hover:bg-[#D0007A] text-white px-4 py-2 rounded-full text-xs font-semibold transition-all shadow-sm shadow-[#EC008C]/25 hover:shadow-md group"
             >
               <Play className="w-3.5 h-3.5 fill-current text-[#FCD705] group-hover:scale-110 transition-transform" />
               <span>Następna lekcja</span>
@@ -282,7 +282,7 @@ export function StrefaNavbar() {
               <Link
                 href={`/strefa/lekcja/${nextLesson.id}`}
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center space-x-2 bg-[#250A24] text-white py-3 rounded-xl text-sm font-semibold shadow-md"
+                className="w-full flex items-center justify-center space-x-2 bg-[#EC008C] hover:bg-[#D0007A] text-white py-3 rounded-xl text-sm font-semibold shadow-md shadow-[#EC008C]/25 transition-all"
               >
                 <Play className="w-4 h-4 text-[#FCD705] fill-current" />
                 <span>Przejdź do: Lekcja {nextLesson.lessonNumber}</span>

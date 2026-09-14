@@ -62,7 +62,7 @@ export function DigitalMedicineCabinet() {
             onClick={() => setActiveCategory(cat)}
             className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
               activeCategory === cat
-                ? 'bg-[#1A1512] text-white shadow-sm'
+                ? 'bg-[#EC008C] text-white shadow-sm shadow-[#EC008C]/20'
                 : 'bg-white/80 border border-[#EAE3DB] text-[#544A44] hover:border-[#867A72]'
             }`}
           >

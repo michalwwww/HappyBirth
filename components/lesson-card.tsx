@@ -34,7 +34,7 @@ export function LessonCard({ lesson, isCompleted, isActive = false }: LessonCard
               ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
               : isActive
               ? 'bg-[#EC008C] text-white shadow-sm'
-              : 'bg-[#FBF8F4] text-[#544A44] border border-[#EAE3DB] group-hover:bg-[#1A1512] group-hover:text-white'
+              : 'bg-[#FBF8F4] text-[#544A44] border border-[#EAE3DB] group-hover:bg-[#EC008C] group-hover:text-white group-hover:border-[#EC008C]'
           }`}
         >
           {isCompleted ? (

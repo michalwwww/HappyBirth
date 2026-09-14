@@ -88,7 +88,7 @@ function StrefaLessonsContent() {
             onClick={() => setSelectedStage('all')}
             className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
               selectedStage === 'all'
-                ? 'bg-[#250A24] text-white shadow-sm'
+                ? 'bg-[#EC008C] text-white shadow-sm shadow-[#EC008C]/25'
                 : 'bg-white border border-[#EAE3DB] text-[#544A44] hover:border-[#867A72]'
             }`}
           >

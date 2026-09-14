@@ -131,7 +131,7 @@ export default function StrefaLessonClient({ lessonId }: StrefaLessonClientProps
 
                       <button
                         onClick={() => alert(`Pobieranie materiału: ${att.name}`)}
-                        className="p-2 rounded-lg bg-white hover:bg-[#1A1512] hover:text-white border border-[#EAE3DB] transition-colors"
+                        className="p-2 rounded-lg bg-white hover:bg-[#EC008C] hover:text-white hover:border-[#EC008C] border border-[#EAE3DB] transition-colors"
                         title="Pobierz PDF"
                       >
                         <Download className="w-3.5 h-3.5" />

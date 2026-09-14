@@ -85,7 +85,7 @@ export function MarketingNavbar() {
 
             <a
               href="/#cena"
-              className="hidden sm:inline-flex items-center space-x-2 bg-[#250A24] hover:bg-[#EC008C] text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md hover:shadow-lg hover:scale-105"
+              className="hidden sm:inline-flex items-center space-x-2 bg-[#EC008C] hover:bg-[#D0007A] text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:shadow-lg hover:scale-105"
             >
               <span>Dołącz · 349 zł</span>
               <ArrowRight className="w-4 h-4" />
@@ -129,7 +129,7 @@ export function MarketingNavbar() {
               <a
                 href="/#cena"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-3.5 rounded-full bg-[#250A24] hover:bg-[#EC008C] text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-md"
+                className="w-full py-3.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-md shadow-[#EC008C]/25"
               >
                 <span>Dołącz do kursu · 349 zł</span>
                 <ArrowRight className="w-4 h-4" />

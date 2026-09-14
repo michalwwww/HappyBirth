@@ -185,7 +185,7 @@ export default function StrefaDashboardPage() {
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <Link
                 href={`/strefa/lekcja/${nextLesson.id}`}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#250A24] hover:bg-[#EC008C] text-white text-xs sm:text-sm font-semibold transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs sm:text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:scale-105"
               >
                 <Play className="w-3.5 h-3.5 fill-current text-[#FCD705]" />
                 <span>Odtwórz lekcję ({nextLesson.durationFormatted})</span>
@@ -409,7 +409,7 @@ export default function StrefaDashboardPage() {
 
           <Link
             href="/strefa/standard-medyczny"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#250A24] hover:bg-[#EC008C] text-white text-xs font-semibold transition-colors shrink-0 shadow-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold transition-all shrink-0 shadow-md shadow-[#EC008C]/25 hover:scale-105"
           >
             <ShieldCheck className="w-4 h-4 text-[#FCD705]" />
             <span>Standard merytoryczny & E-E-A-T</span>
