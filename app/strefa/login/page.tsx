@@ -43,7 +43,7 @@ export default function StrefaLoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/strefa`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       if (error) {
@@ -72,7 +72,7 @@ export default function StrefaLoginPage() {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/strefa`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       if (error) {
