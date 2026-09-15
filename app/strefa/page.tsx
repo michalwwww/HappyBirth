@@ -1,10 +1,12 @@
 'use client';
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { stages, lessons, getLessonsByStage } from '@/lib/course-data';
 import { useCourseProgress } from '@/lib/progress';
 import { StageIcon } from '@/components/stage-icons';
+import { PregnancyProfile, getSavedPregnancyProfile } from '@/lib/pregnancy';
+import { OnboardingWizard } from '@/components/onboarding-wizard';
+import { PregnancyTrackerCard } from '@/components/pregnancy-tracker-card';
 import {
   Play,
   CheckCircle2,
@@ -27,6 +29,12 @@ import Image from 'next/image';
 
 export default function StrefaDashboardPage() {
   const { role, completedLessons, percentCompleted } = useCourseProgress();
+  const [pregnancyProfile, setPregnancyProfile] = useState<PregnancyProfile | null>(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
+
+  useEffect(() => {
+    setPregnancyProfile(getSavedPregnancyProfile());
+  }, []);
 
   // Znajdź następną nieukończoną lekcję
   const nextLesson = lessons.find((l) => !completedLessons.includes(l.id)) || lessons[0];
@@ -43,6 +51,14 @@ export default function StrefaDashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-10">
+      {/* 0. INTELIGENTNY TRACKER CIĄŻY I PERSONALIZACJA */}
+      {role === 'student' && (
+        <PregnancyTrackerCard 
+          profile={pregnancyProfile} 
+          onOpenWizard={() => setWizardOpen(true)} 
+        />
+      )}
+
       {/* 1. HERO GREETING & PROGRESS CARD */}
       <div className="rounded-3xl bg-gradient-to-r from-[#250A24] via-[#320D30] to-[#20071F] text-white p-6 sm:p-10 border border-[#461643] shadow-xl relative overflow-hidden">
         {/* Dekoracyjne tło */}
@@ -598,6 +614,14 @@ export default function StrefaDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* MODAL ONBOARDINGU / PERSONALIZACJI */}
+      <OnboardingWizard
+        isOpen={wizardOpen}
+        onClose={() => setWizardOpen(false)}
+        onComplete={(p) => setPregnancyProfile(p)}
+        initialProfile={pregnancyProfile}
+      />
     </div>
   );
 }
