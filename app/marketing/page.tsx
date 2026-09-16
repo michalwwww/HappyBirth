@@ -47,9 +47,13 @@ export default function MarketingPage() {
             <h1 className="font-brand-display font-medium text-4xl sm:text-5xl lg:text-6xl text-[#1A1512] dark:text-[#FBF8F4] leading-[1.08] tracking-tight">
               {t.hero.title1}{' '}
               <em className="font-brand-serif italic font-normal text-[#EC008C] dark:text-[#F472B6]">
-                {t.hero.title2}
+                {t.hero.titlePink1}
+              </em>
+              <br className="hidden sm:inline" />
+              <em className="font-brand-serif italic font-normal text-[#EC008C] dark:text-[#F472B6]">
+                {t.hero.titlePink2}
               </em>{' '}
-              {t.hero.title3}
+              {t.hero.title2}
             </h1>
 
             <p className="text-base sm:text-lg text-[#544A44] dark:text-[#D7CCC3] leading-relaxed font-sans max-w-2xl">
@@ -190,7 +194,7 @@ export default function MarketingPage() {
             return (
               <div
                 key={pillar.num}
-                className="p-6 rounded-3xl bg-white dark:bg-[#1F071D] border border-[#EAE3DB] dark:border-[#461643] flex flex-col justify-between shadow-sm hover:shadow-md transition-all"
+                className="p-6 rounded-3xl bg-white dark:bg-[#20081E] border border-[#EAE3DB] dark:border-[#461643] flex flex-col justify-between shadow-sm hover:shadow-md transition-all"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -253,10 +257,10 @@ export default function MarketingPage() {
           {t.stages.items.map((stage) => (
             <div
               key={stage.num}
-              className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#1F071D] border border-[#EAE3DB] dark:border-[#461643] flex items-start gap-3.5 shadow-sm hover:shadow-md transition-all"
+              className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#20081E] border border-[#EAE3DB] dark:border-[#461643] flex items-center gap-4 shadow-sm hover:shadow-md transition-all"
             >
               <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm"
                 style={{ backgroundColor: stage.color }}
               >
                 {stage.num}
@@ -289,38 +293,38 @@ export default function MarketingPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-3xl bg-[#FAE3EB] dark:bg-[#2C0C2B] border border-[#F3CAD9] dark:border-[#461643] space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-2xl bg-[#EC008C] text-white flex items-center justify-center">
+          <div className="p-6 sm:p-7 rounded-3xl bg-[#FAE3EB] dark:bg-[#341230] border border-[#F3CAD9] dark:border-[#52134C] space-y-3.5 shadow-sm">
+            <div className="w-10 h-10 rounded-2xl bg-[#EC008C] text-white flex items-center justify-center shadow-sm">
               <FileText className="w-5 h-5" />
             </div>
             <h3 className="font-brand-display font-bold text-xl text-[#1A1512] dark:text-[#FBF8F4]">
               {t.tools.card1Title}
             </h3>
-            <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
+            <p className="text-xs sm:text-[13px] text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
               {t.tools.card1Desc}
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-[#EAD5E5] dark:bg-[#250A24] border border-[#D5B8CF] dark:border-[#461643] space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-2xl bg-[#98269C] text-white flex items-center justify-center">
+          <div className="p-6 sm:p-7 rounded-3xl bg-[#EAD5E5] dark:bg-[#2A112F] border border-[#D5B8CF] dark:border-[#461643] space-y-3.5 shadow-sm">
+            <div className="w-10 h-10 rounded-2xl bg-[#98269C] text-white flex items-center justify-center shadow-sm">
               <Users className="w-5 h-5" />
             </div>
             <h3 className="font-brand-display font-bold text-xl text-[#1A1512] dark:text-[#FBF8F4]">
               {t.tools.card2Title}
             </h3>
-            <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
+            <p className="text-xs sm:text-[13px] text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
               {t.tools.card2Desc}
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-[#D0EBF3] dark:bg-[#162238] border border-[#B3DFEB] dark:border-[#203657] space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-2xl bg-[#0088BC] text-white flex items-center justify-center">
+          <div className="p-6 sm:p-7 rounded-3xl bg-[#D0EBF3] dark:bg-[#0F2236] border border-[#B3DFEB] dark:border-[#1E3B5C] space-y-3.5 shadow-sm">
+            <div className="w-10 h-10 rounded-2xl bg-[#0088BC] text-white flex items-center justify-center shadow-sm">
               <Sparkles className="w-5 h-5" />
             </div>
             <h3 className="font-brand-display font-bold text-xl text-[#1A1512] dark:text-[#FBF8F4]">
               {t.tools.card3Title}
             </h3>
-            <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
+            <p className="text-xs sm:text-[13px] text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
               {t.tools.card3Desc}
             </p>
           </div>
@@ -338,7 +342,7 @@ export default function MarketingPage() {
           </h2>
         </div>
 
-        <div className="rounded-3xl bg-white dark:bg-[#1F071D] border border-[#EAE3DB] dark:border-[#461643] overflow-hidden shadow-sm">
+        <div className="rounded-3xl bg-white dark:bg-[#20081E] border border-[#EAE3DB] dark:border-[#461643] overflow-hidden shadow-sm">
           <div className="grid grid-cols-12 bg-[#F6F2EC] dark:bg-[#250A24] p-4 text-xs font-bold uppercase tracking-wider border-b border-[#EAE3DB] dark:border-[#3A1038]">
             <div className="col-span-4 text-[#867A72] dark:text-[#A2958C]">{t.comparison.colFeature}</div>
             <div className="col-span-4 text-[#867A72] dark:text-[#A2958C]">{t.comparison.colTraditional}</div>
@@ -412,7 +416,7 @@ export default function MarketingPage() {
           {t.testimonials.items.map((item, i) => (
             <div
               key={i}
-              className="p-6 rounded-3xl bg-white dark:bg-[#1F071D] border border-[#EAE3DB] dark:border-[#461643] flex flex-col justify-between shadow-sm hover:shadow-md transition-all"
+              className="p-6 rounded-3xl bg-white dark:bg-[#20081E] border border-[#EAE3DB] dark:border-[#461643] flex flex-col justify-between shadow-sm hover:shadow-md transition-all"
             >
               <div className="space-y-3">
                 <div className="flex text-amber-400 gap-1 text-sm">
@@ -447,7 +451,7 @@ export default function MarketingPage() {
           </h2>
         </div>
 
-        <div className="divide-y divide-[#EAE3DB] dark:divide-[#3A1038] bg-white dark:bg-[#1F071D] rounded-3xl border border-[#EAE3DB] dark:border-[#461643] p-6 sm:p-10 shadow-sm">
+        <div className="divide-y divide-[#EAE3DB] dark:divide-[#3A1038] bg-white dark:bg-[#20081E] rounded-3xl border border-[#EAE3DB] dark:border-[#461643] p-6 sm:p-10 shadow-sm">
           {t.faq.items.map((f, idx) => (
             <details key={f.q} className="py-5 group" open={idx === 0}>
               <summary className="font-brand-display font-medium text-base sm:text-lg text-[#1A1512] dark:text-[#FBF8F4] cursor-pointer list-none flex items-center justify-between gap-4">

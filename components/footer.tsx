@@ -65,37 +65,37 @@ export function Footer() {
           {/* Kolumna 2: Nawigacja Kursu */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-white">
-              Odkryj HappyBirth
+              {t.footer.navTitle}
             </h4>
             <ul className="space-y-2 text-xs text-[#EAD5E5]/80">
               <li>
                 <a href="#filary" className="hover:text-white transition-colors">
-                  4 Filary Spokoju
+                  {t.nav.links.pillars}
                 </a>
               </li>
               <li>
                 <a href="#etapy" className="hover:text-white transition-colors">
-                  9 Etapów rodzicielstwa
+                  {t.nav.links.stages}
                 </a>
               </li>
               <li>
                 <a href="#narzedzia" className="hover:text-white transition-colors">
-                  Przewodnik & Notatnik Rodzica
+                  {t.nav.links.tools}
                 </a>
               </li>
               <li>
                 <a href="#cena" className="hover:text-white transition-colors">
-                  Cennik i gwarancja dostępu
+                  {t.nav.links.price}
                 </a>
               </li>
               <li>
                 <a href={strefaUrl} className="hover:text-[#EC008C] transition-colors font-medium">
-                  Wejdź do Strefy Rodziców
+                  {t.nav.zoneBtn}
                 </a>
               </li>
               <li>
                 <a href={`${strefaUrl}/standard-medyczny`} className="hover:text-white transition-colors">
-                  Standard Rzetelnej Wiedzy
+                  {lang === 'pl' ? 'Standard Rzetelnej Wiedzy' : lang === 'en' ? 'Evidence-Based Standard' : 'Медицинский стандарт'}
                 </a>
               </li>
             </ul>

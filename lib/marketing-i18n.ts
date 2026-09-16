@@ -60,8 +60,9 @@ export interface MarketingContent {
   hero: {
     badge: string;
     title1: string;
+    titlePink1: string;
+    titlePink2: string;
     title2: string;
-    title3: string;
     desc: string;
     ctaBuy: string;
     ctaPreview: string;
@@ -162,8 +163,9 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
     hero: {
       badge: 'Program Edukacyjny Online dla Rodziców · 52 Lekcje VOD',
       title1: 'Szkoła rodzenia,',
-      title2: 'która daje spokój',
-      title3: 'i pewność siebie',
+      titlePink1: 'która daje',
+      titlePink2: 'spokój',
+      title2: 'i pewność siebie',
       desc: 'Wszystko, co musisz wiedzieć o narodzinach, skurczach, opiece nad noworodkiem i pierwszych tygodniach w domu. Bez medycznego żargonu, w tempie Twojej rodziny.',
       ctaBuy: 'Rozpocznij przygotowania · 349 zł',
       ctaPreview: 'Zobacz bezpłatny zwiastun',
@@ -389,8 +391,9 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
     hero: {
       badge: 'Online Educational Program for Parents · 52 VOD Lessons',
       title1: 'Birthing school,',
-      title2: 'that brings calm',
-      title3: 'and true confidence',
+      titlePink1: 'that brings',
+      titlePink2: 'calm',
+      title2: 'and true confidence',
       desc: 'Everything you need to know about birth, contractions, newborn care, and the first weeks at home. No clinical jargon, at your family’s own pace.',
       ctaBuy: 'Start Preparing · 349 PLN',
       ctaPreview: 'Watch Free Preview',
@@ -616,8 +619,9 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
     hero: {
       badge: 'Образовательная Онлайн-Программа для Родителей · 52 Видеоурока VOD',
       title1: 'Школа родов,',
-      title2: 'дарящая спокойствие',
-      title3: 'и уверенность',
+      titlePink1: 'которая дарит',
+      titlePink2: 'спокойствие',
+      title2: 'и уверенность в себе',
       desc: 'Всё, что вам нужно знать о родах, схватках, уходе за новорожденным и первых неделях дома. Без медицинского жаргона, в ритме вашей семьи.',
       ctaBuy: 'Начать подготовку · 349 zł',
       ctaPreview: 'Смотреть демо-урок',

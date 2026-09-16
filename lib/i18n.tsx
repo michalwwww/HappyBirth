@@ -219,6 +219,14 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       if (saved && (saved === 'pl' || saved === 'en' || saved === 'ru')) {
         setLangState(saved);
       }
+      const handleSync = () => {
+        const current = localStorage.getItem('hb_lang') as Language;
+        if (current && (current === 'pl' || current === 'en' || current === 'ru')) {
+          setLangState(current);
+        }
+      };
+      window.addEventListener('hb_lang_updated', handleSync);
+      return () => window.removeEventListener('hb_lang_updated', handleSync);
     }
   }, []);
 
