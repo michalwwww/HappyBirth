@@ -30,9 +30,9 @@ export function MarketingNavbar() {
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center space-x-2 shrink-0">
             <span className="w-2 h-2 rounded-full bg-[#EC008C] animate-pulse"></span>
-            <span className="font-semibold text-white tracking-wide">Dla naszych Mam i Tatów:</span>
+            <span className="font-semibold text-white tracking-wide">Platforma Edukacyjna dla Rodziców:</span>
             <span className="text-[#EAD5E5]/80 hidden md:inline truncate">
-              Dostęp na 12 miesięcy od terminu porodu dla dwojga · Ponad 18 000 rodzin
+              52 lekcje e-learning VOD · Dostęp dla dwojga na 12 miesięcy
             </span>
           </div>
 
@@ -73,10 +73,10 @@ export function MarketingNavbar() {
             <Logo className="h-9 sm:h-11 w-auto object-contain group-hover:scale-105 transition-transform" priority />
             <div className="hidden sm:flex flex-col border-l border-[#EAE3DB] dark:border-[#461643] pl-2.5 py-0.5">
               <span className="font-brand-display font-bold text-sm sm:text-base tracking-tight text-[#1A1512] dark:text-[#FBF8F4] leading-tight">
-                Szkoła Rodzenia
+                Szkoła Rodzenia · Edukacja VOD
               </span>
               <span className="text-[10px] sm:text-[11px] font-medium tracking-wide uppercase text-[#867A72] dark:text-[#EAD5E5]/70">
-                online dla dwojga
+                kurs online dla dwojga
               </span>
             </div>
           </Link>

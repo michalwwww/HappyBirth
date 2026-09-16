@@ -33,8 +33,8 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: 'pln',
             product_data: {
-              name: 'Szkoła Rodzenia Online HappyBirth (52 Lekcje VOD + Strefa dla Dwojga)',
-              description: 'Dostęp na 12 miesięcy dla dwojga do 52 lekcji Full HD, Cyfrowej Apteczki, Licznika 5-1-1 i Strefy dla Taty.',
+              name: 'Edukacyjny Kurs Online HappyBirth (52 Lekcje VOD dla Dwojga)',
+              description: 'Dostęp edukacyjny e-learning na 12 miesięcy dla dwojga: 52 lekcje wideo, Notatnik Rodzica PDF i Strefa dla Taty.',
             },
             unit_amount: 34900, // 349.00 PLN
           },
@@ -49,6 +49,8 @@ export async function POST(req: NextRequest) {
       metadata: {
         courseId,
         platform: 'HappyBirth',
+        category: 'Education / E-learning Course',
+        mcc: '8299',
       },
       locale: 'pl',
       success_url: `${origin}/strefa?session_id={CHECKOUT_SESSION_ID}&payment=success`,

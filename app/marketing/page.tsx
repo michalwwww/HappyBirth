@@ -23,6 +23,8 @@ import {
   Baby,
   Feather,
   Instagram,
+  BookOpen,
+  Award,
 } from 'lucide-react';
 import { CLOUDFLARE_CUSTOMER_DOMAIN } from '@/lib/course-data';
 
@@ -89,27 +91,27 @@ export default function MarketingPage() {
 
   const comparison = [
     {
-      feature: 'Czas i wygoda',
-      traditional: 'Sztywne godziny, dojazdy w korkach po pracy',
-      happybirth: 'Oglądacie we dwoje na kanapie w telefonie lub na TV',
+      feature: 'Format nauki',
+      traditional: 'Sztywne wykłady w sali, dojazdy po pracy',
+      happybirth: 'Nowoczesny e-learning VOD na kanapie w telefonie lub TV',
     },
     {
-      feature: 'Rola taty / partnera',
+      feature: 'Zaangażowanie taty',
       traditional: 'Często czuje się biernym obserwatorem z boku',
-      happybirth: 'Dedykowana Strefa dla Taty: masaż, wsparcie i konkretne zadania',
+      happybirth: 'Dedykowana Strefa dla Taty: masaż relaksacyjny i konkretne zadania',
     },
     {
       feature: 'Dostęp po narodzinach',
       traditional: 'Kurs kończy się przed porodem – po powrocie zostajecie sami',
-      happybirth: 'Dostęp na 12 miesięcy od terminu porodu – wracacie w domu',
+      happybirth: 'Dostęp na 12 miesięcy od terminu porodu – powrót do lekcji w domu',
     },
     {
-      feature: 'Praktyczne narzędzia',
+      feature: 'Pomoce dydaktyczne',
       traditional: 'Zeszyt z notatkami, który gubi się w stresie',
       happybirth: 'Cyfrowy Notatnik Rodzica PDF, wideo-patenty i ściągi dla taty',
     },
     {
-      feature: 'Podejście do rodziców',
+      feature: 'Podejście edukacyjne',
       traditional: 'Sztywne dogmaty budzące presję i poczucie winy',
       happybirth: 'Ciepło, zero oceniania i zaufanie do Waszych wyborów',
     },
@@ -165,18 +167,18 @@ export default function MarketingPage() {
           <div className="lg:col-span-7 space-y-5 sm:space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] dark:bg-[#370E35] border border-[#F3CAD9] dark:border-[#5E1E5A] text-xs font-semibold text-[#EC008C]">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Czuła szkoła rodzenia online dla dwojga · Ponad 18 000 rodzin</span>
+              <span>Program Edukacyjny Online dla Rodziców · 52 Lekcje VOD</span>
             </div>
 
             <h1 className="font-brand-display font-medium text-4xl sm:text-5xl lg:text-6xl text-[#1A1512] dark:text-white leading-[1.08] tracking-tight">
               Spokojny, świadomy poród.{' '}
               <em className="font-brand-serif italic font-normal text-[#EC008C]">
-                Razem, we własnym rytmie.
+                Edukacyjny kurs dla dwojga.
               </em>
             </h1>
 
             <p className="text-base sm:text-lg text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed font-sans max-w-2xl">
-              52 filmowe lekcje i sprawdzone patenty, które krok po kroku przygotują Was na najpiękniejszy dzień w życiu. Zamiast sprzecznych rad z forów – czuła wiedza, opieka i spokój dla całej rodziny.
+              52 filmowe lekcje edukacyjne i sprawdzone patenty w formule e-learningu dla dwojga. Zamiast sprzecznych rad z forów – rzetelny program szkoleniowy, opieka i spokój dla całej rodziny.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-3.5 sm:gap-4">
@@ -190,7 +192,7 @@ export default function MarketingPage() {
                 className="inline-flex items-center gap-2 px-5 sm:px-6 py-3.5 rounded-full bg-white dark:bg-[#1C081A] hover:bg-stone-50 text-[#1A1512] dark:text-white border border-[#EAE3DB] dark:border-[#461643] text-sm font-semibold transition-all shadow-sm"
               >
                 <Play className="w-3.5 h-3.5 text-[#EC008C] fill-current" />
-                <span>Zobacz bezpłatną lekcję</span>
+                <span>Zobacz bezpłatną lekcję demonstracyjną</span>
               </a>
             </div>
 
@@ -198,15 +200,15 @@ export default function MarketingPage() {
             <div className="pt-2 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-[#867A72] dark:text-[#EAD5E5]/70">
               <div className="flex items-center gap-1.5">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Dostęp dla dwojga w cenie</span>
+                <span>Certyfikat ukończenia kursu</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>12 msc od terminu porodu</span>
+                <span>E-learning na 12 miesięcy</span>
               </div>
               <div className="flex items-center gap-1.5 col-span-2 sm:col-span-1">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Jednorazowa opłata BLIK</span>
+                <span>Dostęp dla dwojga w cenie</span>
               </div>
             </div>
           </div>
@@ -303,13 +305,13 @@ export default function MarketingPage() {
       <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-7xl mx-auto" id="filary">
         <div className="text-center max-w-2xl mx-auto space-y-2 mb-10">
           <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
-            Fundament przygotowania
+            Program Szkoleniowy
           </span>
           <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512] dark:text-white">
-            4 Filary Spokoju HappyBirth
+            4 Filary Edukacji i Spokoju HappyBirth
           </h2>
           <p className="text-sm text-[#544A44] dark:text-[#EAD5E5]/70">
-            Wszystko, czego potrzebujecie od pierwszej fali skurczu po spokojny sen w domu.
+            Kompleksowa wiedza e-learningowa: od przygotowania ciała po spokojny sen malucha w domu.
           </p>
         </div>
 
@@ -352,8 +354,8 @@ export default function MarketingPage() {
 
         <div className="text-center pt-6">
           <div className="text-xs font-semibold text-[#867A72] dark:text-[#EAD5E5]/70 inline-flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Sprawdzona wiedza i techniki wspierające opracowane z praktykami rodzicielstwa</span>
+            <BookOpen className="w-4 h-4 text-[#EC008C]" />
+            <span>Autorski program edukacyjny opracowany we współpracy z certyfikowanymi edukatorami rodzicielstwa</span>
           </div>
         </div>
       </section>
@@ -362,13 +364,13 @@ export default function MarketingPage() {
       <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-7xl mx-auto" id="etapy">
         <div className="text-center max-w-2xl mx-auto space-y-2 mb-10">
           <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
-            Kompletna ścieżka
+            Sylabus kursu
           </span>
           <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512] dark:text-white">
-            9 Etapów Twojej Ciąży i Porodu
+            9 Modułów Edukacyjnych Twojej Podróży
           </h2>
           <p className="text-sm text-[#544A44] dark:text-[#EAD5E5]/70">
-            Od dwóch kresek na teście, przez salę porodową, po pierwszy rok życia malucha.
+            Przejrzysty program szkoleniowy podzielony na etapy: od testu, przez poród, po 1. rok malucha.
           </p>
         </div>
 
@@ -610,6 +612,19 @@ export default function MarketingPage() {
           <p className="text-[11px] text-[#EAD5E5]/60 max-w-md mx-auto">
             Bezpieczne płatności Stripe, BLIK i Apple Pay. Dostęp do Strefy Rodziców aktywuje się natychmiast na Twój adres e-mail.
           </p>
+
+          {/* Pasek Pelerynki Edukacyjnej */}
+          <div className="pt-2 border-t border-white/10">
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-white/5 border border-white/10 text-center max-w-xl mx-auto space-y-1">
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#FCD705]">
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Status: Usługa Edukacyjno-Szkoleniowa (E-learning VOD)</span>
+              </div>
+              <p className="text-[11px] text-[#EAD5E5]/75 leading-relaxed">
+                HappyBirth to internetowy kurs przygotowania do rodzicielstwa. Materiały mają charakter wyłącznie edukacyjny i informacyjny. Usługa nie stanowi świadczenia zdrowotnego ani konsultacji medycznej.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     </div>

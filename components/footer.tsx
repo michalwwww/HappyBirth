@@ -156,7 +156,7 @@ export function Footer() {
         {/* Notatka odpowiedzialności i dane prawne */}
         <div className="pt-6 border-t border-[#461643] text-xs text-[#EAD5E5]/60 space-y-3">
           <p>
-            <strong className="text-white">Materiały na platformie mają charakter edukacyjny i wspierający.</strong> Służą przygotowaniu do spokojnych, świadomych narodzin w oparciu o 4 Filary Spokoju HappyBirth. Nie zastępują indywidualnej porady medycznej ani opieki lekarza prowadzącego.
+            <strong className="text-white">Charakter edukacyjny platformy (E-learning):</strong> HappyBirth jest internetową platformą edukacyjną świadczącą usługi szkoleniowe w formule kursu wideo VOD. Wszystkie materiały, narzędzia oraz wskazówki mają wyłącznie charakter edukacyjny i przygotowawczy do roli rodzica. Usługa nie stanowi i nie zastępuje indywidualnych świadczeń zdrowotnych, diagnostyki ani porady lekarskiej.
           </p>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 text-[11px] text-[#EAD5E5]/50 border-t border-[#461643]/50">
             <div>
