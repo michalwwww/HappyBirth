@@ -56,16 +56,20 @@ export function useCourseProgress() {
     setRole(storedRole);
     setIsLoaded(true);
 
-    // Weryfikacja ze stanem serwera
+    // Weryfikacja ze stanem serwera (tylko jeśli brak ręcznego wyboru w localStorage)
     fetch('/api/auth/me')
       .then((res) => res.json())
       .then((data) => {
-        if (data.authenticated && (data.user?.hasActiveCourse || data.user?.role === 'student' || data.user?.role === 'partner')) {
-          const validRole = (data.user.role as UserRole) || 'student';
-          setRole(validRole);
-          localStorage.setItem(CURRENT_ROLE_KEY, validRole);
-        } else if (!data.authenticated && !localStorage.getItem(CURRENT_ROLE_KEY)) {
-          setRole('guest');
+        const stored = localStorage.getItem(CURRENT_ROLE_KEY);
+        if (!stored) {
+          if (data.authenticated && (data.user?.hasActiveCourse || data.user?.role === 'student' || data.user?.role === 'partner')) {
+            const validRole = (data.user.role as UserRole) || 'student';
+            setRole(validRole);
+            localStorage.setItem(CURRENT_ROLE_KEY, validRole);
+            window.dispatchEvent(new Event('hb_role_updated'));
+          } else {
+            setRole('guest');
+          }
         }
       })
       .catch(() => {});
@@ -86,8 +90,18 @@ export function useCourseProgress() {
       setCompletedLessons(getStoredCompletedLessons());
     };
 
+    const handleRoleUpdate = () => {
+      const updated = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || 'guest';
+      setRole(updated);
+    };
+
     window.addEventListener('hb_progress_updated', handleUpdate);
-    return () => window.removeEventListener('hb_progress_updated', handleUpdate);
+    window.addEventListener('hb_role_updated', handleRoleUpdate);
+
+    return () => {
+      window.removeEventListener('hb_progress_updated', handleUpdate);
+      window.removeEventListener('hb_role_updated', handleRoleUpdate);
+    };
   }, []);
 
   const toggleLessonCompletion = (lessonId: string) => {
@@ -99,6 +113,7 @@ export function useCourseProgress() {
     setRole(newRole);
     if (typeof window !== 'undefined') {
       localStorage.setItem(CURRENT_ROLE_KEY, newRole);
+      window.dispatchEvent(new Event('hb_role_updated'));
     }
   };
 

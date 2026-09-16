@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Logo } from './logo';
 import { BuyCourseButton } from './buy-button';
 import { ArrowRight, LogIn, Sparkles, Heart, Menu, X, Users } from 'lucide-react';
+import { LanguageSwitcher } from './language-switcher';
+import { ThemeToggle } from './theme-toggle';
 
 export function MarketingNavbar() {
   const isDev = typeof window !== 'undefined' && window.location.hostname.includes('localhost');
@@ -24,7 +26,7 @@ export function MarketingNavbar() {
   return (
     <header className="sticky top-0 z-50 w-full">
       {/* Top Banner w luksusowej śliwce */}
-      <div className="bg-[#250A24] text-[#EAD5E5] border-b border-[#461643] px-4 py-2 text-xs">
+      <div className="bg-[#250A24] dark:bg-[#140513] text-[#EAD5E5] border-b border-[#461643] px-4 py-2 text-xs transition-colors">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-[#EC008C] animate-pulse"></span>
@@ -35,7 +37,13 @@ export function MarketingNavbar() {
           </div>
 
           <div className="flex items-center space-x-3 text-[11px]">
-            <span className="text-[#EAD5E5]/60 hidden sm:inline">Masz już konto?</span>
+            {/* Przełącznik języków z flagami PL / EN / RU */}
+            <LanguageSwitcher />
+
+            {/* Przełącznik Motywu Light / Dark */}
+            <ThemeToggle />
+
+            <span className="text-[#EAD5E5]/60 hidden sm:inline border-l border-[#461643] pl-2.5">Masz już konto?</span>
             <a
               href={strefaUrl}
               className="inline-flex items-center gap-1 font-semibold text-white hover:text-[#EC008C] transition-colors"
@@ -48,7 +56,7 @@ export function MarketingNavbar() {
       </div>
 
       {/* Main Navbar */}
-      <nav className="glass-nav border-b border-[#EAE3DB] bg-[#FBF8F4]/95 backdrop-blur-md">
+      <nav className="glass-nav border-b border-[#EAE3DB] dark:border-[#461643] bg-[#FBF8F4]/95 dark:bg-[#1C081A]/95 backdrop-blur-md transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3.5 group">
             <Logo className="h-11 sm:h-12 w-auto object-contain group-hover:scale-105 transition-transform" priority />

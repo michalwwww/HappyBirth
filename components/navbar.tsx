@@ -7,6 +7,8 @@ import { Logo } from './logo';
 import { BuyCourseButton } from './buy-button';
 import { useCourseProgress } from '@/lib/progress';
 import { Sparkles, Heart, User, AlertCircle, ArrowRight } from 'lucide-react';
+import { LanguageSwitcher } from './language-switcher';
+import { ThemeToggle } from './theme-toggle';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -15,7 +17,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full">
       {/* Top Luxury Announcement Ribbon (Ciemnofioletowy / Purpurowy aksamit) */}
-      <div className="bg-[#250A24] text-[#EAD5E5] border-b border-[#461643] px-4 py-2 text-xs transition-colors">
+      <div className="bg-[#250A24] dark:bg-[#140513] text-[#EAD5E5] border-b border-[#461643] px-4 py-2 text-xs transition-colors">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center space-x-2.5">
             <span className="w-2 h-2 rounded-full bg-[#EC008C] animate-pulse"></span>
@@ -28,8 +30,15 @@ export function Navbar() {
             </span>
           </div>
 
-          {/* Subtelny przełącznik profilu w tonacji purpurowej */}
-          <div className="flex items-center space-x-2 text-[11px]">
+          <div className="flex items-center flex-wrap gap-2.5">
+            {/* Przełącznik języków z flagami PL / EN / RU */}
+            <LanguageSwitcher />
+
+            {/* Przełącznik Motywu Light / Dark */}
+            <ThemeToggle />
+
+            {/* Subtelny przełącznik profilu w tonacji purpurowej */}
+            <div className="flex items-center space-x-2 text-[11px] border-l border-[#461643] pl-2.5">
             <span className="text-[#EAD5E5]/60 hidden sm:inline">Tryb widoku:</span>
             <div className="inline-flex rounded-full bg-[#180517] p-0.5 border border-[#461643]">
               <button
@@ -69,6 +78,7 @@ export function Navbar() {
           </div>
         </div>
       </div>
+    </div>
 
       {/* Główny pasek nawigacyjny z Netlify: ciepłe tło paper #FBF8F4, border #EAE3DB */}
       <nav className="glass-nav border-b border-[#EAE3DB] transition-all">

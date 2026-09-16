@@ -15,8 +15,9 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   const url = new URL(context.request.url);
   const host = context.request.headers.get('host') || '';
 
-  // 1. Przepuść bez zmian pliki statyczne, chunki JS, CSS, obrazy i favicon
+  // 1. Przepuść bez zmian pliki statyczne, chunki JS, CSS, obrazy, favicon oraz endpointy API
   if (
+    url.pathname.startsWith('/api') ||
     url.pathname.startsWith('/_next') ||
     url.pathname.includes('.') ||
     url.pathname.startsWith('/favicon')

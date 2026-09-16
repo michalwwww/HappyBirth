@@ -11,23 +11,41 @@ export async function POST(req: NextRequest) {
     const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID;
 
-    if (!priceId) {
+    // Sprawdź czy klucz Stripe API jest zdefiniowany
+    if (!process.env.STRIPE_SECRET_KEY) {
+      // W trybie deweloperskim bez kluczy Stripe przekieruj do symulacji sukcesu
+      if (process.env.NODE_ENV !== 'production') {
+        return NextResponse.json({
+          url: `${origin}/strefa?payment=success&demo=true`,
+          sessionId: 'demo_session_123',
+        });
+      }
       return NextResponse.json(
-        { error: 'Brak skonfigurowanego NEXT_PUBLIC_STRIPE_PRICE_ID w zmiennych środowiskowych.' },
+        { error: 'Brak skonfigurowanego STRIPE_SECRET_KEY w środowisku serwera.' },
         { status: 500 }
       );
     }
 
+    // Dynamiczny dobór pozycji: jeśli brak zdefiniowanego price_id, generujemy pozycję dynamicznie (349 zł brutto)
+    const lineItem = priceId
+      ? { price: priceId, quantity: 1 }
+      : {
+          price_data: {
+            currency: 'pln',
+            product_data: {
+              name: 'Szkoła Rodzenia Online HappyBirth (52 Lekcje VOD + Strefa dla Dwojga)',
+              description: 'Dostęp na 12 miesięcy dla dwojga do 52 lekcji Full HD, Cyfrowej Apteczki, Licznika 5-1-1 i Strefy dla Taty.',
+            },
+            unit_amount: 34900, // 349.00 PLN
+          },
+          quantity: 1,
+        };
+
     const sessionParams: any = {
       mode: 'payment',
-      managed_payments: { enabled: false },
       payment_method_types: ['card', 'blik', 'p24'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: [lineItem],
+      allow_promotion_codes: true,
       metadata: {
         courseId,
         platform: 'HappyBirth',
@@ -47,7 +65,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error('Błąd podczas tworzenia sesji Stripe Checkout:', error);
     return NextResponse.json(
-      { error: error.message || 'Wystąpił błąd przy inicjalizacji płatności.' },
+      { error: error.message || 'Wystąpił błąd przy inicjalizacji płatności Stripe.' },
       { status: 500 }
     );
   }

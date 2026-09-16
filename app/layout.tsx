@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Bricolage_Grotesque, Instrument_Serif, Inter } from 'next/font/google';
 import './globals.css';
 import { CookieBanner } from '@/components/cookie-banner';
+import { I18nProvider } from '@/lib/i18n';
+import { AccessibilityToolbar } from '@/components/accessibility-toolbar';
 
 const bricolage = Bricolage_Grotesque({
   subsets: ['latin', 'latin-ext'],
@@ -48,9 +50,12 @@ export default function RootLayout({
       lang="pl"
       className={`scroll-smooth ${bricolage.variable} ${instrumentSerif.variable} ${inter.variable}`}
     >
-      <body className="min-h-screen flex flex-col bg-[#FBF8F4] text-[#1A1512] antialiased selection:bg-[#EC008C]/20">
-        {children}
-        <CookieBanner />
+      <body className="min-h-screen flex flex-col bg-[#FBF8F4] dark:bg-[#140513] text-[#1A1512] dark:text-[#FBF8F4] antialiased selection:bg-[#EC008C]/20">
+        <I18nProvider>
+          {children}
+          <CookieBanner />
+          <AccessibilityToolbar />
+        </I18nProvider>
       </body>
     </html>
   );
