@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Logo } from './logo';
+import { BuyCourseButton } from './buy-button';
 import { useCourseProgress } from '@/lib/progress';
 import { Sparkles, Heart, User, AlertCircle, ArrowRight } from 'lucide-react';
 
@@ -157,13 +158,10 @@ export function Navbar() {
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                <Link
-                  href="/#cennik"
-                  className="inline-flex items-center space-x-1.5 bg-[#EC008C] hover:bg-[#D0007A] text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:shadow-lg"
-                >
+                <BuyCourseButton className="inline-flex items-center space-x-1.5 bg-[#EC008C] hover:bg-[#D0007A] text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:shadow-lg cursor-pointer">
                   <span>Dołącz · 349 zł</span>
                   <ArrowRight className="w-4 h-4" />
-                </Link>
+                </BuyCourseButton>
               </div>
             )}
           </div>

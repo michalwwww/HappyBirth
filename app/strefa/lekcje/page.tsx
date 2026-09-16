@@ -5,7 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import { stages, lessons } from '@/lib/course-data';
 import { LessonCard } from '@/components/lesson-card';
 import { useCourseProgress } from '@/lib/progress';
-import { Search, Filter, Sparkles, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { BuyCourseButton } from '@/components/buy-button';
+import { Search, Filter, Sparkles, CheckCircle2, ArrowLeft, Lock } from 'lucide-react';
 import Link from 'next/link';
 
 function StrefaLessonsContent() {
@@ -14,7 +15,7 @@ function StrefaLessonsContent() {
 
   const [selectedStage, setSelectedStage] = useState<string>(initialStage);
   const [search, setSearch] = useState<string>('');
-  const { completedLessons, percentCompleted } = useCourseProgress();
+  const { completedLessons, percentCompleted, role } = useCourseProgress();
 
   useEffect(() => {
     const stageParam = searchParams.get('stage');
@@ -67,6 +68,29 @@ function StrefaLessonsContent() {
           </div>
         </div>
       </div>
+
+      {/* Guest Notice & Buy CTA */}
+      {role === 'guest' && (
+        <div className="rounded-2xl bg-gradient-to-r from-[#250A24] via-[#351034] to-[#20071F] border border-[#EC008C]/40 p-4 sm:p-5 text-white shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#EC008C]/20 border border-[#EC008C]/40 text-[#EC008C] flex items-center justify-center shrink-0">
+              <Lock className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-[#FCD705] flex items-center gap-1">
+                <Sparkles className="w-3 h-3" /> Lekcja 1 jest bezpłatna dla każdego
+              </div>
+              <p className="text-xs text-[#EAD5E5]/90 mt-0.5">
+                Dostęp do pozostałych 51 filmów VOD, apteczki i planu porodu odblokujesz po zakupie kursu.
+              </p>
+            </div>
+          </div>
+
+          <BuyCourseButton className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-bold transition-all shadow-md shadow-[#EC008C]/30 hover:scale-105 shrink-0 flex items-center justify-center gap-2 cursor-pointer">
+            <span>Kup pełny dostęp · 349 zł</span>
+          </BuyCourseButton>
+        </div>
+      )}
 
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">

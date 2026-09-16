@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { StageIcon } from '@/components/stage-icons';
+import { BuyCourseButton } from '@/components/buy-button';
 import {
   Play,
   Sparkles,
@@ -190,13 +191,10 @@ export default function MarketingPage() {
 
             {/* Przyciski CTA */}
             <div className="pt-2 flex flex-wrap items-center gap-3.5 sm:gap-4">
-              <a
-                href="#cena"
-                className="inline-flex items-center gap-2.5 px-8 sm:px-10 py-4 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-base sm:text-lg font-semibold transition-all shadow-xl shadow-[#EC008C]/25 hover:shadow-[#EC008C]/40 hover:scale-[1.03]"
-              >
+              <BuyCourseButton className="inline-flex items-center gap-2.5 px-8 sm:px-10 py-4 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-base sm:text-lg font-semibold transition-all shadow-xl shadow-[#EC008C]/25 hover:shadow-[#EC008C]/40 hover:scale-[1.03] cursor-pointer">
                 <span>Dołącz do kursu · 349 zł</span>
                 <ArrowRight className="w-5 h-5" />
-              </a>
+              </BuyCourseButton>
 
               <a
                 href="#zwiastun"
@@ -508,13 +506,10 @@ export default function MarketingPage() {
                 <span className="text-xs text-[#EC008C] font-semibold ml-2">pełny pakiet na rok</span>
               </div>
 
-              <a
-                href="#cena"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:scale-105"
-              >
-                <span>Wybierz HappyBirth</span>
+              <BuyCourseButton className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:scale-105 cursor-pointer">
+                <span>Wybierz HappyBirth · 349 zł</span>
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </BuyCourseButton>
             </div>
           </div>
         </div>
@@ -755,13 +750,7 @@ export default function MarketingPage() {
                 Dostęp do Strefy Kursantki w 30 sekund na maila
               </div>
 
-              <a
-                href={strefaUrl}
-                className="w-full py-4 rounded-full bg-[#FCD705] hover:bg-[#ffe338] text-[#1A1512] font-bold text-base transition-all shadow-xl hover:scale-105 flex items-center justify-center gap-2"
-              >
-                <span>Kup dostęp · BLIK / Karta</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
+              <BuyCourseButton />
 
               <div className="pt-2 flex items-center justify-center gap-3 text-[11px] text-[#A2958C]">
                 <span className="flex items-center gap-1">

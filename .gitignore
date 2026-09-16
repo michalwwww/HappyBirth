@@ -17,3 +17,5 @@ LogoHB.jpeg
 .DS_Store
 Thumbs.db
 tsconfig.tsbuildinfo
+.wrangler/
+.wrangler

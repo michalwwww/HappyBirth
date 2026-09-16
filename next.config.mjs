@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export',
+  // output: 'export', // Wyłączone, aby umożliwić działanie API Routes (/api/stripe/checkout, /api/stripe/webhook)
   images: {
     unoptimized: true,
     remotePatterns: [

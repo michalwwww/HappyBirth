@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Logo } from './logo';
@@ -25,6 +25,21 @@ export function StrefaNavbar() {
   const pathname = usePathname();
   const { role, changeRole, percentCompleted, completedLessons } = useCourseProgress();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ email: string; role: string; hasActiveCourse: boolean } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated && data.user) {
+          setCurrentUser(data.user);
+          if (data.user.role) {
+            changeRole(data.user.role as any);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Find next uncompleted lesson
   const nextLesson = lessons.find((l) => !completedLessons.includes(l.id)) || lessons[0];
@@ -82,6 +97,32 @@ export function StrefaNavbar() {
               >
                 Gość
               </button>
+            </div>
+
+            {/* Stan konta / Wyloguj */}
+            <div className="flex items-center space-x-2.5 border-l border-[#461643] pl-3 text-[11px]">
+              {currentUser ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-white/90 font-medium hidden sm:inline truncate max-w-[150px]">
+                    {currentUser.email}
+                  </span>
+                  <form action="/api/auth/logout" method="POST">
+                    <button
+                      type="submit"
+                      className="text-[#EAD5E5]/70 hover:text-white flex items-center gap-1 transition-colors underline cursor-pointer"
+                    >
+                      <LogOut className="w-3 h-3" /> Wyloguj
+                    </button>
+                  </form>
+                </div>
+              ) : (
+                <Link
+                  href="/strefa/login"
+                  className="text-[#FCD705] hover:underline font-semibold"
+                >
+                  Logowanie
+                </Link>
+              )}
             </div>
           </div>
         </div>

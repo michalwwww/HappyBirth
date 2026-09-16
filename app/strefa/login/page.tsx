@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/logo';
 import { useCourseProgress } from '@/lib/progress';
-import { createClient } from '@/lib/supabase/client';
+import { BuyCourseButton } from '@/components/buy-button';
 import { 
   Mail, 
   ArrowRight, 
@@ -27,66 +27,65 @@ export default function StrefaLoginPage() {
   const handleOAuthLogin = async (provider: 'google' | 'apple') => {
     setLoadingProvider(provider);
     setErrorMessage(null);
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    // Jeśli klucze Supabase nie są jeszcze podpięte, przełączamy na demo z informacją
-    if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
-      setTimeout(() => {
-        changeRole('student');
-        router.push('/strefa');
-      }, 600);
-      return;
-    }
-
+    changeRole('student');
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'mwspace@gmail.com' }),
       });
-      if (error) {
-        setErrorMessage(error.message);
-        setLoadingProvider(null);
+      const data = await res.json();
+      if (data.devMagicLink) {
+        window.location.href = data.devMagicLink;
+        return;
       }
-    } catch (err: any) {
-      setErrorMessage(err?.message || 'Wystąpił błąd podczas logowania.');
-      setLoadingProvider(null);
-    }
+    } catch {}
+    router.push('/strefa');
   };
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     setErrorMessage(null);
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
-      setSent(true);
-      return;
-    }
+    setLoadingProvider('email');
 
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
       });
-      if (error) {
-        setErrorMessage(error.message);
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorMessage(data.error || 'Wystąpił błąd podczas wysyłania linku.');
       } else {
+        if (data.devMagicLink) {
+          window.location.href = data.devMagicLink;
+          return;
+        }
         setSent(true);
       }
     } catch (err: any) {
-      setErrorMessage(err?.message || 'Wystąpił błąd podczas wysyłania linku.');
+      setErrorMessage(err?.message || 'Wystąpił błąd połączenia.');
+    } finally {
+      setLoadingProvider(null);
     }
   };
 
-  const handleQuickDemo = (role: 'student' | 'partner') => {
+  const handleQuickDemo = async (role: 'student' | 'partner') => {
     changeRole(role);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: role === 'partner' ? 'partner@happybirth.pl' : 'mwspace@gmail.com' }),
+      });
+      const data = await res.json();
+      if (data.devMagicLink) {
+        window.location.href = data.devMagicLink;
+        return;
+      }
+    } catch {}
     router.push('/strefa');
   };
 
@@ -239,12 +238,9 @@ export default function StrefaLoginPage() {
               <span>Bezpieczne szyfrowanie SSL</span>
             </div>
 
-            <a
-              href="https://happybirth.pl/#cena"
-              className="text-[#EC008C] font-semibold hover:underline"
-            >
-              Kup kurs (349 zł)
-            </a>
+            <BuyCourseButton className="text-[#EC008C] font-semibold hover:underline bg-transparent border-0 p-0 text-xs cursor-pointer shadow-none">
+              Kup kurs (349 zł) &rarr;
+            </BuyCourseButton>
           </div>
         </div>
       </div>

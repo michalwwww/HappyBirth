@@ -28,12 +28,35 @@ import {
 import Image from 'next/image';
 
 export default function StrefaDashboardPage() {
-  const { role, completedLessons, percentCompleted } = useCourseProgress();
+  const { role, changeRole, completedLessons, percentCompleted } = useCourseProgress();
   const [pregnancyProfile, setPregnancyProfile] = useState<PregnancyProfile | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   useEffect(() => {
     setPregnancyProfile(getSavedPregnancyProfile());
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get('session_id');
+      const payment = params.get('payment');
+
+      if (sessionId) {
+        fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              changeRole('student');
+              setPaymentSuccess(true);
+              window.dispatchEvent(new Event('hb_progress_updated'));
+            }
+          })
+          .catch((err) => console.error('Błąd weryfikacji płatności:', err));
+      } else if (payment === 'success') {
+        changeRole('student');
+        setPaymentSuccess(true);
+        window.dispatchEvent(new Event('hb_progress_updated'));
+      }
+    }
   }, []);
 
   // Znajdź następną nieukończoną lekcję
@@ -51,6 +74,26 @@ export default function StrefaDashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-10">
+      {/* Baner sukcesu po płatności Stripe */}
+      {paymentSuccess && (
+        <div className="rounded-3xl bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-950 border border-emerald-500/40 p-6 sm:p-8 text-white shadow-2xl flex flex-col sm:flex-row items-start sm:items-center gap-5 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-400 flex items-center justify-center shrink-0 shadow-inner">
+            <CheckCircle2 className="w-8 h-8" />
+          </div>
+          <div className="space-y-1.5 flex-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5" /> Płatność BLIK / Karta zatwierdzona
+            </div>
+            <h3 className="font-brand-display font-bold text-xl sm:text-2xl text-white">
+              Wspaniale! Twój dostęp do HappyBirth jest w 100% aktywny 🎉
+            </h3>
+            <p className="text-xs sm:text-sm text-emerald-100/80 leading-relaxed font-sans">
+              Odblokowaliśmy wszystkie 52 lekcje wideo, materiały PDF i dedykowaną Strefę dla Partnera. Dostęp jest ważny przez 12 miesięcy dla Ciebie i Twojego partnera.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 0. INTELIGENTNY TRACKER CIĄŻY I PERSONALIZACJA */}
       {role === 'student' && (
         <PregnancyTrackerCard 
@@ -166,7 +209,7 @@ export default function StrefaDashboardPage() {
             />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <Link
-                href={`/strefa/lekcja/${nextLesson.id}`}
+                href={`/strefa/lekcja/${nextLesson.id}?autoplay=true`}
                 className="w-12 h-12 rounded-full bg-[#EC008C] text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform"
               >
                 <Play className="w-5 h-5 fill-current ml-0.5" />
@@ -200,7 +243,7 @@ export default function StrefaDashboardPage() {
 
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <Link
-                href={`/strefa/lekcja/${nextLesson.id}`}
+                href={`/strefa/lekcja/${nextLesson.id}?autoplay=true`}
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs sm:text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:scale-105"
               >
                 <Play className="w-3.5 h-3.5 fill-current text-[#FCD705]" />

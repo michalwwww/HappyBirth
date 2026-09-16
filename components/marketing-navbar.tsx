@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Logo } from './logo';
+import { BuyCourseButton } from './buy-button';
 import { ArrowRight, LogIn, Sparkles, Heart, Menu, X, Users } from 'lucide-react';
 
 export function MarketingNavbar() {
@@ -83,13 +84,10 @@ export function MarketingNavbar() {
               <span>Strefa Kursantki</span>
             </a>
 
-            <a
-              href="/#cena"
-              className="hidden sm:inline-flex items-center space-x-2 bg-[#EC008C] hover:bg-[#D0007A] text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:shadow-lg hover:scale-105"
-            >
+            <BuyCourseButton className="hidden sm:inline-flex items-center space-x-2 bg-[#EC008C] hover:bg-[#D0007A] text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:shadow-lg hover:scale-105 cursor-pointer">
               <span>Dołącz · 349 zł</span>
               <ArrowRight className="w-4 h-4" />
-            </a>
+            </BuyCourseButton>
 
             {/* Mobile Hamburger Toggle Button */}
             <button
@@ -126,14 +124,10 @@ export function MarketingNavbar() {
             </div>
 
             <div className="pt-3 border-t border-[#EAE3DB] space-y-2.5">
-              <a
-                href="/#cena"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-3.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-md shadow-[#EC008C]/25"
-              >
+              <BuyCourseButton className="w-full py-3.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-md shadow-[#EC008C]/25 cursor-pointer">
                 <span>Dołącz do kursu · 349 zł</span>
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </BuyCourseButton>
 
               <a
                 href={strefaUrl}

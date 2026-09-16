@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { useCourseProgress } from '@/lib/progress';
 import { Sparkles, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -14,61 +13,24 @@ function AuthCallbackContent() {
   const { changeRole } = useCourseProgress();
 
   useEffect(() => {
-    const handleAuth = async () => {
-      const error = searchParams.get('error');
-      const errorDescription = searchParams.get('error_description');
+    const error = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
 
-      if (error) {
-        setErrorMsg(errorDescription || error || 'Wystąpił błąd podczas autoryzacji.');
-        return;
-      }
+    if (error) {
+      setErrorMsg(errorDescription || error || 'Wystąpił błąd podczas autoryzacji.');
+      return;
+    }
 
-      const code = searchParams.get('code');
-      const nextUrl = searchParams.get('next') || '/strefa';
+    const token = searchParams.get('token');
+    const nextUrl = searchParams.get('next') || '/strefa';
 
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
-        // Tryb demo / brak kluczy Supabase
-        changeRole('student');
-        router.replace(nextUrl);
-        return;
-      }
+    if (token) {
+      window.location.href = `/api/auth/verify?token=${encodeURIComponent(token)}`;
+      return;
+    }
 
-      try {
-        const supabase = createClient();
-
-        if (code) {
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-          if (exchangeError) {
-            setErrorMsg(exchangeError.message);
-            return;
-          }
-        }
-
-        // Sprawdź czy mamy aktywną sesję
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          changeRole('student');
-          router.replace(nextUrl);
-        } else {
-          // Jeśli brak sesji, sprawdź czy hash fragment zawiera tokeny
-          if (typeof window !== 'undefined' && window.location.hash) {
-            // Supabase automatycznie wyciąga tokeny z hasha w tle
-            setTimeout(() => {
-              changeRole('student');
-              router.replace(nextUrl);
-            }, 500);
-          } else {
-            router.replace('/strefa');
-          }
-        }
-      } catch (err: any) {
-        console.error('Błąd w auth callback:', err);
-        setErrorMsg(err?.message || 'Wystąpił problem podczas logowania.');
-      }
-    };
-
-    handleAuth();
+    changeRole('student');
+    router.replace(nextUrl);
   }, [searchParams, router, changeRole]);
 
   if (errorMsg) {

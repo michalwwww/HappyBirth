@@ -5,7 +5,6 @@ import { UserRole } from './types';
 
 const COMPLETED_LESSONS_KEY = 'hb_completed_lessons';
 const CURRENT_ROLE_KEY = 'hb_current_role';
-const DUE_DATE_KEY = 'hb_due_date';
 
 export function getStoredCompletedLessons(): string[] {
   if (typeof window === 'undefined') return [];
@@ -30,6 +29,15 @@ export function saveCompletedLesson(lessonId: string, isCompleted: boolean = tru
     const updated = Array.from(set);
     localStorage.setItem(COMPLETED_LESSONS_KEY, JSON.stringify(updated));
     window.dispatchEvent(new Event('hb_progress_updated'));
+
+    // Synchronizacja w tle z Cloudflare D1
+    fetch('/api/progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lessonId, completed: isCompleted }),
+    }).catch(() => {
+      // Offline lub niezalogowany - zachowaj w localStorage
+    });
   } catch (e) {
     console.error('Failed to save progress', e);
   }
@@ -37,14 +45,42 @@ export function saveCompletedLesson(lessonId: string, isCompleted: boolean = tru
 
 export function useCourseProgress() {
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
-  const [role, setRole] = useState<UserRole>('student');
+  const [role, setRole] = useState<UserRole>('guest');
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    setCompletedLessons(getStoredCompletedLessons());
-    const storedRole = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || 'student';
+    // 1. Natychmiast załaduj z localStorage (domyślnie 'guest')
+    const localLessons = getStoredCompletedLessons();
+    setCompletedLessons(localLessons);
+    const storedRole = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || 'guest';
     setRole(storedRole);
     setIsLoaded(true);
+
+    // Weryfikacja ze stanem serwera
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated && (data.user?.hasActiveCourse || data.user?.role === 'student' || data.user?.role === 'partner')) {
+          const validRole = (data.user.role as UserRole) || 'student';
+          setRole(validRole);
+          localStorage.setItem(CURRENT_ROLE_KEY, validRole);
+        } else if (!data.authenticated && !localStorage.getItem(CURRENT_ROLE_KEY)) {
+          setRole('guest');
+        }
+      })
+      .catch(() => {});
+
+    // 2. Pobierz postępy z Cloudflare D1 i połącz
+    fetch('/api/progress')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.completedLessons && Array.isArray(data.completedLessons) && data.completedLessons.length > 0) {
+          const merged = Array.from(new Set([...localLessons, ...data.completedLessons]));
+          setCompletedLessons(merged);
+          localStorage.setItem(COMPLETED_LESSONS_KEY, JSON.stringify(merged));
+        }
+      })
+      .catch(() => {});
 
     const handleUpdate = () => {
       setCompletedLessons(getStoredCompletedLessons());

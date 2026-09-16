@@ -60,7 +60,7 @@ export default function StrefaLessonClient({ lessonId }: StrefaLessonClientProps
           {prev && next && <span>·</span>}
           {next && (
             <Link
-              href={`${prefix}/lekcja/${next.id}`}
+              href={`${prefix}/lekcja/${next.id}?autoplay=true`}
               className="hover:text-[#1A1512] transition-colors flex items-center gap-1 font-semibold text-[#EC008C]"
             >
               <span>Następna</span>
@@ -165,6 +165,7 @@ export default function StrefaLessonClient({ lessonId }: StrefaLessonClientProps
                   lesson={l}
                   isCompleted={completedLessons.includes(l.id)}
                   isActive={l.id === lesson.id}
+                  autoplay={true}
                 />
               ))}
             </div>

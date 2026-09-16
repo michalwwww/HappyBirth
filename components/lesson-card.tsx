@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Lesson } from '@/lib/types';
-import { Play, CheckCircle2, Clock, Sparkles } from 'lucide-react';
+import { Play, CheckCircle2, Clock, Sparkles, Lock } from 'lucide-react';
 
 import { usePathname } from 'next/navigation';
 
@@ -11,15 +11,16 @@ interface LessonCardProps {
   lesson: Lesson;
   isCompleted: boolean;
   isActive?: boolean;
+  autoplay?: boolean;
 }
 
-export function LessonCard({ lesson, isCompleted, isActive = false }: LessonCardProps) {
+export function LessonCard({ lesson, isCompleted, isActive = false, autoplay = true }: LessonCardProps) {
   const pathname = usePathname();
   const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
 
   return (
     <Link
-      href={`${prefix}/lekcja/${lesson.id}`}
+      href={`${prefix}/lekcja/${lesson.id}${autoplay ? '?autoplay=true' : ''}`}
       className={`group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border transition-all duration-200 ${
         isActive
           ? 'bg-white border-[#EC008C] shadow-md ring-1 ring-[#EC008C]'
@@ -56,9 +57,13 @@ export function LessonCard({ lesson, isCompleted, isActive = false }: LessonCard
               {lesson.stageTitle}
             </span>
 
-            {lesson.isFreePreview && (
-              <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 flex items-center gap-1">
-                <Sparkles className="w-2.5 h-2.5" /> Lekcja próbna
+            {lesson.isFreePreview ? (
+              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
+                <Sparkles className="w-2.5 h-2.5" /> Bezpłatna lekcja
+              </span>
+            ) : (
+              <span className="text-[10px] font-medium text-[#867A72] bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200 flex items-center gap-1">
+                <Lock className="w-2.5 h-2.5 text-[#EC008C]" /> Pełny kurs
               </span>
             )}
           </div>
