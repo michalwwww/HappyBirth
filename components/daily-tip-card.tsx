@@ -77,7 +77,7 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
 
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl bg-white border border-[#EAE3DB] p-5 sm:p-6 shadow-md hover:shadow-lg transition-all ${className}`}
+      className={`relative overflow-hidden rounded-3xl bg-white dark:bg-[#1E071D] border border-[#EAE3DB] dark:border-[#461643] p-5 sm:p-6 shadow-md hover:shadow-lg transition-all ${className}`}
     >
       {/* Decorative top accent */}
       <div
@@ -93,7 +93,7 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
           >
             {tip.categoryLabel}
           </span>
-          <span className="text-[11px] text-[#867A72] font-medium flex items-center gap-1">
+          <span className="text-[11px] text-[#867A72] dark:text-[#A2958C] font-medium flex items-center gap-1">
             <Lightbulb className="w-3 h-3 text-[#FCD705]" />
             {tip.authorNote || 'Patent z bazy HappyBirth'}
           </span>
@@ -101,7 +101,7 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
 
         <button
           onClick={handleNextTip}
-          className="text-xs text-[#867A72] hover:text-[#EC008C] transition-colors flex items-center gap-1 font-medium"
+          className="text-xs text-[#867A72] dark:text-[#A2958C] hover:text-[#EC008C] dark:hover:text-[#EC008C] transition-colors flex items-center gap-1 font-medium cursor-pointer"
           title="Pokaż inny patent z bazy wiedzy"
         >
           <RefreshCw className="w-3.5 h-3.5" />
@@ -110,14 +110,14 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
       </div>
 
       <div className={`transition-opacity duration-200 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
-        <h3 className="font-brand-display font-semibold text-lg sm:text-xl text-[#1A1512] mb-2 leading-snug">
+        <h3 className="font-brand-display font-semibold text-lg sm:text-xl text-[#1A1512] dark:text-[#FBF8F4] mb-2 leading-snug">
           {tip.title}
         </h3>
-        <p className="text-sm text-[#544A44] leading-relaxed mb-4">
+        <p className="text-sm text-[#544A44] dark:text-[#D7CCC3] leading-relaxed mb-4">
           {tip.shortDesc}
         </p>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#EAE3DB]">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#EAE3DB] dark:border-[#461643]">
           {tip.lessonId ? (
             <a
               href={`${strefaUrl}/lekcja/${tip.lessonId}`}
@@ -134,10 +134,10 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
 
           <button
             onClick={handleSave}
-            className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full transition-colors ${
+            className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full transition-colors cursor-pointer ${
               saved
-                ? 'bg-rose-100 text-rose-700'
-                : 'text-[#867A72] hover:text-[#1A1512]'
+                ? 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300'
+                : 'text-[#867A72] dark:text-[#A2958C] hover:text-[#1A1512] dark:hover:text-white'
             }`}
           >
             <Heart className={`w-3.5 h-3.5 ${saved ? 'fill-current text-rose-500' : ''}`} />

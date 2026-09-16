@@ -110,8 +110,26 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(educationalJsonLd) }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+              try {
+                var t = localStorage.getItem('hb_theme');
+                if (t === 'dark') {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+                var l = localStorage.getItem('hb_lang');
+                if (l && (l === 'pl' || l === 'en' || l === 'ru')) {
+                  document.documentElement.lang = l;
+                }
+              } catch (e) {}
+            })()`,
+          }}
+        />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#FBF8F4] text-[#1A1512] antialiased selection:bg-[#EC008C]/20">
+      <body className="min-h-screen flex flex-col bg-[#FBF8F4] dark:bg-[#140513] text-[#1A1512] dark:text-[#FBF8F4] antialiased selection:bg-[#EC008C]/20 transition-colors duration-200">
         <I18nProvider>
           {children}
           <CookieBanner />

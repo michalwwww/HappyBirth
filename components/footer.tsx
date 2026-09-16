@@ -4,11 +4,15 @@ import React from 'react';
 import Link from 'next/link';
 import { Logo } from './logo';
 import { ShieldCheck, Heart, ArrowUpRight, Sparkles, Users } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
+import { getMarketingTranslations } from '@/lib/marketing-i18n';
 
 export function Footer() {
   const isDev = typeof window !== 'undefined' && window.location.hostname.includes('localhost');
   const partnerzyUrl = isDev ? '/partnerzy' : 'https://partnerzy.happybirth.pl';
   const strefaUrl = isDev ? '/strefa' : 'https://strefa.happybirth.pl';
+  const { lang } = useI18n();
+  const t = getMarketingTranslations(lang);
 
   return (
     <footer className="bg-[#20071F] text-[#EAD5E5] border-t border-[#461643] pt-16 pb-12 transition-colors">
@@ -25,16 +29,16 @@ export function Footer() {
                   HAPPYBIRTH
                 </span>
                 <span className="text-[10px] uppercase font-semibold text-[#EC008C] tracking-wider mt-0.5">
-                  szkoła rodzenia online
+                  {lang === 'pl' ? 'szkoła rodzenia online' : lang === 'en' ? 'online birthing school' : 'онлайн школа родов'}
                 </span>
               </div>
             </div>
             <p className="text-xs text-[#EAD5E5]/75 leading-relaxed">
-              Czuła szkoła rodzenia online dla naszych mam i ojców. 52 filmowe lekcje wideo, sprawdzone patenty i wsparcie przez cały pierwszy rok życia dziecka.
+              {t.footer.tagline}
             </p>
             <div className="flex items-center space-x-2 text-xs text-[#EAD5E5]/90 pt-1">
               <Sparkles className="w-4 h-4 text-[#FCD705]" />
-              <span>Ponad 18 000 przygotowanych rodzin</span>
+              <span>{t.footer.familyCount}</span>
             </div>
 
             {/* Social media links */}
@@ -156,7 +160,10 @@ export function Footer() {
         {/* Notatka odpowiedzialności i dane prawne */}
         <div className="pt-6 border-t border-[#461643] text-xs text-[#EAD5E5]/60 space-y-3">
           <p>
-            <strong className="text-white">Charakter edukacyjny platformy (E-learning):</strong> HappyBirth jest internetową platformą edukacyjną świadczącą usługi szkoleniowe w formule kursu wideo VOD. Wszystkie materiały, narzędzia oraz wskazówki mają wyłącznie charakter edukacyjny i przygotowawczy do roli rodzica. Usługa nie stanowi i nie zastępuje indywidualnych świadczeń zdrowotnych, diagnostyki ani porady lekarskiej.
+            <strong className="text-white">
+              {lang === 'pl' ? 'Charakter edukacyjny platformy (E-learning): ' : lang === 'en' ? 'Educational character (E-learning): ' : 'Образовательный характер платформы (E-learning): '}
+            </strong>
+            {t.footer.legalNote}
           </p>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 text-[11px] text-[#EAD5E5]/50 border-t border-[#461643]/50">
             <div>
