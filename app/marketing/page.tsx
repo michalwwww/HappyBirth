@@ -17,6 +17,7 @@ import {
   Feather,
   Instagram,
   BookOpen,
+  Clock,
 } from 'lucide-react';
 import { CLOUDFLARE_CUSTOMER_DOMAIN } from '@/lib/course-data';
 import { useI18n } from '@/lib/i18n';
@@ -331,42 +332,123 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      {/* 7. PORÓWNANIE: SZKOŁA TRADYCYJNA VS HAPPYBIRTH */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-5xl mx-auto">
-        <div className="text-center space-y-2 mb-8">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C] dark:text-[#F472B6]">
-            {t.comparison.tag}
-          </span>
-          <h2 className="font-brand-display font-medium text-2xl sm:text-3xl text-[#1A1512] dark:text-[#FBF8F4]">
-            {t.comparison.title}
+      {/* 7. PORÓWNANIE: SZKOŁA TRADYCYJNA VS HAPPYBIRTH (Dwa Światy) */}
+      <section className="py-16 sm:py-24 px-4 sm:px-6 max-w-7xl mx-auto" id="porownanie">
+        <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] dark:bg-[#3B0D36] border border-[#F3CAD9] dark:border-[#52134C] text-xs font-semibold text-[#EC008C] dark:text-[#F472B6]">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{t.comparison.tag}</span>
+          </div>
+          <h2 className="font-brand-display font-medium text-3xl sm:text-5xl text-[#1A1512] dark:text-[#FBF8F4] leading-tight">
+            {t.comparison.title1}{' '}
+            <em className="font-brand-serif italic font-normal text-[#EC008C] dark:text-[#F472B6]">
+              {t.comparison.titlePink}
+            </em>
           </h2>
+          <p className="text-base sm:text-lg text-[#544A44] dark:text-[#D7CCC3] leading-relaxed max-w-2xl mx-auto">
+            {t.comparison.desc}
+          </p>
         </div>
 
-        <div className="rounded-3xl bg-white dark:bg-[#20081E] border border-[#EAE3DB] dark:border-[#461643] overflow-hidden shadow-sm">
-          <div className="grid grid-cols-12 bg-[#F6F2EC] dark:bg-[#250A24] p-4 text-xs font-bold uppercase tracking-wider border-b border-[#EAE3DB] dark:border-[#3A1038]">
-            <div className="col-span-4 text-[#867A72] dark:text-[#A2958C]">{t.comparison.colFeature}</div>
-            <div className="col-span-4 text-[#867A72] dark:text-[#A2958C]">{t.comparison.colTraditional}</div>
-            <div className="col-span-4 text-[#EC008C] dark:text-[#F472B6]">{t.comparison.colHappyBirth}</div>
+        {/* Karty Porównawcze: Dwa Światy */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+          {/* Karta 1: Tradycyjna Szkoła Stacjonarna */}
+          <div className="rounded-3xl bg-[#F6F2EC] dark:bg-[#20081E] border border-[#E5DFD7] dark:border-[#461643] p-8 sm:p-10 flex flex-col justify-between space-y-8 shadow-sm">
+            <div className="space-y-6">
+              {/* Header Karty */}
+              <div className="space-y-2 border-b border-[#E5DFD7] dark:border-[#461643] pb-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EAE4DC] dark:bg-[#320C30] text-[#786D65] dark:text-[#EAD5E5]/70 text-xs font-semibold uppercase tracking-wider">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{t.comparison.traditionalBadge}</span>
+                </div>
+                <h3 className="font-brand-display font-semibold text-2xl sm:text-3xl text-[#2C2420] dark:text-[#FBF8F4]">
+                  {t.comparison.traditionalTitle}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#786D65] dark:text-[#D7CCC3] leading-relaxed">
+                  {t.comparison.traditionalSubtitle}
+                </p>
+              </div>
+
+              {/* Lista punktów */}
+              <ul className="space-y-4 text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3]">
+                {t.comparison.traditionalPoints.map((pt, idx) => (
+                  <li key={idx} className="flex items-start gap-3.5">
+                    <div className="w-5 h-5 rounded-full bg-stone-200 dark:bg-white/10 text-stone-600 dark:text-stone-300 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                      ✕
+                    </div>
+                    <div>
+                      <strong className="text-[#1A1512] dark:text-[#FBF8F4] block mb-0.5">
+                        {pt.bold}
+                      </strong>
+                      <span className="text-[#786D65] dark:text-[#A2958C] leading-relaxed">
+                        {pt.text}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="pt-4 border-t border-[#E5DFD7] dark:border-[#461643] text-xs text-[#867A72] dark:text-[#A2958C] flex items-center justify-between">
+              <span>{t.comparison.traditionalFoot1}</span>
+              <span className="font-semibold">{t.comparison.traditionalFoot2}</span>
+            </div>
           </div>
 
-          {t.comparison.items.map((item, idx) => (
-            <div
-              key={item.feature}
-              className={`grid grid-cols-12 p-4 text-xs items-center gap-2 border-b border-[#EAE3DB]/50 dark:border-[#3A1038]/50 last:border-b-0 ${
-                idx % 2 === 1 ? 'bg-[#FAF7F2] dark:bg-white/[0.02]' : ''
-              }`}
-            >
-              <div className="col-span-4 font-semibold text-[#1A1512] dark:text-[#FBF8F4]">
-                {item.feature}
+          {/* Karta 2: HappyBirth Online (Hero Lifestyle Card) */}
+          <div className="relative rounded-3xl bg-gradient-to-b from-white via-[#FFFBFD] to-[#FDF2F7] dark:from-[#2A0B28] dark:via-[#20081E] dark:to-[#1A0518] border-2 border-[#EC008C] p-8 sm:p-10 shadow-2xl shadow-[#EC008C]/15 flex flex-col justify-between space-y-8 overflow-hidden">
+            {/* Ambient glow */}
+            <div className="absolute -right-12 -top-12 w-48 h-48 bg-[#EC008C]/10 rounded-full blur-2xl pointer-events-none" />
+
+            <div className="relative z-10 space-y-6">
+              {/* Header Karty */}
+              <div className="space-y-2 border-b border-[#F3CAD9] dark:border-[#52134C] pb-6">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EC008C] text-white text-xs font-bold uppercase tracking-wider shadow-sm">
+                  <Sparkles className="w-3.5 h-3.5 text-[#FCD705]" />
+                  <span>{t.comparison.happybirthBadge}</span>
+                </div>
+                <h3 className="font-brand-display font-bold text-2xl sm:text-3xl text-[#1A1512] dark:text-[#FBF8F4]">
+                  {t.comparison.happybirthTitle}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
+                  {t.comparison.happybirthSubtitle}
+                </p>
               </div>
-              <div className="col-span-4 text-[#867A72] dark:text-[#A2958C]">
-                {item.traditional}
-              </div>
-              <div className="col-span-4 font-semibold text-[#EC008C] dark:text-[#F472B6]">
-                {item.happybirth}
-              </div>
+
+              {/* Lista punktów */}
+              <ul className="space-y-4 text-xs sm:text-sm text-[#342D28] dark:text-[#EAD5E5]">
+                {t.comparison.happybirthPoints.map((pt, idx) => (
+                  <li key={idx} className="flex items-start gap-3.5">
+                    <div className="w-5 h-5 rounded-full bg-[#EC008C] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-sm">
+                      ✓
+                    </div>
+                    <div>
+                      <strong className="text-[#1A1512] dark:text-[#FBF8F4] block mb-0.5">
+                        {pt.bold}
+                      </strong>
+                      <span className="text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
+                        {pt.text}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
-          ))}
+
+            {/* Dolna belka z przyciskiem w karcie */}
+            <div className="relative z-10 pt-6 border-t border-[#F3CAD9] dark:border-[#52134C] mt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <span className="text-xs text-[#867A72] dark:text-[#A2958C] block">{t.comparison.priceLabel}</span>
+                <span className="font-brand-display text-2xl font-bold text-[#1A1512] dark:text-[#FBF8F4]">{t.pricing.price}</span>
+                <span className="text-xs text-[#EC008C] dark:text-[#F472B6] font-semibold ml-2">{t.comparison.priceSub}</span>
+              </div>
+
+              <BuyCourseButton className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:scale-105 cursor-pointer">
+                <span>{t.comparison.cta}</span>
+                <ArrowRight className="w-4 h-4" />
+              </BuyCourseButton>
+            </div>
+          </div>
         </div>
       </section>
 

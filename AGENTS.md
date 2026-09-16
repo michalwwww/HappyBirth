@@ -1,4 +1,4 @@
-﻿# Instrukcja dla Asystenta AI (Claude / Antigravity) w projekcie HappyBirth
+# Instrukcja dla Asystenta AI (Claude / Antigravity) w projekcie HappyBirth
 
 Witaj! Ten plik zawiera kluczowe zasady, architekturę i wytyczne współpracy zespołowej nad projektem **HappyBirth**.
 Projekt jest rozwijany równolegle przez:
@@ -80,3 +80,28 @@ wrangler.toml              # Konfiguracja środowiska Cloudflare
 - `npm run build` – Kompilacja produkcyjna i test typów
 - `npm run lint` – Sprawdzenie reguł lintera
 - `npx wrangler d1 execute happybirth-db --local --file=./d1-schema.sql` – Inicjalizacja lokalnej bazy D1
+
+---
+
+## 5. Żelazne Zasady Marketingu, Ochrony Kapitału i AdOps (Zero-Burn Guardrails)
+
+Każdy asystent AI (Antigravity / Claude) pracujący nad integracjami marketingowymi, lejkami, analityką i reklamami HappyBirth MUSI bezwzględnie przestrzegać poniższych reguł:
+
+1. **Kategoryczny Zakaz Ślepego „Advantage+”**:
+   - Nigdy nie uruchamiaj kampanii Meta Ads bez twardych kagańców demograficznych (`enable_audience_expansion: false`, płeć: kobiety, wiek: ściśle 22–37 lat).
+   - Budżety WYŁĄCZNIE na poziomie zestawu (ABO) w mikropakietach (max 30–50 zł/dzień na test).
+2. **Bezpiecznik Bilingowy i Hardware Kill-Switch**:
+   - Wszystkie konta reklamowe muszą być powiązane wyłącznie z kartami wirtualnymi o twardym limicie dziennym (np. subkonto Revolut Business max 150–200 zł).
+3. **Automatyczny Strażnik Kosztu Pozyskania (CPA Circuit Breaker)**:
+   - Zestaw wydał 70 zł bez ani jednego `InitiateCheckout` lub 105 zł (1.5x limit) bez `Purchase` ze Stripe -> natychmiastowy status `PAUSED`.
+   - Wykrycie wyświetleń dla grupy 45+ w metrykach breakdown -> natychmiastowe ubicie zestawu.
+4. **Ochrona przed Oflagowaniem i Cenzurą (Policy & Anti-Ban)**:
+   - **Sterylna Śluza Treści Medycznych**: Publiczne strony lądowania z reklam nie mogą zawierać inwazyjnego języka medycznego (krocze, nacięcie, krew, oksytocyna, cesarka). Pełne narzędzia (np. Plan Porodu) udostępniane są wyłącznie w zamkniętej strefie po podaniu maila.
+   - **Wizyjny Filtr Kreacji Wideo**: Zakaz używania w reklamach ujęć nagości (karmienie piersią z widoczną brodawką), ran pooperacyjnych czy procedur szpitalnych. Używamy kadrów z ekspertkami mówiącymi do kamery, partnerem ćwiczącym w ubraniu oraz organizacją wyprawki.
+5. **Separacja Danych Medycznych od Piksela Mety**:
+   - Skrypty Piksela Mety / TikToka mogą być ładowane WYŁĄCZNIE na stronach publicznych (`happybirth.pl`, `/marketing`, checkout).
+   - Kategoryczny zakaz instalowania pikseli wewnątrz strefy kursantki (`/strefa/*`), odtwarzacza lekcji czy licznika skurczów (ochrona przed karami RODO i banem Mety za wyciek danych wrażliwych zdrowotnych).
+6. **Zgodność Prawna (UOKiK, Prawo Konsumenckie, Omnibus)**:
+   - W procesie zakupu Stripe obowiązkowa klauzula z art. 38 pkt 13 Ustawy o prawach konsumenta (wygaśnięcie prawa odstąpienia z chwilą rozpoczęcia świadczenia).
+   - Żadnych sztucznych cen przekreślonych – stała cena regularna 349 zł, a rabaty wyłącznie przez indywidualne kody promocyjne w Stripe.
+

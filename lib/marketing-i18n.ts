@@ -16,10 +16,29 @@ export interface StageItem {
   color: string;
 }
 
-export interface ComparisonItem {
-  feature: string;
-  traditional: string;
-  happybirth: string;
+export interface ComparisonPoint {
+  bold: string;
+  text: string;
+}
+
+export interface ComparisonContent {
+  tag: string;
+  title1: string;
+  titlePink: string;
+  desc: string;
+  traditionalBadge: string;
+  traditionalTitle: string;
+  traditionalSubtitle: string;
+  traditionalPoints: ComparisonPoint[];
+  traditionalFoot1: string;
+  traditionalFoot2: string;
+  happybirthBadge: string;
+  happybirthTitle: string;
+  happybirthSubtitle: string;
+  happybirthPoints: ComparisonPoint[];
+  priceLabel: string;
+  priceSub: string;
+  cta: string;
 }
 
 export interface TestimonialItem {
@@ -100,14 +119,7 @@ export interface MarketingContent {
     card3Title: string;
     card3Desc: string;
   };
-  comparison: {
-    tag: string;
-    title: string;
-    colFeature: string;
-    colTraditional: string;
-    colHappyBirth: string;
-    items: ComparisonItem[];
-  };
+  comparison: ComparisonContent;
   testimonials: {
     tag: string;
     title: string;
@@ -251,38 +263,65 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       card3Desc: 'Krótkie 2-minutowe instrukcje: jak masować lędźwie, jak podtrzymać żonę pod prysznicem i co zrobić po powrocie ze szpitala.',
     },
     comparison: {
-      tag: 'Dlaczego HappyBirth?',
-      title: 'Tradycyjna szkoła rodzenia vs HappyBirth',
-      colFeature: 'Obszar',
-      colTraditional: 'Tradycyjna Szkoła Rodzenia',
-      colHappyBirth: 'HappyBirth Online VOD',
-      items: [
+      tag: 'Nowoczesne przygotowanie dla dwojga',
+      title1: 'Szkoła rodzenia, która',
+      titlePink: 'dopasowuje się do Was.',
+      desc: 'Porównaj tradycyjne kursy stacjonarne z podejściem HappyBirth. Zobacz, dlaczego ponad 18 000 par wybrało spokój we własnym salonie.',
+      traditionalBadge: 'Tradycyjna szkoła stacjonarna',
+      traditionalTitle: 'Sztywny grafik i pośpiech w korkach',
+      traditionalSubtitle: 'Często kosztuje 600–900 zł, a po narodzinach dziecka zostajecie sami bez dostępu do wiedzy.',
+      traditionalPoints: [
         {
-          feature: 'Format nauki',
-          traditional: 'Sztywne wykłady w sali, dojazdy po pracy',
-          happybirth: 'Nowoczesny e-learning VOD na kanapie w telefonie lub TV',
+          bold: 'Wtorki o 18:00 na drugim końcu miasta',
+          text: 'Dojazdy w korkach po pracy, pośpiech i zmęczenie w zaawansowanej ciąży. Gdy nie dotrzesz – lekcja bezpowrotnie przepada.',
         },
         {
-          feature: 'Zaangażowanie taty',
-          traditional: 'Często czuje się biernym obserwatorem z boku',
-          happybirth: 'Dedykowana Strefa dla Taty: masaż relaksacyjny i konkretne zadania',
+          bold: 'Partner jako bierny widz z tyłu sali',
+          text: 'Siedzi skrępowany na niewygodnym krześle. Brak czasu na indywidualne przećwiczenie technik masażu i realnych chwytów.',
         },
         {
-          feature: 'Dostęp po narodzinach',
-          traditional: 'Kurs kończy się przed porodem – po powrocie zostajecie sami',
-          happybirth: 'Dostęp na 12 miesięcy od terminu porodu – powrót do lekcji w domu',
+          bold: 'Koniec kursu tuż przed porodem',
+          text: 'Zajęcia kończą się przed narodzinami. Po powrocie ze szpitala o 3:00 w nocy przy pierwszych wyzwaniach zostajecie zdani na fora internetowe.',
         },
         {
-          feature: 'Pomoce dydaktyczne',
-          traditional: 'Zeszyt z notatkami, który gubi się w stresie',
-          happybirth: 'Cyfrowy Notatnik Rodzica PDF, wideo-patenty i ściągi dla taty',
+          bold: 'Notatki w zeszycie, które gubią się w torbie',
+          text: 'Stosy kartek i kserówek, których nikt nie czyta w trakcie akcji porodowej ani w szpitalnej sali.',
         },
         {
-          feature: 'Podejście edukacyjne',
-          traditional: 'Sztywne dogmaty budzące presję i poczucie winy',
-          happybirth: 'Ciepło, zero oceniania i zaufanie do Waszych wyborów',
+          bold: 'Sztywne dogmaty i presja',
+          text: 'Narzucanie jednego idealnego scenariusza, który budzi poczucie winy, gdy poród lub laktacja potoczą się inaczej.',
         },
       ],
+      traditionalFoot1: 'Brak powrotu do materiałów',
+      traditionalFoot2: 'Ograniczony czas',
+      happybirthBadge: 'HappyBirth Online · Dla Dwojga',
+      happybirthTitle: 'Spokój, czułość i pełna wolność',
+      happybirthSubtitle: '52 filmowe lekcje 4K, do których wracacie przez 12 miesięcy po porodzie – na Smart TV i telefonie.',
+      happybirthPoints: [
+        {
+          bold: 'Ciepła herbata, kanapa i własny salon',
+          text: 'Oglądacie we dwoje o dowolnej porze na Smart TV lub smartfonie. Pauzujecie, wracacie i rozmawiacie we własnym rytmie, bez stresu i dojazdów.',
+        },
+        {
+          bold: 'Dedykowana Strefa dla Taty',
+          text: 'Praktyczne wideo-instrukcje dla partnera: masaż relaksacyjny, wsparcie mamy, gotowe zadania i pewność na porodówce.',
+        },
+        {
+          bold: 'Dostęp przez 12 miesięcy od narodzin malucha',
+          text: 'Najwięcej pytań pojawia się po powrocie do domu. Włączacie lekcje o laktacji, kąpieli, śnie czy pierwszej pomocy dokładnie wtedy, gdy ich potrzebujecie.',
+        },
+        {
+          bold: 'Narzędzia nocne w telefonie i ściągi',
+          text: 'Cyfrowy Notatnik Rodzica PDF, wideo-patenty oraz ściągi na wyciągnięcie ręki o każdej porze.',
+        },
+        {
+          bold: 'Ciepło, zero dogmatów i akceptacja',
+          text: 'Wspieramy każdą drogę rodzicielstwa: poród naturalny i cesarskie cięcie, karmienie piersią i butelką – bez poczucia winy, z pełnym zrozumieniem.',
+        },
+      ],
+      priceLabel: 'Płatność jednorazowa za dwoje:',
+      priceSub: 'pełny pakiet na rok',
+      cta: 'Wybierz HappyBirth · 349 zł',
     },
     testimonials: {
       tag: 'Głosy rodziców',
@@ -479,38 +518,65 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       card3Desc: 'Concise 2-minute guides: lower back sacrum massage, supporting in the shower, and home transition support.',
     },
     comparison: {
-      tag: 'Why HappyBirth?',
-      title: 'Traditional Birthing School vs HappyBirth',
-      colFeature: 'Area',
-      colTraditional: 'Traditional Birthing School',
-      colHappyBirth: 'HappyBirth Online VOD',
-      items: [
+      tag: 'Modern Preparation for Two',
+      title1: 'A birthing school that',
+      titlePink: 'adapts to your life.',
+      desc: 'Compare traditional classes with HappyBirth. See why over 18,000 couples chose serenity in their own living room.',
+      traditionalBadge: 'Traditional In-Person Class',
+      traditionalTitle: 'Rigid schedule and rushed commutes',
+      traditionalSubtitle: 'Often costs 600–900 PLN, and once baby is born, you are left completely on your own.',
+      traditionalPoints: [
         {
-          feature: 'Learning Format',
-          traditional: 'Rigid lectures in a classroom, commuting after work',
-          happybirth: 'Modern e-learning VOD from your sofa on phone or TV',
+          bold: 'Tuesday evenings across town',
+          text: 'Commuting in rush-hour traffic after work while heavily pregnant. Miss a session and it’s lost forever.',
         },
         {
-          feature: 'Dad’s Engagement',
-          traditional: 'Often feels like a passive bystander on the side',
-          happybirth: 'Dedicated Dad Zone: massage techniques and actionable duties',
+          bold: 'Partner as a passive spectator',
+          text: 'Sitting awkwardly on an uncomfortable chair. Zero time for hands-on partner massage practice.',
         },
         {
-          feature: 'Access Post-Birth',
-          traditional: 'Ends right before labor – left completely alone at home',
-          happybirth: '12 months access from due date – rewatch whenever needed',
+          bold: 'Class ends before labor',
+          text: 'Lessons stop before baby arrives. When you are home at 3:00 AM facing new challenges, you are left to Google forums.',
         },
         {
-          feature: 'Learning Materials',
-          traditional: 'Messy paper notes that get lost during high stress',
-          happybirth: 'Digital Parent Notebook PDF, quick video hacks & cheatsheets',
+          bold: 'Paper notes lost in bags',
+          text: 'Piles of photocopies that nobody ever reads during active labor or in the hospital.',
         },
         {
-          feature: 'Philosophy & Tone',
-          traditional: 'Rigid dogmas triggering anxiety, guilt, and fear',
-          happybirth: 'Warmth, zero judgment, and respect for your choices',
+          bold: 'Rigid dogmas and pressure',
+          text: 'Enforcing a single "ideal" birth path that fuels guilt when labor or feeding goes differently.',
         },
       ],
+      traditionalFoot1: 'No return to materials',
+      traditionalFoot2: 'Limited time',
+      happybirthBadge: 'HappyBirth Online · For Two',
+      happybirthTitle: 'Serenity, tenderness & complete freedom',
+      happybirthSubtitle: '52 cinema-grade 4K lessons you can rewatch for 12 months after birth – on Smart TV and smartphone.',
+      happybirthPoints: [
+        {
+          bold: 'Hot tea, your sofa, your living room',
+          text: 'Watch together whenever you want on Smart TV or smartphone. Pause, replay, and discuss at your own pace.',
+        },
+        {
+          bold: 'Dedicated Dad Zone',
+          text: 'Actionable video guides for partner: soothing massage techniques, shower support, and birth room confidence.',
+        },
+        {
+          bold: '12 months access from your due date',
+          text: 'Most questions arise after coming home. Rewatch feeding, bath, sleep, and first-aid lessons when you actually need them.',
+        },
+        {
+          bold: 'Nighttime tools & mobile cheatsheets',
+          text: 'Digital Parent Notebook PDF, quick video hacks, and actionable guides at your fingertips.',
+        },
+        {
+          bold: 'Warmth, zero dogmas, total acceptance',
+          text: 'We embrace every birth and parenting journey: natural birth and C-section, breastfeeding and bottle – zero guilt.',
+        },
+      ],
+      priceLabel: 'One-time payment for two:',
+      priceSub: 'full 1-year package',
+      cta: 'Choose HappyBirth · 349 PLN',
     },
     testimonials: {
       tag: "Parents' Voices",
@@ -707,38 +773,65 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       card3Desc: 'Короткие 2-минутные инструкции: массаж крестца, поддержка в душе и первые шаги дома.',
     },
     comparison: {
-      tag: 'Почему HappyBirth?',
-      title: 'Традиционная школа родов vs HappyBirth',
-      colFeature: 'Критерий',
-      colTraditional: 'Традиционная Школа Родов',
-      colHappyBirth: 'HappyBirth Онлайн VOD',
-      items: [
+      tag: 'Современная подготовка для двоих',
+      title1: 'Школа родов, которая',
+      titlePink: 'подстраивается под вас.',
+      desc: 'Сравните традиционные очные курсы с подходом HappyBirth. Узнайте, почему более 18 000 пар выбрали спокойствие в собственной гостиной.',
+      traditionalBadge: 'Традиционная очная школа',
+      traditionalTitle: 'Жесткий график и пробки после работы',
+      traditionalSubtitle: 'Часто стоит 600–900 zł, а после родов вы остаетесь один на один с вопросами.',
+      traditionalPoints: [
         {
-          feature: 'Формат обучения',
-          traditional: 'Лекции в душных кабинетах, поездки после работы',
-          happybirth: 'Современный VOD e-learning на диване в телефоне или на ТВ',
+          bold: 'Вторник в 18:00 на другом конце города',
+          text: 'Поездки по пробкам после работы на поздних сроках беременности. Пропустили занятие – оно сгорело.',
         },
         {
-          feature: 'Участие папы',
-          traditional: 'Часто чувствует себя лишним пассивным зрителем',
-          happybirth: 'Специальная Зона для Папы: техники массажа и четкие задачи',
+          bold: 'Партнер – пассивный зритель',
+          text: 'Неловко сидит сзади на стуле. Нет времени индивидуально отработать техники обезболивающего массажа.',
         },
         {
-          feature: 'Доступ после родов',
-          traditional: 'Курс заканчивается до родов – дома вы остаетесь одни',
-          happybirth: 'Доступ на 12 месяцев с даты родов – возврат к урокам дома',
+          bold: 'Курс заканчивается до родов',
+          text: 'Занятия заканчиваются до появления малыша. Вернувшись домой в 3 часа ночи, вы ищете ответы на форумах.',
         },
         {
-          feature: 'Материалы',
-          traditional: 'Бумажная тетрадь, которая теряется в стрессе',
-          happybirth: 'Цифровой Блокнот Родителя PDF, видео-лайфхаки и памятки',
+          bold: 'Записи в блокноте, которые теряются',
+          text: 'Стопки бумажных конспектов, которые никто не читает в родзале.',
         },
         {
-          feature: 'Философия',
-          traditional: 'Устаревшие догмы, вызывающие вину и тревогу',
-          happybirth: 'Тепло, уважение к вашим решениям и ноль осуждения',
+          bold: 'Жесткие догмы и давление',
+          text: 'Навязывание единственного идеального сценария, вызывающее чувство вины при отклонениях.',
         },
       ],
+      traditionalFoot1: 'Нет доступа к материалам',
+      traditionalFoot2: 'Ограниченное время',
+      happybirthBadge: 'HappyBirth Online · Для двоих',
+      happybirthTitle: 'Спокойствие, забота и полная свобода',
+      happybirthSubtitle: '52 фильма 4K, к которым вы возвращаетесь в течение 12 месяцев после родов – на Smart TV и телефоне.',
+      happybirthPoints: [
+        {
+          bold: 'Теплый чай, диван и своя гостиная',
+          text: 'Смотрите вдвоем в удобное время на Smart TV или смартфоне. Ставьте на паузу, повторяйте и обсуждайте в своем ритме.',
+        },
+        {
+          bold: 'Специальная Зона для Папы',
+          text: 'Практические видео-шпаргалки: расслабляющий массаж, поддержка в душе, четкие задачи и уверенность.',
+        },
+        {
+          bold: 'Доступ на 12 месяцев с даты родов',
+          text: 'Больше всего вопросов возникает дома. Смотрите уроки по кормлению, купанию, сну и первой помощи, когда они нужны.',
+        },
+        {
+          bold: 'Ночные инструменты и шпаргалки в телефоне',
+          text: 'Цифровой блокнот родителя PDF, видео-лайфхаки и удобные памятки всегда под рукой.',
+        },
+        {
+          bold: 'Чуткость, отсутствие догм и поддержка',
+          text: 'Мы поддерживаем любой выбор: естественные роды и кесарево сечение, грудное и искусственное вскармливание.',
+        },
+      ],
+      priceLabel: 'Разовый платеж за двоих:',
+      priceSub: 'полный пакет на год',
+      cta: 'Выбрать HappyBirth · 349 zł',
     },
     testimonials: {
       tag: 'Голоса родителей',
