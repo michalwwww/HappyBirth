@@ -40,35 +40,35 @@ export default function MarketingPage() {
     {
       num: '01',
       title: 'Poród & Oddech',
-      subtitle: 'Współpraca z ciałem i ochrona krocza',
-      desc: 'Oddech przeponowy, pozycje wertykalne i niefarmakologiczna ulga w skurczach. Uczymy, jak zaufać ciału zamiast z nim walczyć.',
+      subtitle: 'Współpraca z ciałem i naturalny rytm',
+      desc: 'Świadomy oddech, wygodne pozycje wertykalne i spokój. Uczymy, jak zaufać ciału i zachować pewność siebie krok po kroku.',
       accent: '#EC008C',
       bg: '#FAE3EB',
       icon: Feather,
     },
     {
       num: '02',
-      title: 'Ciało & Dno Miednicy',
-      subtitle: 'Fizjoterapia i regeneracja połogu',
-      desc: 'Przygotowanie tkanek do porodu, masaż krzyżowy dla taty oraz bezpieczna, łagodna regeneracja mięśni dna miednicy po narodzinach.',
+      title: 'Ciało & Spokojny Ruch',
+      subtitle: 'Komfort, mobilność i czuły powrót do sił',
+      desc: 'Praktyczne ćwiczenia rozluźniające, masaż dla taty oraz bezpieczna domowa regeneracja dla świeżo upieczonej mamy.',
       accent: '#98269C',
       bg: '#EAD5E5',
       icon: Activity,
     },
     {
       num: '03',
-      title: 'Laktacja & Więź',
-      subtitle: 'Czułe karmienie bez presji',
-      desc: 'Prawidłowe przystawienie, chwyt asymetryczny i radzenie sobie z nawałem. Pełne wsparcie dla karmienia piersią oraz butelką bez poczucia winy.',
+      title: 'Czułe Karmienie & Więź',
+      subtitle: 'Bliskość bez presji i bez oceniania',
+      desc: 'Wygodne pozycje i spokojny start – zarówno przy karmieniu piersią, jak i butelką. Bezpiecznie i z pełnym zrozumieniem.',
       accent: '#0088BC',
       bg: '#D0EBF3',
       icon: Heart,
     },
     {
       num: '04',
-      title: 'Noworodek & Pierwszy Rok',
-      subtitle: 'Zdrowy rozsądek o 3:00 w nocy',
-      desc: 'Kąpiel krok po kroku, bezpieczny sen, pielęgnacja pępka i łagodzenie kolek. Spokój i pewność siebie w pierwszych tygodniach w domu.',
+      title: 'Maluszek w Domu',
+      subtitle: 'Pewność siebie o 3:00 w nocy',
+      desc: 'Kąpiel bez stresu, bezpieczny sen, noszenie i uspokajanie maluszka. Praktyczny spokój w pierwszych tygodniach w domu.',
       accent: '#347A22',
       bg: '#DFEED4',
       icon: Baby,
@@ -77,57 +77,57 @@ export default function MarketingPage() {
 
   const stagesOverview = [
     { num: '01', name: 'Zanim', desc: 'Świadome przygotowanie i spokój w głowie', color: '#8F8D8D' },
-    { num: '02', name: 'Dwie kreski', desc: 'I Trymestr – badania, emocje i ciało', color: '#54BF39' },
-    { num: '03', name: 'Wreszcie lepiej', desc: 'II Trymestr – energia, ruch, USG i siła', color: '#FCD705' },
-    { num: '04', name: 'Torba spakowana', desc: 'III Trymestr – wyprawka i plan porodu', color: '#F57B14' },
-    { num: '05', name: 'Kiedy zacznie boleć', desc: 'Aktywny poród – skurcze, pozycje i oddech', color: '#ED1C24' },
-    { num: '06', name: 'Gdy plan się posypie', desc: 'Cięcie cesarskie i plan B bez lęku', color: '#952999' },
-    { num: '07', name: 'Pierwsza noc w domu', desc: 'Czuły połóg i regeneracja mamy', color: '#EC008C' },
-    { num: '08', name: 'Karmienie', desc: 'Laktacja z miłością – pierś i butelka', color: '#00ADEF' },
-    { num: '09', name: 'Nie śpi', desc: 'Pierwszy rok życia – sen, rozwój i bezpieczeństwo', color: '#3B46A4' },
+    { num: '02', name: 'Dwie kreski', desc: 'I Trymestr – emocje, ciało i pierwsze chwile', color: '#54BF39' },
+    { num: '03', name: 'Wreszcie lepiej', desc: 'II Trymestr – nowa energia, ruch i siła', color: '#FCD705' },
+    { num: '04', name: 'Torba spakowana', desc: 'III Trymestr – sprytna wyprawka i organizacja', color: '#F57B14' },
+    { num: '05', name: 'Wielki Dzień', desc: 'Ciało w ruchu, oddech i spokój we dwoje', color: '#ED1C24' },
+    { num: '06', name: 'Plan B bez stresu', desc: 'Świadome narodziny w każdym scenariuszu', color: '#952999' },
+    { num: '07', name: 'Pierwsza noc w domu', desc: 'Czuły połóg i regeneracja sił mamy', color: '#EC008C' },
+    { num: '08', name: 'Karmienie z miłością', desc: 'Pierś i butelka bez presji i poczucia winy', color: '#00ADEF' },
+    { num: '09', name: 'Razem przez 1. rok', desc: 'Sen, rozwój maluszka i bezpieczeństwo', color: '#3B46A4' },
   ];
 
   const comparison = [
     {
       feature: 'Czas i wygoda',
       traditional: 'Sztywne godziny, dojazdy w korkach po pracy',
-      happybirth: 'Oglądacie we dwoje na kanapie, w telefonie lub na Smart TV',
+      happybirth: 'Oglądacie we dwoje na kanapie w telefonie lub na TV',
     },
     {
       feature: 'Rola taty / partnera',
-      traditional: 'Często czuje się biernym obserwatorem na sali',
-      happybirth: 'Dedykowana Strefa dla Taty: konkretne zadania, pozycje i masaż',
+      traditional: 'Często czuje się biernym obserwatorem z boku',
+      happybirth: 'Dedykowana Strefa dla Taty: masaż, wsparcie i konkretne zadania',
     },
     {
-      feature: 'Dostęp po porodzie',
+      feature: 'Dostęp po narodzinach',
       traditional: 'Kurs kończy się przed porodem – po powrocie zostajecie sami',
-      happybirth: 'Dostęp na 12 miesięcy od terminu porodu – wracacie w połogu',
+      happybirth: 'Dostęp na 12 miesięcy od terminu porodu – wracacie w domu',
     },
     {
       feature: 'Praktyczne narzędzia',
-      traditional: 'Notatki w zeszycie, które gubią się w drodze na izbę',
-      happybirth: 'Kreator Planu Porodu PDF, Apteczka SOS i codzienne patenty',
+      traditional: 'Zeszyt z notatkami, który gubi się w stresie',
+      happybirth: 'Cyfrowy Notatnik Rodzica PDF, wideo-patenty i ściągi dla taty',
     },
     {
-      feature: 'Podejście do rodzicielstwa',
+      feature: 'Podejście do rodziców',
       traditional: 'Sztywne dogmaty budzące presję i poczucie winy',
-      happybirth: 'Ciepło, zero oceniania, zaufanie do Waszych wyborów i spokój',
+      happybirth: 'Ciepło, zero oceniania i zaufanie do Waszych wyborów',
     },
   ];
 
   const testimonials = [
     {
-      quote: '„Największa wartość to spokój mojego męża. Na porodówce nie stał bezradnie – dokładnie wiedział, gdzie masować i jak pomóc przy każdym skurczu.”',
+      quote: '„Największa wartość to spokój mojego męża. Nie stał bezradnie – dokładnie wiedział, jak masować plecy i wspierać mnie oddechem.”',
       author: 'Katarzyna i Michał',
       meta: 'Córeczka Pola · Wrocław',
     },
     {
-      quote: '„Lekcje o pierwszych dobach uratowały naszą laktację. O 2:30 w nocy przy nawale po prostu włączyliśmy wideo. Zero paniki, same konkrety.”',
+      quote: '„Lekcje o pierwszych dobach w domu uratowały nasz spokój. O 2:30 w nocy po prostu włączyliśmy wideo z telefonu. Zero paniki, same konkrety.”',
       author: 'Aleksandra i Tomasz',
       meta: 'Syn Leon · Poznań',
     },
     {
-      quote: '„Obejrzeliśmy kurs wieczorami przy herbacie. Piękne, filmowe ujęcia, zero akademickiego żargonu. Prawdziwa przystań dla przyszłych rodziców.”',
+      quote: '„Obejrzeliśmy cały kurs wieczorami przy herbacie. Piękne, filmowe ujęcia, ciepły język i zero akademickiego żargonu. Prawdziwa przystań.”',
       author: 'Magdalena i Piotr',
       meta: 'Bliźniaki Jan i Tymon · Kraków',
     },
@@ -136,23 +136,23 @@ export default function MarketingPage() {
   const faqs = [
     {
       q: 'Kiedy najlepiej dołączyć do kursu?',
-      a: 'Większość rodziców dołącza między 16. a 28. tygodniem ciąży. Dostęp trwa 12 miesięcy od przewidywanego terminu porodu, więc materiały służą Wam przez cały pierwszy rok życia maluszka.',
+      a: 'Większość rodziców dołącza między 16. a 28. tygodniem ciąży. Dostęp trwa 12 miesięcy od terminu porodu, więc materiały służą Wam przez cały pierwszy rok życia maluszka.',
     },
     {
       q: 'Czy tata potrzebuje osobnego konta?',
       a: 'Nie. Dostęp jest dla dwojga w jednej cenie. Tata może logować się na swoim telefonie i korzystać z dedykowanej Strefy dla Taty.',
     },
     {
-      q: 'Czy kurs przygotowuje do cesarskiego cięcia?',
-      a: 'Tak. Poświęciliśmy temu cały Etap 06. Tłumaczymy procedurę, rolę taty na bloku oraz bezpieczną pielęgnację blizny i pionizację w połogu.',
+      q: 'Czy kurs przygotowuje na różne scenariusze narodzin?',
+      a: 'Tak. Pokazujemy każdy wariant narodzin. Tata wie, jak towarzyszyć mamie, a Wy zyskujecie pełny spokój bez względu na przebieg sytuacji.',
     },
     {
       q: 'Co jeśli wybierzemy karmienie butelką?',
-      a: 'W HappyBirth nie ma oceniania. Uczymy karmienia piersią, ale z równą czułością pokazujemy karmienie butelką, dobór mieszanek i pozycje bliskości.',
+      a: 'W HappyBirth nie ma oceniania. Uczymy karmienia piersią, ale z równą czułością pokazujemy karmienie butelką i bezpieczne pozycje bliskości.',
     },
     {
-      q: 'Jak szybko po zakupie otrzymam dostęp?',
-      a: 'Natychmiast. Po opłaceniu zamówienia przez BLIK, Apple Pay lub kartę konto aktywuje się automatycznie w kilkadziesiąt sekund.',
+      q: 'Jak szybko po zakupie otrzymamy dostęp?',
+      a: 'Natychmiast. Po opłaceniu zamówienia przez BLIK, Apple Pay lub kartę konto w Strefie Rodziców aktywuje się automatycznie w kilkadziesiąt sekund.',
     },
   ];
 
@@ -351,13 +351,10 @@ export default function MarketingPage() {
         </div>
 
         <div className="text-center pt-6">
-          <a
-            href={`${strefaUrl}/standard-medyczny`}
-            className="text-xs font-semibold text-[#867A72] hover:text-[#EC008C] transition-colors inline-flex items-center gap-1"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Zobacz pełny Standard Merytoryczny & E-E-A-T oparty o wytyczne MZ</span>
-          </a>
+          <div className="text-xs font-semibold text-[#867A72] dark:text-[#EAD5E5]/70 inline-flex items-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <span>Sprawdzona wiedza i techniki wspierające opracowane z praktykami rodzicielstwa</span>
+          </div>
         </div>
       </section>
 
@@ -400,17 +397,17 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      {/* 6. NARZĘDZIA PORODOWE (Plan Porodu, Apteczka, Tata) */}
+      {/* 6. NARZĘDZIA RODZINNE (Notatnik, Strefa dla Taty, Patenty) */}
       <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-7xl mx-auto" id="narzedzia">
         <div className="text-center max-w-2xl mx-auto space-y-2 mb-10">
           <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
             Praktyczne wsparcie
           </span>
           <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512] dark:text-white">
-            Narzędzia, do których wracasz w dzień i w nocy
+            Narzędzia, do których wracacie w dzień i w nocy
           </h2>
           <p className="text-sm text-[#544A44] dark:text-[#EAD5E5]/70">
-            Gotowe do użycia w telefonie na sali porodowej i po powrocie ze szpitala.
+            Gotowe do użycia w telefonie – w drodze i po powrocie do domu.
           </p>
         </div>
 
@@ -420,10 +417,10 @@ export default function MarketingPage() {
               <FileText className="w-5 h-5" />
             </div>
             <h3 className="font-brand-display font-bold text-xl text-[#1A1512] dark:text-white">
-              Kreator Planu Porodu (PDF)
+              Cyfrowy Notatnik Rodzica (PDF)
             </h3>
             <p className="text-xs text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed">
-              Zgodny ze Standardem Opieki Okołoporodowej. Wyklikajcie preferencje we dwoje, wygenerujcie czysty dokument PDF i weźcie ze sobą na izbę przyjęć.
+              Przejrzysty dokument dla Was obojga. Uporządkujcie swoje życzenia: obecność partnera, muzykę, kangurowanie i pierwsze chwile z maluchem.
             </p>
           </div>
 
@@ -435,7 +432,7 @@ export default function MarketingPage() {
               Dedykowana Strefa dla Taty
             </h3>
             <p className="text-xs text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed">
-              Krótkie ściągi bez lania wody: techniki masażu krzyżowego piłeczką, zadania na izbie przyjęć oraz ochrona spokoju rodzącej mamy.
+              Krótkie wideo-ściągi bez zbędnych słów: relaksacyjny masaż pleców, wsparcie mamy i gotowość na każdą minutę.
             </p>
           </div>
 
@@ -444,10 +441,10 @@ export default function MarketingPage() {
               <Sparkles className="w-5 h-5" />
             </div>
             <h3 className="font-brand-display font-bold text-xl text-[#1A1512] dark:text-white">
-              Cyfrowa Apteczka SOS
+              Wyszukiwarka Złotych Patentów
             </h3>
             <p className="text-xs text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed">
-              Wpisz objaw (ból lędźwi, wody płodowe, nawał, kikut pępowinowy) i natychmiast otrzymaj sprawdzoną instrukcję wideo.
+              Wpisz dowolne wyzwanie (sen, kąpiel, płacz, noszenie) i błyskawicznie otrzymaj sprawdzoną instrukcję wideo z kursu.
             </p>
           </div>
         </div>

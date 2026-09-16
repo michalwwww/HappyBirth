@@ -71,12 +71,12 @@ export function Footer() {
               </li>
               <li>
                 <a href="#etapy" className="hover:text-white transition-colors">
-                  9 Etapów ciąży i porodu
+                  9 Etapów rodzicielstwa
                 </a>
               </li>
               <li>
-                <a href={`${strefaUrl}/plan-porodu`} className="hover:text-white transition-colors">
-                  Kreator Planu Porodu
+                <a href="#narzedzia" className="hover:text-white transition-colors">
+                  Przewodnik & Notatnik Rodzica
                 </a>
               </li>
               <li>
@@ -91,7 +91,7 @@ export function Footer() {
               </li>
               <li>
                 <a href={`${strefaUrl}/standard-medyczny`} className="hover:text-white transition-colors">
-                  Standard opieki & E-E-A-T
+                  Standard Rzetelnej Wiedzy
                 </a>
               </li>
             </ul>
@@ -156,7 +156,7 @@ export function Footer() {
         {/* Notatka odpowiedzialności i dane prawne */}
         <div className="pt-6 border-t border-[#461643] text-xs text-[#EAD5E5]/60 space-y-3">
           <p>
-            <strong className="text-white">Materiały na platformie mają charakter edukacyjny i wspierający.</strong> Służą przygotowaniu do aktywnego, świadomego porodu w oparciu o 4 Filary Spokoju i dorobek położnych Mama Gaja od 2012 roku. Nie zastępują indywidualnej opieki położnej ani lekarza prowadzącego ciążę. <a href={`${strefaUrl}/standard-medyczny`} className="underline hover:text-white transition-colors">Zobacz Standard Merytoryczny & E-E-A-T</a>.
+            <strong className="text-white">Materiały na platformie mają charakter edukacyjny i wspierający.</strong> Służą przygotowaniu do spokojnych, świadomych narodzin w oparciu o 4 Filary Spokoju HappyBirth. Nie zastępują indywidualnej porady medycznej ani opieki lekarza prowadzącego.
           </p>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 text-[11px] text-[#EAD5E5]/50 border-t border-[#461643]/50">
             <div>

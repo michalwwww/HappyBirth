@@ -26,13 +26,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'HAPPYBIRTH · Szkoła Rodzenia Online — 52 Lekcje VOD',
+  title: 'HAPPYBIRTH · Szkoła Rodzenia Online dla Dwojga — 52 Lekcje VOD',
   description:
-    'Nowoczesna szkoła rodzenia online dla przyszłych mam i partnerów. 9 etapów, 52 lekcje wideo w jakości HD, cyfrowa apteczka porodowa i licznik skurczów 5-1-1.',
+    'Czuła szkoła rodzenia online dla naszych mam i ojców. 52 filmowe lekcje VOD, sprawdzone złote patenty i wsparcie dla dwojga przez cały pierwszy rok życia dziecka.',
   metadataBase: new URL('https://happybirth.pl'),
   openGraph: {
-    title: 'HAPPYBIRTH · Szkoła Rodzenia Online — 52 Lekcje VOD',
-    description: 'Nowoczesna szkoła rodzenia online dla przyszłych mam i partnerów. 52 filmowe lekcje VOD dla dwojga.',
+    title: 'HAPPYBIRTH · Szkoła Rodzenia Online dla Dwojga — 52 Lekcje VOD',
+    description: 'Czuła szkoła rodzenia online dla naszych mam i ojców. 52 filmowe lekcje VOD, sprawdzone złote patenty i wsparcie dla dwojga.',
     url: 'https://happybirth.pl',
     siteName: 'HappyBirth',
     locale: 'pl_PL',

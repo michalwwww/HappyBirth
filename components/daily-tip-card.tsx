@@ -11,6 +11,8 @@ interface DailyTipCardProps {
 }
 
 export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardProps) {
+  const isDev = typeof window !== 'undefined' && window.location.hostname.includes('localhost');
+  const strefaUrl = isDev ? '/strefa' : 'https://strefa.happybirth.pl';
   const [tip, setTip] = useState<DailyTip>(getTodayTip());
   const [saved, setSaved] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -60,13 +62,13 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
           </button>
 
           {tip.lessonId ? (
-            <Link
-              href={`/strefa/lekcja/${tip.lessonId}`}
+            <a
+              href={`${strefaUrl}/lekcja/${tip.lessonId}`}
               className="text-[11px] font-semibold text-[#EC008C] hover:text-pink-300 flex items-center gap-1 transition-colors"
             >
               <span>Zobacz wideo</span>
               <ArrowRight className="w-3 h-3" />
-            </Link>
+            </a>
           ) : null}
         </div>
       </div>
@@ -117,15 +119,15 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
 
         <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#EAE3DB] dark:border-[#461643]">
           {tip.lessonId ? (
-            <Link
-              href={`/strefa/lekcja/${tip.lessonId}`}
+            <a
+              href={`${strefaUrl}/lekcja/${tip.lessonId}`}
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EC008C] hover:text-[#C80077] dark:hover:text-pink-300 transition-colors group"
             >
               <div className="w-6 h-6 rounded-full bg-[#EC008C]/10 text-[#EC008C] flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Play className="w-3 h-3 fill-current" />
               </div>
               <span>{tip.lessonTitle || 'Przejdź do powiązanej lekcji wideo'}</span>
-            </Link>
+            </a>
           ) : (
             <div />
           )}
