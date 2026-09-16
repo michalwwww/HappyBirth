@@ -7,13 +7,29 @@ CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
     full_name TEXT,
+    avatar_url TEXT,
+    auth_provider TEXT DEFAULT 'email', -- 'email', 'google', 'apple'
+    google_id TEXT UNIQUE,
+    apple_id TEXT UNIQUE,
     due_date TEXT, -- YYYY-MM-DD
+    due_date_source TEXT DEFAULT 'usg', -- 'usg', 'om', 'gestational_week'
+    lmp_date TEXT, -- YYYY-MM-DD
+    baby_name TEXT,
+    baby_gender TEXT DEFAULT 'surprise', -- 'girl', 'boy', 'surprise', 'twins'
+    partner_name TEXT,
+    parity TEXT DEFAULT 'first_baby', -- 'first_baby', 'subsequent_baby'
+    planned_birth_type TEXT DEFAULT 'natural', -- 'natural', 'cesarean', 'vbac', 'undecided'
+    city TEXT,
+    hospital TEXT,
+    rodo_consent INTEGER DEFAULT 1,
     role TEXT DEFAULT 'student', -- 'student', 'partner', 'admin'
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_google ON users(google_id);
+CREATE INDEX IF NOT EXISTS idx_users_apple ON users(apple_id);
 
 -- 2. TABELA DOSTĘPÓW / ENROLLMENTS (INTEGRACJA ZE STRIPE)
 CREATE TABLE IF NOT EXISTS enrollments (

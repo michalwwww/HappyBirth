@@ -1,6 +1,7 @@
 # MASTER SPECIFICATION: Platforma Kursu Online „HappyBirth” (Strefa Kursanta)
-> **Typ dokumentu:** Specyfikacja Techniczna i Master Prompt dla Agenta AI (np. Claude 3.5 Sonnet / Antigravity)  
-> **Przeznaczenie:** Budowa od zera kompletnej strefy kursanta, autoryzacji, bazy danych, webhooka płatności oraz odtwarzacza wideo.
+> **UWAGA ARCHITEKTONICZNA:**  
+> Projekt HappyBirth działa w 100% w ekosystemie **Cloudflare** (Cloudflare Pages, Cloudflare D1 SQLite, Cloudflare Stream) oraz Stripe i Resend, zgodnie z instrukcją w pliku `AGENTS.md`.  
+> Projekt **nie używa Supabase ani Vimeo**. Aktualna baza danych to Cloudflare D1 (`d1-schema.sql`, `lib/d1.ts`, `wrangler.toml`).
 
 ---
 

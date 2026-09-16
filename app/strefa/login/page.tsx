@@ -24,23 +24,27 @@ export default function StrefaLoginPage() {
   const router = useRouter();
   const { changeRole } = useCourseProgress();
 
-  const handleOAuthLogin = async (provider: 'google' | 'apple') => {
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get('error');
+    if (err) {
+      if (err === 'google_not_configured') {
+        setErrorMessage('Logowanie Google nie jest jeszcze włączone w konfiguracji serwera (brak GOOGLE_CLIENT_ID). Skorzystaj z Magicznego Linku e-mail lub szybkiego podglądu DEMO.');
+      } else if (err === 'apple_not_configured') {
+        setErrorMessage('Logowanie Apple ID nie jest jeszcze włączone w konfiguracji serwera (brak APPLE_CLIENT_ID). Skorzystaj z Magicznego Linku e-mail lub szybkiego podglądu DEMO.');
+      } else if (err === 'invalid_oauth_state') {
+        setErrorMessage('Sesja logowania wygasła. Spróbuj ponownie.');
+      } else {
+        setErrorMessage(decodeURIComponent(err));
+      }
+    }
+  }, []);
+
+  const handleOAuthLogin = (provider: 'google' | 'apple') => {
     setLoadingProvider(provider);
     setErrorMessage(null);
-    changeRole('student');
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'mwspace@gmail.com' }),
-      });
-      const data = await res.json();
-      if (data.devMagicLink) {
-        window.location.href = data.devMagicLink;
-        return;
-      }
-    } catch {}
-    router.push('/strefa');
+    window.location.href = `/api/auth/${provider}`;
   };
 
   const handleMagicLink = async (e: React.FormEvent) => {
