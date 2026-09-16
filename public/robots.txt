@@ -1,9 +1,13 @@
-﻿User-agent: *
+User-agent: *
 Allow: /
 Allow: /marketing
 Allow: /regulamin
 Allow: /polityka-prywatnosci
 Disallow: /strefa/
 Disallow: /strefa/*
+Disallow: /api/
+Disallow: /api/*
+Disallow: /partnerzy/
+Disallow: /partnerzy/*
 
 Sitemap: https://happybirth.pl/sitemap.xml

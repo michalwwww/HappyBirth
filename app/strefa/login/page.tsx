@@ -88,10 +88,10 @@ export default function StrefaLoginPage() {
             <Logo className="h-12 w-auto mx-auto object-contain" priority />
           </Link>
           <h1 className="font-brand-display font-bold text-3xl text-[#1A1512]">
-            Strefa Kursantki
+            Strefa Rodziców
           </h1>
           <p className="text-sm text-[#544A44]">
-            Zaloguj się, aby uzyskać dostęp do 52 lekcji VOD, personalizowanego harmonogramu i Licznika 5-1-1.
+            Zaloguj się, aby uzyskać dostęp do 52 lekcji VOD, personalizowanego harmonogramu i Kreatora Planu Porodu.
           </p>
         </div>
 
@@ -120,7 +120,7 @@ export default function StrefaLoginPage() {
                   onClick={() => handleQuickDemo('student')}
                   className="w-full py-3 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold transition-all shadow-md shadow-[#EC008C]/25"
                 >
-                  Przejdź od razu do panelu kursantki (Demo)
+                  Wejdź od razu do panelu (Demo)
                 </button>
               </div>
             </div>
@@ -139,24 +139,31 @@ export default function StrefaLoginPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="twoj-email@domena.pl"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C] transition-all"
+                      placeholder="twoj-email@example.com"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#EAE3DB] focus:outline-none focus:ring-2 focus:ring-[#EC008C] text-sm text-[#1A1512]"
                     />
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white font-semibold text-xs sm:text-sm transition-all shadow-md shadow-[#EC008C]/25 flex items-center justify-center gap-2 hover:scale-[1.01]"
+                  disabled={loadingProvider === 'email'}
+                  className="w-full py-3.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
-                  <span>Wyślij Magiczny Link do logowania</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {loadingProvider === 'email' ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span>Wyślij bezpieczny link logowania</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
                 </button>
               </form>
 
-              {/* Szybki dostęp demo */}
-              <div className="pt-2">
-                <div className="relative py-2 text-center text-[10px] text-[#867A72]">
+              {/* Szybki Dostęp Demo */}
+              <div className="pt-4 border-t border-[#EAE3DB] space-y-2">
+                <div className="text-[11px] text-[#867A72] text-center relative">
                   <span className="bg-white px-2 relative z-10 font-medium uppercase tracking-wider">SZYBKI PODGLĄD DEMO</span>
                   <div className="absolute inset-0 top-1/2 border-t border-[#EAE3DB]" />
                 </div>
@@ -168,7 +175,7 @@ export default function StrefaLoginPage() {
                     className="py-2.5 px-3 rounded-xl bg-[#FAE3EB] hover:bg-[#EC008C] text-[#EC008C] hover:text-white border border-[#F3CAD9] text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
                   >
                     <Heart className="w-3.5 h-3.5" />
-                    <span>Jako Kursantka</span>
+                    <span>Dla Mamy</span>
                   </button>
 
                   <button
@@ -177,7 +184,7 @@ export default function StrefaLoginPage() {
                     className="py-2.5 px-3 rounded-xl bg-[#EAD5E5] hover:bg-[#98269C] text-[#98269C] hover:text-white border border-[#D5B8CF] text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>Jako Partner</span>
+                    <span>Dla Taty</span>
                   </button>
                 </div>
               </div>

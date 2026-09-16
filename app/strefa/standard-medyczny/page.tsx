@@ -80,7 +80,7 @@ export default function StandardMedycznyPage() {
       <div className="flex items-center space-x-2 text-xs text-[#867A72]">
         <Link href="/strefa" className="hover:text-[#1A1512] transition-colors flex items-center gap-1">
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Wróć do kokpitu kursantki</span>
+          <span>Wróć do kokpitu</span>
         </Link>
       </div>
 
@@ -208,7 +208,7 @@ export default function StandardMedycznyPage() {
             4 Filary Spokoju HappyBirth
           </h2>
           <p className="text-xs sm:text-sm text-[#544A44] mt-1 max-w-2xl">
-            Każda z 52 lekcji wideo w Strefie Kursantki została przypisana do jednego z 4 filarów, reprezentujących kluczowe obszary wiedzy położniczej i fizjoterapeutycznej.
+            Każda z 52 lekcji wideo w Strefie Rodziców została przypisana do jednego z 4 filarów, reprezentujących kluczowe obszary wiedzy położniczej i fizjoterapeutycznej.
           </p>
         </div>
 
@@ -285,7 +285,7 @@ export default function StandardMedycznyPage() {
             href="/strefa"
             className="inline-flex items-center gap-1.5 text-white bg-[#EC008C] hover:bg-[#c70077] px-4 py-2 rounded-full font-semibold transition-colors shadow-sm"
           >
-            <span>Przejdź do lekcji w Strefie Kursantki</span>
+            <span>Przejdź do lekcji w Strefie Rodziców</span>
             <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
           </Link>
         </div>

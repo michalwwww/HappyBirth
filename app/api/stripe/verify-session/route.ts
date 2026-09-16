@@ -27,11 +27,12 @@ export async function GET(req: NextRequest) {
     const customerEmail = (
       session.customer_details?.email ||
       session.customer_email ||
+      session.client_reference_id ||
       ''
     )
       .trim()
       .toLowerCase();
-    const customerName = session.customer_details?.name || 'Kursantka HappyBirth';
+    const customerName = session.customer_details?.name || 'Mama HappyBirth';
     const courseId = session.metadata?.courseId || 'kurs-glowny-happybirth';
 
     if (!customerEmail) {

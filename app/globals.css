@@ -109,3 +109,44 @@ em.se {
   border-radius: 4px;
   background: #FCD705;
 }
+
+/* Dark Mode Tokens */
+.dark {
+  --paper: #140513;
+  --ink: #FBF8F4;
+  --ink2: #D7CCC3;
+  --ink3: #A2958C;
+  --line: #3A1038;
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #140513;
+  color: #FBF8F4;
+}
+
+/* WCAG 2.1 AA / EAA Accessibility Helpers */
+.a11y-underline-links a {
+  text-decoration: underline !important;
+  text-underline-offset: 4px !important;
+}
+
+.a11y-readable-font, 
+.a11y-readable-font * {
+  font-family: Arial, Helvetica, Verdana, sans-serif !important;
+  letter-spacing: 0.03em !important;
+  word-spacing: 0.08em !important;
+  line-height: 1.8 !important;
+}
+
+.a11y-reduce-motion *, 
+.a11y-reduce-motion *::before, 
+.a11y-reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+.a11y-high-contrast {
+  filter: contrast(135%) brightness(105%) !important;
+}

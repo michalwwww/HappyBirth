@@ -24,8 +24,10 @@ import {
   Feather,
   Activity,
   Baby,
+  FileText,
 } from 'lucide-react';
 import Image from 'next/image';
+import { DailyTipCard } from '@/components/daily-tip-card';
 
 export default function StrefaDashboardPage() {
   const { role, changeRole, completedLessons, percentCompleted } = useCourseProgress();
@@ -112,18 +114,18 @@ export default function StrefaDashboardPage() {
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#EC008C] animate-pulse"></span>
               <span className="text-xs font-bold uppercase tracking-widest text-[#EAD5E5]">
-                {role === 'partner' ? 'Strefa dla Taty / Osoby Towarzyszącej' : 'Kokpit Kursantki'}
+                {role === 'partner' ? 'Strefa dla Taty / Osoby Towarzyszącej' : 'Strefa dla Mamy'}
               </span>
             </div>
 
             <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-white tracking-tight leading-tight">
               {role === 'partner'
                 ? 'Witaj w Strefie dla Taty!'
-                : 'Cześć! Miło Cię widzieć.'}
+                : 'Cześć! Spokojnego dnia.'}
             </h1>
 
             <p className="text-sm sm:text-base text-[#EAD5E5]/80 leading-relaxed font-sans">
-              Program szkoły rodzenia oparty o 4 Filary Spokoju HappyBirth, doświadczenie ponad 18 000 mam od 2012 roku i Standard Opieki Okołoporodowej. Oglądaj lekcje we własnym tempie na telefonie, laptopie lub Smart TV.
+              Program szkoły rodzenia oparty o 4 Filary Spokoju HappyBirth i Standard Opieki Okołoporodowej. Czuła wiedza dla Ciebie i Twojej rodziny, do której wracacie w dowolnym momencie.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-[#EAD5E5]/70">
@@ -179,6 +181,9 @@ export default function StrefaDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Daily Tip Widget */}
+      <DailyTipCard />
 
       {/* 2. KARTA "KONTYNUUJ NAUKĘ" (Następna nierozpoczęta lekcja) */}
       <div className="bg-white rounded-3xl border border-[#EAE3DB] p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow">
@@ -275,28 +280,30 @@ export default function StrefaDashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Licznik Skurczów 5-1-1 */}
+          {/* Plan Porodu (PDF) */}
           <Link
-            href="/strefa/licznik"
-            className="p-6 rounded-2xl bg-gradient-to-br from-[#ED1C24] to-[#C70D14] text-white flex flex-col justify-between min-h-[190px] shadow-sm hover:shadow-lg transition-all group"
+            href="/strefa/plan-porodu"
+            className="p-6 rounded-2xl bg-gradient-to-br from-[#EC008C] to-[#98269C] text-white flex flex-col justify-between min-h-[190px] shadow-sm hover:shadow-lg transition-all group"
           >
             <div>
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-widest text-white/80">
-                  Na Porodówkę
+                  Dokument do Szpitala
                 </span>
-                <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping" />
+                <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full font-mono font-bold">
+                  PDF
+                </span>
               </div>
               <h3 className="font-brand-display font-bold text-2xl mt-2 text-white">
-                Licznik skurczów 5·1·1
+                Kreator Planu Porodu
               </h3>
               <p className="text-xs text-white/90 mt-2 leading-relaxed">
-                Mierz odstępy i czas trwania. Algorytm powie, kiedy jechać do szpitala.
+                Zgodny ze Standardem MZ. Zaznacz preferencje, wydrukuj i weź ze sobą na izbę przyjęć.
               </p>
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t border-white/20 mt-4 text-xs font-semibold">
-              <span>Uruchom licznik</span>
+              <span>Wypełnij plan porodu</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>

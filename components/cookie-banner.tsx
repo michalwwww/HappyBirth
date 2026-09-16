@@ -53,7 +53,7 @@ export function CookieBanner() {
               </span>
             </div>
             <p className="text-[#D8C7D5]/90 text-xs leading-relaxed">
-              Używamy pamięci podręcznej oraz niezbędnych plików cookies, aby zapamiętać Twoje postępy w oglądaniu 52 lekcji i zapewnić poprawne działanie platformy. W Strefie Kursantki{' '}
+              Używamy pamięci podręcznej oraz niezbędnych plików cookies, aby zapamiętać Twoje postępy w oglądaniu 52 lekcji i zapewnić poprawne działanie platformy. W Strefie Rodziców{' '}
               <strong>nie stosujemy żadnych pikseli marketingowych Meta ani Google</strong>.{' '}
               <Link
                 href="/polityka-prywatnosci"

@@ -7,6 +7,8 @@ import { Logo } from './logo';
 import { BuyCourseButton } from './buy-button';
 import { useCourseProgress } from '@/lib/progress';
 import { Sparkles, Heart, User, AlertCircle, ArrowRight } from 'lucide-react';
+import { LanguageSwitcher } from './language-switcher';
+import { ThemeToggle } from './theme-toggle';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -15,7 +17,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full">
       {/* Top Luxury Announcement Ribbon (Ciemnofioletowy / Purpurowy aksamit) */}
-      <div className="bg-[#250A24] text-[#EAD5E5] border-b border-[#461643] px-4 py-2 text-xs transition-colors">
+      <div className="bg-[#250A24] dark:bg-[#140513] text-[#EAD5E5] border-b border-[#461643] px-4 py-2 text-xs transition-colors">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center space-x-2.5">
             <span className="w-2 h-2 rounded-full bg-[#EC008C] animate-pulse"></span>
@@ -28,47 +30,44 @@ export function Navbar() {
             </span>
           </div>
 
-          {/* Subtelny przełącznik profilu w tonacji purpurowej */}
-          <div className="flex items-center space-x-2 text-[11px]">
-            <span className="text-[#EAD5E5]/60 hidden sm:inline">Tryb widoku:</span>
-            <div className="inline-flex rounded-full bg-[#180517] p-0.5 border border-[#461643]">
-              <button
-                onClick={() => changeRole('student')}
-                className={`px-2.5 py-0.5 rounded-full transition-all flex items-center gap-1 font-medium ${
-                  role === 'student'
-                    ? 'bg-[#EC008C] text-white shadow-sm'
-                    : 'text-[#EAD5E5]/70 hover:text-white'
-                }`}
-                title="Widok zalogowanej kursantki"
-              >
-                <Heart className="w-2.5 h-2.5" /> Kursantka
-              </button>
-              <button
-                onClick={() => changeRole('partner')}
-                className={`px-2.5 py-0.5 rounded-full transition-all flex items-center gap-1 font-medium ${
-                  role === 'partner'
-                    ? 'bg-[#98269C] text-white shadow-sm'
-                    : 'text-[#EAD5E5]/70 hover:text-white'
-                }`}
-                title="Widok dla partnera / taty"
-              >
-                <User className="w-2.5 h-2.5" /> Partner
-              </button>
-              <button
-                onClick={() => changeRole('guest')}
-                className={`px-2.5 py-0.5 rounded-full transition-all font-medium ${
-                  role === 'guest'
-                    ? 'bg-[#b45309] text-white shadow-sm'
-                    : 'text-[#EAD5E5]/70 hover:text-white'
-                }`}
-                title="Widok przed zakupem"
-              >
-                Gość (Zakup)
-              </button>
+          <div className="flex items-center flex-wrap gap-2.5">
+            {/* Przełącznik języków z flagami PL / EN / RU */}
+            <LanguageSwitcher />
+
+            {/* Przełącznik Motywu Light / Dark */}
+            <ThemeToggle />
+
+            {/* Subtelny przełącznik perspektywy */}
+            <div className="flex items-center space-x-2 text-[11px] border-l border-[#461643] pl-2.5">
+              <span className="text-[#EAD5E5]/60 hidden sm:inline">Perspektywa:</span>
+              <div className="inline-flex rounded-full bg-[#180517] p-0.5 border border-[#461643]">
+                <button
+                  onClick={() => changeRole('student')}
+                  className={`px-2.5 py-0.5 rounded-full transition-all flex items-center gap-1 font-semibold whitespace-nowrap ${
+                    role === 'student'
+                      ? 'bg-[#EC008C] text-white shadow-sm'
+                      : 'text-[#EAD5E5]/70 hover:text-white'
+                  }`}
+                  title="Widok dla Mamy"
+                >
+                  <Heart className="w-2.5 h-2.5" /> Dla Mamy
+                </button>
+                <button
+                  onClick={() => changeRole('partner')}
+                  className={`px-2.5 py-0.5 rounded-full transition-all flex items-center gap-1 font-semibold whitespace-nowrap ${
+                    role === 'partner'
+                      ? 'bg-[#98269C] text-white shadow-sm'
+                      : 'text-[#EAD5E5]/70 hover:text-white'
+                  }`}
+                  title="Widok dla Taty"
+                >
+                  <User className="w-2.5 h-2.5" /> Dla Taty
+                </button>
+              </div>
             </div>
-          </div>
         </div>
       </div>
+    </div>
 
       {/* Główny pasek nawigacyjny z Netlify: ciepłe tło paper #FBF8F4, border #EAE3DB */}
       <nav className="glass-nav border-b border-[#EAE3DB] transition-all">

@@ -30,11 +30,31 @@ export function Footer() {
               </div>
             </div>
             <p className="text-xs text-[#EAD5E5]/75 leading-relaxed">
-              Nowoczesna szkoła rodzenia dla przyszłych mam i osób towarzyszących. 52 filmowe lekcje wideo, cztery filary spokoju i wsparcie przez cały pierwszy rok życia dziecka.
+              Czuła szkoła rodzenia online dla naszych mam i ojców. 52 filmowe lekcje wideo, sprawdzone patenty i wsparcie przez cały pierwszy rok życia dziecka.
             </p>
             <div className="flex items-center space-x-2 text-xs text-[#EAD5E5]/90 pt-1">
               <Sparkles className="w-4 h-4 text-[#FCD705]" />
-              <span>Doświadczenie ponad 18 000 mam od 2012 roku</span>
+              <span>Ponad 18 000 przygotowanych rodzin</span>
+            </div>
+
+            {/* Social media links */}
+            <div className="pt-2 flex items-center gap-3 text-xs">
+              <a
+                href="https://instagram.com/happybirth.pl"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-[#EC008C] text-white transition-all font-medium"
+              >
+                <span>Instagram @happybirth.pl</span>
+              </a>
+              <a
+                href="https://tiktok.com/@happybirth_pl"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all font-medium"
+              >
+                <span>TikTok</span>
+              </a>
             </div>
           </div>
 
@@ -51,12 +71,12 @@ export function Footer() {
               </li>
               <li>
                 <a href="#etapy" className="hover:text-white transition-colors">
-                  9 Etapów ciąży i porodu
+                  9 Etapów rodzicielstwa
                 </a>
               </li>
               <li>
                 <a href="#narzedzia" className="hover:text-white transition-colors">
-                  Licznik skurczów 5-1-1
+                  Przewodnik & Notatnik Rodzica
                 </a>
               </li>
               <li>
@@ -66,12 +86,12 @@ export function Footer() {
               </li>
               <li>
                 <a href={strefaUrl} className="hover:text-[#EC008C] transition-colors font-medium">
-                  Wejdź do Strefy Kursantki
+                  Wejdź do Strefy Rodziców
                 </a>
               </li>
               <li>
                 <a href={`${strefaUrl}/standard-medyczny`} className="hover:text-white transition-colors">
-                  Standard opieki & E-E-A-T
+                  Standard Rzetelnej Wiedzy
                 </a>
               </li>
             </ul>
@@ -136,7 +156,7 @@ export function Footer() {
         {/* Notatka odpowiedzialności i dane prawne */}
         <div className="pt-6 border-t border-[#461643] text-xs text-[#EAD5E5]/60 space-y-3">
           <p>
-            <strong className="text-white">Materiały na platformie mają charakter edukacyjny i wspierający.</strong> Służą przygotowaniu do aktywnego, świadomego porodu w oparciu o 4 Filary Spokoju i dorobek położnych Mama Gaja od 2012 roku. Nie zastępują indywidualnej opieki położnej ani lekarza prowadzącego ciążę. <a href={`${strefaUrl}/standard-medyczny`} className="underline hover:text-white transition-colors">Zobacz Standard Merytoryczny & E-E-A-T</a>.
+            <strong className="text-white">Charakter edukacyjny platformy (E-learning):</strong> HappyBirth jest internetową platformą edukacyjną świadczącą usługi szkoleniowe w formule kursu wideo VOD. Wszystkie materiały, narzędzia oraz wskazówki mają wyłącznie charakter edukacyjny i przygotowawczy do roli rodzica. Usługa nie stanowi i nie zastępuje indywidualnych świadczeń zdrowotnych, diagnostyki ani porady lekarskiej.
           </p>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 text-[11px] text-[#EAD5E5]/50 border-t border-[#461643]/50">
             <div>

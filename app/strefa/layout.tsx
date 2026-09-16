@@ -3,8 +3,8 @@ import { StrefaNavbar } from '@/components/strefa-navbar';
 import { StrefaFooter } from '@/components/strefa-footer';
 
 export const metadata: Metadata = {
-  title: 'Strefa Kursantki · HappyBirth VOD',
-  description: 'Panel edukacyjny i 52 lekcje wideo w jakości HD dla kursantek szkoły rodzenia HappyBirth.',
+  title: 'Strefa Rodziców · HappyBirth VOD',
+  description: 'Panel edukacyjny i 52 lekcje wideo w jakości HD dla naszych mam i ojców szkoły rodzenia HappyBirth.',
   robots: {
     index: false,
     follow: false,

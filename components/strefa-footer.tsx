@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Logo } from './logo';
-import { ShieldCheck, PhoneCall, AlertTriangle, Mail, Heart, Sparkles, ExternalLink } from 'lucide-react';
+import { ShieldCheck, PhoneCall, AlertTriangle, Mail, Heart, Sparkles, ExternalLink, FileText } from 'lucide-react';
 
 export function StrefaFooter() {
   return (
@@ -18,27 +18,37 @@ export function StrefaFooter() {
                 <span className="font-brand-display font-bold text-white tracking-tight leading-tight">
                   HappyBirth
                 </span>
-                <span className="text-[10px] tracking-wider uppercase text-[#EAD5E5]/70 font-semibold">
-                  Strefa Kursantki
+                <span className="text-[10px] tracking-wider uppercase text-[#EC008C] font-semibold">
+                  Strefa Rodziców
                 </span>
               </div>
             </div>
             <p className="text-xs text-[#D8C7D5]/80 leading-relaxed">
-              Szkoła rodzenia oparta o 4 Filary Spokoju HappyBirth i 14 lat doświadczenia położnych Mama Gaja od 2012 roku. Dostęp dla dwojga przez 12 miesięcy od terminu porodu.
+              Szkoła rodzenia oparta o 4 Filary Spokoju HappyBirth. Dostęp dla dwojga przez 12 miesięcy od terminu porodu.
             </p>
             <div className="flex items-center gap-2 text-xs text-[#EC008C] font-semibold pt-1">
               <Heart className="w-3.5 h-3.5 fill-current" />
-              <span>Jesteśmy z Tobą na każdym etapie</span>
+              <span>Dla naszych Mam, Ojców i Maluszków</span>
+            </div>
+            <div className="pt-2">
+              <a
+                href="https://instagram.com/happybirth.pl"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-[#EC008C] text-white text-xs transition-all font-medium"
+              >
+                <span>Instagram @happybirth.pl</span>
+              </a>
             </div>
           </div>
 
-          {/* Szybka Nawigacja Kursantki */}
+          {/* Nawigacja dla Rodziców */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Nawigacja kursu</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Nawigacja Strefy</h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/strefa" className="hover:text-white transition-colors">
-                  Pulpit (9 Etapów ciąży i porodu)
+                  Kokpit (9 Etapów ciąży i porodu)
                 </Link>
               </li>
               <li>
@@ -47,25 +57,21 @@ export function StrefaFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/strefa/apteczka" className="hover:text-white transition-colors">
-                  Cyfrowa Apteczka SOS
-                </Link>
-              </li>
-              <li>
                 <Link href="/strefa/partner" className="hover:text-white transition-colors">
                   Strefa dla Taty (Wsparcie w Porodzie)
                 </Link>
               </li>
               <li>
-                <Link href="/strefa/standard-medyczny" className="hover:text-white transition-colors flex items-center gap-1 text-[#EC008C] font-semibold">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Standard merytoryczny & E-E-A-T</span>
+                <Link href="/strefa/plan-porodu" className="hover:text-[#EC008C] font-medium transition-colors flex items-center gap-1">
+                  <FileText className="w-3.5 h-3.5 text-[#EC008C]" />
+                  <span>Kreator Planu Porodu</span>
+                  <span className="text-[9px] bg-[#EC008C] text-white px-1.5 py-0.2 rounded font-bold">PDF</span>
                 </Link>
               </li>
               <li>
-                <Link href="/strefa/licznik" className="hover:text-rose-400 font-medium transition-colors flex items-center gap-1">
-                  <span>Licznik skurczów 5-1-1</span>
-                  <span className="text-[9px] bg-rose-600 text-white px-1.5 py-0.2 rounded font-bold">SOS</span>
+                <Link href="/strefa/standard-medyczny" className="hover:text-white transition-colors flex items-center gap-1 text-[#EAD5E5]/70">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Standard merytoryczny & E-E-A-T</span>
                 </Link>
               </li>
             </ul>
@@ -73,39 +79,29 @@ export function StrefaFooter() {
 
           {/* Narzędzia i Materiały */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Materiały do druku</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Narzędzia HappyBirth</h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <span className="text-[#D8C7D5]/80 hover:text-white transition-colors cursor-pointer">
-                  Plan Porodu (Standard MZ / 16 punktów)
-                </span>
+                <Link href="/strefa/plan-porodu" className="text-[#D8C7D5]/80 hover:text-white transition-colors">
+                  Plan Porodu (do druku PDF)
+                </Link>
               </li>
               <li>
-                <span className="text-[#D8C7D5]/80 hover:text-white transition-colors cursor-pointer">
-                  Torba do szpitala w 3 strefach
-                </span>
+                <Link href="/strefa/apteczka" className="text-[#D8C7D5]/80 hover:text-white transition-colors">
+                  Cyfrowa Apteczka SOS
+                </Link>
               </li>
               <li>
-                <span className="text-[#D8C7D5]/80 hover:text-white transition-colors cursor-pointer">
-                  Kalendarz badań (Standard Opieki Okołoporodowej)
-                </span>
-              </li>
-              <li>
-                <span className="text-[#D8C7D5]/80 hover:text-white transition-colors cursor-pointer">
-                  Ściąga dla Taty na porodówkę
-                </span>
-              </li>
-              <li>
-                <span className="text-[#D8C7D5]/80 hover:text-white transition-colors cursor-pointer">
-                  Certyfikat ukończenia szkoły rodzenia
-                </span>
+                <Link href="/strefa/partner" className="text-[#D8C7D5]/80 hover:text-white transition-colors">
+                  Ściągi dla Taty na porodówkę
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Pomoc techniczna i medyczna */}
+          {/* Pomoc techniczna i kontakt */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Wsparcie kursantki</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Wsparcie dla Rodziców</h4>
             <p className="text-xs text-[#D8C7D5]/80">
               Masz problem z odtwarzaniem lub dostępem? Napisz do naszego opiekuna technicznego:
             </p>
