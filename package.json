@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "export:pages": "node scripts/build-export.mjs",
+    "deploy:pages": "node scripts/build-export.mjs && npx wrangler pages deploy out --project-name happybirth --branch main",
     "start": "next start",
     "lint": "next lint"
   },

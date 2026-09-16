@@ -2,6 +2,7 @@ name = "happybirth-app"
 account_id = "f36929138c42b84cddc0584aae36e0f2"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "out"
 
 # Powiązanie z bazą Cloudflare D1
 [[d1_databases]]

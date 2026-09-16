@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // output: 'export', // Wyłączone, aby umożliwić działanie API Routes (/api/stripe/checkout, /api/stripe/webhook)
+  // Eksport statyczny aktywowany tylko podczas budowania dla Cloudflare Pages (NEXT_EXPORT=true)
+  ...(process.env.NEXT_EXPORT === 'true' ? { output: 'export' } : {}),
   images: {
     unoptimized: true,
     remotePatterns: [
