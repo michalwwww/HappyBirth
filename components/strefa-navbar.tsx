@@ -18,6 +18,7 @@ import {
   LogOut,
   ChevronRight,
   ShieldAlert,
+  FileText,
 } from 'lucide-react';
 import { lessons } from '@/lib/course-data';
 
@@ -52,71 +53,60 @@ export function StrefaNavbar() {
   return (
     <header className="sticky top-0 z-50 w-full">
       {/* Top Luxury Announcement Ribbon (Ciemnofioletowy aksamit #250A24) */}
-      <div className="bg-[#250A24] dark:bg-[#140513] text-[#EAD5E5] border-b border-[#461643] px-4 py-2 text-xs transition-colors">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center space-x-2.5">
+      <div className="bg-[#250A24] dark:bg-[#140513] text-[#EAD5E5] border-b border-[#461643] px-3 sm:px-4 py-1.5 sm:py-2 text-xs transition-colors">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center space-x-2 shrink-0">
             <span className="w-2 h-2 rounded-full bg-[#EC008C] animate-pulse"></span>
-            <span className="font-semibold text-white tracking-wide">
+            <span className="font-semibold text-white tracking-wide whitespace-nowrap">
               {t('brandTitle')}
             </span>
-            <span className="text-white/40 hidden md:inline">|</span>
-            <span className="text-[#EAD5E5]/80 hidden md:inline">
+            <span className="text-white/40 hidden xl:inline">|</span>
+            <span className="text-[#EAD5E5]/80 hidden xl:inline truncate max-w-md">
               {t('ribbonSubtitle')}
             </span>
           </div>
 
-          <div className="flex items-center flex-wrap gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             {/* Przełącznik języków z flagami PL / EN / RU */}
             <LanguageSwitcher />
 
             {/* Przełącznik Motywu Light / Dark */}
             <ThemeToggle />
 
-            {/* Role switcher */}
-            <div className="flex items-center space-x-2 text-[11px] border-l border-[#461643] pl-2.5">
-              <span className="text-[#EAD5E5]/60 hidden sm:inline">{t('viewMode')}</span>
+            {/* Zbalansowany przełącznik perspektywy: Dla Mamy / Dla Taty */}
+            <div className="flex items-center space-x-1.5 text-[11px] border-l border-[#461643] pl-2">
+              <span className="text-[#EAD5E5]/60 hidden md:inline">{t('viewMode')}</span>
               <div className="inline-flex rounded-full bg-[#180517] p-0.5 border border-[#461643]">
                 <button
                   onClick={() => changeRole('student')}
-                  className={`px-2.5 py-0.5 rounded-full transition-all flex items-center gap-1 font-medium ${
+                  className={`px-2.5 py-0.5 rounded-full transition-all flex items-center gap-1 font-semibold whitespace-nowrap ${
                     role === 'student'
                       ? 'bg-[#EC008C] text-white shadow-sm'
                       : 'text-[#EAD5E5]/70 hover:text-white'
                   }`}
-                  title="Widok zalogowanej kursantki"
+                  title="Widok dla Mamy"
                 >
                   <Heart className="w-2.5 h-2.5" /> {t('roleStudent')}
                 </button>
                 <button
                   onClick={() => changeRole('partner')}
-                  className={`px-2.5 py-0.5 rounded-full transition-all flex items-center gap-1 font-medium ${
+                  className={`px-2.5 py-0.5 rounded-full transition-all flex items-center gap-1 font-semibold whitespace-nowrap ${
                     role === 'partner'
                       ? 'bg-[#98269C] text-white shadow-sm'
                       : 'text-[#EAD5E5]/70 hover:text-white'
                   }`}
-                  title="Widok dla partnera / taty na porodówce"
+                  title="Widok dla Taty"
                 >
                   <User className="w-2.5 h-2.5" /> {t('rolePartner')}
-                </button>
-                <button
-                  onClick={() => changeRole('guest')}
-                  className={`px-2.5 py-0.5 rounded-full transition-all font-medium ${
-                    role === 'guest'
-                      ? 'bg-[#b45309] text-white shadow-sm'
-                      : 'text-[#EAD5E5]/70 hover:text-white'
-                  }`}
-                  title="Widok przed zakupem"
-                >
-                  {t('roleGuest')}
                 </button>
               </div>
             </div>
 
             {/* Stan konta / Wyloguj */}
-            <div className="flex items-center space-x-2.5 border-l border-[#461643] pl-3 text-[11px]">
+            <div className="flex items-center space-x-2 border-l border-[#461643] pl-2.5 text-[11px]">
               {currentUser ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-[#EAD5E5]/80 hidden md:inline truncate max-w-[120px]">
+                  <span className="text-[#EAD5E5]/80 hidden lg:inline truncate max-w-[110px]">
                     {currentUser.email}
                   </span>
                   <button
@@ -135,7 +125,7 @@ export function StrefaNavbar() {
               ) : (
                 <Link
                   href="/strefa/login"
-                  className="text-[#FCD705] hover:underline font-semibold"
+                  className="text-[#FCD705] hover:underline font-semibold whitespace-nowrap"
                 >
                   {t('btnLogin')}
                 </Link>
@@ -147,21 +137,21 @@ export function StrefaNavbar() {
 
       {/* Main Strefa Navbar */}
       <nav className="glass-nav border-b border-[#EAE3DB] dark:border-[#461643] bg-[#FBF8F4]/95 dark:bg-[#1C081A]/95 backdrop-blur-md transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-4">
           {/* Logo & Zone Badge */}
-          <div className="flex items-center space-x-3.5">
+          <div className="flex items-center space-x-3.5 shrink-0">
             <Link href="/strefa" className="flex items-center space-x-3 group">
-              <Logo className="h-10 sm:h-11 w-auto object-contain group-hover:scale-105 transition-transform" priority />
-              <div className="flex flex-col border-l border-[#EAE3DB] dark:border-[#461643] pl-3 py-0.5">
-                <div className="flex items-center gap-2">
+              <Logo className="h-9 sm:h-10 w-auto object-contain group-hover:scale-105 transition-transform" priority />
+              <div className="flex flex-col border-l border-[#EAE3DB] dark:border-[#461643] pl-2.5 py-0.5">
+                <div className="flex items-center gap-1.5">
                   <span className="font-brand-display font-bold text-sm sm:text-base tracking-tight text-[#1A1512] dark:text-[#FBF8F4] leading-tight">
                     {t('schoolTitle')}
                   </span>
-                  <span className="bg-[#EC008C] text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase shadow-sm shadow-[#EC008C]/20">
+                  <span className="bg-[#EC008C] text-white text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase shadow-sm shadow-[#EC008C]/20">
                     {t('vodZone')}
                   </span>
                 </div>
-                <span className="text-[10px] sm:text-[11px] font-medium tracking-wide uppercase text-[#867A72] dark:text-[#EAD5E5]/70">
+                <span className="text-[10px] font-medium tracking-wide uppercase text-[#867A72] dark:text-[#EAD5E5]/70 hidden sm:inline">
                   {t('vodSubtitle')}
                 </span>
               </div>
@@ -169,10 +159,10 @@ export function StrefaNavbar() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center space-x-6 text-[14px] font-medium text-[#544A44] dark:text-[#EAD5E5]/80">
+          <div className="hidden lg:flex items-center space-x-5 xl:space-x-7 text-[14px] font-medium text-[#544A44] dark:text-[#EAD5E5]/80 shrink-0">
             <Link
               href="/strefa"
-              className={`hover:text-[#1A1512] dark:hover:text-white transition-colors py-1 border-b-2 ${
+              className={`whitespace-nowrap hover:text-[#1A1512] dark:hover:text-white transition-colors py-1 border-b-2 ${
                 pathname === '/strefa' || pathname === '/' ? 'border-[#EC008C] text-[#1A1512] dark:text-white font-semibold' : 'border-transparent'
               }`}
             >
@@ -180,7 +170,7 @@ export function StrefaNavbar() {
             </Link>
             <Link
               href="/strefa/lekcje"
-              className={`hover:text-[#1A1512] dark:hover:text-white transition-colors py-1 border-b-2 flex items-center gap-1.5 ${
+              className={`whitespace-nowrap hover:text-[#1A1512] dark:hover:text-white transition-colors py-1 border-b-2 flex items-center gap-1.5 ${
                 pathname.includes('/lekcj') ? 'border-[#EC008C] text-[#1A1512] dark:text-white font-semibold' : 'border-transparent'
               }`}
             >
@@ -189,7 +179,7 @@ export function StrefaNavbar() {
             </Link>
             <Link
               href="/strefa/apteczka"
-              className={`hover:text-[#1A1512] dark:hover:text-white transition-colors py-1 border-b-2 flex items-center gap-1.5 ${
+              className={`whitespace-nowrap hover:text-[#1A1512] dark:hover:text-white transition-colors py-1 border-b-2 flex items-center gap-1.5 ${
                 pathname.includes('/apteczka') ? 'border-[#EC008C] text-[#1A1512] dark:text-white font-semibold' : 'border-transparent'
               }`}
             >
@@ -198,7 +188,7 @@ export function StrefaNavbar() {
             </Link>
             <Link
               href="/strefa/partner"
-              className={`hover:text-[#1A1512] dark:hover:text-white transition-colors py-1 border-b-2 flex items-center gap-1.5 ${
+              className={`whitespace-nowrap hover:text-[#1A1512] dark:hover:text-white transition-colors py-1 border-b-2 flex items-center gap-1.5 ${
                 pathname.includes('/partner') ? 'border-[#98269C] text-[#98269C] dark:text-pink-400 font-semibold' : 'border-transparent'
               }`}
             >
@@ -206,13 +196,13 @@ export function StrefaNavbar() {
               {t('navPartner')}
             </Link>
             <Link
-              href="/strefa/licznik"
-              className={`transition-colors py-1 border-b-2 flex items-center gap-1.5 font-bold text-rose-600 dark:text-rose-400 ${
-                pathname.includes('/licznik') ? 'border-rose-500' : 'border-transparent hover:text-rose-700 dark:hover:text-rose-300'
+              href="/strefa/plan-porodu"
+              className={`whitespace-nowrap transition-colors py-1 border-b-2 flex items-center gap-1.5 font-semibold text-[#EC008C] dark:text-pink-400 ${
+                pathname.includes('/plan-porodu') ? 'border-[#EC008C]' : 'border-transparent hover:text-[#C80077]'
               }`}
             >
-              <AlertCircle className="w-4 h-4 text-rose-500 animate-pulse" />
-              {t('navCounter')}
+              <FileText className="w-4 h-4 text-[#EC008C]" />
+              {t('navPlan')}
             </Link>
           </div>
 
@@ -324,15 +314,15 @@ export function StrefaNavbar() {
                 <ChevronRight className="w-4 h-4 opacity-50" />
               </Link>
               <Link
-                href="/strefa/licznik"
+                href="/strefa/plan-porodu"
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2.5 rounded-lg flex items-center justify-between bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 font-semibold"
+                className="px-3 py-2.5 rounded-lg flex items-center justify-between bg-[#FAE3EB]/60 dark:bg-[#EC008C]/15 text-[#EC008C] font-semibold"
               >
                 <div className="flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-600 animate-pulse" />
-                  <span>{t('navCounter')}</span>
+                  <FileText className="w-4 h-4 text-[#EC008C]" />
+                  <span>{t('navPlan')}</span>
                 </div>
-                <span className="text-[10px] bg-rose-600 text-white px-2 py-0.5 rounded-full uppercase">SOS</span>
+                <span className="text-[10px] bg-[#EC008C] text-white px-2 py-0.5 rounded-full uppercase">PDF</span>
               </Link>
             </div>
 

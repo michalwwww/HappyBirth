@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
 
-    const customerEmail = (session.customer_details?.email || session.customer_email || '').trim().toLowerCase();
-    const customerName = session.customer_details?.name || 'Kursantka HappyBirth';
+    const customerEmail = session.customer_details?.email || session.client_reference_id;
+    const customerName = session.customer_details?.name || 'Mama HappyBirth';
     const courseId = session.metadata?.courseId || 'kurs-glowny-happybirth';
 
     console.log(`✅ [Stripe Webhook] Otrzymano płatność! Sesja: ${session.id}, Email: ${customerEmail}`);

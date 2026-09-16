@@ -15,24 +15,24 @@ export interface Translations {
 export const translations: Translations = {
   // Nawigacja górna & Paski
   brandTitle: {
-    pl: 'Strefa Kursantki HappyBirth',
-    en: 'HappyBirth Student Zone',
-    ru: 'Зона Курсантки HappyBirth',
+    pl: 'Strefa Rodziców HappyBirth',
+    en: 'HappyBirth Parent Zone',
+    ru: 'Зона Родителей HappyBirth',
   },
   ribbonSubtitle: {
-    pl: '52 lekcje wideo w jakości Full HD · Dostęp aktywny: 12 msc od terminu porodu dla dwojga',
-    en: '52 Full HD video lessons · Active access: 12 months from due date for two',
-    ru: '52 видеоурока Full HD · Доступ: 12 месяцев с даты родов для двоих',
+    pl: 'Dla naszych Mam i Tatów · Dostęp na 12 msc od terminu porodu dla dwojga',
+    en: 'For our Moms and Dads · 12 months access from due date for two',
+    ru: 'Для наших Мам и Пап · Доступ на 12 месяцев с даты родов для двоих',
   },
   viewMode: {
-    pl: 'Tryb widoku:',
-    en: 'View mode:',
-    ru: 'Режим:',
+    pl: 'Perspektywa:',
+    en: 'View:',
+    ru: 'Вид:',
   },
   roleStudent: {
-    pl: 'Kursantka',
-    en: 'Student',
-    ru: 'Курсантка',
+    pl: 'Dla Mamy',
+    en: 'For Mom',
+    ru: 'Для Мамы',
   },
   rolePartner: {
     pl: 'Dla Taty',
@@ -40,8 +40,8 @@ export const translations: Translations = {
     ru: 'Для Папы',
   },
   roleGuest: {
-    pl: 'Gość',
-    en: 'Guest',
+    pl: 'Odwiedzający',
+    en: 'Visitor',
     ru: 'Гость',
   },
   navDashboard: {
@@ -50,23 +50,28 @@ export const translations: Translations = {
     ru: 'Главная',
   },
   navLessons: {
-    pl: 'Lekcje (52)',
-    en: 'Lessons (52)',
-    ru: 'Уроки (52)',
+    pl: 'Lekcje VOD',
+    en: 'VOD Lessons',
+    ru: 'Уроки VOD',
   },
   navCabinet: {
-    pl: 'Apteczka',
-    en: 'Medicine Box',
-    ru: 'Аптечка',
+    pl: 'Apteczka SOS',
+    en: 'SOS Cabinet',
+    ru: 'Аптечка SOS',
   },
   navCounter: {
-    pl: 'Licznik 5-1-1',
-    en: '5-1-1 Counter',
-    ru: 'Счётчик 5-1-1',
+    pl: 'Plan Porodu',
+    en: 'Birth Plan',
+    ru: 'План родов',
+  },
+  navPlan: {
+    pl: 'Plan Porodu',
+    en: 'Birth Plan',
+    ru: 'План родов',
   },
   navPartner: {
-    pl: 'Strefa dla Taty',
-    en: 'Dad Zone',
+    pl: 'Dla Taty',
+    en: 'For Dad',
     ru: 'Для Папы',
   },
   navStandard: {

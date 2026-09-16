@@ -68,10 +68,10 @@ function AuthCallbackContent() {
         </div>
         <div className="space-y-1">
           <h2 className="font-brand-display font-bold text-xl text-[#1A1512]">
-            Logowanie do Strefy Kursantki...
+            Logowanie do Strefy Rodziców...
           </h2>
           <p className="text-xs text-[#544A44]">
-            Trwa bezpieczna weryfikacja Twojej sesji. Za chwilę zostaniesz przekierowana.
+            Trwa bezpieczna weryfikacja Twojej sesji. Za chwilę nastąpi przekierowanie.
           </p>
         </div>
       </div>

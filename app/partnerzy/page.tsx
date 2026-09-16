@@ -17,6 +17,7 @@ import {
   Mail,
   ChevronRight,
   Lock,
+  Percent,
 } from 'lucide-react';
 
 export default function PartnerzyPage() {
@@ -78,14 +79,14 @@ export default function PartnerzyPage() {
           </div>
 
           <h1 className="font-brand-display font-medium text-4xl sm:text-6xl text-[#1A1512] leading-tight">
-            Wspieraj swoje pacjentki i buduj{' '}
+            Wspieraj przyszłe mamy i buduj{' '}
             <em className="font-brand-serif italic font-normal text-[#EC008C]">
               dodatkowy przychód.
             </em>
           </h1>
 
           <p className="text-base sm:text-xl text-[#544A44] leading-relaxed">
-            Polecaj nowoczesną szkołę rodzenia online, której możesz zaufać. Twoje pacjentki zyskują <strong>rabat -30 zł</strong>, a Ty otrzymujesz <strong>20% prowizji (ok. 70 zł)</strong> od każdej poleconej osoby.
+            Polecaj nowoczesną szkołę rodzenia online, której możesz zaufać. Przyszłe mamy zyskują <strong>rabat -30 zł</strong>, a Ty otrzymujesz <strong>20% prowizji (ok. 70 zł)</strong> od każdej poleconej rodziny.
           </p>
 
           <div className="pt-2 flex flex-wrap items-center gap-4">
@@ -112,7 +113,7 @@ export default function PartnerzyPage() {
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="max-w-2xl space-y-2">
             <span className="text-xs font-bold uppercase tracking-widest text-[#EC008C]">
-              Korzyści dla Ciebie i Pacjentek
+              Korzyści dla Ciebie i Rodzin
             </span>
             <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512]">
               Dlaczego warto współpracować z HappyBirth?
@@ -120,13 +121,13 @@ export default function PartnerzyPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Karta 1: Pacjentka */}
+            {/* Karta 1: Przyszła Mama */}
             <div className="p-8 rounded-3xl bg-[#FAF7F2] border border-[#EAE3DB] space-y-4">
               <div className="w-12 h-12 rounded-2xl bg-[#FAE3EB] text-[#EC008C] flex items-center justify-center font-bold">
                 <Gift className="w-6 h-6" />
               </div>
               <h3 className="font-brand-display font-medium text-2xl text-[#1A1512]">
-                Dla Twojej Pacjentki: Zniżka -30 zł
+                Dla Przyszłej Mamy: Zniżka -30 zł
               </h3>
               <p className="text-sm text-[#544A44] leading-relaxed">
                 Każda mama, której przekażesz swoją wizytówkę lub link, otrzymuje kod rabatowy obniżający cenę kursu z 349 zł do 319 zł. Dajesz jej realną korzyść i sprawdzoną opiekę.
@@ -135,63 +136,68 @@ export default function PartnerzyPage() {
 
             {/* Karta 2: Prowizja */}
             <div className="p-8 rounded-3xl bg-[#FAF7F2] border border-[#EAE3DB] space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#DFEED4] text-[#347A22] flex items-center justify-center font-bold">
-                <DollarSign className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-2xl bg-[#D0EBF3] text-[#0088BC] flex items-center justify-center font-bold">
+                <Percent className="w-6 h-6" />
               </div>
               <h3 className="font-brand-display font-medium text-2xl text-[#1A1512]">
-                Dla Ciebie: 20% stałej prowizji
+                Dla Ciebie: 20% Prowizji (70 zł)
               </h3>
               <p className="text-sm text-[#544A44] leading-relaxed">
-                Zarabiasz ok. 70 zł od każdego zakupu z Twojego polecenia. Przy 20 pacjentkach miesięcznie to ponad <strong>1 400 zł dodatkowego przychodu</strong>, wypłacanego regularnie co miesiąc.
+                Zarabiasz ok. 70 zł od każdego zakupu z Twojego polecenia. Przy 20 mamach miesięcznie to ponad <strong>1 400 zł dodatkowego przychodu</strong>, wypłacanego regularnie co miesiąc.
               </p>
             </div>
 
-            {/* Karta 3: Bezpłatne materiały */}
+            {/* Karta 3: Transparentność */}
             <div className="p-8 rounded-3xl bg-[#FAF7F2] border border-[#EAE3DB] space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#EAD5E5] text-[#98269C] flex items-center justify-center font-bold">
-                <QrCode className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-2xl bg-[#DFEED4] text-[#347A22] flex items-center justify-center font-bold">
+                <ShieldCheck className="w-6 h-6" />
               </div>
               <h3 className="font-brand-display font-medium text-2xl text-[#1A1512]">
-                Bezpłatny pakiet do gabinetu
+                Dedykowany Kod i Panel
               </h3>
               <p className="text-sm text-[#544A44] leading-relaxed">
-                Wysyłamy bezpłatnie elegancki stojak na biurko oraz pakiet 100 estetycznych wizytówek z Twoim unikalnym kodem QR do poczekalni gabinetu lub torby patronażowej.
+                Otrzymujesz swój unikalny kod rabatowy (np. <code>KOWALSKA30</code>) oraz dostęp do panelu, w którym widzisz liczbę zamówień i stan swoich prowizji w czasie rzeczywistym.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Kalkulator potencjału */}
-      <section className="py-16 px-4 sm:px-6 max-w-5xl mx-auto">
-        <div className="p-8 sm:p-12 rounded-3xl bg-[#250A24] text-white border border-[#461643] shadow-xl text-center space-y-6">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#EC008C]">
-            Symulacja dochodu partnerskiego
-          </span>
-          <h2 className="font-brand-display font-medium text-3xl sm:text-4xl">
-            Zobacz, ile możesz zyskać miesięcznie
-          </h2>
+      {/* Symulator Zarobków */}
+      <section className="py-16 px-4 sm:px-6 bg-[#250A24] text-white">
+        <div className="max-w-5xl mx-auto space-y-10 text-center">
+          <div className="space-y-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#EC008C]">
+              Kalkulator partnerski
+            </span>
+            <h2 className="font-brand-display font-medium text-3xl sm:text-5xl">
+              Ile możesz zyskać polecając HappyBirth?
+            </h2>
+            <p className="text-sm text-[#EAD5E5]/80 max-w-xl mx-auto">
+              Wypłacamy 20% od każdej zrealizowanej transakcji przelewem na konto bankowe raz w miesiącu na podstawie faktury lub rachunku.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
-            <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-              <div className="text-xs text-[#EAD5E5]/70 uppercase tracking-wider">10 pacjentek / msc</div>
-              <div className="font-brand-display text-4xl font-bold text-white mt-2">ok. 700 zł</div>
-              <div className="text-[11px] text-[#EAD5E5]/50 mt-1">pasywnego zysku co miesiąc</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-2">
+              <div className="text-xs text-[#EAD5E5]/70 uppercase tracking-wider">10 mam / msc</div>
+              <div className="font-brand-display text-4xl font-bold text-[#FCD705]">~700 zł</div>
+              <div className="text-xs text-[#EAD5E5]/60">miesięcznie dodatkowego zysku</div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white/10 border border-[#EC008C]/50 relative">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#EC008C] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">
-                Średnia praktyka
+            <div className="p-6 rounded-3xl bg-[#EC008C]/20 border border-[#EC008C] space-y-2 relative">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#EC008C] text-white text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full">
+                Średnia dla gabinetu
               </span>
-              <div className="text-xs text-[#EAD5E5]/70 uppercase tracking-wider">25 pacjentek / msc</div>
-              <div className="font-brand-display text-4xl font-bold text-[#FCD705] mt-2">ok. 1 750 zł</div>
-              <div className="text-[11px] text-[#EAD5E5]/70 mt-1">wypłacane na fakturę lub umowę</div>
+              <div className="text-xs text-[#EAD5E5]/70 uppercase tracking-wider">25 mam / msc</div>
+              <div className="font-brand-display text-4xl font-bold text-[#FCD705]">~1 750 zł</div>
+              <div className="text-xs text-[#EAD5E5]/60">miesięcznie dodatkowego zysku</div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-              <div className="text-xs text-[#EAD5E5]/70 uppercase tracking-wider">50 pacjentek / msc</div>
-              <div className="font-brand-display text-4xl font-bold text-white mt-2">ok. 3 500 zł</div>
-              <div className="text-[11px] text-[#EAD5E5]/50 mt-1">dla gabinetów i szkół rodzenia</div>
+            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-2">
+              <div className="text-xs text-[#EAD5E5]/70 uppercase tracking-wider">50 mam / msc</div>
+              <div className="font-brand-display text-4xl font-bold text-[#FCD705]">~3 500 zł</div>
+              <div className="text-xs text-[#EAD5E5]/60">miesięcznie dodatkowego zysku</div>
             </div>
           </div>
         </div>

@@ -112,7 +112,7 @@ export default function PolitykaPrywatnosciPage() {
           </p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Zapamiętywanie oznaczonych jako ukończone lekcji;</li>
-            <li>Zapamiętanie wybranego trybu widoku (Kursantka / Partner);</li>
+            <li>Zapamiętanie wybranego trybu widoku (Dla Mamy / Dla Taty);</li>
             <li>Zapisanie statusu zgody na baner cookies.</li>
           </ul>
           <p>
