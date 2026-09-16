@@ -165,19 +165,19 @@ export default function MarketingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Lewa kolumna */}
           <div className="lg:col-span-7 space-y-5 sm:space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] dark:bg-[#370E35] border border-[#F3CAD9] dark:border-[#5E1E5A] text-xs font-semibold text-[#EC008C]">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] border border-[#F3CAD9] text-xs font-semibold text-[#EC008C]">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Program Edukacyjny Online dla Rodziców · 52 Lekcje VOD</span>
             </div>
 
-            <h1 className="font-brand-display font-medium text-4xl sm:text-5xl lg:text-6xl text-[#1A1512] dark:text-white leading-[1.08] tracking-tight">
+            <h1 className="font-brand-display font-medium text-4xl sm:text-5xl lg:text-6xl text-[#1A1512] leading-[1.08] tracking-tight">
               Spokojny, świadomy poród.{' '}
               <em className="font-brand-serif italic font-normal text-[#EC008C]">
                 Edukacyjny kurs dla dwojga.
               </em>
             </h1>
 
-            <p className="text-base sm:text-lg text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed font-sans max-w-2xl">
+            <p className="text-base sm:text-lg text-[#544A44] leading-relaxed font-sans max-w-2xl">
               52 filmowe lekcje edukacyjne i sprawdzone patenty w formule e-learningu dla dwojga. Zamiast sprzecznych rad z forów – rzetelny program szkoleniowy, opieka i spokój dla całej rodziny.
             </p>
 
@@ -189,7 +189,7 @@ export default function MarketingPage() {
 
               <a
                 href="#zwiastun"
-                className="inline-flex items-center gap-2 px-5 sm:px-6 py-3.5 rounded-full bg-white dark:bg-[#1C081A] hover:bg-stone-50 text-[#1A1512] dark:text-white border border-[#EAE3DB] dark:border-[#461643] text-sm font-semibold transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-3.5 rounded-full bg-white hover:bg-stone-50 text-[#1A1512] border border-[#EAE3DB] text-sm font-semibold transition-all shadow-sm"
               >
                 <Play className="w-3.5 h-3.5 text-[#EC008C] fill-current" />
                 <span>Zobacz bezpłatną lekcję demonstracyjną</span>
@@ -197,7 +197,7 @@ export default function MarketingPage() {
             </div>
 
             {/* Gwarancje zaufania */}
-            <div className="pt-2 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-[#867A72] dark:text-[#EAD5E5]/70">
+            <div className="pt-2 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-[#867A72]">
               <div className="flex items-center gap-1.5">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>Certyfikat ukończenia kursu</span>
@@ -247,37 +247,37 @@ export default function MarketingPage() {
       </section>
 
       {/* 2. PASEK SPOŁECZNEGO DOWODU */}
-      <section className="border-y border-[#EAE3DB] dark:border-[#461643] py-6 px-4 sm:px-6 bg-[#FAF7F2] dark:bg-[#1C081A]/50">
+      <section className="border-y border-[#EAE3DB] py-6 px-4 sm:px-6 bg-[#FAF7F2]">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center sm:text-left">
           <div>
-            <div className="font-brand-display text-3xl sm:text-4xl font-semibold text-[#1A1512] dark:text-white">
+            <div className="font-brand-display text-3xl sm:text-4xl font-semibold text-[#1A1512]">
               18 000+
             </div>
-            <div className="text-xs text-[#867A72] dark:text-[#EAD5E5]/70 mt-0.5">
+            <div className="text-xs text-[#867A72] mt-0.5">
               przygotowanych mam i ojców
             </div>
           </div>
           <div>
-            <div className="font-brand-display text-3xl sm:text-4xl font-semibold text-[#1A1512] dark:text-white">
+            <div className="font-brand-display text-3xl sm:text-4xl font-semibold text-[#1A1512]">
               52 lekcje
             </div>
-            <div className="text-xs text-[#867A72] dark:text-[#EAD5E5]/70 mt-0.5">
+            <div className="text-xs text-[#867A72] mt-0.5">
               filmowej wiedzy w 9 etapach
             </div>
           </div>
           <div>
-            <div className="font-brand-display text-3xl sm:text-4xl font-semibold text-[#1A1512] dark:text-white">
+            <div className="font-brand-display text-3xl sm:text-4xl font-semibold text-[#1A1512]">
               12 msc
             </div>
-            <div className="text-xs text-[#867A72] dark:text-[#EAD5E5]/70 mt-0.5">
+            <div className="text-xs text-[#867A72] mt-0.5">
               dostępu od terminu porodu
             </div>
           </div>
           <div>
-            <div className="font-brand-display text-3xl sm:text-4xl font-semibold text-[#1A1512] dark:text-white">
+            <div className="font-brand-display text-3xl sm:text-4xl font-semibold text-[#1A1512]">
               349 zł
             </div>
-            <div className="text-xs text-[#867A72] dark:text-[#EAD5E5]/70 mt-0.5">
+            <div className="text-xs text-[#867A72] mt-0.5">
               jednorazowo dla dwojga
             </div>
           </div>
@@ -290,10 +290,10 @@ export default function MarketingPage() {
           <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
             Wiedza, której nie znajdziesz na forach
           </span>
-          <h2 className="font-brand-display font-medium text-2xl sm:text-4xl text-[#1A1512] dark:text-white">
+          <h2 className="font-brand-display font-medium text-2xl sm:text-4xl text-[#1A1512]">
             Codzienne Złote Patenty HappyBirth
           </h2>
-          <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#EAD5E5]/70 max-w-xl mx-auto">
+          <p className="text-xs sm:text-sm text-[#544A44] max-w-xl mx-auto">
             Próbka konkretnych trików, które wyciągamy z 52 lekcji VOD. Kliknij poniżej, aby wylosować patent na dziś.
           </p>
         </div>
@@ -307,10 +307,10 @@ export default function MarketingPage() {
           <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
             Program Szkoleniowy
           </span>
-          <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512] dark:text-white">
+          <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512]">
             4 Filary Edukacji i Spokoju HappyBirth
           </h2>
-          <p className="text-sm text-[#544A44] dark:text-[#EAD5E5]/70">
+          <p className="text-sm text-[#544A44]">
             Kompleksowa wiedza e-learningowa: od przygotowania ciała po spokojny sen malucha w domu.
           </p>
         </div>
@@ -321,7 +321,7 @@ export default function MarketingPage() {
             return (
               <div
                 key={pillar.num}
-                className="p-6 rounded-3xl bg-white dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#461643] flex flex-col justify-between shadow-sm hover:shadow-md transition-all"
+                className="p-6 rounded-3xl bg-white border border-[#EAE3DB] flex flex-col justify-between shadow-sm hover:shadow-md transition-all"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -336,14 +336,14 @@ export default function MarketingPage() {
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-brand-display font-bold text-lg text-[#1A1512] dark:text-white">
+                    <h3 className="font-brand-display font-bold text-lg text-[#1A1512]">
                       {pillar.title}
                     </h3>
                     <div className="text-[11px] font-semibold text-[#EC008C]">
                       {pillar.subtitle}
                     </div>
                   </div>
-                  <p className="text-xs text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed">
+                  <p className="text-xs text-[#544A44] leading-relaxed">
                     {pillar.desc}
                   </p>
                 </div>
@@ -353,7 +353,7 @@ export default function MarketingPage() {
         </div>
 
         <div className="text-center pt-6">
-          <div className="text-xs font-semibold text-[#867A72] dark:text-[#EAD5E5]/70 inline-flex items-center gap-1.5">
+          <div className="text-xs font-semibold text-[#867A72] inline-flex items-center gap-1.5">
             <BookOpen className="w-4 h-4 text-[#EC008C]" />
             <span>Autorski program edukacyjny opracowany we współpracy z certyfikowanymi edukatorami rodzicielstwa</span>
           </div>
@@ -366,10 +366,10 @@ export default function MarketingPage() {
           <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
             Sylabus kursu
           </span>
-          <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512] dark:text-white">
+          <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512]">
             9 Modułów Edukacyjnych Twojej Podróży
           </h2>
-          <p className="text-sm text-[#544A44] dark:text-[#EAD5E5]/70">
+          <p className="text-sm text-[#544A44]">
             Przejrzysty program szkoleniowy podzielony na etapy: od testu, przez poród, po 1. rok malucha.
           </p>
         </div>
@@ -378,7 +378,7 @@ export default function MarketingPage() {
           {stagesOverview.map((stage) => (
             <div
               key={stage.num}
-              className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#461643] flex items-start gap-3.5 shadow-sm"
+              className="p-4 sm:p-5 rounded-2xl bg-white border border-[#EAE3DB] flex items-start gap-3.5 shadow-sm hover:shadow-md transition-all"
             >
               <div
                 className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5"
@@ -387,10 +387,10 @@ export default function MarketingPage() {
                 {stage.num}
               </div>
               <div>
-                <h4 className="font-brand-display font-bold text-sm sm:text-base text-[#1A1512] dark:text-white">
+                <h4 className="font-brand-display font-bold text-sm sm:text-base text-[#1A1512]">
                   {stage.name}
                 </h4>
-                <p className="text-xs text-[#544A44] dark:text-[#EAD5E5]/70 mt-0.5 leading-relaxed">
+                <p className="text-xs text-[#544A44] mt-0.5 leading-relaxed">
                   {stage.desc}
                 </p>
               </div>
@@ -405,47 +405,47 @@ export default function MarketingPage() {
           <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
             Praktyczne wsparcie
           </span>
-          <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512] dark:text-white">
+          <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512]">
             Narzędzia, do których wracacie w dzień i w nocy
           </h2>
-          <p className="text-sm text-[#544A44] dark:text-[#EAD5E5]/70">
+          <p className="text-sm text-[#544A44]">
             Gotowe do użycia w telefonie – w drodze i po powrocie do domu.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-3xl bg-[#FAE3EB] dark:bg-[#370E35] border border-[#F3CAD9] dark:border-[#5E1E5A] space-y-3">
+          <div className="p-6 rounded-3xl bg-[#FAE3EB] border border-[#F3CAD9] space-y-3 shadow-sm">
             <div className="w-10 h-10 rounded-2xl bg-[#EC008C] text-white flex items-center justify-center">
               <FileText className="w-5 h-5" />
             </div>
-            <h3 className="font-brand-display font-bold text-xl text-[#1A1512] dark:text-white">
+            <h3 className="font-brand-display font-bold text-xl text-[#1A1512]">
               Cyfrowy Notatnik Rodzica (PDF)
             </h3>
-            <p className="text-xs text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed">
+            <p className="text-xs text-[#544A44] leading-relaxed">
               Przejrzysty dokument dla Was obojga. Uporządkujcie swoje życzenia: obecność partnera, muzykę, kangurowanie i pierwsze chwile z maluchem.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-[#EAD5E5] dark:bg-[#250A24] border border-[#D5B8CF] dark:border-[#461643] space-y-3">
+          <div className="p-6 rounded-3xl bg-[#EAD5E5] border border-[#D5B8CF] space-y-3 shadow-sm">
             <div className="w-10 h-10 rounded-2xl bg-[#98269C] text-white flex items-center justify-center">
               <Users className="w-5 h-5" />
             </div>
-            <h3 className="font-brand-display font-bold text-xl text-[#1A1512] dark:text-white">
+            <h3 className="font-brand-display font-bold text-xl text-[#1A1512]">
               Dedykowana Strefa dla Taty
             </h3>
-            <p className="text-xs text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed">
+            <p className="text-xs text-[#544A44] leading-relaxed">
               Krótkie wideo-ściągi bez zbędnych słów: relaksacyjny masaż pleców, wsparcie mamy i gotowość na każdą minutę.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-[#D0EBF3] dark:bg-[#004A66] border border-[#B3DFEB] dark:border-[#006085] space-y-3">
+          <div className="p-6 rounded-3xl bg-[#D0EBF3] border border-[#B3DFEB] space-y-3 shadow-sm">
             <div className="w-10 h-10 rounded-2xl bg-[#0088BC] text-white flex items-center justify-center">
               <Sparkles className="w-5 h-5" />
             </div>
-            <h3 className="font-brand-display font-bold text-xl text-[#1A1512] dark:text-white">
+            <h3 className="font-brand-display font-bold text-xl text-[#1A1512]">
               Wyszukiwarka Złotych Patentów
             </h3>
-            <p className="text-xs text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed">
+            <p className="text-xs text-[#544A44] leading-relaxed">
               Wpisz dowolne wyzwanie (sen, kąpiel, płacz, noszenie) i błyskawicznie otrzymaj sprawdzoną instrukcję wideo z kursu.
             </p>
           </div>
@@ -455,13 +455,13 @@ export default function MarketingPage() {
       {/* 7. PORÓWNANIE: SZKOŁA TRADYCYJNA VS HAPPYBIRTH */}
       <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-5xl mx-auto">
         <div className="text-center space-y-2 mb-8">
-          <h2 className="font-brand-display font-medium text-2xl sm:text-3xl text-[#1A1512] dark:text-white">
+          <h2 className="font-brand-display font-medium text-2xl sm:text-3xl text-[#1A1512]">
             Dlaczego rodzice wybierają HappyBirth?
           </h2>
         </div>
 
-        <div className="rounded-3xl bg-white dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#461643] overflow-hidden shadow-sm">
-          <div className="grid grid-cols-12 bg-[#F6F2EC] dark:bg-[#250A24] p-4 text-xs font-bold uppercase tracking-wider border-b border-[#EAE3DB] dark:border-[#461643]">
+        <div className="rounded-3xl bg-white border border-[#EAE3DB] overflow-hidden shadow-sm">
+          <div className="grid grid-cols-12 bg-[#F6F2EC] p-4 text-xs font-bold uppercase tracking-wider border-b border-[#EAE3DB]">
             <div className="col-span-4 text-[#867A72]">Cecha</div>
             <div className="col-span-4 text-[#867A72]">Tradycyjna szkoła</div>
             <div className="col-span-4 text-[#EC008C]">HappyBirth Online</div>
@@ -471,16 +471,16 @@ export default function MarketingPage() {
             <div
               key={item.feature}
               className={`grid grid-cols-12 p-4 text-xs items-center gap-2 ${
-                idx % 2 === 1 ? 'bg-[#FAF7F2] dark:bg-white/5' : ''
+                idx % 2 === 1 ? 'bg-[#FAF7F2]' : ''
               }`}
             >
-              <div className="col-span-4 font-semibold text-[#1A1512] dark:text-white">
+              <div className="col-span-4 font-semibold text-[#1A1512]">
                 {item.feature}
               </div>
-              <div className="col-span-4 text-[#867A72] dark:text-[#EAD5E5]/70">
+              <div className="col-span-4 text-[#867A72]">
                 {item.traditional}
               </div>
-              <div className="col-span-4 font-semibold text-[#EC008C] dark:text-pink-300">
+              <div className="col-span-4 font-semibold text-[#EC008C]">
                 {item.happybirth}
               </div>
             </div>
@@ -521,7 +521,7 @@ export default function MarketingPage() {
           <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
             Głosy naszych rodzin
           </span>
-          <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512] dark:text-white">
+          <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512]">
             Historie mam i ojców po porodzie
           </h2>
         </div>
@@ -530,22 +530,22 @@ export default function MarketingPage() {
           {testimonials.map((t, i) => (
             <div
               key={i}
-              className="p-6 rounded-3xl bg-white dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#461643] flex flex-col justify-between shadow-sm"
+              className="p-6 rounded-3xl bg-white border border-[#EAE3DB] flex flex-col justify-between shadow-sm hover:shadow-md transition-all"
             >
               <div className="space-y-3">
                 <div className="flex text-amber-400 gap-1 text-sm">
                   ★★★★★
                 </div>
-                <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed italic">
+                <p className="text-xs sm:text-sm text-[#544A44] leading-relaxed italic">
                   {t.quote}
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-[#EAE3DB] dark:border-[#461643] mt-4">
-                <div className="font-bold text-xs text-[#1A1512] dark:text-white">
+              <div className="pt-4 border-t border-[#EAE3DB] mt-4">
+                <div className="font-bold text-xs text-[#1A1512]">
                   {t.author}
                 </div>
-                <div className="text-[11px] text-[#867A72] dark:text-[#EAD5E5]/60">
+                <div className="text-[11px] text-[#867A72]">
                   {t.meta}
                 </div>
               </div>
@@ -554,30 +554,33 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      {/* 10. FAQ */}
+      {/* 10. FAQ: CZYSTE BIAŁE HARMONIJKI (ACCORDION) JAK W POPRZEDNIEJ WERSJI */}
       <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-4xl mx-auto" id="faq">
         <div className="text-center space-y-2 mb-8">
           <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
             Odpowiedzi na pytania
           </span>
-          <h2 className="font-brand-display font-medium text-2xl sm:text-3xl text-[#1A1512] dark:text-white">
+          <h2 className="font-brand-display font-medium text-2xl sm:text-4xl text-[#1A1512]">
             Często zadawane pytania (FAQ)
           </h2>
+          <p className="text-sm text-[#544A44]">
+            Wszystko, co warto wiedzieć przed dołączeniem do programu edukacyjnego.
+          </p>
         </div>
 
-        <div className="space-y-3">
-          {faqs.map((faq, i) => (
-            <div
-              key={i}
-              className="p-5 rounded-2xl bg-white dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#461643]"
-            >
-              <h4 className="font-brand-display font-bold text-sm sm:text-base text-[#1A1512] dark:text-white mb-1.5">
-                {faq.q}
-              </h4>
-              <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed">
-                {faq.a}
+        <div className="divide-y divide-[#EAE3DB] bg-white rounded-3xl border border-[#EAE3DB] p-6 sm:p-10 shadow-sm">
+          {faqs.map((f, idx) => (
+            <details key={f.q} className="py-5 group" open={idx === 0}>
+              <summary className="font-brand-display font-medium text-base sm:text-lg text-[#1A1512] cursor-pointer list-none flex items-center justify-between gap-4">
+                <span>{f.q}</span>
+                <span className="w-6 h-6 rounded-full bg-stone-100 flex items-center justify-center text-xs text-[#867A72] group-open:rotate-180 transition-transform">
+                  ▼
+                </span>
+              </summary>
+              <p className="mt-3 text-xs sm:text-sm text-[#544A44] leading-relaxed">
+                {f.a}
               </p>
-            </div>
+            </details>
           ))}
         </div>
       </section>

@@ -46,6 +46,9 @@ export function AccessibilityToolbar() {
           setSettings(parsed);
           applySettings(parsed);
         }
+        const handleOpen = () => setIsOpen(true);
+        window.addEventListener('hb_open_a11y', handleOpen);
+        return () => window.removeEventListener('hb_open_a11y', handleOpen);
       } catch {}
     }
   }, []);
@@ -119,9 +122,9 @@ export function AccessibilityToolbar() {
       {/* Panel Dostępności (Modal / Popover) */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-md bg-white dark:bg-[#1C081A] rounded-3xl p-6 border border-[#EAE3DB] dark:border-[#461643] shadow-2xl space-y-6 text-[#1A1512] dark:text-[#FBF8F4]">
+          <div className="w-full max-w-md bg-white rounded-3xl p-6 border border-[#EAE3DB] shadow-2xl space-y-6 text-[#1A1512]">
             {/* Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-[#EAE3DB] dark:border-[#461643]">
+            <div className="flex items-center justify-between pb-4 border-b border-[#EAE3DB]">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-[#EC008C]/10 text-[#EC008C] flex items-center justify-center">
                   <Accessibility className="w-4 h-4" />
@@ -130,7 +133,7 @@ export function AccessibilityToolbar() {
                   <h3 className="font-brand-display font-bold text-base leading-tight">
                     {t('a11yTitle')}
                   </h3>
-                  <span className="text-[10px] text-[#867A72] dark:text-[#EAD5E5]/60 uppercase tracking-wider font-semibold">
+                  <span className="text-[10px] text-[#867A72] uppercase tracking-wider font-semibold">
                     Standard WCAG 2.1 AA · Dyrektywa UE
                   </span>
                 </div>
@@ -138,7 +141,7 @@ export function AccessibilityToolbar() {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-white/10 text-[#867A72] hover:text-[#1A1512] dark:hover:text-white transition-colors"
+                className="p-1.5 rounded-full hover:bg-neutral-100 text-[#867A72] hover:text-[#1A1512] transition-colors"
                 aria-label="Zamknij ułatwienia dostępu"
               >
                 <X className="w-4 h-4" />
@@ -149,7 +152,7 @@ export function AccessibilityToolbar() {
             <div className="space-y-4 text-xs">
               {/* 1. Rozmiar tekstu */}
               <div className="space-y-1.5">
-                <label className="font-semibold flex items-center gap-1.5">
+                <label className="font-semibold flex items-center gap-1.5 text-[#1A1512]">
                   <Type className="w-3.5 h-3.5 text-[#EC008C]" />
                   <span>{t('a11yFontSize')}</span>
                 </label>
@@ -161,8 +164,8 @@ export function AccessibilityToolbar() {
                       onClick={() => updateSetting('fontSize', size)}
                       className={`py-2 px-3 rounded-xl border text-center font-medium transition-all ${
                         settings.fontSize === size
-                          ? 'border-[#EC008C] bg-[#FAE3EB] dark:bg-[#EC008C]/20 text-[#EC008C] font-bold shadow-sm'
-                          : 'border-[#EAE3DB] dark:border-[#461643] bg-neutral-50 dark:bg-black/40 hover:border-[#867A72]'
+                          ? 'border-[#EC008C] bg-[#FAE3EB] text-[#EC008C] font-bold shadow-sm'
+                          : 'border-[#EAE3DB] bg-neutral-50 hover:border-[#867A72] text-[#544A44]'
                       }`}
                     >
                       {size === '100%' ? t('a11yNormal') : size === '115%' ? t('a11yMedium') : t('a11yLarge')}
@@ -172,10 +175,10 @@ export function AccessibilityToolbar() {
               </div>
 
               {/* 2. Przełączniki funkcji */}
-              <div className="space-y-2 pt-2 border-t border-[#EAE3DB] dark:border-[#461643]">
+              <div className="space-y-2 pt-2 border-t border-[#EAE3DB]">
                 {/* Wysoki Kontrast */}
                 <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 text-[#1A1512]">
                     <Contrast className="w-3.5 h-3.5 text-[#EC008C]" />
                     <span>{t('a11yContrast')}</span>
                   </span>
@@ -189,7 +192,7 @@ export function AccessibilityToolbar() {
 
                 {/* Podkreślenie linków */}
                 <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 text-[#1A1512]">
                     <Underline className="w-3.5 h-3.5 text-[#EC008C]" />
                     <span>{t('a11yUnderline')}</span>
                   </span>
@@ -203,7 +206,7 @@ export function AccessibilityToolbar() {
 
                 {/* Czytelna czcionka dla dyslektyków */}
                 <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 text-[#1A1512]">
                     <BookOpen className="w-3.5 h-3.5 text-[#EC008C]" />
                     <span>{t('a11yDyslexic')}</span>
                   </span>
@@ -217,7 +220,7 @@ export function AccessibilityToolbar() {
 
                 {/* Zatrzymanie animacji */}
                 <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 text-[#1A1512]">
                     <PauseCircle className="w-3.5 h-3.5 text-[#EC008C]" />
                     <span>{t('a11yReduceMotion')}</span>
                   </span>
@@ -232,7 +235,7 @@ export function AccessibilityToolbar() {
             </div>
 
             {/* Footer / Reset & Deklaracja */}
-            <div className="pt-4 border-t border-[#EAE3DB] dark:border-[#461643] flex items-center justify-between text-xs">
+            <div className="pt-4 border-t border-[#EAE3DB] flex items-center justify-between text-xs">
               <button
                 type="button"
                 onClick={resetSettings}
@@ -258,15 +261,15 @@ export function AccessibilityToolbar() {
       {/* Modal Deklaracji Dostępności UE */}
       {showDeclaration && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-lg bg-white dark:bg-[#1C081A] rounded-3xl p-6 sm:p-8 border border-[#EAE3DB] dark:border-[#461643] shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto text-xs text-[#544A44] dark:text-[#EAD5E5]/90">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE3DB] dark:border-[#461643]">
-              <h3 className="font-brand-display font-bold text-lg text-[#1A1512] dark:text-white">
+          <div className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 border border-[#EAE3DB] shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto text-xs text-[#544A44]">
+            <div className="flex items-center justify-between pb-3 border-b border-[#EAE3DB]">
+              <h3 className="font-brand-display font-bold text-lg text-[#1A1512]">
                 Deklaracja Dostępności Cyfrowej (WCAG 2.1 AA / EAA)
               </h3>
               <button
                 type="button"
                 onClick={() => setShowDeclaration(false)}
-                className="p-1 rounded-full text-[#867A72] hover:text-[#1A1512] dark:hover:text-white"
+                className="p-1 rounded-full text-[#867A72] hover:text-[#1A1512]"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -276,8 +279,8 @@ export function AccessibilityToolbar() {
               Platforma edukacyjna <strong>HappyBirth</strong> (KLARSolutions sp. z o.o.) zobowiązuje się do zapewnienia dostępności swojej strony internetowej zgodnie z przepisami ustawy z dnia 4 kwietnia 2019 r. o dostępności cyfrowej stron internetowych oraz wytycznymi <strong>European Accessibility Act (EAA)</strong> i standardem <strong>WCAG 2.1 na poziomie AA</strong>.
             </p>
 
-            <div className="space-y-2 bg-neutral-50 dark:bg-black/30 p-3.5 rounded-2xl border border-[#EAE3DB] dark:border-[#461643]">
-              <h4 className="font-bold text-[#1A1512] dark:text-white">Zastosowane udogodnienia:</h4>
+            <div className="space-y-2 bg-neutral-50 p-3.5 rounded-2xl border border-[#EAE3DB]">
+              <h4 className="font-bold text-[#1A1512]">Zastosowane udogodnienia:</h4>
               <ul className="list-disc pl-4 space-y-1">
                 <li>Pełna obsługa nawigacji za pomocą samej klawiatury (Focus outlines).</li>
                 <li>Transkrypcje tekstowe i napisy dla materiałów wideo w odtwarzaczu Cloudflare Stream.</li>

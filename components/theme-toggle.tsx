@@ -9,8 +9,8 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('hb_theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+      // Domyślnie ZAWSZE tryb jasny (charakterystyczny dla identyfikacji HappyBirth), chyba że użytkownik celowo wybrał 'dark'
+      const shouldBeDark = savedTheme === 'dark';
       
       setIsDark(shouldBeDark);
       if (shouldBeDark) {

@@ -77,7 +77,7 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
 
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl bg-white dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#461643] p-5 sm:p-6 shadow-md hover:shadow-lg transition-all ${className}`}
+      className={`relative overflow-hidden rounded-3xl bg-white border border-[#EAE3DB] p-5 sm:p-6 shadow-md hover:shadow-lg transition-all ${className}`}
     >
       {/* Decorative top accent */}
       <div
@@ -93,7 +93,7 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
           >
             {tip.categoryLabel}
           </span>
-          <span className="text-[11px] text-[#867A72] dark:text-[#EAD5E5]/60 font-medium flex items-center gap-1">
+          <span className="text-[11px] text-[#867A72] font-medium flex items-center gap-1">
             <Lightbulb className="w-3 h-3 text-[#FCD705]" />
             {tip.authorNote || 'Patent z bazy HappyBirth'}
           </span>
@@ -101,7 +101,7 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
 
         <button
           onClick={handleNextTip}
-          className="text-xs text-[#867A72] dark:text-[#EAD5E5]/70 hover:text-[#EC008C] dark:hover:text-white transition-colors flex items-center gap-1 font-medium"
+          className="text-xs text-[#867A72] hover:text-[#EC008C] transition-colors flex items-center gap-1 font-medium"
           title="Pokaż inny patent z bazy wiedzy"
         >
           <RefreshCw className="w-3.5 h-3.5" />
@@ -110,18 +110,18 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
       </div>
 
       <div className={`transition-opacity duration-200 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
-        <h3 className="font-brand-display font-semibold text-lg sm:text-xl text-[#1A1512] dark:text-[#FBF8F4] mb-2 leading-snug">
+        <h3 className="font-brand-display font-semibold text-lg sm:text-xl text-[#1A1512] mb-2 leading-snug">
           {tip.title}
         </h3>
-        <p className="text-sm text-[#544A44] dark:text-[#EAD5E5]/80 leading-relaxed mb-4">
+        <p className="text-sm text-[#544A44] leading-relaxed mb-4">
           {tip.shortDesc}
         </p>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#EAE3DB] dark:border-[#461643]">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#EAE3DB]">
           {tip.lessonId ? (
             <a
               href={`${strefaUrl}/lekcja/${tip.lessonId}`}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EC008C] hover:text-[#C80077] dark:hover:text-pink-300 transition-colors group"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EC008C] hover:text-[#C80077] transition-colors group"
             >
               <div className="w-6 h-6 rounded-full bg-[#EC008C]/10 text-[#EC008C] flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Play className="w-3 h-3 fill-current" />
@@ -136,8 +136,8 @@ export function DailyTipCard({ className = '', variant = 'card' }: DailyTipCardP
             onClick={handleSave}
             className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full transition-colors ${
               saved
-                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300'
-                : 'text-[#867A72] dark:text-[#EAD5E5]/60 hover:text-[#1A1512] dark:hover:text-white'
+                ? 'bg-rose-100 text-rose-700'
+                : 'text-[#867A72] hover:text-[#1A1512]'
             }`}
           >
             <Heart className={`w-3.5 h-3.5 ${saved ? 'fill-current text-rose-500' : ''}`} />
