@@ -50,8 +50,11 @@ export function middleware(request: NextRequest) {
   // C. DOMENA GŁÓWNA MARKETINGOWA (happybirth.pl lub localhost:3000)
   // -------------------------------------------------------------
   // Jeśli użytkownik wpisze ścieżkę kursantki na domenie głównej:
-  const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny'];
-  const isStudentRoute = studentRoutes.some((route) => url.pathname.startsWith(route));
+  // Dopasowanie do całego segmentu: '/partner' nie może łapać '/partnerzy' (program partnerski B2B)
+  const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny', '/plan-porodu'];
+  const isStudentRoute = studentRoutes.some(
+    (route) => url.pathname === route || url.pathname.startsWith(`${route}/`)
+  );
 
   if (isStudentRoute) {
     if (!isDev) {

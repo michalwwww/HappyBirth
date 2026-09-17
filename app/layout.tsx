@@ -1,32 +1,17 @@
 import type { Metadata } from 'next';
-import { Bricolage_Grotesque, Instrument_Serif, Inter } from 'next/font/google';
+// Fonty hostowane lokalnie (bez zapytań do Google Fonts: RODO, brak zależności sieciowej przy buildzie)
+import '@fontsource-variable/bricolage-grotesque/standard.css';
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource/instrument-serif/index.css';
+import '@fontsource/instrument-serif/400-italic.css';
 import './globals.css';
 import { CookieBanner } from '@/components/cookie-banner';
 import { I18nProvider } from '@/lib/i18n';
 import { AccessibilityToolbar } from '@/components/accessibility-toolbar';
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-bricolage',
-  display: 'swap',
-});
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: ['400'],
-  style: ['normal', 'italic'],
-  variable: '--font-instrument-serif',
-  display: 'swap',
-});
-
-const inter = Inter({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-inter',
-  display: 'swap',
-});
+import { StageSymbolSprite } from '@/components/stage-icons';
 
 export const metadata: Metadata = {
-  title: 'HAPPYBIRTH · Edukacyjny Kurs Szkoły Rodzenia Online — 52 Lekcje VOD',
+  title: 'HAPPYBIRTH · Szkoła rodzenia online, 52 lekcje wideo',
   description:
     'Certyfikowany kurs edukacyjny online dla przyszłych mam i ojców. 52 filmowe lekcje e-learning VOD, sprawdzone patenty i edukacja rodzicielska dla dwojga.',
   metadataBase: new URL('https://happybirth.pl'),
@@ -41,8 +26,8 @@ export const metadata: Metadata = {
     'przygotowanie do porodu kurs',
   ],
   openGraph: {
-    title: 'HAPPYBIRTH · Edukacyjny Kurs Szkoły Rodzenia Online — 52 Lekcje VOD',
-    description: 'Certyfikowany program edukacyjny dla mam i ojców. 52 filmowe lekcje e-learning VOD dla dwojga.',
+    title: 'HAPPYBIRTH · Szkoła rodzenia online, 52 lekcje wideo',
+    description: 'Program edukacyjny dla mam i ojców. 52 lekcje wideo w dziewięciu etapach, dostęp 12 miesięcy dla dwojga.',
     url: 'https://happybirth.pl',
     siteName: 'HappyBirth Edukacja',
     locale: 'pl_PL',
@@ -101,17 +86,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="pl"
-      className={`scroll-smooth ${bricolage.variable} ${instrumentSerif.variable} ${inter.variable}`}
-    >
+    <html lang="pl" className="scroll-smooth">
       <head>
+        {/* Klasa js przed pierwszym malowaniem: bez JS elementy .r pozostają widoczne */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(educationalJsonLd) }}
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#FBF8F4] dark:bg-[#140513] text-[#1A1512] dark:text-[#FBF8F4] antialiased selection:bg-[#EC008C]/20">
+      <body className="min-h-screen flex flex-col bg-[#FBF8F4] dark:bg-[#140513] text-[#1A1512] dark:text-[#FBF8F4] antialiased">
+        <StageSymbolSprite />
         <I18nProvider>
           {children}
           <CookieBanner />

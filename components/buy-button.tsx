@@ -9,14 +9,20 @@ interface BuyButtonProps {
   courseId?: string;
 }
 
+/**
+ * Przycisk zakupu: tworzy sesję Stripe Checkout i przekierowuje.
+ * Błąd pokazujemy pod przyciskiem, bez alertów przeglądarki.
+ */
 export function BuyCourseButton({
-  className = 'w-full py-4 rounded-full bg-[#FCD705] hover:bg-[#ffe338] text-[#1A1512] font-bold text-base transition-all shadow-xl hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed',
+  className = 'btn btn-primary',
   children,
   courseId = 'kurs-glowny-happybirth',
 }: BuyButtonProps) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleCheckout = async () => {
+    setError(null);
     try {
       setLoading(true);
       const res = await fetch('/api/stripe/checkout', {
@@ -29,36 +35,38 @@ export function BuyCourseButton({
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert(data.error || 'Wystąpił problem przy inicjalizacji płatności.');
+        setError(data.error || 'Nie udało się uruchomić płatności. Spróbuj ponownie za chwilę.');
         setLoading(false);
       }
     } catch (err) {
       console.error('Błąd checkoutu:', err);
-      alert('Nie udało się połączyć z bramką płatności.');
+      setError('Brak połączenia z bramką płatności. Sprawdź internet i spróbuj ponownie.');
       setLoading(false);
     }
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleCheckout}
-      disabled={loading}
-      className={className}
-    >
-      {loading ? (
-        <>
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span>Łączenie ze Stripe...</span>
-        </>
-      ) : children ? (
-        children
-      ) : (
-        <>
-          <span>Kup dostęp · BLIK / Karta</span>
-          <ArrowRight className="w-4 h-4" />
-        </>
-      )}
-    </button>
+    <>
+      <button type="button" onClick={handleCheckout} disabled={loading} className={className} aria-busy={loading}>
+        {loading ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+            <span>Łączę z płatnością</span>
+          </>
+        ) : children ? (
+          children
+        ) : (
+          <>
+            <span>Kup dostęp · BLIK / karta</span>
+            <ArrowRight className="w-4 h-4" aria-hidden="true" />
+          </>
+        )}
+      </button>
+      {error ? (
+        <span role="alert" className="block basis-full text-[14px] leading-snug text-alarm">
+          {error}
+        </span>
+      ) : null}
+    </>
   );
 }

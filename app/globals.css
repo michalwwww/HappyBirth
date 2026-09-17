@@ -2,73 +2,414 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   HAPPYBIRTH · design system v2
+   Fundament: papier i atrament, dziewięć etapów, dziewięć kolorów.
+   Tokeny etapów wyliczone algorytmicznie (paczka marki, assets/tokens.css).
+   Każda para tekst/tło przechodzi WCAG AA. Hexów etapów nie poprawiamy ręcznie.
+   ========================================================================== */
+
 :root {
+  /* Kroje pisma (hostowane lokalnie, patrz app/layout.tsx) */
+  --font-bricolage: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-instrument-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-inter: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Paleta robocza, wspólna dla całej strony */
   --paper: #FBF8F4;
+  --paper-2: #F6F2EC;
   --ink: #1A1512;
   --ink2: #544A44;
-  --ink3: #867A72;
+  --ink3: #766A62; /* ciemniejszy niż w paczce (#867A72), żeby tekst 13 do 16 px przechodził AA na papierze */
   --line: #EAE3DB;
-  --c: #EC008C;
-  --tint: #FAE3EB;
-  --deep: #C80077;
-  
-  /* Ciemnofioletowa / Purpurowa paleta dla belek i stopki */
+  --alarm: #B32218;
+  --caution: #A8802F;
+  --safe: #2F6B4F;
+
+  /* Jedyny akcent pełnego nasycenia poza symbolami: cennik i główne CTA */
+  --accent: #FCD705;
+  --accent-hover: #F3CE00;
+
+  /* Domyślny etap (zanim) dla elementów bez kontekstu etapu */
+  --c: #8F8D8D;
+  --tint: #F2EFEB;
+  --tint2: #E9E6E2;
+  --deep: #6B6969;
+  --nav: #828080;
+  --on-c: #1A1512;
+
+  /* Paleta śliwkowa Strefy (zachowana dla panelu kursantki) */
   --plum-night: #1F071D;
   --plum-deep: #250A24;
   --plum-card: #2C0C2B;
   --plum-border: #461643;
   --plum-tint: #EAD5E5;
   --plum-glow: rgba(236, 0, 140, 0.18);
+
+  /* Rytm i geometria */
+  --pad: clamp(16px, 5vw, 72px);
+  --r: 14px;
+  --r-lg: 22px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --nav-h: 76px;
+}
+
+/* --- Dziewięć etapów: c (plama i symbol), tint (tło sekcji), tint2 (tło kafla),
+       deep (jedyny kolorowy tekst na tincie 8,5 procent; na tint2 daje 4,0 do 4,5, więc drobny tekst na kaflu idzie w atramencie),
+       nav (kropka nawigacji na papierze), on-c (tekst na czystym kolorze: atrament na jasnych, biel na ciemnych) --- */
+.e-zanim       { --c: #8F8D8D; --tint: #F2EFEB; --tint2: #E9E6E2; --deep: #6B6969; --nav: #828080; --on-c: #1A1512; }
+.e-dwiekreski  { --c: #54BF39; --tint: #EDF3E4; --tint2: #DFEED4; --deep: #347A22; --nav: #3E9228; --on-c: #1A1512; }
+.e-lepiej      { --c: #FCD705; --tint: #FBF5E0; --tint2: #FBF2CB; --deep: #816E00; --nav: #967F00; --on-c: #1A1512; }
+.e-torba       { --c: #F57B14; --tint: #FAEDE1; --tint2: #FAE3CE; --deep: #AA5003; --nav: #D26204; --on-c: #1A1512; }
+.e-boli        { --c: #ED1C24; --tint: #FAE5E2; --tint2: #F9D3D1; --deep: #D00B13; --nav: #F2171F; --on-c: #FFFFFF; }
+.e-planb       { --c: #952999; --tint: #F2E6EC; --tint2: #EAD5E5; --deep: #98269C; --nav: #98269C; --on-c: #FFFFFF; }
+.e-pierwszanoc { --c: #EC008C; --tint: #FAE3EB; --tint2: #F8CEE2; --deep: #C80077; --nav: #EC008C; --on-c: #FFFFFF; }
+.e-karmienie   { --c: #00ADEF; --tint: #E6F2F4; --tint2: #D0EBF3; --deep: #00729D; --nav: #0088BC; --on-c: #1A1512; }
+.e-niespi      { --c: #3B46A4; --tint: #EBE9ED; --tint2: #DADAE6; --deep: #3844A7; --nav: #3844A7; --on-c: #FFFFFF; }
+
+/* ==========================================================================
+   Baza typograficzna
+   ========================================================================== */
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background-color: var(--paper);
   color: var(--ink);
-  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter);
   font-size: 18px;
   line-height: 1.62;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'tnum' 1, 'cv11' 1;
 }
 
 h1, h2, h3, h4 {
-  font-family: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-family: var(--font-bricolage);
   font-weight: 500;
   letter-spacing: -0.032em;
-  line-height: 1.05;
+  line-height: 1.02;
+  text-wrap: balance;
+  font-optical-sizing: auto;
 }
 
-em.se {
-  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+em.se,
+.se {
+  font-family: var(--font-instrument-serif);
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.012em;
 }
 
+p {
+  text-wrap: pretty;
+}
+
 .font-brand-display {
-  font-family: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-family: var(--font-bricolage);
   letter-spacing: -0.032em;
 }
 
 .font-brand-serif {
-  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-instrument-serif);
   font-style: italic;
 }
 
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: rgba(252, 215, 5, 0.55);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
 /* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--paper); }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink3); }
+
+/* ==========================================================================
+   Komponenty systemu
+   ========================================================================== */
+
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--pad);
+    padding-right: var(--pad);
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-inter);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink2);
+  }
+  .eyebrow::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--c);
+    flex: none;
+  }
+
+  .lead {
+    font-size: clamp(18px, 1.5vw, 21px);
+    line-height: 1.55;
+    color: var(--ink2);
+  }
+
+  .h-display {
+    font-size: clamp(40px, 7vw, 84px);
+  }
+  .h-section {
+    font-size: clamp(30px, 4.4vw, 52px);
+  }
+  .h-card {
+    font-size: clamp(22px, 2vw, 26px);
+  }
+
+  /* Przyciski: jeden akcent żółty, reszta atrament i papier */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 0 24px;
+    border-radius: 999px;
+    font-family: var(--font-inter);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.25s var(--ease-out), background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    will-change: transform;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn-sm { min-height: 44px; padding: 0 18px; font-size: 15px; }
+  .btn-lg { min-height: 58px; padding: 0 30px; font-size: 17px; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--ink);
+    box-shadow: 0 1px 0 rgba(26, 21, 18, 0.06), 0 10px 24px -14px rgba(26, 21, 18, 0.35);
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+
+  .btn-ink {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn-ink:hover { background: #2B2420; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .btn-ghost:hover { background: var(--paper-2); border-color: #DCD3C9; }
+
+  .btn-paper {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .btn-paper:hover { background: #fff; }
+
+  .link-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.25s ease, gap 0.25s var(--ease-out);
+  }
+  .link-arrow:hover { border-color: var(--ink); gap: 10px; }
+
+  /* Karta na papierze */
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+  }
+
+  /* Kafel etapu: tło tint2, po najechaniu pełne nasycenie, symbol obraca się o 9 stopni */
+  .tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--tint2);
+    color: var(--ink);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    text-align: left;
+    transition: background-color 0.35s ease, color 0.35s ease, transform 0.35s var(--ease-out), box-shadow 0.35s ease;
+  }
+  .tile:hover,
+  .tile[aria-pressed='true'] {
+    background: var(--c);
+    color: var(--on-c);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 32px -20px rgba(26, 21, 18, 0.45);
+  }
+  .tile:hover .sym,
+  .tile[aria-pressed='true'] .sym {
+    transform: rotate(-9deg) scale(1.06);
+  }
+  .tile .muted { color: var(--ink2); transition: color 0.35s ease; }
+  .tile:hover .muted,
+  .tile[aria-pressed='true'] .muted { color: var(--on-c); }
+
+  .sym {
+    display: block;
+    color: currentColor;
+    transition: transform 0.45s var(--ease-out);
+  }
+
+  /* Moduł red flag: stała, rozpoznawalna forma. Bez ilustracji, bez koloru etapu. */
+  .redflag {
+    border-left: 4px solid var(--alarm);
+    background: #fff;
+    border-radius: 0 var(--r) var(--r) 0;
+    padding: 18px 20px;
+    color: var(--ink);
+  }
+
+  /* Kropka nawigacji przejmuje kolor etapu */
+  .navdot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--nav);
+    flex: none;
+    transition: background-color 0.5s ease, transform 0.4s var(--ease-out);
+  }
+
+  /* Dziewięć kropek palety w hero */
+  .oko {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .oko i {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    display: block;
+    background: var(--c);
+  }
+
+  /* Wielka wyciszona liczba (liczba jako bohater) */
+  .big-nr {
+    font-family: var(--font-bricolage);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 0.85;
+    opacity: 0.13;
+    user-select: none;
+  }
 }
-::-webkit-scrollbar-track {
-  background: #FBF8F4;
+
+/* ==========================================================================
+   Ruch. Ma pracować, nie popisywać się.
+   ========================================================================== */
+
+/* Tylko gdy działa JS (klasa .js na <html>), inaczej treść jest widoczna od razu */
+.js .r {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.6s ease, transform 0.6s var(--ease-out);
 }
-::-webkit-scrollbar-thumb {
-  background: #EAE3DB;
-  border-radius: 4px;
+.js .r.in {
+  opacity: 1;
+  transform: none;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #867A72;
+
+@keyframes hb-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -10px, 0) rotate(3deg); }
 }
+.float {
+  animation: hb-float 7s ease-in-out infinite;
+}
+.float-slow {
+  animation: hb-float 11s ease-in-out infinite;
+}
+
+@keyframes hb-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  70% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.pop {
+  animation: hb-pop 0.6s var(--ease-out) both;
+}
+
+@keyframes hb-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.fade-up {
+  animation: hb-fade-up 0.5s var(--ease-out) both;
+}
+
+/* Akordeon FAQ na natywnym <details> */
+details.faq > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details.faq > summary::-webkit-details-marker {
+  display: none;
+}
+details.faq .faq-icon {
+  transition: transform 0.35s var(--ease-out);
+}
+details.faq[open] .faq-icon {
+  transform: rotate(45deg);
+}
+details.faq .faq-body {
+  animation: hb-fade-up 0.35s var(--ease-out) both;
+}
+
+/* Ukrywanie paska przewijania w poziomych listach */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .r { opacity: 1; transform: none; transition: none; }
+  .float, .float-slow, .pop, .fade-up, details.faq .faq-body { animation: none !important; }
+  .tile, .sym, .navdot, .btn { transition: none !important; }
+  html { scroll-behavior: auto !important; }
+}
+
+/* ==========================================================================
+   Elementy zachowane dla Strefy kursantki (panel po zalogowaniu)
+   ========================================================================== */
 
 .glass-nav {
   background: rgba(251, 248, 244, 0.94);
@@ -76,29 +417,11 @@ em.se {
   -webkit-backdrop-filter: blur(14px);
 }
 
-/* 9-bar color swatch from Netlify */
-.hero-sw {
-  display: flex;
-  gap: 6px;
-}
-.hero-sw i {
-  flex: 1;
-  height: 8px;
-  border-radius: 4px;
-  display: block;
-}
+.hero-sw { display: flex; gap: 6px; }
+.hero-sw i { flex: 1; height: 8px; border-radius: 4px; display: block; }
 
-/* Tick list from Netlify */
-.tick-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.tick-list li {
-  position: relative;
-  padding-left: 28px;
-  margin-bottom: 12px;
-}
+.tick-list { list-style: none; padding: 0; margin: 0; }
+.tick-list li { position: relative; padding-left: 28px; margin-bottom: 12px; }
 .tick-list li::before {
   content: '';
   position: absolute;
@@ -110,7 +433,7 @@ em.se {
   background: #FCD705;
 }
 
-/* Dark Mode Tokens */
+/* Tryb ciemny (Strefa). Strona marketingowa pracuje zawsze na papierze. */
 .dark {
   --paper: #140513;
   --ink: #FBF8F4;
@@ -119,10 +442,19 @@ em.se {
   --line: #3A1038;
   color-scheme: dark;
 }
-
 .dark body {
   background-color: #140513;
   color: #FBF8F4;
+}
+.marketing-root {
+  --paper: #FBF8F4;
+  --ink: #1A1512;
+  --ink2: #544A44;
+  --ink3: #867A72;
+  --line: #EAE3DB;
+  color-scheme: light;
+  background-color: var(--paper);
+  color: var(--ink);
 }
 
 /* WCAG 2.1 AA / EAA Accessibility Helpers */
@@ -131,7 +463,7 @@ em.se {
   text-underline-offset: 4px !important;
 }
 
-.a11y-readable-font, 
+.a11y-readable-font,
 .a11y-readable-font * {
   font-family: Arial, Helvetica, Verdana, sans-serif !important;
   letter-spacing: 0.03em !important;
@@ -139,13 +471,14 @@ em.se {
   line-height: 1.8 !important;
 }
 
-.a11y-reduce-motion *, 
-.a11y-reduce-motion *::before, 
+.a11y-reduce-motion *,
+.a11y-reduce-motion *::before,
 .a11y-reduce-motion *::after {
   animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
 }
+.a11y-reduce-motion .r { opacity: 1 !important; transform: none !important; }
 
 .a11y-high-contrast {
   filter: contrast(135%) brightness(105%) !important;

@@ -54,8 +54,8 @@ export function StrefaNavbar() {
     <header className="sticky top-0 z-50 w-full">
       {/* Top Luxury Announcement Ribbon (Ciemnofioletowy aksamit #250A24) */}
       <div className="bg-[#250A24] dark:bg-[#140513] text-[#EAD5E5] border-b border-[#461643] px-3 sm:px-4 py-1.5 sm:py-2 text-xs transition-colors">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
-          <div className="flex items-center space-x-2 shrink-0">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 sm:gap-4">
+          <div className="hidden sm:flex items-center space-x-2 shrink-0">
             <span className="w-2 h-2 rounded-full bg-[#EC008C] animate-pulse"></span>
             <span className="font-semibold text-white tracking-wide whitespace-nowrap">
               {t('brandTitle')}
@@ -66,7 +66,7 @@ export function StrefaNavbar() {
             </span>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 min-w-0 max-w-full">
             {/* Przełącznik języków z flagami PL / EN / RU */}
             <LanguageSwitcher />
 

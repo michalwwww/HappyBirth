@@ -3,26 +3,22 @@ import { MarketingNavbar } from '@/components/marketing-navbar';
 import { Footer } from '@/components/footer';
 
 export const metadata: Metadata = {
-  title: 'HAPPYBIRTH · Szkoła Rodzenia Online — od Szkoły Rodzenia Mama Gaja',
+  title: 'HAPPYBIRTH · Szkoła rodzenia online, od dwóch kresek do pierwszych urodzin',
   description:
-    'Poród nie jest niespodzianką. Prowadzimy Cię przez niego etap po etapie. Od dwóch kresek do pierwszych urodzin. Dostęp 12 miesięcy dla Ciebie i partnera w cenie 349 zł.',
+    'Poród nie jest niespodzianką. 52 lekcje wideo w dziewięciu etapach, dopasowane do twojego tygodnia ciąży. Dostęp 12 miesięcy od terminu porodu, dla ciebie i partnera, 349 zł.',
   openGraph: {
-    title: 'HAPPYBIRTH · Szkoła Rodzenia Online',
-    description: 'Poród nie jest niespodzianką. Jest procesem, który da się poznać zawczasu.',
+    title: 'HAPPYBIRTH · Szkoła rodzenia online',
+    description: 'Poród nie jest niespodzianką. Dostajesz dokładnie ten etap, w którym jesteś. Od dwóch kresek do pierwszych urodzin.',
     url: 'https://happybirth.pl',
-    siteName: 'HappyBirth',
+    siteName: 'HAPPYBIRTH',
     locale: 'pl_PL',
     type: 'website',
   },
 };
 
-export default function MarketingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBF8F4] text-[#1A1512]">
+    <div className="marketing-root min-h-screen flex flex-col">
       <MarketingNavbar />
       <main className="flex-1">{children}</main>
       <Footer />

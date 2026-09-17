@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Logo } from './logo';
+import { RedFlag } from './red-flag';
 import { ShieldCheck, PhoneCall, AlertTriangle, Mail, Heart, Sparkles, ExternalLink, FileText } from 'lucide-react';
 
 export function StrefaFooter() {
@@ -119,15 +120,20 @@ export function StrefaFooter() {
           </div>
         </div>
 
-        {/* Czerwone Flagi / Medical Alert */}
-        <div className="mt-8 p-4 rounded-xl bg-[#2D0A14] border border-[#781B2B] text-xs space-y-2">
-          <div className="flex items-center gap-2 text-rose-300 font-bold tracking-wide uppercase">
-            <AlertTriangle className="w-4 h-4 text-rose-400" />
-            <span>Kiedy nie oglądasz wideo, tylko natychmiast dzwonisz pod 112:</span>
-          </div>
-          <p className="text-[#F1D0D5] leading-relaxed">
-            Krwawienie jasną krwią · odpływanie wód płodowych (zwłaszcza zielonych lub mętnych) · silny ból głowy z mroczkami przed oczami · nagłe, gwałtowne obrzęki twarzy i dłoni · brak wyczuwalnych ruchów dziecka przez 10 godzin · silny świąd dłoni i stóp w III trymestrze. <b>W każdej z tych sytuacji jedź natychmiast na Izbę Przyjęć lub wezwij karetkę pogotowia.</b>
-          </p>
+        {/* Moduł red flag: stała forma (components/red-flag.tsx), bez ilustracji i koloru etapu */}
+        <div className="mt-8">
+          <RedFlag
+            title="Kiedy nie oglądasz lekcji, tylko dzwonisz pod 112"
+            items={[
+              'Krwawienie jasną krwią',
+              'Odpływanie wód płodowych, zwłaszcza zielonych lub mętnych',
+              'Silny ból głowy z mroczkami przed oczami',
+              'Nagłe, gwałtowne obrzęki twarzy i dłoni',
+              'Brak wyczuwalnych ruchów dziecka przez 10 godzin',
+              'Silny świąd dłoni i stóp w trzecim trymestrze',
+            ]}
+            footer="W każdej z tych sytuacji jedź natychmiast na izbę przyjęć albo wezwij pogotowie (112 lub 999)."
+          />
         </div>
 
         {/* Copyright & Legal */}

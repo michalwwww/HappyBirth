@@ -61,8 +61,11 @@ export async function onRequest(context: PagesContext): Promise<Response> {
 
   // 4. DOMENA GŁÓWNA MARKETINGOWA: happybirth.pl
   const isMainProdHost = host === 'happybirth.pl' || host === 'www.happybirth.pl';
-  const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny'];
-  const isStudentRoute = studentRoutes.some((route) => url.pathname.startsWith(route));
+  // Dopasowanie do całego segmentu: '/partner' nie może łapać '/partnerzy' (program partnerski B2B)
+  const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny', '/plan-porodu'];
+  const isStudentRoute = studentRoutes.some(
+    (route) => url.pathname === route || url.pathname.startsWith(`${route}/`)
+  );
 
   // Przekieruj ścieżki kursantki z domeny głównej do strefy (tylko na produkcji)
   if (isMainProdHost && isStudentRoute) {
