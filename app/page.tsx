@@ -1064,12 +1064,64 @@ export default function RootPage() {
                   ))}
                 </ul>
 
+                {/* SEKCJA KODU RABATOWEGO - ZAWSZE WIDOCZNA DLA WYGODY TESTOWANIA */}
+                <div className="mt-6 pt-5 border-t border-[#EAE3DB] dark:border-[#3A1038] text-left">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11.5px] font-bold text-[#867A72] dark:text-[#A2958C] uppercase tracking-wider">
+                        {t.pricing.promoTrigger}
+                      </span>
+                      <span className="text-[11px] text-[#DA0271] font-medium">
+                        Kod testowy 100%: <strong className="font-mono">TEST</strong>
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Wpisz kod (np. TEST)"
+                        value={promoCodeInput}
+                        onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleApplyPromo();
+                          }
+                        }}
+                        className="flex-1 px-3.5 py-2.5 text-xs font-semibold uppercase rounded-xl border border-[#EAE3DB] dark:border-[#3A1038] bg-[#FDFAF6] dark:bg-[#250A24] text-[#1A1512] dark:text-white focus:outline-none focus:border-[#DA0271] focus:ring-1 focus:ring-[#DA0271]"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyPromo}
+                        className="px-4 py-2.5 rounded-xl bg-[#250A24] dark:bg-[#3D0E39] text-white text-xs font-bold hover:bg-[#DA0271] transition-colors cursor-pointer"
+                      >
+                        {t.pricing.promoApply}
+                      </button>
+                    </div>
+
+                    {appliedPromo && (
+                      <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/40 space-y-2 mt-2">
+                        <p className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span>Kod {appliedPromo} aktywny: Zniżka 100% (do zapłaty: 0 zł)!</span>
+                        </p>
+                      </div>
+                    )}
+
+                    {promoError && (
+                      <p className="text-xs text-rose-500 font-semibold">
+                        {promoError}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
                 {/* GŁÓWNY PRZYCISK ZAKUPU */}
                 <button
                   type="button"
                   onClick={handleCheckout}
                   disabled={loading}
-                  className={`btn-oferta-zakup mt-6 ${appliedPromo ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-emerald-500/30 ring-2 ring-emerald-400/50' : ''}`}
+                  className={`btn-oferta-zakup mt-4 ${appliedPromo ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-emerald-500/30 ring-2 ring-emerald-400/50 hover:scale-[1.02]' : ''}`}
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
@@ -1091,71 +1143,6 @@ export default function RootPage() {
                     <span>{t.pricing.cta}</span>
                   )}
                 </button>
-
-                {/* SEKCJA KODU RABATOWEGO */}
-                <div className="mt-4 pt-4 border-t border-[#EAE3DB] dark:border-[#3A1038] text-left">
-                  {!showPromoInput && !appliedPromo ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowPromoInput(true)}
-                      className="text-xs font-semibold text-[#867A72] dark:text-[#A2958C] hover:text-[#DA0271] underline cursor-pointer"
-                    >
-                      {t.pricing.promoTrigger}
-                    </button>
-                  ) : (
-                    <div className="space-y-2">
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          placeholder={t.pricing.promoPlaceholder}
-                          value={promoCodeInput}
-                          onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              handleApplyPromo();
-                            }
-                          }}
-                          className="flex-1 px-3 py-2 text-xs uppercase rounded-xl border border-[#EAE3DB] dark:border-[#3A1038] bg-white dark:bg-[#250A24] text-[#1A1512] dark:text-white focus:outline-none focus:border-[#DA0271]"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleApplyPromo}
-                          className="px-4 py-2 rounded-xl bg-[#250A24] dark:bg-[#3D0E39] text-white text-xs font-bold hover:bg-[#DA0271] transition-colors cursor-pointer"
-                        >
-                          {t.pricing.promoApply}
-                        </button>
-                      </div>
-                      {appliedPromo && (
-                        <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/40 space-y-2 mt-2">
-                          <p className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold flex items-center gap-1.5">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                            <span>{t.pricing.promoActive}</span>
-                          </p>
-                          <button
-                            type="button"
-                            onClick={handleCheckout}
-                            className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.02]"
-                          >
-                            <span>
-                              {lang === 'pl'
-                                ? 'Przejdź od razu do panelu 52 lekcji →'
-                                : lang === 'en'
-                                ? 'Go to 52 video lessons now →'
-                                : 'Перейти к 52 урокам →'}
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      )}
-                      {promoError && (
-                        <p className="text-xs text-rose-500 font-semibold">
-                          {promoError}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
 
                 <div className="mt-4 flex items-center justify-center gap-2 text-xs text-[#867A72] dark:text-[#A2958C]">
                   <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
