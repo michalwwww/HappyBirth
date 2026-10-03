@@ -76,7 +76,7 @@ em.se {
   -webkit-backdrop-filter: blur(14px);
 }
 
-/* 9-bar color swatch from Netlify */
+/* 9-bar color swatch */
 .hero-sw {
   display: flex;
   gap: 6px;
@@ -88,7 +88,7 @@ em.se {
   display: block;
 }
 
-/* Tick list from Netlify */
+/* Tick list */
 .tick-list {
   list-style: none;
   padding: 0;
@@ -110,31 +110,477 @@ em.se {
   background: #FCD705;
 }
 
-/* Dark Mode Tokens */
-.dark,
+/* -------------------------------------------------------------
+   KOMPLETNY SYSTEM CIEMNEGO MOTYWU (DARK MODE - PEŁNY KONTRAST)
+   ------------------------------------------------------------- */
 html.dark {
-  --paper: #140513;
+  --paper: #120311;
   --ink: #FBF8F4;
   --ink2: #EAD5E5;
   --ink3: #C4ADC0;
   --line: #3A1038;
-  --kosc: #140513;
-  --papier: #1C081A;
-  --len: #250A24;
-  --karta: #220820;
-  --noc: #2F0C2B;
-  --noc2: #461643;
+  --kosc: #120311;
+  --papier: #1A0619;
+  --len: #180517;
+  --karta: #1F081D;
+  --noc: #250A24;
+  --noc2: #3D0E39;
   --linia: #3D0E39;
-  --linia2: #52134C;
+  --linia2: #4D1248;
+  --roz: #FF4BA8;
+  --p1t: #2B0C23;
+  --p2t: #2E2207;
+  --p3t: #301607;
+  --p4t: #0A202E;
+  --p1h: #3D1031;
+  --p2h: #40300A;
+  --p3h: #421D0A;
+  --p4h: #0E2B3E;
+  --a-zol: #FECB22;
   color-scheme: dark;
 }
 
-.dark body {
-  background-color: #140513;
-  color: #FBF8F4;
+html.dark body {
+  background-color: #120311 !important;
+  color: #FBF8F4 !important;
 }
 
-/* Wyczyszczenie cieni pod buttonami i ujednolicenie czytelności krojów pisma */
+/* Górny pasek biegunkowy (ticker) w dark mode */
+html.dark .pasek {
+  background: #1C081A !important;
+  border-bottom: 1px solid #3D0E39 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .pasek b {
+  color: #FFFFFF !important;
+}
+
+/* Pasek nawigacyjny w dark mode */
+html.dark .nav {
+  background: rgba(18, 3, 17, 0.96) !important;
+  backdrop-filter: blur(16px) saturate(1.2) !important;
+  border-bottom: 1px solid #3D0E39 !important;
+}
+
+html.dark .nav .linki a {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #FBF8F4 !important;
+}
+
+html.dark .nav .linki a:hover {
+  background: rgba(218, 2, 113, 0.25) !important;
+  border-color: #DA0271 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .menu summary {
+  background: #1C081A !important;
+  border-color: #461643 !important;
+}
+
+html.dark .menu summary i {
+  background: #FBF8F4 !important;
+  box-shadow: 0 -6px 0 #FBF8F4, 0 6px 0 #FBF8F4 !important;
+}
+
+html.dark .menu nav {
+  background: #1C081A !important;
+  border-color: #461643 !important;
+  box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.85) !important;
+}
+
+html.dark .menu nav a {
+  color: #FBF8F4 !important;
+}
+
+html.dark .menu nav a:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* PRZYCISKI W DARK MODE - wysoki, elegancki kontrast bez rażenia po oczach */
+html.dark .btn.kup,
+html.dark .nav .btn.kup {
+  background-color: #DA0271 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #FF4BA8 !important;
+}
+
+html.dark .btn.kup:hover,
+html.dark .nav .btn.kup:hover {
+  background-color: #F0027E !important;
+}
+
+/* Przycisk zwiastuna w hero: stonowany, kontrastowy bursztyn ze złotą ramką */
+html.dark .btn.zolty {
+  background-color: rgba(254, 203, 34, 0.14) !important;
+  border: 1.5px solid #FECB22 !important;
+  color: #FECB22 !important;
+  font-weight: 700 !important;
+}
+
+html.dark .btn.zolty:hover {
+  background-color: #FECB22 !important;
+  color: #120311 !important;
+}
+
+html.dark .btn.zolty .graj {
+  border-left-color: currentColor !important;
+}
+
+/* Moduły programu w dark mode */
+html.dark .sek.papier {
+  background: #160415 !important;
+}
+
+html.dark .modul {
+  background: #1C081A !important;
+  border: 1px solid #3D0E39 !important;
+  color: #EAD5E5 !important;
+}
+
+html.dark .modul h3 {
+  color: #FFFFFF !important;
+}
+
+html.dark .modul .meta {
+  color: #C4ADC0 !important;
+}
+
+html.dark .modul p {
+  color: #D7CCC3 !important;
+}
+
+html.dark .modul.p1 {
+  border-color: rgba(218, 2, 113, 0.45) !important;
+  background: #250C20 !important;
+}
+
+html.dark .modul.p2 {
+  border-color: rgba(254, 203, 34, 0.45) !important;
+  background: #271E08 !important;
+}
+
+html.dark .modul.p3 {
+  border-color: rgba(232, 115, 34, 0.45) !important;
+  background: #291508 !important;
+}
+
+html.dark .modul.p4 {
+  border-color: rgba(0, 151, 219, 0.45) !important;
+  background: #091C28 !important;
+}
+
+html.dark .pelna-lista {
+  background: #1C081A !important;
+  border-color: #3D0E39 !important;
+  color: #FBF8F4 !important;
+}
+
+html.dark .pelna-lista b {
+  color: #FFFFFF !important;
+}
+
+html.dark .pelna-lista span {
+  color: #D7CCC3 !important;
+}
+
+/* Przycisk przejścia do pełnego programu */
+html.dark .btn-program-top {
+  background: #20071E !important;
+  border: 1.5px solid #DA0271 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .btn-program-top:hover {
+  background: #DA0271 !important;
+  color: #FFFFFF !important;
+}
+
+/* Karta cenowa (.oferta) i argumenty w dark mode */
+html.dark .oferta {
+  background: #1F081D !important;
+  border: 1.5px solid #461643 !important;
+  color: #FBF8F4 !important;
+}
+
+html.dark .oferta .kwota {
+  color: #FFFFFF !important;
+}
+
+html.dark .oferta .kwota small {
+  color: #D7CCC3 !important;
+}
+
+html.dark .oferta li {
+  border-top: 1px solid #3D0E39 !important;
+  color: #EAD5E5 !important;
+}
+
+html.dark .btn-oferta-zakup {
+  background: #DA0271 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #FF4BA8 !important;
+}
+
+html.dark .btn-oferta-zakup:hover {
+  background: #F0027E !important;
+}
+
+html.dark .argumenty h3 {
+  color: #FFFFFF !important;
+}
+
+html.dark .argumenty .arg li b {
+  color: #FFFFFF !important;
+}
+
+html.dark .argumenty .arg li span {
+  color: #D7CCC3 !important;
+}
+
+/* Przycisk play na wideo zwiastunie */
+html.dark .wideo-start span {
+  background: rgba(28, 8, 26, 0.94) !important;
+  color: #FFFFFF !important;
+  border: 1px solid #461643 !important;
+}
+
+html.dark .wideo-start i {
+  background: #DA0271 !important;
+}
+
+/* Suwak i etapy w dark mode */
+html.dark .mapa {
+  background: #160415 !important;
+  border-color: #3D0E39 !important;
+  color: #FBF8F4 !important;
+}
+
+html.dark .pasmo {
+  background: #1C081A !important;
+  border: 1px solid #3D0E39 !important;
+  color: #EAD5E5 !important;
+}
+
+html.dark .pasmo h3 {
+  color: #FFFFFF !important;
+}
+
+html.dark .pasmo a {
+  color: #FBF8F4 !important;
+}
+
+html.dark .pasmo.p1.akt { border-color: #DA0271 !important; background: #250C20 !important; }
+html.dark .pasmo.p2.akt { border-color: #FECB22 !important; background: #271E08 !important; }
+html.dark .pasmo.p3.akt { border-color: #E87322 !important; background: #291508 !important; }
+html.dark .pasmo.p4.akt { border-color: #0097DB !important; background: #091C28 !important; }
+
+html.dark .se-rekomendacja-box {
+  background: #250A24 !important;
+  border: 1.5px solid #DA0271 !important;
+  color: #FBF8F4 !important;
+}
+
+html.dark .se-rek-label {
+  color: #FF4BA8 !important;
+}
+
+html.dark .se-rek-film {
+  color: #FFFFFF !important;
+}
+
+html.dark .se-opis {
+  background: #1F081D !important;
+  border-color: #3D0E39 !important;
+  color: #FBF8F4 !important;
+}
+
+html.dark .se-opis b {
+  color: #FFFFFF !important;
+}
+
+html.dark .se-opis span {
+  color: #D7CCC3 !important;
+}
+
+/* FAQ i Stopka w dark mode */
+html.dark .sek.len {
+  background: #140313 !important;
+}
+
+html.dark .faq {
+  border-top-color: #3D0E39 !important;
+}
+
+html.dark .faq details {
+  border-bottom-color: #3D0E39 !important;
+}
+
+html.dark .faq summary {
+  color: #FFFFFF !important;
+}
+
+html.dark .faq p {
+  color: #D7CCC3 !important;
+}
+
+html.dark .stopka {
+  background: #0D020D !important;
+  border-top: 1px solid #3D0E39 !important;
+  color: #EAD5E5 !important;
+}
+
+html.dark .stopka h2 {
+  color: #FFFFFF !important;
+}
+
+html.dark .stopka a {
+  color: #D7CCC3 !important;
+}
+
+html.dark .stopka a:hover {
+  color: #FFFFFF !important;
+}
+
+html.dark .stopka .dane {
+  border-top-color: #3D0E39 !important;
+  color: #A2958C !important;
+}
+
+html.dark .pasek-prawny {
+  background: #080108 !important;
+  border-top: 1px solid #220520 !important;
+  color: #A2958C !important;
+}
+
+html.dark .fakty li {
+  color: #FBF8F4 !important;
+}
+
+/* -------------------------------------------------------------
+   WCAG 2.1 AA ACCESSIBILITY RULES (WIDOCZNE I NATYCHMIASTOWE ZMIANY)
+   ------------------------------------------------------------- */
+/* 1. Skalowanie czcionek (Zoom dla całego dokumentu i elementów) */
+html.a11y-font-115 {
+  zoom: 1.15;
+}
+
+html.a11y-font-130 {
+  zoom: 1.30;
+}
+
+html.a11y-font-115 body,
+html.a11y-font-115 p,
+html.a11y-font-115 li,
+html.a11y-font-115 span,
+html.a11y-font-115 a,
+html.a11y-font-115 button,
+html.a11y-font-115 input,
+html.a11y-font-115 h1,
+html.a11y-font-115 h2,
+html.a11y-font-115 h3 {
+  font-size: 1.15em !important;
+}
+
+html.a11y-font-130 body,
+html.a11y-font-130 p,
+html.a11y-font-130 li,
+html.a11y-font-130 span,
+html.a11y-font-130 a,
+html.a11y-font-130 button,
+html.a11y-font-130 input,
+html.a11y-font-130 h1,
+html.a11y-font-130 h2,
+html.a11y-font-130 h3 {
+  font-size: 1.3em !important;
+}
+
+/* 2. Prawdziwy Wysoki Kontrast WCAG (Żółć i biel na czerni) */
+html.a11y-high-contrast,
+html.a11y-high-contrast body,
+html.a11y-high-contrast main,
+html.a11y-high-contrast section,
+html.a11y-high-contrast div:not([data-a11y-modal]):not([data-karuzela]),
+html.a11y-high-contrast header,
+html.a11y-high-contrast nav,
+html.a11y-high-contrast footer,
+html.a11y-high-contrast article,
+html.a11y-high-contrast .nav,
+html.a11y-high-contrast .modul,
+html.a11y-high-contrast .oferta,
+html.a11y-high-contrast .argumenty,
+html.a11y-high-contrast .mapa,
+html.a11y-high-contrast .pasmo,
+html.a11y-high-contrast .se,
+html.a11y-high-contrast .faq,
+html.a11y-high-contrast .stopka {
+  background-color: #000000 !important;
+  color: #FFFF00 !important;
+  border-color: #FFFF00 !important;
+}
+
+html.a11y-high-contrast h1,
+html.a11y-high-contrast h2,
+html.a11y-high-contrast h3,
+html.a11y-high-contrast h4,
+html.a11y-high-contrast b,
+html.a11y-high-contrast strong {
+  color: #FFFFFF !important;
+}
+
+html.a11y-high-contrast p,
+html.a11y-high-contrast span:not([data-a11y-modal] *),
+html.a11y-high-contrast li,
+html.a11y-high-contrast small {
+  color: #FFFF00 !important;
+}
+
+html.a11y-high-contrast a,
+html.a11y-high-contrast button:not([data-a11y-modal] *) {
+  color: #FFFF00 !important;
+  border: 2px solid #FFFF00 !important;
+}
+
+html.a11y-high-contrast .btn.kup,
+html.a11y-high-contrast .btn-oferta-zakup,
+html.a11y-high-contrast .btn.zolty {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+  border: 2px solid #FFFFFF !important;
+}
+
+/* 3. Podkreślenie odnośników */
+html.a11y-underline-links a {
+  text-decoration: underline !important;
+  text-underline-offset: 4px !important;
+  text-decoration-thickness: 2px !important;
+}
+
+/* 4. Czytelny krój pisma (dysleksja) */
+html.a11y-readable-font, 
+html.a11y-readable-font * {
+  font-family: Arial, Helvetica, Verdana, sans-serif !important;
+  letter-spacing: 0.04em !important;
+  word-spacing: 0.1em !important;
+  line-height: 1.85 !important;
+}
+
+/* 5. Zatrzymanie animacji i paska biegunkowego */
+html.a11y-reduce-motion *, 
+html.a11y-reduce-motion *::before, 
+html.a11y-reduce-motion *::after,
+html.a11y-reduce-motion .pasek-tor {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* -------------------------------------------------------------
+   STYLISTYKA PRZYCISKÓW I CZYTELNOŚĆ TYPOGRAFII
+   ------------------------------------------------------------- */
 .btn,
 .btn.kup,
 .btn.zolty,
@@ -198,21 +644,12 @@ html.dark {
   transition: all 0.2s ease;
 }
 
-.dark .se-rekomendacja-box {
-  background: rgba(218, 2, 113, 0.16);
-  border-color: rgba(218, 2, 113, 0.35);
-}
-
 .se-rek-label {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: #DA0271;
-}
-
-.dark .se-rek-label {
-  color: #F472B6;
 }
 
 .se-rek-film {
@@ -246,10 +683,6 @@ html.dark {
   transform: translateY(-1px);
 }
 
-.dark .btn-program-top:hover {
-  background: #2A0D28;
-}
-
 /* Wbudowany przycisk i sekcja rabatu w karcie oferty */
 .btn-oferta-zakup {
   width: 100%;
@@ -278,30 +711,4 @@ html.dark {
 .btn-oferta-zakup:disabled {
   opacity: 0.65;
   cursor: not-allowed;
-}
-
-/* WCAG 2.1 AA / EAA Accessibility Helpers */
-.a11y-underline-links a {
-  text-decoration: underline !important;
-  text-underline-offset: 4px !important;
-}
-
-.a11y-readable-font, 
-.a11y-readable-font * {
-  font-family: Arial, Helvetica, Verdana, sans-serif !important;
-  letter-spacing: 0.03em !important;
-  word-spacing: 0.08em !important;
-  line-height: 1.8 !important;
-}
-
-.a11y-reduce-motion *, 
-.a11y-reduce-motion *::before, 
-.a11y-reduce-motion *::after {
-  animation-duration: 0.001ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.001ms !important;
-}
-
-.a11y-high-contrast {
-  filter: contrast(135%) brightness(105%) !important;
 }

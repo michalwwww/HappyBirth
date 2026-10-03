@@ -57,8 +57,19 @@ export function AccessibilityToolbar() {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
 
-    // Font size
-    root.style.fontSize = s.fontSize === '100%' ? '' : s.fontSize;
+    // Font size - polaczenie zoom (skalowanie calej strony) i klas font-size
+    if (s.fontSize === '115%') {
+      root.classList.add('a11y-font-115');
+      root.classList.remove('a11y-font-130');
+      (root.style as any).zoom = '1.15';
+    } else if (s.fontSize === '130%') {
+      root.classList.add('a11y-font-130');
+      root.classList.remove('a11y-font-115');
+      (root.style as any).zoom = '1.30';
+    } else {
+      root.classList.remove('a11y-font-115', 'a11y-font-130');
+      (root.style as any).zoom = '';
+    }
 
     // High Contrast
     if (s.highContrast) {
@@ -108,40 +119,29 @@ export function AccessibilityToolbar() {
 
   return (
     <>
-      {/* Przycisk wywołania dostępności w prawym dolnym rogu ekranu lub w nagłówku */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-[#250A24] text-[#EAD5E5] hover:text-white hover:bg-[#EC008C] border border-[#461643] shadow-2xl transition-all hover:scale-110 flex items-center justify-center focus:outline-none focus:ring-4 focus:ring-[#EC008C]/50"
-        title={t('a11yTitle')}
-        aria-label={t('a11yTitle')}
-      >
-        <Accessibility className="w-5 h-5" />
-      </button>
-
       {/* Panel Dostępności (Modal / Popover) */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-md bg-white rounded-3xl p-6 border border-[#EAE3DB] shadow-2xl space-y-6 text-[#1A1512]">
+          <div data-a11y-modal="true" className="w-full max-w-md bg-white dark:bg-[#1C081A] rounded-3xl p-6 border border-[#EAE3DB] dark:border-[#3A1038] shadow-2xl space-y-6 text-[#1A1512] dark:text-[#FBF8F4]">
             {/* Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-[#EAE3DB]">
+            <div className="flex items-center justify-between pb-4 border-b border-[#EAE3DB] dark:border-[#3A1038]">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-[#EC008C]/10 text-[#EC008C] flex items-center justify-center">
                   <Accessibility className="w-4 h-4" />
                 </div>
                 <div>
                   <h3 className="font-brand-display font-bold text-base leading-tight">
-                    {t('a11yTitle')}
+                    Ułatwienia dostępu
                   </h3>
-                  <span className="text-[10px] text-[#867A72] uppercase tracking-wider font-semibold">
-                    Standard WCAG 2.1 AA · Dyrektywa UE
+                  <span className="text-[10px] text-[#867A72] dark:text-[#A2958C] uppercase tracking-wider font-semibold">
+                    Standard WCAG 2.1 AA · Dostępność cyfrowa
                   </span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-full hover:bg-neutral-100 text-[#867A72] hover:text-[#1A1512] transition-colors"
+                className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-white/10 text-[#867A72] dark:text-[#A2958C] hover:text-[#1A1512] dark:hover:text-white transition-colors"
                 aria-label="Zamknij ułatwienia dostępu"
               >
                 <X className="w-4 h-4" />
@@ -149,12 +149,13 @@ export function AccessibilityToolbar() {
             </div>
 
             {/* Opcje */}
+            {/* Opcje */}
             <div className="space-y-4 text-xs">
               {/* 1. Rozmiar tekstu */}
               <div className="space-y-1.5">
-                <label className="font-semibold flex items-center gap-1.5 text-[#1A1512]">
+                <label className="font-semibold flex items-center gap-1.5 text-[#1A1512] dark:text-[#FBF8F4]">
                   <Type className="w-3.5 h-3.5 text-[#EC008C]" />
-                  <span>{t('a11yFontSize')}</span>
+                  <span>Rozmiar tekstu</span>
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {(['100%', '115%', '130%'] as const).map((size) => (
@@ -164,23 +165,23 @@ export function AccessibilityToolbar() {
                       onClick={() => updateSetting('fontSize', size)}
                       className={`py-2 px-3 rounded-xl border text-center font-medium transition-all ${
                         settings.fontSize === size
-                          ? 'border-[#EC008C] bg-[#FAE3EB] text-[#EC008C] font-bold shadow-sm'
-                          : 'border-[#EAE3DB] bg-neutral-50 hover:border-[#867A72] text-[#544A44]'
+                          ? 'border-[#EC008C] bg-[#FAE3EB] dark:bg-[#3D0E39] text-[#EC008C] font-bold shadow-sm'
+                          : 'border-[#EAE3DB] dark:border-[#3A1038] bg-neutral-50 dark:bg-[#250A24] hover:border-[#867A72] text-[#544A44] dark:text-[#D7CCC3]'
                       }`}
                     >
-                      {size === '100%' ? t('a11yNormal') : size === '115%' ? t('a11yMedium') : t('a11yLarge')}
+                      {size === '100%' ? 'Domyślny' : size === '115%' ? 'Większy +15%' : 'Duży +30%'}
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* 2. Przełączniki funkcji */}
-              <div className="space-y-2 pt-2 border-t border-[#EAE3DB]">
+              <div className="space-y-2 pt-2 border-t border-[#EAE3DB] dark:border-[#3A1038]">
                 {/* Wysoki Kontrast */}
                 <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2 text-[#1A1512]">
+                  <span className="flex items-center gap-2 text-[#1A1512] dark:text-[#FBF8F4]">
                     <Contrast className="w-3.5 h-3.5 text-[#EC008C]" />
-                    <span>{t('a11yContrast')}</span>
+                    <span>Wysoki kontrast (żółć na czerni)</span>
                   </span>
                   <input
                     type="checkbox"
@@ -192,9 +193,9 @@ export function AccessibilityToolbar() {
 
                 {/* Podkreślenie linków */}
                 <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2 text-[#1A1512]">
+                  <span className="flex items-center gap-2 text-[#1A1512] dark:text-[#FBF8F4]">
                     <Underline className="w-3.5 h-3.5 text-[#EC008C]" />
-                    <span>{t('a11yUnderline')}</span>
+                    <span>Podkreślenie odnośników</span>
                   </span>
                   <input
                     type="checkbox"
@@ -206,9 +207,9 @@ export function AccessibilityToolbar() {
 
                 {/* Czytelna czcionka dla dyslektyków */}
                 <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2 text-[#1A1512]">
+                  <span className="flex items-center gap-2 text-[#1A1512] dark:text-[#FBF8F4]">
                     <BookOpen className="w-3.5 h-3.5 text-[#EC008C]" />
-                    <span>{t('a11yDyslexic')}</span>
+                    <span>Prosty krój pisma (Arial / bezszeryfowy)</span>
                   </span>
                   <input
                     type="checkbox"
@@ -220,9 +221,9 @@ export function AccessibilityToolbar() {
 
                 {/* Zatrzymanie animacji */}
                 <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2 text-[#1A1512]">
+                  <span className="flex items-center gap-2 text-[#1A1512] dark:text-[#FBF8F4]">
                     <PauseCircle className="w-3.5 h-3.5 text-[#EC008C]" />
-                    <span>{t('a11yReduceMotion')}</span>
+                    <span>Zatrzymanie animacji i ruchu</span>
                   </span>
                   <input
                     type="checkbox"
@@ -235,14 +236,14 @@ export function AccessibilityToolbar() {
             </div>
 
             {/* Footer / Reset & Deklaracja */}
-            <div className="pt-4 border-t border-[#EAE3DB] flex items-center justify-between text-xs">
+            <div className="pt-4 border-t border-[#EAE3DB] dark:border-[#3A1038] flex items-center justify-between text-xs">
               <button
                 type="button"
                 onClick={resetSettings}
-                className="text-[#867A72] hover:text-[#EC008C] flex items-center gap-1 font-medium transition-colors"
+                className="text-[#867A72] dark:text-[#A2958C] hover:text-[#EC008C] flex items-center gap-1 font-medium transition-colors"
               >
                 <RotateCcw className="w-3 h-3" />
-                <span>{t('a11yReset')}</span>
+                <span>Resetuj ustawienia</span>
               </button>
 
               <button

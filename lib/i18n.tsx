@@ -181,9 +181,9 @@ export const translations: Translations = {
     ru: 'Сбросить настройки',
   },
   a11yDeclaration: {
-    pl: 'Deklaracja dostępności UE',
-    en: 'EU Accessibility Declaration',
-    ru: 'Декларация доступности ЕС',
+    pl: 'Deklaracja dostępności cyfrowej',
+    en: 'Digital Accessibility Declaration',
+    ru: 'Декларация доступности',
   },
   // Tryby
   themeLight: {

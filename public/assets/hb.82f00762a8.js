@@ -204,30 +204,74 @@ window.SuwakEtapow = (function () {
         el('span', '', li).textContent = m.meta;
       });
 
-      /* Dynamiczna sugestia filmu w zależności od konkretnego tygodnia ciąży */
+      /* Dynamiczna sugestia filmu w zależności od konkretnego tygodnia ciąży i wybranego języka */
+      var lang = document.documentElement.lang || 'pl';
       var rekTekst = '';
       if (v <= 280) {
         var tydz = Math.max(1, Math.ceil(v / 7));
         if (tydz <= 13) {
-          rekTekst = 'Lekcja 1: „Początek nowego życia i pierwsze tygodnie” oraz Lekcja 2: „Kalendarz badań w I trymestrze”';
+          if (lang === 'en') {
+            rekTekst = 'Lesson 1: "Beginning of a New Life and First Weeks" & Lesson 2: "First Trimester Tests Schedule"';
+          } else if (lang === 'ru') {
+            rekTekst = 'Урок 1: «Начало новой жизни и первые недели» и Урок 2: «Календарь анализов в I триместре»';
+          } else {
+            rekTekst = 'Lekcja 1: „Początek nowego życia i pierwsze tygodnie” oraz Lekcja 2: „Kalendarz badań w I trymestrze”';
+          }
         } else if (tydz <= 20) {
-          rekTekst = 'Lekcja 6: „Kiedy i jak rozpocząć przygotowania” oraz Lekcja 13: „Komfort, sen i pozycje odciążające ciało”';
+          if (lang === 'en') {
+            rekTekst = 'Lesson 6: "When and How to Start Preparing" & Lesson 13: "Comfort, Sleep and Relieving Postures"';
+          } else if (lang === 'ru') {
+            rekTekst = 'Урок 6: «Когда и как начинать подготовку» и Урок 13: «Комфорт, сон и разгрузка тела»';
+          } else {
+            rekTekst = 'Lekcja 6: „Kiedy i jak rozpocząć przygotowania” oraz Lekcja 13: „Komfort, sen i pozycje odciążające ciało”';
+          }
         } else if (tydz <= 27) {
-          rekTekst = 'Lekcja 14: „Aktywność fizyczna i ćwiczenia z fizjoterapeutką” oraz Lekcja 16: „Zdrowa dieta i profilaktyka”';
+          if (lang === 'en') {
+            rekTekst = 'Lesson 14: "Physical Activity with a Physical Therapist" & Lesson 16: "Healthy Diet and Wellness"';
+          } else if (lang === 'ru') {
+            rekTekst = 'Урок 14: «Физическая активность и упражнения с физиотерапевтом» и Урок 16: «Питание и профилактика»';
+          } else {
+            rekTekst = 'Lekcja 14: „Aktywność fizyczna i ćwiczenia z fizjoterapeutką” oraz Lekcja 16: „Zdrowa dieta i profilaktyka”';
+          }
         } else if (tydz <= 34) {
-          rekTekst = 'Lekcja 19: „Wyprawka bez chaosu – co naprawdę kupić” oraz Lekcja 20: „Bezpieczny fotelik i wózek”';
+          if (lang === 'en') {
+            rekTekst = 'Lesson 19: "Layette Without Chaos – What to Actually Buy" & Lesson 20: "Safe Stroller and Car Seat"';
+          } else if (lang === 'ru') {
+            rekTekst = 'Урок 19: «Приданое без хаоса – что действительно нужно» и Урок 20: «Безопасная коляска и автокресло»';
+          } else {
+            rekTekst = 'Lekcja 19: „Wyprawka bez chaosu – co naprawdę kupić” oraz Lekcja 20: „Bezpieczny fotelik i wózek”';
+          }
         } else {
-          rekTekst = 'Lekcja 26: „Godzina Zero: zwiastuny porodu, skurcze i torba” oraz Lekcja 28: „Oddech i pozycje wertykalne”';
+          if (lang === 'en') {
+            rekTekst = 'Lesson 26: "Hour Zero: Labor Signs, Contractions and Hospital Bag" & Lesson 28: "Breathing and Upright Postures"';
+          } else if (lang === 'ru') {
+            rekTekst = 'Урок 26: «Час Ноль: предвестники родов, схватки и сумка» и Урок 28: «Дыхание и вертикальные позы»';
+          } else {
+            rekTekst = 'Lekcja 26: „Godzina Zero: zwiastuny porodu, skurcze i torba” oraz Lekcja 28: „Oddech i pozycje wertykalne”';
+          }
         }
       } else {
         var mies = Math.max(1, Math.ceil((v - 280) / 30.44));
         if (mies <= 3) {
-          rekTekst = 'Lekcja 35: „Pierwsze 48 godzin, bezpieczna kąpiel i pielęgnacja noworodka” oraz Lekcja 44: „Połóg i regeneracja”';
+          if (lang === 'en') {
+            rekTekst = 'Lesson 35: "First 48 Hours, Safe Bathing and Newborn Care" & Lesson 44: "Postpartum Recovery"';
+          } else if (lang === 'ru') {
+            rekTekst = 'Урок 35: «Первые 48 часов, безопасное купание и уход» и Урок 44: «Послеродовое восстановление»';
+          } else {
+            rekTekst = 'Lekcja 35: „Pierwsze 48 godzin, bezpieczna kąpiel i pielęgnacja noworodka” oraz Lekcja 44: „Połóg i regeneracja”';
+          }
         } else {
-          rekTekst = 'Lekcja 48: „Karmienie i laktacja bez bólu” oraz Lekcja 50: „Bezpieczny sen i rozwój w 1. roku życia”';
+          if (lang === 'en') {
+            rekTekst = 'Lesson 48: "Comfortable Breastfeeding" & Lesson 50: "Safe Sleep and Development in the 1st Year"';
+          } else if (lang === 'ru') {
+            rekTekst = 'Урок 48: «Грудное вскармливание без боли» и Урок 50: «Безопасный сон и развитие в 1-й год»';
+          } else {
+            rekTekst = 'Lekcja 48: „Karmienie i laktacja bez bólu” oraz Lekcja 50: „Bezpieczny sen i rozwój w 1. roku życia”';
+          }
         }
       }
-      rekBox.innerHTML = '<span class="se-rek-label">W Twoim obecnym tygodniu zacznij od filmu:</span><span class="se-rek-film">' + rekTekst + '</span>';
+      var labelText = lang === 'en' ? 'In your current week, start with:' : lang === 'ru' ? 'На вашем текущем сроке начните с урока:' : 'W Twoim obecnym tygodniu zacznij od filmu:';
+      rekBox.innerHTML = '<span class="se-rek-label">' + labelText + '</span><span class="se-rek-film">' + rekTekst + '</span>';
 
       znacznik.style.left = (x / 10).toFixed(3) + '%';
       suwak.setAttribute('aria-valuetext', podpis + (e.nazwa ? ', ' + e.nazwa : ''));
@@ -280,6 +324,17 @@ window.SuwakEtapow = (function () {
     };
     if (window.requestIdleCallback) requestIdleCallback(start, { timeout: 1200 });
     else setTimeout(start, 200);
+
+    /* Dynamiczne odświeżenie suwaka przy zmianie języka strony */
+    window.addEventListener('hb_lang_updated', function () {
+      setTimeout(function () {
+        var freshZrodlo = document.getElementById('konfig-suwak');
+        if (freshZrodlo && miejsce) {
+          try { utworz(miejsce, JSON.parse(freshZrodlo.textContent)); }
+          catch (e) {}
+        }
+      }, 50);
+    });
   }
   return { utworz: utworz };
 })();
