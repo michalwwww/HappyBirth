@@ -6,7 +6,7 @@ export const runtime = 'nodejs';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const { email, courseId = 'kurs-glowny-happybirth' } = body;
+    const { email, courseId = 'kurs-glowny-happybirth', utm = {} } = body;
 
     const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID;
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Dynamiczny dobór pozycji: jeśli brak zdefiniowanego price_id, generujemy pozycję dynamicznie (349 zł brutto)
+    // Dynamiczny dobór pozycji: jeśli brak zdefiniowanego price_id, generujemy pozycję dynamicznie (489 zł brutto)
     const lineItem = priceId
       ? { price: priceId, quantity: 1 }
       : {
@@ -36,22 +36,36 @@ export async function POST(req: NextRequest) {
               name: 'Edukacyjny Kurs Online HappyBirth (52 Lekcje VOD dla Dwojga)',
               description: 'Dostęp edukacyjny e-learning na 12 miesięcy dla dwojga: 52 lekcje wideo, Notatnik Rodzica PDF i Strefa dla Taty.',
             },
-            unit_amount: 34900, // 349.00 PLN
+            unit_amount: 48900, // 489.00 PLN
           },
           quantity: 1,
         };
+
+    // Budowa metadanych z atrybucją marketingową i zgodnością prawną
+    const metadata: Record<string, string> = {
+      courseId,
+      platform: 'HappyBirth',
+      category: 'Education / E-learning Course',
+      mcc: '8299',
+      legal_consent_art38: 'true', // Art. 38 pkt 13 Ustawy o prawach konsumenta
+    };
+
+    if (utm && typeof utm === 'object') {
+      if (utm.utm_source) metadata.utm_source = String(utm.utm_source).slice(0, 100);
+      if (utm.utm_medium) metadata.utm_medium = String(utm.utm_medium).slice(0, 100);
+      if (utm.utm_campaign) metadata.utm_campaign = String(utm.utm_campaign).slice(0, 100);
+      if (utm.utm_content) metadata.utm_content = String(utm.utm_content).slice(0, 100);
+      if (utm.ad_id) metadata.ad_id = String(utm.ad_id).slice(0, 100);
+      if (utm.ref) metadata.ref = String(utm.ref).slice(0, 100);
+      if (utm.fbclid) metadata.fbclid = String(utm.fbclid).slice(0, 100);
+    }
 
     const sessionParams: any = {
       mode: 'payment',
       payment_method_types: ['card', 'blik', 'p24'],
       line_items: [lineItem],
       allow_promotion_codes: true,
-      metadata: {
-        courseId,
-        platform: 'HappyBirth',
-        category: 'Education / E-learning Course',
-        mcc: '8299',
-      },
+      metadata,
       locale: 'pl',
       success_url: `${origin}/strefa?session_id={CHECKOUT_SESSION_ID}&payment=success`,
       cancel_url: `${origin}/#cena`,

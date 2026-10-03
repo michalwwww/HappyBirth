@@ -198,7 +198,7 @@ export default function StrefaLoginPage() {
             </div>
 
             <BuyCourseButton className="text-[#EC008C] font-semibold hover:underline bg-transparent border-0 p-0 text-xs cursor-pointer shadow-none">
-              Kup kurs (349 zł) &rarr;
+              Kup kurs (489 zł) &rarr;
             </BuyCourseButton>
           </div>
         </div>

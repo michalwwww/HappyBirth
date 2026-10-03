@@ -114,6 +114,53 @@ export async function POST(req: NextRequest) {
             }),
           });
         }
+
+        // 6. Server-Side Conversions API (Meta CAPI Dispatcher)
+        const metaPixelId = process.env.META_PIXEL_ID;
+        const metaToken = process.env.META_CAPI_ACCESS_TOKEN;
+
+        if (metaPixelId && metaToken) {
+          try {
+            const hashedEmail = crypto.createHash('sha256').update(customerEmail.trim().toLowerCase()).digest('hex');
+            const eventTime = Math.floor(Date.now() / 1000);
+            const fbclid = session.metadata?.fbclid;
+            const amountTotal = (session.amount_total || 48900) / 100;
+
+            const capiPayload = {
+              data: [
+                {
+                  event_name: 'Purchase',
+                  event_time: eventTime,
+                  event_id: session.id, // Unikalne ID do deduplikacji z pikselem przeglądarki
+                  event_source_url: `${origin}/strefa`,
+                  action_source: 'website',
+                  user_data: {
+                    em: [hashedEmail],
+                    ...(fbclid ? { fbc: `fb.1.${eventTime}.${fbclid}` } : {}),
+                  },
+                  custom_data: {
+                    currency: 'PLN',
+                    value: amountTotal,
+                    content_name: 'HappyBirth - Edukacyjny Kurs Online VOD dla Dwojga',
+                    content_type: 'product',
+                    content_ids: [courseId],
+                  },
+                },
+              ],
+            };
+
+            await fetch(`https://graph.facebook.com/v19.0/${metaPixelId}/events?access_token=${metaToken}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(capiPayload),
+            });
+            console.log(`📡 [Meta CAPI] Pomyślnie wysłano zdarzenie zakupu Purchase (${amountTotal} PLN) dla: ${session.id}`);
+          } catch (capiErr) {
+            console.error('⚠️ [Meta CAPI] Błąd wysyłki zdarzenia do Meta Graph API:', capiErr);
+          }
+        } else {
+          console.log('ℹ️ [Meta CAPI] Brak zdefiniowanego META_PIXEL_ID lub META_CAPI_ACCESS_TOKEN w .env.local - pomijam wysyłkę CAPI');
+        }
       } catch (dbError: any) {
         console.error('❌ Błąd zapisu do Cloudflare D1:', dbError);
       }

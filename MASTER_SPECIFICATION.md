@@ -1,653 +1,283 @@
-# MASTER SPECIFICATION: Platforma Kursu Online „HappyBirth” (Strefa Kursanta)
-> **UWAGA ARCHITEKTONICZNA:**  
-> Projekt HappyBirth działa w 100% w ekosystemie **Cloudflare** (Cloudflare Pages, Cloudflare D1 SQLite, Cloudflare Stream) oraz Stripe i Resend, zgodnie z instrukcją w pliku `AGENTS.md`.  
-> Projekt **nie używa Supabase ani Vimeo**. Aktualna baza danych to Cloudflare D1 (`d1-schema.sql`, `lib/d1.ts`, `wrangler.toml`).
+# HappyBirth · Master Architecture & Growth Specification (2026)
+**Wersja dokumentu:** 1.1 (Zaktualizowana o twarde reguły Anti-Flagging & MDR Compliance — Wrzesień 2026)  
+**Autorzy / Architekci:** Zespół HappyBirth (Michał / Google Antigravity & Maciej / Claude)  
+**Status:** Canonical Single Source of Truth (SSOT)
 
 ---
 
-## 1. ROLA I ZADANIE AGENTA
-
-Jesteś doświadczonym **Senior Full-Stack Architectem i Developerem Next.js / TypeScript**. Twoim zadaniem jest stworzenie produkcyjnego, bezpiecznego i nowoczesnego portalu kursanta dla platformy **HappyBirth**.
-
-Projekt skupia się na:
-1. **Autoryzacji i Zarządzaniu Kursantami** (Supabase Auth: bezhasłowe logowanie Magic Link / Email).
-2. **Bazie Danych i Uprawnieniach** (PostgreSQL z Row Level Security – tylko opłaceni użytkownicy mają dostęp do lekcji).
-3. **Płatnościach i Automatyzacji Dostępów** (Stripe Checkout z obsługą BLIK + Webhook nadający dostęp natychmiast po transakcji).
-4. **Odtwarzaczu Wideo i Śledzeniu Postępów** (Osadzony Vimeo Player z ochroną domenową i automatycznym zapisem postępu lekcji).
-5. **Responsywnym Interfejsie Użytkownika** (Mobile-First, elegancki, minimalistyczny UI w Tailwind CSS).
-
----
-
-## 2. STACK TECHNOLOGICZNY
-
-- **Framework:** Next.js 15 (App Router, React 19, TypeScript).
-- **Styling & UI:** Tailwind CSS v4, Lucide React (ikony), opcjonalnie Shadcn UI (komponenty Radix).
-- **Baza Danych & Auth:** Supabase (`@supabase/supabase-js`, `@supabase/ssr`).
-- **Płatności:** Stripe Node SDK (`stripe`), Stripe Checkout.
-- **Odtwarzacz Wideo:** Vimeo Player Embed API (`@vimeo/player`).
-- **Narzędzia pomocnicze:** `clsx`, `tailwind-merge`.
+## SPIS TREŚCI
+1. [Filozofia Projektowa: Od Czego Wychodzimy?](#1-filozofia-projektowa-od-czego-wychodzimy)
+2. [Topologia Stron i Ścieżek Ruchu (Next.js 15 App Router)](#2-topologia-stron-i-ścieżek-ruchu-nextjs-15-app-router)
+3. [Protokół Sterylnej Śluzy i Ochrony Przed Oflagowaniem (Anti-Ban & Anti-Flagging)](#3-protokół-sterylnej-śluzy-i-ochrony-przed-oflagowaniem-anti-ban--anti-flagging)
+4. [Standard Budowy Strony, UX i Bezpieczna Anatomia Sekcji](#4-standard-budowy-strony-ux-i-bezpieczna-anatomia-sekcji)
+5. [Infolinia i Kontakt Telefoniczny (Wymogi Prawne vs Operacje)](#5-infolinia-i-kontakt-telefoniczny-wymogi-prawne-vs-operacje)
+6. [Ekosystem Znaczników i Nowa Era AI (Schema.org & llms.txt)](#6-ekosystem-znaczników-i-nowa-era-ai-schemaorg--llmstxt)
+7. [Zaawansowane Zaplecze Techniczne i Analityka (CAPI, PWA, KSeF)](#7-zaawansowane-zaplecze-techniczne-i-analityka-capi-pwa-ksef)
+8. [Status Narzędzi: Plan Porodu i Licznik Czasu Skurczów (MDR Compliance)](#8-status-narzędzi-plan-porodu-i-licznik-czasu-skurczów-mdr-compliance)
+9. [Dźwignie Wzrostu i Monetyzacji (Growth & Monetization Loops)](#9-dźwignie-wzrostu-i-monetyzacji-growth--monetization-loops)
+10. [Zgodność Prawna, Podatki i Bezpieczeństwo Medyczne](#10-zgodność-prawna-podatki-i-bezpieczeństwo-medyczne)
+11. [Atomowe Detale Wdrożeniowe (Apple Pay, DRM, Wizerunek, D1 Backup)](#11-atomowe-detale-wdrożeniowe-apple-pay-drm-wizerunek-d1-backup)
+12. [Sprintowa Roadmapa Realizacji (Od Chaosu do Nr 1)](#12-sprintowa-roadmapa-realizacji-od-chaosu-do-nr-1)
 
 ---
 
-## 3. SCHEMAT BAZY DANYCH (SUPABASE POSTGRESQL + RLS)
+## 1. Filozofia Projektowa: Od Czego Wychodzimy?
 
-Wykonaj poniższy skrypt migracji SQL w Supabase SQL Editor:
+W branży edukacji okołoporodowej sukces zależy od harmonijnego zestrojenia trzech przeciwstawnych sił:
 
-```sql
--- ==============================================================================
--- 1. TABELA PROFILI (ROZSZERZENIE AUTH.USERS)
--- ==============================================================================
-CREATE TABLE public.profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email TEXT NOT NULL UNIQUE,
-    full_name TEXT,
-    avatar_url TEXT,
-    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+```
+                          ┌─────────────────────────────┐
+                          │   KORZEŃ: PSYCHOLOGIA MAMY  │
+                          │   Spokój, redukcja lęku,    │
+                          │   wsparcie partnera, 12 m-cy│
+                          └──────────────┬──────────────┘
+                                         │
+                 ┌───────────────────────┴───────────────────────┐
+                 ▼                                               ▼
+  ┌─────────────────────────────┐                 ┌─────────────────────────────┐
+  │   KAGANIEC: POLICY & PRAWO  │                 │ INŻYNIERIA: NEXT.JS ROUTING │
+  │   Meta Ads Sensitive Health │                 │ Pełne rozdzielenie ścieżek  │
+  │   UOKiK, MDR, Art. 38       │                 │ Walled Garden w /strefa     │
+  └─────────────────────────────┘                 └─────────────────────────────┘
+```
 
--- ==============================================================================
--- 2. TABELA KURSÓW
--- ==============================================================================
-CREATE TABLE public.courses (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    slug TEXT NOT NULL UNIQUE,
-    title TEXT NOT NULL,
-    description TEXT,
-    thumbnail_url TEXT,
-    price_cents INTEGER NOT NULL DEFAULT 0, -- np. 35000 = 350.00 PLN
-    currency TEXT NOT NULL DEFAULT 'pln',
-    stripe_price_id TEXT,
-    is_published BOOLEAN DEFAULT true,
-    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+1. **Korzeń (Komunikacja)**: Przyszła mama nie kupuje „plików wideo”, lecz **poczucie bezpieczeństwa, opanowanie w godzinie zero i zaangażowanego partnera**.
+2. **Kaganiec (Policy & Regulacje)**: Meta/TikTok rygorystycznie banują za *Personal Attributes*, terminy chirurgiczne i nazwy leków. Prawo unijne (MDR) penalizuje programy wydające nakazy kliniczne, a UOKiK zakazuje obietnic bez pokrycia („poród bez bólu”).
+3. **Inżynieria (Routing)**: Zamiast jednej chaotycznej strony tworzymy **odrębne ścieżki (Silosy)** zoptymalizowane pod specyficzne źródła ruchu.
 
--- ==============================================================================
--- 3. TABELA MODUŁÓW
--- ==============================================================================
-CREATE TABLE public.modules (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    course_id UUID NOT NULL REFERENCES public.courses(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    description TEXT,
-    sort_order INTEGER NOT NULL DEFAULT 0,
-    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+---
 
--- ==============================================================================
--- 4. TABELA LEKCJI
--- ==============================================================================
-CREATE TABLE public.lessons (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    module_id UUID NOT NULL REFERENCES public.modules(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    description TEXT,
-    vimeo_video_id TEXT NOT NULL, -- Sam identyfikator wideo z Vimeo, np. '892347891'
-    duration_seconds INTEGER DEFAULT 0,
-    sort_order INTEGER NOT NULL DEFAULT 0,
-    is_free_preview BOOLEAN DEFAULT false,
-    attachments JSONB DEFAULT '[]'::jsonb, -- Format: [{ "name": "Karty Pracy PDF", "url": "https://...", "size": "2.4 MB" }]
-    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+## 2. Topologia Stron i Ścieżek Ruchu (Next.js 15 App Router)
 
--- ==============================================================================
--- 5. TABELA DOSTĘPÓW / ZAKUPÓW (ENROLLMENTS)
--- ==============================================================================
-CREATE TABLE public.enrollments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-    course_id UUID NOT NULL REFERENCES public.courses(id) ON DELETE CASCADE,
-    stripe_session_id TEXT UNIQUE,
-    stripe_customer_id TEXT,
-    status TEXT NOT NULL DEFAULT 'active', -- 'active', 'cancelled', 'refunded'
-    granted_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
-    UNIQUE(user_id, course_id)
-);
-
--- ==============================================================================
--- 6. TABELA POSTĘPU LEKCJI (LESSON PROGRESS)
--- ==============================================================================
-CREATE TABLE public.lesson_progress (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-    lesson_id UUID NOT NULL REFERENCES public.lessons(id) ON DELETE CASCADE,
-    is_completed BOOLEAN DEFAULT false,
-    last_position_seconds INTEGER DEFAULT 0,
-    updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
-    UNIQUE(user_id, lesson_id)
-);
-
--- ==============================================================================
--- 7. TRIGGER: AUTOMATYCZNE TWORZENIE PROFILU PRZY REJESTRACJI
--- ==============================================================================
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $$
-BEGIN
-  INSERT INTO public.profiles (id, email, full_name)
-  VALUES (
-    new.id,
-    new.email,
-    COALESCE(new.raw_user_meta_data->>'full_name', '')
-  )
-  ON CONFLICT (id) DO UPDATE
-  SET email = EXCLUDED.email,
-      full_name = COALESCE(EXCLUDED.full_name, profiles.full_name);
-  RETURN new;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE OR REPLACE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
-
--- ==============================================================================
--- 8. ROW LEVEL SECURITY (RLS) - BEZPIECZEŃSTWO DANYCH
--- ==============================================================================
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.modules ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.lessons ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.lesson_progress ENABLE ROW LEVEL SECURITY;
-
--- 8.1 Profiles
-CREATE POLICY "Users can view own profile" 
-  ON public.profiles FOR SELECT 
-  TO authenticated 
-  USING (auth.uid() = id);
-
-CREATE POLICY "Users can update own profile" 
-  ON public.profiles FOR UPDATE 
-  TO authenticated 
-  USING (auth.uid() = id);
-
--- 8.2 Courses & Modules (Publiczny odczyt podstawowych informacji o kursach)
-CREATE POLICY "Anyone can view published courses" 
-  ON public.courses FOR SELECT 
-  USING (is_published = true);
-
-CREATE POLICY "Anyone can view modules of published courses" 
-  ON public.modules FOR SELECT 
-  USING (EXISTS (
-    SELECT 1 FROM public.courses c 
-    WHERE c.id = modules.course_id AND c.is_published = true
-  ));
-
--- 8.3 Lessons (Tylko zapisani użytkownicy z aktywnym kursem LUB darmowa lekcja preview)
-CREATE POLICY "Users can view lessons if enrolled or free preview" 
-  ON public.lessons FOR SELECT 
-  TO authenticated 
-  USING (
-    is_free_preview = true 
-    OR EXISTS (
-        SELECT 1 FROM public.enrollments e
-        JOIN public.modules m ON m.id = lessons.module_id
-        WHERE e.course_id = m.course_id 
-          AND e.user_id = auth.uid() 
-          AND e.status = 'active'
-    )
-  );
-
--- 8.4 Enrollments
-CREATE POLICY "Users can view own enrollments" 
-  ON public.enrollments FOR SELECT 
-  TO authenticated 
-  USING (auth.uid() = user_id);
-
--- 8.5 Lesson Progress
-CREATE POLICY "Users can view and manage own progress" 
-  ON public.lesson_progress FOR ALL 
-  TO authenticated 
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+```
+app/
+├── (public)/                         # ŚRODOWISKO PUBLICZNE (Piksel Meta, TikTok, GTM włączone)
+│   ├── page.tsx                      # Strona Główna / Hub Zaufania Marki
+│   ├── lp/                           # STERILIZED AD LANDINGS (PAID SOCIAL)
+│   │   ├── spokojny-porod/page.tsx   # LP pod Meta Ads (Kobiety 22-37, 0 zakazanych słów, brak linków ucieczki)
+│   │   └── dla-taty/page.tsx         # LP pod reklamy dla partnerów (konkret, wsparcie)
+│   ├── plan-porodu/page.tsx          # STERYLNA ŚLUZA LEAD MAGNETU (Tylko formularz zapisu! 0 pytań medycznych w kodzie)
+│   ├── szkola-rodzenia-online/       # HIGH-INTENT GOOGLE SEARCH ADS LANDING
+│   │   └── page.tsx                  # Cena, program, akredytacje, natychmiastowy start
+│   ├── wiedza/                       # SEO HUBS (Google E-E-A-T, Schema MedicalWebPage)
+│   │   ├── standard-porodu/page.tsx  # Prawa pacjenta, Standard MZ
+│   │   ├── torba-do-szpitala/page.tsx# Interaktywna lista wyprawkowa
+│   │   └── skurcze-porodowe/page.tsx # Kiedy kontaktować się z położną (edukacja)
+│   ├── polonia/page.tsx              # Kampania dla Polek w UK, Niemczech, Holandii
+│   ├── partnerzy/page.tsx            # B2B dla położnych i gabinetów ginekologicznych
+│   ├── kontakt/page.tsx              # Dane rejestrowe, infolinia VoIP, formularz
+│   ├── regulamin/page.tsx            # Regulamin z klauzulą Art. 38 pkt 13
+│   └── polityka-prywatnosci/page.tsx # RODO, klauzule cookies, brak pikseli w strefie
+│
+├── api/                              # SERWEROWE ENDPOINTY
+│   ├── stripe/checkout/route.ts      # Tworzenie sesji z atrybucją UTM i parametrami
+│   ├── stripe/webhook/route.ts       # Źródło prawdy -> Trigger Meta CAPI Server-Side
+│   ├── leads/route.ts                # Zapis leada w Cloudflare D1 + trigger maila Resend z PDF
+│   └── auth/                         # Bezhasłowe sesje HMAC-SHA256
+│
+└── strefa/                           # WALLED GARDEN (STREFA KURSANTKI)
+                                      # ⚠️ KATEGORYCZNY ZAKAZ TRACKERÓW META/TIKTOK! (robots.txt: Disallow)
+    ├── page.tsx                      # Dashboard kursantki, wskaźnik tygodnia ciąży
+    ├── lekcje/page.tsx               # 9 etapów / 52 lekcje VOD (Cloudflare Stream)
+    ├── lekcja/[id]/page.tsx          # Odtwarzacz z dynamicznym znakiem wodnym i notatkami
+    ├── plan-porodu/page.tsx          # PEŁNY KREATOR Z OPCJAMI MEDYCZNYMI (Bezpiecznie odcięty od crawlerów Mety)
+    ├── partner/page.tsx              # Ściągawka dla taty (masaż, oddech, techniki)
+    ├── apteczka/page.tsx             # Sprawdzona apteczka domowa i szpitalna
+    └── licznik/page.tsx              # Notatnik Czasu Skurczów (Czysty stoper bez diagnoz klinicznych)
 ```
 
 ---
 
-## 4. STRUKTURA PROJEKTU (FILE TREE)
+## 3. Protokół Sterylnej Śluzy i Ochrony Przed Oflagowaniem (Anti-Ban & Anti-Flagging)
+
+Roboty reklamowe Meta Ads i Google Ads używają silników OCR oraz analizatorów plików JavaScript (Headless Chrome) do wyszukiwania słów kluczowych uznawanych za *Sensitive Health & Medical Procedures*.
+
+### 3.1. Zasada Całkowitego Odcięcia Kodu Medycznego na `/plan-porodu`
+* **Zagrożenie**: Statyczne zaimportowanie komponentu `BirthPlanGenerator` na publicznej stronie `/plan-porodu` powoduje wyciek terminów medycznych (*episiotomia, ZZO, kaniulacja, cięcie cesarskie*) w wynikowej paczce JS (`bundle chunk`), co skutkuje banem konta reklamowego.
+* **Rozwiązanie architektoniczne**:
+  - Na publicznej stronie `/plan-porodu` **NIGDY nie ładujemy komponentu z pytaniami medycznymi**.
+  - Strona publiczna zawiera **WYŁĄCZNIE sterylny formularz** (Imię, E-mail, Termin porodu) w czystym języku prawno-edukacyjnym (*„Szablon Praw Pacjenta MZ 2024”*).
+  - Po kliknięciu „Wyślij”:
+    1. Gotowy, spersonalizowany plik PDF jest generowany serwerowo i przesyłany na skrzynkę e-mail kursantki przez Resend, LUB
+    2. Użytkowniczka zostaje przekierowana do zamkniętej strefy `/strefa/plan-porodu`, która jest chroniona dyrektywą `Disallow: /strefa/*` w `robots.txt` i pozbawiona pikseli Mety.
+
+### 3.2. Słownik Bezpiecznego Języka (Safe Copywriting Filter)
+Na wszystkich stronach publicznych (`/`, `/marketing`, `/lp/*`) obowiązuje filtr leksykalny:
+
+| ❌ Sformułowanie Zakazane (Ryzyko Bana / UOKiK) |  Bezpieczny Odpowiednik Edukacyjny |
+| :--- | :--- |
+| *„Cięcie cesarskie, znieczulenie ZZO, gaz rozweselający”* | **„Świadomość procedur szpitalnych i opieka w każdym scenariuszu”** |
+| *„Chwyt asymetryczny brodawki, nawał”* | **„Prawidłowa technika przystawienia maluszka i pozycje karmienia”** |
+| *„Laktacja bez bólu”* (Nielegalny claim medyczny) | **„Komfortowa laktacja – technika, pozycje i wsparcie”** |
+| *„Unikniesz nacięcia krocza i powikłań”* | **„Ochrona krocza i fizjologiczne pozycje wertykalne”** |
+| *„Poród bez bólu / bez komplikacji”* | **„Spokojny poród, techniki oddechowe i opanowanie stresu”** |
+
+---
+
+## 4. Standard Budowy Strony, UX i Bezpieczna Anatomia Sekcji
 
 ```
-├── app/
-│   ├── (auth)/
-│   │   ├── login/
-│   │   │   └── page.tsx              # Ekran logowania (Magic Link / Hasło)
-│   │   └── auth/callback/
-│   │       └── route.ts             # PKCE Auth Exchange dla Supabase
-│   ├── (dashboard)/
-│   │   ├── layout.tsx               # Shell panelu kursanta (Top Nav, Profil, Wyloguj)
-│   │   ├── dashboard/
-│   │   │   └── page.tsx             # Pulpit kursanta (Wykaz kursów, ogólny % ukończenia)
-│   │   └── kurs/
-│   │       └── [courseSlug]/
-│   │           ├── layout.tsx       # Layout kursu z bocznym panelem lekcji (Sidebar)
-│   │           ├── page.tsx         # Strona główna kursu (Opis, spis modułów, przycisk Start)
-│   │           └── lekcja/
-│   │               └── [lessonId]/
-│   │                   └── page.tsx # Odtwarzacz wideo, notatki, załączniki PDF, nawigacja
-│   ├── api/
-│   │   ├── stripe/
-│   │   │   ├── checkout/
-│   │   │   │   └── route.ts         # Endpoint tworzenia sesji płatności Stripe Checkout
-│   │   │   └── webhook/
-│   │   │       └── route.ts         # Webhook: weryfikacja Stripe, autotworzenie konta, enrollment
-│   │   └── progress/
-│   │       └── route.ts             # API do oznaczania ukończenia lekcji / timestampu
-│   ├── globals.css
-│   └── layout.tsx
-├── components/
-│   ├── video-player.tsx             # Responsywny player Vimeo (@vimeo/player z auto-complete)
-│   ├── course-sidebar.tsx           # Pasek boczny modułów i lekcji z checkmarkami
-│   ├── progress-bar.tsx             # Wizualny pasek postępu (%)
-│   ├── lesson-navigation.tsx        # Przyciski "Poprzednia" / "Następna lekcja"
-│   └── attachments-list.tsx         # Pobieranie materiałów PDF
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts                # createBrowserClient (dla komponentów klienckich)
-│   │   ├── server.ts                # createServerClient (dla Server Components i Server Actions)
-│   │   └── admin.ts                 # createClient z SUPABASE_SERVICE_ROLE_KEY (dla Webhooka Stripe)
-│   ├── stripe.ts                    # Inicjalizacja klienta Stripe SDK
-│   └── types.ts                     # Interfejsy TypeScript (Course, Module, Lesson, Progress)
-├── middleware.ts                    # Zabezpieczenie ścieżek: odświeżanie sesji i ochrona /dashboard, /kurs
-├── .env.example
-├── package.json
-└── tsconfig.json
+[POZIOM 01] ANNOUNCEMENT TOP-BAR
+            • Treść: "Standard MZ 2024 · Dostęp natychmiastowy po zakupie · Dla Dwojga"
+            • Kolor: Akcent #FAE3EB / Dark #3B0D36, tekst #EC008C
+
+[POZIOM 02] STICKY NAVBAR (DESKTOP & MOBILE)
+            • Lewo: Logo HappyBirth + sygnet jakości
+            • Środek: Kotwice [#program] [#dla-taty] [#narzedzia] [#eksperci] [#faq]
+            • Prawo: Przycisk "Zaloguj" + CTA "Kup kurs (349 zł)"
+            • Mobile: Hamburger Drawer (powierzchnia dotyku min. 48x48px w Thumb Zone)
+            • Na landingach płatnych (/lp/*): Menu całkowicie usunięte (Leaky Bucket Shield)
+
+[POZIOM 03] HERO SECTION (PIERWSZE 5 SEKUND)
+            • Badge zaufania: "Rekomendacja Certyfikowanych Położnych"
+            • H1: Spokojny poród i pewność w pierwszych dniach życia malucha
+            • Podtytuł: Kompletny kurs szkoły rodzenia online dla dwojga. 52 lekcje VOD.
+            • Przyciski: [Kupuję kurs — 349 zł] oraz [Zobacz darmową lekcję]
+            • Cloudflare Stream Player (Zwiastun 4K)
+            • 3 mikro-bullety: Natychmiastowy start | 12 m-cy dostępu | Dostęp dla dwojga
+
+[POZIOM 04] PAIN & PROBLEM (TRADYCYJNA VS NOWOCZESNA SZKOŁA RODZENIA)
+            • Kontrast: Dojazdy w korkach i zmęczenie vs. Spokojna nauka na kanapie we dwoje
+            • Eliminacja lęku przed szpitalem i chaosem informacyjnym
+
+[POZIOM 05] BEZPIECZNY PROGRAM (9 ETAPÓW / 52 LEKCJE VOD)
+            • Akordeon z bezpiecznym słownictwem:
+              01. Zanim (Badania wstępne, kalkulator tygodnia)
+              02. Dwie kreski (I Trymestr, mdłości, wybór lekarza)
+              03. Wreszcie lepiej (II & III Trymestr, ruchy dziecka, profilaktyka kręgosłupa)
+              04. Torba spakowana (Wyprawka, bezpieczny wózek, fotelik R129, apteczka)
+              05. Zaczęło się (Poród fizjologiczny, oddech, pozycje wertykalne, masaż z partnerem)
+              06. Plan B (Przygotowanie na każdy scenariusz, procedury szpitalne, spokój w kryzysie)
+              07. Pierwsza noc w domu (Czuła regeneracja w połogu, emocje, Baby Blues, dno miednicy)
+              08. Karmienie (Komfortowa laktacja, technika przystawienia, wsparcie w nawale)
+              09. Nie śpi (Noworodek, bezpieczna kąpiel, pielęgnacja pępka, pierwsza pomoc)
+            • Oznaczenie bezpłatnej lekcji demonstracyjnej (Lekcja 1)
+
+[POZIOM 06] MODUŁ „STREFA DLA TATY”
+            • Praktyczne instrukcje: Rola w skurczu, ucisk kości krzyżowej, prawa pacjentki w szpitalu
+
+[POZIOM 07] CYFROWY NIEZBĘDNIK (WARTOŚĆ DODANA)
+            • Szablon Praw Pacjenta i Plan Porodu PDF (Standard MZ)
+            • Cyfrowy Notatnik Czasu Skurczów
+            • Interaktywna Apteczka Mamy i Noworodka
+
+[POZIOM 08] EKSPERCI I AUTORYTET MEDYCZNY (GOOGLE E-E-A-T)
+            • Zdjęcia i biogramy położnych, lekarzy i fizjoterapeutek z numerami PWZL / PWZF
+
+[POZIOM 09] OPINIE I SOCIAL PROOF (DYREKTYWA OMNIBUS)
+            • Autentyczne opinie rodziców oznaczone: "Opinia potwierdzona zakupem"
+
+[POZIOM 10] TRANSPARENTNY BOX OFERTOWY
+            • Cena stała: 349 zł brutto (brak sztucznych obniżek)
+            • 52 lekcje VOD, 12 miesięcy dostępu, 2 konta bez dopłat
+            • Płatności: BLIK, Apple Pay, Google Pay, Przelewy24, Karty przez Stripe
+            • Zgoda prawna: Klauzula Art. 38 pkt 13
+
+[POZIOM 11] FAQ (AKORDEON PYTAŃ I ODPOWIEDZI + SCHEMA FAQPAGE)
+
+[POZIOM 12] FINAL CTA
+
+[POZIOM 13] MEGA-FOOTER PRAWNY (TRUST & COMPLIANCE)
+            • Dane rejestrowe, NIP, infolinia techniczna VoIP, regulamin, RODO, disclaimer medyczny
 ```
 
 ---
 
-## 5. KLUCZOWE IMPLEMENTACJE (KOD ŹRÓDŁOWY)
+## 5. Infolinia i Kontakt Telefoniczny (Wymogi Prawne vs Operacje)
 
-### A. Konfiguracja Klientów Supabase (`lib/supabase/`)
-
-#### `lib/supabase/client.ts` (Przeglądarka)
-```typescript
-import { createBrowserClient } from '@supabase/ssr';
-
-export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-}
-```
-
-#### `lib/supabase/server.ts` (Server Components)
-```typescript
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-
-export async function createClient() {
-  const cookieStore = await cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Ignorowane w Server Componentach
-          }
-        },
-      },
-    }
-  );
-}
-```
-
-#### `lib/supabase/admin.ts` (Service Role dla Webhooków)
-```typescript
-import { createClient } from '@supabase/supabase-js';
-
-// Klient z uprawnieniami administratora (Bypass RLS) używany WYŁĄCZNIE w API routes (webhook Stripe)
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-);
-```
+* **Wymóg prawny**: Zgodnie z art. 12 ust. 1 pkt 3 Ustawy o prawach konsumenta, wytycznymi UOKiK oraz wymogami Stripe i Google Ads, sklep internetowy musi posiadać numer telefonu do kontaktu.
+* **Rozwiązanie**: Wirtualny numer VoIP (FCN/Zadarma) w stopce:  
+  *„Infolinia techniczna: +48 22 XXX XX XX (poniedziałek – piątek, godz. 10:00 – 14:00). W sprawach pilnych prosimy o kontakt e-mail: kontakt@happybirth.pl”*.  
+  Po godzinach pracy automatyczna sekretarka informuje o priorytetowej obsłudze mailowej.
 
 ---
 
-### B. Ochrona Tras (`middleware.ts`)
+## 6. Ekosystem Znaczników i Nowa Era AI (Schema.org & llms.txt)
 
-```typescript
-import { createServerClient } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
-
-export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const isProtectedPath =
-    request.nextUrl.pathname.startsWith('/dashboard') ||
-    request.nextUrl.pathname.startsWith('/kurs');
-
-  // Niezalogowany próbuje wejść do strefy kursanta -> przekieruj na /login
-  if (isProtectedPath && !user) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    url.searchParams.set('redirect', request.nextUrl.pathname);
-    return NextResponse.redirect(url);
-  }
-
-  // Zalogowany wchodzi na /login -> przekieruj na /dashboard
-  if (request.nextUrl.pathname === '/login' && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
-  return supabaseResponse;
-}
-
-export const config = {
-  matcher: ['/dashboard/:path*', '/kurs/:path*', '/login'],
-};
-```
+* **`public/llms.txt`**: Czysty Markdown dla robotów SearchGPT, Perplexity i Gemini. Podaje twarde fakty: szkoła rodzenia online dla par, 52 lekcje, 349 zł, Standard MZ 2024.
+* **JSON-LD**:
+  - `EducationalOrganization`: Informacje o wydawcy edukacyjnym.
+  - `Course` & `CourseInstance`: 52 lekcje, 15 godzin, cena 349 PLN.
+  - `FAQPage`: Rozwijane pytania i odpowiedzi w wynikach Google.
+  - `MedicalWebPage`: Recenzje medyczne (`reviewedBy`) z numerami PWZL autorek pod kątem Google YMYL.
 
 ---
 
-### C. Webhook Stripe – Nadawanie Dostępów (`app/api/stripe/webhook/route.ts`)
+## 7. Zaawansowane Zaplecze Techniczne i Analityka (CAPI, PWA, KSeF)
 
-```typescript
-import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
-import { supabaseAdmin } from '@/lib/supabase/admin';
-import Stripe from 'stripe';
-
-export const runtime = 'nodejs';
-
-export async function POST(req: NextRequest) {
-  const body = await req.text();
-  const signature = req.headers.get('stripe-signature');
-
-  if (!signature || !process.env.STRIPE_WEBHOOK_SECRET) {
-    return NextResponse.json({ error: 'Missing webhook signature or secret' }, { status: 400 });
-  }
-
-  let event: Stripe.Event;
-
-  try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-  } catch (err: any) {
-    console.error(`❌ Webhook Signature Error: ${err.message}`);
-    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
-  }
-
-  // Obsługa zakończonej sukcesem płatności
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
-
-    const customerEmail = session.customer_details?.email || session.customer_email;
-    const customerName = session.customer_details?.name || 'Kursant';
-    const courseId = session.metadata?.courseId;
-
-    if (!customerEmail || !courseId) {
-      console.error('❌ Missing customerEmail or courseId in metadata');
-      return NextResponse.json({ error: 'Incomplete session metadata' }, { status: 400 });
-    }
-
-    try {
-      // 1. Sprawdź, czy użytkownik już istnieje w bazie Auth
-      const { data: usersData, error: userSearchError } = await supabaseAdmin.auth.admin.listUsers();
-      let user = usersData?.users.find((u) => u.email?.toLowerCase() === customerEmail.toLowerCase());
-
-      // 2. Jeśli nie istnieje – utwórz konto bezhasłowe
-      if (!user) {
-        const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-          email: customerEmail,
-          email_confirm: true,
-          user_metadata: { full_name: customerName },
-        });
-
-        if (createError || !newUser.user) {
-          throw new Error(`Failed to create auth user: ${createError?.message}`);
-        }
-        user = newUser.user;
-      }
-
-      // 3. Nadaj dostęp do kursu (Enrollment)
-      const { error: enrollError } = await supabaseAdmin
-        .from('enrollments')
-        .upsert(
-          {
-            user_id: user.id,
-            course_id: courseId,
-            stripe_session_id: session.id,
-            stripe_customer_id: typeof session.customer === 'string' ? session.customer : null,
-            status: 'active',
-            granted_at: new Date().toISOString(),
-          },
-          { onConflict: 'user_id,course_id' }
-        );
-
-      if (enrollError) {
-        throw new Error(`Failed to create enrollment: ${enrollError.message}`);
-      }
-
-      // 4. Wygeneruj Magic Link do natychmiastowego logowania
-      const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-        type: 'magiclink',
-        email: customerEmail,
-        options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
-        },
-      });
-
-      console.log(`✅ Sukces! Dostęp nadany dla: ${customerEmail}. Magic Link: ${linkData?.properties?.action_link}`);
-      
-      // (Opcjonalnie: Tutaj wyślij e-mail z linkiem przez Resend lub własne API transakcyjne)
-
-    } catch (dbErr: any) {
-      console.error('❌ Error executing fulfillment:', dbErr.message);
-      return NextResponse.json({ error: 'Fulfillment failed' }, { status: 500 });
-    }
-  }
-
-  return NextResponse.json({ received: true });
-}
-```
+1. **Meta Conversions API (CAPI)**:
+   - W `/api/stripe/webhook` przy zdarzeniu `checkout.session.completed`:
+   - Serwer wysyła zdarzenie `Purchase` bezpośrednio do Graph API Mety z zahashowanym mailem (SHA-256), kwotą i parametrem `event_id` do deduplikacji.
+2. **Automatyczne Fakturowanie**:
+   - Webhook Stripe wywołuje API systemu księgowego (Fakturownia/inFakt) pod KSeF i generuje fakturę PDF dołączaną do maila powitalnego.
+3. **PWA (Progressive Web App)**:
+   - Service Worker buforuje narzędzia w pamięci smartfona, gwarantując działanie offline na sali porodowej.
+4. **Dostarczalność Poczty (SPF/DKIM/DMARC)**:
+   - Rekordy DNS w Cloudflare zabezpieczają przed wpadaniem haseł i materiałów do folderu SPAM w poczcie WP.pl i Onet.pl.
 
 ---
 
-### D. Responsywny Odtwarzacz Vimeo (`components/video-player.tsx`)
+## 8. Status Narzędzi: Plan Porodu i Licznik Czasu Skurczów (MDR Compliance)
 
-```tsx
-'use client';
+### 8.1. Plan Porodu (Główny Filar Narzędziowy)
+* Na publicznym `/plan-porodu` działa wyłącznie sterylny formularz zapisu (0 terminów medycznych w kodzie JS).
+* Pełny interaktywny kreator znajduje się w zamkniętej strefie `/strefa/plan-porodu` lub trafia do rodziców jako czysty plik PDF na e-mail.
 
-import React, { useEffect, useRef, useState } from 'react';
-import Player from '@vimeo/player';
-import { CheckCircle2, PlayCircle, Loader2 } from 'lucide-react';
-
-interface VideoPlayerProps {
-  videoId: string;
-  lessonId: string;
-  isCompleted?: boolean;
-  initialPositionSeconds?: number;
-  onLessonComplete?: () => void;
-}
-
-export function VideoPlayer({
-  videoId,
-  lessonId,
-  isCompleted = false,
-  initialPositionSeconds = 0,
-  onLessonComplete,
-}: VideoPlayerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<Player | null>(null);
-  const [completed, setCompleted] = useState(isCompleted);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!containerRef.current || !videoId) return;
-
-    // Inicjalizacja odtwarzacza Vimeo
-    const player = new Player(containerRef.current, {
-      id: parseInt(videoId, 10),
-      responsive: true,
-      autoplay: false,
-      title: false,
-      byline: false,
-      portrait: false,
-      speed: true,
-    });
-
-    playerRef.current = player;
-
-    player.ready().then(() => {
-      setLoading(false);
-      if (initialPositionSeconds > 5) {
-        player.setCurrentTime(initialPositionSeconds);
-      }
-    });
-
-    // Zapisuj postęp co 15 sekund
-    player.on('timeupdate', (data) => {
-      if (data.seconds % 15 < 1) {
-        fetch('/api/progress', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            lessonId,
-            lastPositionSeconds: Math.floor(data.seconds),
-          }),
-        }).catch(console.error);
-      }
-    });
-
-    // Automatyczne oznaczanie po obejrzeniu
-    player.on('ended', async () => {
-      setCompleted(true);
-      await fetch('/api/progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lessonId, isCompleted: true }),
-      });
-      if (onLessonComplete) onLessonComplete();
-    });
-
-    return () => {
-      player.destroy().catch(() => {});
-    };
-  }, [videoId, lessonId]);
-
-  return (
-    <div className="w-full bg-black rounded-2xl overflow-hidden shadow-2xl border border-neutral-800">
-      <div className="relative aspect-video w-full flex items-center justify-center">
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-neutral-900/90 text-white z-10">
-            <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
-            <span className="ml-3 text-sm font-medium">Ładowanie wideo...</span>
-          </div>
-        )}
-        <div ref={containerRef} className="w-full h-full" />
-      </div>
-
-      <div className="p-4 bg-neutral-900/90 flex items-center justify-between border-t border-neutral-800">
-        <div className="flex items-center space-x-2">
-          {completed ? (
-            <span className="flex items-center text-xs font-semibold text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-800">
-              <CheckCircle2 className="w-4 h-4 mr-1.5" /> Ukończono lekcję
-            </span>
-          ) : (
-            <span className="flex items-center text-xs font-medium text-neutral-400">
-              <PlayCircle className="w-4 h-4 mr-1.5 text-pink-400" /> W trakcie oglądania
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-```
+### 8.2. Licznik Skurczów (Neutralizacja Ryzyka MDR 2017/745)
+* **Kategoryczny zakaz nakazów klinicznych**: Narzędzie NIE MOŻE wyświetlać komunikatów typu: *„Czas ruszać do szpitala! Skierujcie się z partnerem na izbę przyjęć”* (kwalifikacja jako oprogramowanie medyczne SaMD).
+* **Bezpieczna forma**: Narzędzie działa wyłącznie jako **„Cyfrowy Notatnik Czasu Skurczów”** (stoper mierzący czas i odstęp).
+* Po zarejestrowaniu regularnych skurczów wyświetla neutralny komunikat:  
+  *„Zarejestrowano 3 regularne skurcze. Skonsultuj się telefonicznie ze swoją położną lub szpitalem”*.
 
 ---
 
-## 6. KONFIGURACJA ZMIENNYCH ŚRODOWISKOWYCH (`.env.example`)
+## 9. Dźwignie Wzrostu i Monetyzacji (Growth & Monetization Loops)
 
-```env
-# ==============================================================================
-# SUPABASE
-# ==============================================================================
-NEXT_PUBLIC_SUPABASE_URL=https://twoj-projekt.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=twoj-anon-public-key
-SUPABASE_SERVICE_ROLE_KEY=twoj-secret-service-role-key-do-webhooka
-
-# ==============================================================================
-# STRIPE
-# ==============================================================================
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-
-# ==============================================================================
-# APLIKACJA
-# ==============================================================================
-NEXT_PUBLIC_APP_URL=https://strefa.happybirth.pl
-```
+1. **Kup jako Prezent na Baby Shower**: Opcja zakupu z eleganckim Voucherem Prezentowym PDF do koperty.
+2. **Order Bump przy Kasie (+49 zł / +39 zł)**: Wodoodporne fiszki porodowe dla taty lub audio-afirmacje relaksacyjne MP3.
+3. **Program B2B dla Położnych (`/partnerzy`)**: Prowizja 50 zł za polecenie kursu + bloczki kuponów z kodem QR do gabinetów.
+4. **Dedykowany Lejek dla Emigrantek (`/polonia`)**: Kampania dla Polek w UK, Niemczech i Holandii.
+5. **Retencja (Drugie Dziecko)**: Odnowienie po 11 miesiącach za 89 zł i oferta powtórkowa po 2 latach.
 
 ---
 
-## 7. INSTRUKCJA WDROŻENIA I BEZPIECZEŃSTWA (CHECKLISTA)
+## 10. Zgodność Prawna, Podatki i Bezpieczeństwo Medyczne
 
-1. **Vimeo (Ochrona materiałów):**
-   - Wejdź w ustawienia wideo na Vimeo $\rightarrow$ *Privacy* $\rightarrow$ Ustaw: **Hide from Vimeo**.
-   - W sekcji *Where can this be embedded?* $\rightarrow$ Wybierz **Specific domains** i dodaj swoją domenę produkcyjną oraz lokalną:
-     - `strefa.happybirth.pl`
-     - `localhost:3000` (na czas testów programistycznych).
-
-2. **Stripe (Płatności):**
-   - Skonfiguruj produkt i cenę w panelu Stripe.
-   - W sekcji *Developers* $\rightarrow$ *Webhooks* dodaj URL: `https://strefa.happybirth.pl/api/stripe/webhook` z subskrypcją zdarzenia: `checkout.session.completed`.
-
-3. **Supabase:**
-   - Wklej kod z sekcji **3. SCHEMAT BAZY DANYCH** do SQL Editora i kliknij **Run**.
-   - Włącz w *Authentication $\rightarrow$ Providers* opcję **Email (Magic Link / Password)**.
+1. **Dyrektywa Omnibus**: Stała cena 349 zł brutto. Brak sztucznych promocji bez historii 30 dni.
+2. **Art. 38 pkt 13 Ustawy o prawach konsumenta**: Wymuszona zgoda na natychmiastowe świadczenie treści cyfrowych.
+3. **Stawka VAT**: Zwolnienie podmiotowe (art. 113 ust. 1 do 200k zł/rok) lub 23% VAT przy pełnym obrocie.
+4. **Medical Liability Disclaimer**: Informacja przed lekcjami i w stopce: materiały mają charakter edukacyjny i nie zastępują pomocy lekarskiej w stanach zagrożenia życia.
 
 ---
 
-## 8. POLECENIE WYKONAWCZE DLA AGENTA
+## 11. Atomowe Detale Wdrożeniowe (Apple Pay, DRM, Wizerunek, D1 Backup)
 
-> Zbuduj cały projekt ściśle według powyższej specyfikacji. Upewnij się, że kod jest pozbawiony błędów typowania TypeScript, interfejs jest w 100% responsywny (Mobile & Desktop), a wszystkie zapytania do bazy danych wykorzystują zalecane podejście Server Components ze wsparciem `@supabase/ssr`.
+1. **Apple Pay Domain Association**: Plik weryfikacyjny w `public/.well-known/apple-developer-merchantid-domain-association`.
+2. **Dynamiczny Znak Wodny**: Półprzezroczysty e-mail kursantki przemieszczający się po odtwarzaczu Cloudflare Stream (ochrona przed piractwem).
+3. **Umowy o Wizerunek i Prawa Autorskie**: Podpisane umowy przeniesienia autorskich praw majątkowych z każdą ekspertką.
+4. **Harmonogram Kopiowania Bazy D1**: Automatyczny nocny eksport bazy SQLite.
+
+---
+
+## 12. Sprintowa Roadmapa Realizacji (Od Chaosu do Nr 1)
+
+### 🚀 Sprint 1: Sterylna Śluza i Zabezpieczenia (Dni 1–3)
+* [ ] Zabezpieczenie `/plan-porodu` (usunięcie importu `BirthPlanGenerator` z publicznego kodu JS).
+* [ ] Wprowadzenie filtra językowego w `lib/course-data.ts` (zamiana ZZO, gazu, brodawek, bez bólu).
+* [ ] Uruchomienie dedykowanego, sterylnego landing page'a `/lp/spokojny-porod`.
+* [ ] Zabezpieczenie stopki (dane spółki, infolinia VoIP).
+
+### 🎯 Sprint 2: Tracking Server-Side & Start Reklam (Dni 4–7)
+* [ ] Weryfikacja Meta CAPI w webhooku Stripe.
+* [ ] Podpięcie karty wirtualnej z limitem dziennym 150 zł.
+* [ ] Uruchomienie pierwszych 3 zestawów reklamowych ABO (po 35 zł/dzień) na kobiety 22–37 lat.
+
+### 📚 Sprint 3: E-mail Drip & SEO Hubs (Dni 8–14)
+* [ ] Konfiguracja automatycznego mailingu w Resend dopasowanego do terminu porodu (`due_date`).
+* [ ] Publikacja silosów wiedzy w `/wiedza/*` pod Google E-E-A-T.
+* [ ] Uruchomienie PWA z trybem offline.
+
+### 🤝 Sprint 4: B2B, Vouchery i Skalowanie (Dni 15–20)
+* [ ] Generator Voucherów Prezentowych na Baby Shower.
+* [ ] Aktywacja programu partnerskiego dla położnych `/partnerzy`.
+* [ ] Kampania `/polonia` dla Polek za granicą.

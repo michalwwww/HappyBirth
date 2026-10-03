@@ -18,6 +18,7 @@ import {
   Instagram,
   BookOpen,
   Clock,
+  ShieldCheck,
 } from 'lucide-react';
 import { CLOUDFLARE_CUSTOMER_DOMAIN } from '@/lib/course-data';
 import { useI18n } from '@/lib/i18n';
@@ -332,6 +333,66 @@ export default function MarketingPage() {
         </div>
       </section>
 
+      {/* 6B. ZAJRZYJ DO ŚRODKA: JAK WYGLĄDA PLATFORMA PO ZALOGOWANIU */}
+      <section className="py-14 sm:py-20 px-4 sm:px-6 max-w-7xl mx-auto">
+        <div className="rounded-3xl bg-gradient-to-b from-[#FAF7F2] via-white to-[#FDF9F5] dark:from-[#220920] dark:via-[#1A0518] dark:to-[#160415] border border-[#EAE3DB] dark:border-[#461643] p-8 sm:p-12 shadow-xl space-y-10">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
+              {lang === 'pl' ? 'Przejrzysty i intuicyjny interfejs' : 'Clean and intuitive interface'}
+            </span>
+            <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512] dark:text-[#FBF8F4]">
+              {lang === 'pl' ? 'Wszystko w jednym miejscu. Na telefonie, laptopie i Smart TV' : 'Everything in one place. On mobile, desktop and Smart TV'}
+            </h2>
+            <p className="text-sm text-[#544A44] dark:text-[#D7CCC3]">
+              {lang === 'pl'
+                ? 'Zero chaosu, zero szukania w mailach. Logujesz się jednym kliknięciem (bez hasła) i natychmiast wracasz do momentu, w którym skończyliście.'
+                : 'Zero chaos, no searching through emails. One-click passwordless login.'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Karta 1: Kinowy Player 4K */}
+            <div className="p-6 rounded-2xl bg-white dark:bg-[#2A0D28] border border-[#EAE3DB] dark:border-[#461643] space-y-3 shadow-sm hover:border-[#EC008C] transition-all group">
+              <div className="w-12 h-12 rounded-xl bg-[#FAE3EB] dark:bg-[#3D1036] text-[#EC008C] flex items-center justify-center font-bold">
+                <Play className="w-6 h-6 fill-current" />
+              </div>
+              <h3 className="font-brand-display font-bold text-lg text-[#1A1512] dark:text-white">
+                52 Lekcje w Jakości 4K
+              </h3>
+              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
+                Krystaliczny obraz, profesjonalne ujęcia instruktarzowe, regulacja prędkości (1x, 1.25x, 1.5x) oraz zapamiętywanie momentu odtworzenia na każdym urządzeniu.
+              </p>
+            </div>
+
+            {/* Karta 2: Licznik Skurczów SOS */}
+            <div className="p-6 rounded-2xl bg-white dark:bg-[#2A0D28] border border-[#EAE3DB] dark:border-[#461643] space-y-3 shadow-sm hover:border-[#EC008C] transition-all group">
+              <div className="w-12 h-12 rounded-xl bg-[#D0EBF3] dark:bg-[#11273D] text-[#0088BC] flex items-center justify-center font-bold">
+                <Clock className="w-6 h-6" />
+              </div>
+              <h3 className="font-brand-display font-bold text-lg text-[#1A1512] dark:text-white">
+                Licznik Skurczów Porodowych SOS
+              </h3>
+              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
+                Zgodny ze szpitalną regułą 5-1-1. Jednym przyciskiem mierzycie czas trwania i częstotliwość fal, a algorytm podpowiada, kiedy czas ruszać na izbę przyjęć.
+              </p>
+            </div>
+
+            {/* Karta 3: Dedykowana Strefa dla Taty */}
+            <div className="p-6 rounded-2xl bg-white dark:bg-[#2A0D28] border border-[#EAE3DB] dark:border-[#461643] space-y-3 shadow-sm hover:border-[#EC008C] transition-all group">
+              <div className="w-12 h-12 rounded-xl bg-[#DFEED4] dark:bg-[#173016] text-[#347A22] flex items-center justify-center font-bold">
+                <Users className="w-6 h-6" />
+              </div>
+              <h3 className="font-brand-display font-bold text-lg text-[#1A1512] dark:text-white">
+                Dedykowana Strefa dla Partnera
+              </h3>
+              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
+                Żadnego teoretyzowania. Konkretne wideo-ściągi: jak masować kość krzyżową, jak pomagać przy wstawaniu z wanny i co dokładnie zrobić w pierwszej dobie po powrocie.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 7. PORÓWNANIE: SZKOŁA TRADYCYJNA VS HAPPYBIRTH (Dwa Światy) */}
       <section className="py-16 sm:py-24 px-4 sm:px-6 max-w-7xl mx-auto" id="porownanie">
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
@@ -452,34 +513,83 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      {/* 8. SOCIAL MEDIA STRIP: INSTAGRAM */}
-      <section className="py-10 px-4 sm:px-6 max-w-4xl mx-auto">
-        <div className="rounded-3xl bg-gradient-to-r from-[#250A24] to-[#3B1038] text-white p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 border border-[#461643] shadow-lg">
-          <div className="space-y-1.5 text-center sm:text-left">
-            <div className="inline-flex items-center gap-2 text-xs text-[#EC008C] font-semibold">
-              <Instagram className="w-4 h-4" />
-              <span>@happybirth.pl</span>
-            </div>
-            <h3 className="font-brand-display font-bold text-xl sm:text-2xl text-white">
-              {lang === 'pl' ? 'Bądźmy w kontakcie na Instagramie' : lang === 'en' ? 'Stay connected on Instagram' : 'Оставайтесь на связи в Instagram'}
+      {/* 8. KANAŁY SPOŁECZNOŚCIOWE I DOWÓD SPOŁECZNY */}
+      <section className="py-12 px-4 sm:px-6 max-w-5xl mx-auto">
+        <div className="rounded-3xl bg-gradient-to-br from-[#250A24] via-[#350B32] to-[#1C051A] text-white p-6 sm:p-10 border border-[#461643] shadow-xl space-y-6">
+          <div className="text-center sm:text-left space-y-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
+              {lang === 'pl' ? 'Nasza Społeczność Rodziców' : lang === 'en' ? 'Our Parent Community' : 'Наше сообщество'}
+            </span>
+            <h3 className="font-brand-display font-bold text-2xl sm:text-3xl text-white">
+              {lang === 'pl' ? 'Codzienne patenty, wiedza i wsparcie w social mediach' : lang === 'en' ? 'Daily tips, advice and warm support on social media' : 'Ежедневные лайфхаки и поддержка в соцсетях'}
             </h3>
-            <p className="text-xs text-[#EAD5E5]/80 max-w-md">
+            <p className="text-xs sm:text-sm text-[#EAD5E5]/80 max-w-2xl">
               {lang === 'pl'
-                ? 'Codzienne patenty, kulisy nagrań i ciepłe wsparcie dla naszych mam i ojców. Napisz do nas w DM!'
-                : lang === 'en'
-                ? 'Daily tips, behind-the-scenes, and supportive advice for growing families. Drop us a DM!'
-                : 'Ежедневные лайфхаки, закулисье съемок и поддержка будущих родителей. Пишите нам в DM!'}
+                ? 'Dołącz do ponad 18 000 rodziców. Oglądaj krótkie triki położnych, kulisy nagrań oraz zadawaj pytania naszym ekspertkom w relacjach na żywo.'
+                : 'Join over 18,000 parents. Watch quick midwife hacks, behind-the-scenes, and ask questions during live Q&As.'}
             </p>
           </div>
 
-          <a
-            href="https://instagram.com/happybirth.pl"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-3 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold shadow-md transition-all hover:scale-105 shrink-0"
-          >
-            {lang === 'pl' ? 'Obserwuj @happybirth.pl' : lang === 'en' ? 'Follow @happybirth.pl' : 'Подписаться @happybirth.pl'}
-          </a>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+            {/* Instagram */}
+            <a
+              href="https://instagram.com/happybirth.pl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#EC008C] hover:bg-white/10 transition-all group flex flex-col justify-between space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-9 h-9 rounded-xl bg-[#EC008C]/20 text-[#EC008C] flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Instagram className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-mono text-[#EAD5E5]/60 group-hover:text-white">@happybirth.pl</span>
+              </div>
+              <div>
+                <div className="font-semibold text-sm text-white">Instagram</div>
+                <p className="text-[11px] text-[#EAD5E5]/70 mt-0.5">Codzienne Q&A z położnymi i relacje</p>
+              </div>
+            </a>
+
+            {/* TikTok */}
+            <a
+              href="https://tiktok.com/@happybirth_pl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#00ADEF] hover:bg-white/10 transition-all group flex flex-col justify-between space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-9 h-9 rounded-xl bg-[#00ADEF]/20 text-[#00ADEF] flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 3 15.66a6.34 6.34 0 0 0 10.86 4.47 6.14 6.14 0 0 0 1.83-4.47V8.62a8.27 8.27 0 0 0 4.89 1.57V6.76c-.33 0-.66-.02-.99-.07z"/>
+                  </svg>
+                </div>
+                <span className="text-[10px] font-mono text-[#EAD5E5]/60 group-hover:text-white">@happybirth_pl</span>
+              </div>
+              <div>
+                <div className="font-semibold text-sm text-white">TikTok</div>
+                <p className="text-[11px] text-[#EAD5E5]/70 mt-0.5">Szybkie wideo-triki i patenty wyprawkowe</p>
+              </div>
+            </a>
+
+            {/* YouTube */}
+            <a
+              href="https://youtube.com/@happybirth_pl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#ED1C24] hover:bg-white/10 transition-all group flex flex-col justify-between space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-9 h-9 rounded-xl bg-[#ED1C24]/20 text-[#ED1C24] flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Play className="w-4 h-4 fill-current" />
+                </div>
+                <span className="text-[10px] font-mono text-[#EAD5E5]/60 group-hover:text-white">@happybirth_pl</span>
+              </div>
+              <div>
+                <div className="font-semibold text-sm text-white">YouTube</div>
+                <p className="text-[11px] text-[#EAD5E5]/70 mt-0.5">Darmowe lekcje demonstracyjne i wywiady</p>
+              </div>
+            </a>
+          </div>
         </div>
       </section>
 
@@ -575,6 +685,17 @@ export default function MarketingPage() {
               <span>{t.pricing.cta}</span>
               <ArrowRight className="w-4 h-4" />
             </BuyCourseButton>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs text-[#EAD5E5]/80 pt-1">
+            <span className="inline-flex items-center gap-1.5 text-[#FCD705]">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>BLIK · Przelewy24 · Karta</span>
+            </span>
+            <span>·</span>
+            <span>Dostęp natychmiastowy 24/7 dla dwojga</span>
+            <span>·</span>
+            <span>Faktura VAT 23% na życzenie</span>
           </div>
 
           <p className="text-[11px] text-[#EAD5E5]/60 max-w-md mx-auto">

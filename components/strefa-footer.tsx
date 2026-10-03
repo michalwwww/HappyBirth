@@ -132,8 +132,13 @@ export function StrefaFooter() {
 
         {/* Copyright & Legal */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#D8C7D5]/60">
-          <div>
-            Usługodawca: <strong>KLARSolutions sp. z o.o. (w organizacji)</strong>, ul. Śląska 14, 60-614 Poznań · © {new Date().getFullYear()} HappyBirth. Materiały edukacyjne zgodne ze Standardem MZ.
+          <div className="space-y-1">
+            <div>
+              Usługodawca: <strong>KLARSolutions sp. z o.o.</strong> · ul. Śląska 14, 60-614 Poznań · KRS: <strong>0001268396</strong> · NIP: <strong>7812118273</strong> · REGON: <strong>545782779</strong> · Kapitał: 5 000,00 zł.
+            </div>
+            <div className="text-[10px] text-[#D8C7D5]/50">
+              Sąd Rejonowy Poznań - Nowe Miasto i Wilda w Poznaniu, VIII Wydz. Gospodarczy KRS · © {new Date().getFullYear()} HappyBirth. Materiały edukacyjne zgodne ze Standardem MZ.
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             <a href="https://happybirth.pl/regulamin" className="hover:text-white transition-colors underline">

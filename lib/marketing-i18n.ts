@@ -165,11 +165,11 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
         stages: '9 Etapów',
         tools: 'Patenty & Narzędzia',
         reviews: 'Opinie rodziców',
-        price: 'Cena 349 zł',
+        price: 'Cena 489 zł',
         faq: 'FAQ',
       },
       zoneBtn: 'Strefa Rodziców',
-      joinBtn: 'Dołącz · 349 zł',
+      joinBtn: 'Dołącz · 489 zł',
       partnerB2B: 'Strefa Partnera B2B (Afiliacja)',
     },
     hero: {
@@ -179,7 +179,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       titlePink2: 'spokój',
       title2: 'i pewność siebie',
       desc: 'Wszystko, co musisz wiedzieć o narodzinach, skurczach, opiece nad noworodkiem i pierwszych tygodniach w domu. Bez medycznego żargonu, w tempie Twojej rodziny.',
-      ctaBuy: 'Rozpocznij przygotowania · 349 zł',
+      ctaBuy: 'Rozpocznij przygotowania · 489 zł',
       ctaPreview: 'Zobacz bezpłatny zwiastun',
       bullets: [
         'Dostęp na 12 miesięcy dla dwojga',
@@ -321,7 +321,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       ],
       priceLabel: 'Płatność jednorazowa za dwoje:',
       priceSub: 'pełny pakiet na rok',
-      cta: 'Wybierz HappyBirth · 349 zł',
+      cta: 'Wybierz HappyBirth · 489 zł',
     },
     testimonials: {
       tag: 'Głosy rodziców',
@@ -356,7 +356,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
     pricing: {
       badge: 'Jednorazowa opłata · Dostęp dla dwojga',
       title: 'Dostęp do pełnego programu edukacyjnego VOD',
-      price: '349 zł',
+      price: '489 zł',
       unit: 'jednorazowo',
       features: [
         '52 filmowe lekcje w jakości 4K (ponad 15 godzin materiałów)',
@@ -366,7 +366,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
         'Aplikacja mobilna i odtwarzacz na Smart TV',
         'Certyfikat ukończenia programu edukacyjnego',
       ],
-      cta: 'Dołącz do kursu · 349 zł',
+      cta: 'Dołącz do kursu · 489 zł',
       statusBadge: 'Status: Usługa Edukacyjno-Szkoleniowa (E-learning VOD)',
       statusText: 'Gwarancja 14 dni na zwrot bez zbędnych pytań',
       guarantee: '14 dni gwarancji satysfakcji. Jeśli kurs nie spełni Twoich oczekiwań, zwrócimy 100% wpłaty.',
@@ -420,11 +420,11 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
         stages: '9 Stages',
         tools: 'Tips & Tools',
         reviews: "Parents' Reviews",
-        price: 'Price 349 PLN',
+        price: 'Price 489 PLN',
         faq: 'FAQ',
       },
       zoneBtn: 'Parent Zone',
-      joinBtn: 'Enroll · 349 PLN',
+      joinBtn: 'Enroll · 489 PLN',
       partnerB2B: 'B2B Partner Zone (Affiliation)',
     },
     hero: {
@@ -434,7 +434,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       titlePink2: 'calm',
       title2: 'and true confidence',
       desc: 'Everything you need to know about birth, contractions, newborn care, and the first weeks at home. No clinical jargon, at your family’s own pace.',
-      ctaBuy: 'Start Preparing · 349 PLN',
+      ctaBuy: 'Start Preparing · 489 PLN',
       ctaPreview: 'Watch Free Preview',
       bullets: [
         '12 months access for two',
@@ -576,7 +576,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       ],
       priceLabel: 'One-time payment for two:',
       priceSub: 'full 1-year package',
-      cta: 'Choose HappyBirth · 349 PLN',
+      cta: 'Choose HappyBirth · 489 PLN',
     },
     testimonials: {
       tag: "Parents' Voices",
@@ -611,7 +611,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
     pricing: {
       badge: 'One-time fee · Access for two',
       title: 'Full Access to VOD Educational Program',
-      price: '349 PLN',
+      price: '489 PLN',
       unit: 'one-time payment',
       features: [
         '52 cinema-grade 4K lessons (over 15 hours of video content)',
@@ -621,7 +621,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
         'Mobile web application and Smart TV player support',
         'Official Certificate of educational program completion',
       ],
-      cta: 'Enroll Now · 349 PLN',
+      cta: 'Enroll Now · 489 PLN',
       statusBadge: 'Status: Educational Training Service (E-learning VOD)',
       statusText: '14-day hassle-free money-back guarantee',
       guarantee: '14-day satisfaction guarantee. If the course doesn’t meet your expectations, we refund 100% with no questions asked.',
@@ -675,11 +675,11 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
         stages: '9 Этапов',
         tools: 'Лайфхаки и Инструменты',
         reviews: 'Отзывы родителей',
-        price: 'Цена 349 zł',
+        price: 'Цена 489 zł',
         faq: 'Частые вопросы',
       },
       zoneBtn: 'Зона Родителей',
-      joinBtn: 'Купить курс · 349 zł',
+      joinBtn: 'Купить курс · 489 zł',
       partnerB2B: 'Партнёрская Зона B2B (Аффилиация)',
     },
     hero: {
@@ -689,7 +689,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       titlePink2: 'спокойствие',
       title2: 'и уверенность в себе',
       desc: 'Всё, что вам нужно знать о родах, схватках, уходе за новорожденным и первых неделях дома. Без медицинского жаргона, в ритме вашей семьи.',
-      ctaBuy: 'Начать подготовку · 349 zł',
+      ctaBuy: 'Начать подготовку · 489 zł',
       ctaPreview: 'Смотреть демо-урок',
       bullets: [
         'Доступ на 12 месяцев для двоих',
@@ -831,7 +831,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       ],
       priceLabel: 'Разовый платеж за двоих:',
       priceSub: 'полный пакет на год',
-      cta: 'Выбрать HappyBirth · 349 zł',
+      cta: 'Выбрать HappyBirth · 489 zł',
     },
     testimonials: {
       tag: 'Голоса родителей',
@@ -866,7 +866,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
     pricing: {
       badge: 'Единоразовая оплата · Доступ для двоих',
       title: 'Полный доступ к обучающей программе VOD',
-      price: '349 zł',
+      price: '489 zł',
       unit: 'единоразово',
       features: [
         '52 фильма в качестве 4K (более 15 часов материалов)',
@@ -876,7 +876,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
         'Мобильное веб-приложение и поддержка Smart TV',
         'Официальный сертификат об окончании программы',
       ],
-      cta: 'Купить доступ · 349 zł',
+      cta: 'Купить доступ · 489 zł',
       statusBadge: 'Статус: Образовательно-обучающая услуга (E-learning VOD)',
       statusText: '14 дней гарантии возврата без лишних вопросов',
       guarantee: '14 дней гарантии удовлетворения. Если курс вам не подойдет, вернем 100% средств.',

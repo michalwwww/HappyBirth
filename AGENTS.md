@@ -33,6 +33,10 @@ Projekt jest rozwijany równolegle przez:
 6. **Bezpieczeństwo danych (Sekrety)**:
    - Nigdy nie commituj plików `.env`, `.env.local`, `.wrangler/`, certyfikatów ani tokenów API.
    - Zmienne środowiskowe konfigurujemy lokalnie w oparciu o `.env.example`.
+7. **Święta Zasada: Primum Non Nocere (Przede wszystkim nie szkodzić)**:
+   - Absolutny zakaz destrukcyjnego usuwania, kasowania lub niszczenia działających modułów projektu.
+   - Wszystkie zmiany muszą być bezpieczne, addytywne i w 100% kompatybilne wstecznie. Jeśli pojawia się jakakolwiek wątpliwość – natychmiast STOP.
+
 
 ---
 

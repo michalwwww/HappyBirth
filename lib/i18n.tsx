@@ -80,9 +80,9 @@ export const translations: Translations = {
     ru: 'Мед. стандарт',
   },
   btnBuy: {
-    pl: 'Kup dostęp · 349 zł',
-    en: 'Get Access · 349 PLN',
-    ru: 'Купить доступ · 349 zł',
+    pl: 'Kup dostęp · 489 zł',
+    en: 'Get Access · 489 PLN',
+    ru: 'Купить доступ · 489 zł',
   },
   btnLogin: {
     pl: 'Zaloguj się',

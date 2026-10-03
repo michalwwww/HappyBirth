@@ -19,10 +19,42 @@ export function BuyCourseButton({
   const handleCheckout = async () => {
     try {
       setLoading(true);
+
+      // Zbierz parametry śledzenia i atrybucji marketingowej z URL oraz pamięci sesji
+      let utmParams: Record<string, string> = {};
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'ad_id', 'fbclid', 'gclid', 'ref'];
+        
+        // Odczytaj najnowsze z URL
+        keys.forEach((key) => {
+          const val = urlParams.get(key);
+          if (val) {
+            utmParams[key] = val;
+            try {
+              sessionStorage.setItem(`hb_${key}`, val);
+            } catch (_) {}
+          }
+        });
+
+        // Jeśli brak w URL, odczytaj wcześniej zapamiętane w sesji
+        keys.forEach((key) => {
+          if (!utmParams[key]) {
+            try {
+              const saved = sessionStorage.getItem(`hb_${key}`);
+              if (saved) utmParams[key] = saved;
+            } catch (_) {}
+          }
+        });
+      }
+
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseId }),
+        body: JSON.stringify({
+          courseId,
+          utm: utmParams,
+        }),
       });
 
       const data = await res.json();

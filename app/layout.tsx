@@ -86,7 +86,7 @@ const educationalJsonLd = {
       },
       offers: {
         '@type': 'Offer',
-        price: '349',
+        price: '489',
         priceCurrency: 'PLN',
         availability: 'https://schema.org/InStock',
         category: 'Education / E-learning Course',

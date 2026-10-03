@@ -40,11 +40,14 @@ export default function PolitykaPrywatnosciPage() {
           <p>
             Administratorem Twoich danych osobowych w rozumieniu art. 4 pkt 7 RODO jest:
           </p>
-          <div className="p-5 rounded-2xl bg-white border border-[#EAE3DB] space-y-1 text-sm">
-            <p><strong>KLARSolutions sp. z o.o. (w organizacji)</strong></p>
-            <p>Adres siedziby: ul. Śląska 14, 60-614 Poznań</p>
+          <div className="p-5 rounded-2xl bg-white border border-[#EAE3DB] space-y-1.5 text-sm">
+            <p><strong>KLARSOLUTIONS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</strong> (skrót: <strong>KLARSolutions sp. z o.o.</strong>)</p>
+            <p>Adres siedziby: ul. Śląska 14, 60-614 Poznań, Polska</p>
+            <p>KRS: <strong>0001268396</strong> · NIP: <strong>7812118273</strong> · REGON: <strong>545782779</strong></p>
+            <p>Sąd Rejestrowy: Sąd Rejonowy Poznań - Nowe Miasto i Wilda w Poznaniu, VIII Wydział Gospodarczy KRS</p>
+            <p>Kapitał zakładowy: 5 000,00 PLN</p>
             <p>E-mail kontaktowy: <strong>kontakt@happybirth.pl</strong></p>
-            <p>E-mail Inspektora / ds. prywatności: <strong>pomoc@happybirth.pl</strong></p>
+            <p>E-mail ds. prywatności i RODO: <strong>pomoc@happybirth.pl</strong></p>
           </div>
         </section>
 

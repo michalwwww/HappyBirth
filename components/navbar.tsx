@@ -158,7 +158,7 @@ export function Navbar() {
             ) : (
               <div className="flex items-center space-x-2">
                 <BuyCourseButton className="inline-flex items-center space-x-1.5 bg-[#EC008C] hover:bg-[#D0007A] text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:shadow-lg cursor-pointer">
-                  <span>Dołącz · 349 zł</span>
+                  <span>Dołącz · 489 zł</span>
                   <ArrowRight className="w-4 h-4" />
                 </BuyCourseButton>
               </div>

@@ -87,7 +87,7 @@ function StrefaLessonsContent() {
           </div>
 
           <BuyCourseButton className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-bold transition-all shadow-md shadow-[#EC008C]/30 hover:scale-105 shrink-0 flex items-center justify-center gap-2 cursor-pointer">
-            <span>Kup pełny dostęp · 349 zł</span>
+            <span>Kup pełny dostęp · 489 zł</span>
           </BuyCourseButton>
         </div>
       )}

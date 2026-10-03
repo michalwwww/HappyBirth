@@ -127,10 +127,10 @@ export default function PartnerzyPage() {
                 <Gift className="w-6 h-6" />
               </div>
               <h3 className="font-brand-display font-medium text-2xl text-[#1A1512]">
-                Dla Przyszłej Mamy: Zniżka -30 zł
+                Dla Przyszłej Mamy: Zniżka -40 zł
               </h3>
               <p className="text-sm text-[#544A44] leading-relaxed">
-                Każda mama, której przekażesz swoją wizytówkę lub link, otrzymuje kod rabatowy obniżający cenę kursu z 349 zł do 319 zł. Dajesz jej realną korzyść i sprawdzoną opiekę.
+                Każda mama, której przekażesz swoją wizytówkę lub link, otrzymuje kod rabatowy obniżający cenę kursu z 489 zł do 449 zł. Dajesz jej realną korzyść i sprawdzoną opiekę.
               </p>
             </div>
 
@@ -140,10 +140,10 @@ export default function PartnerzyPage() {
                 <Percent className="w-6 h-6" />
               </div>
               <h3 className="font-brand-display font-medium text-2xl text-[#1A1512]">
-                Dla Ciebie: 20% Prowizji (70 zł)
+                Dla Ciebie: 20% Prowizji (~90 zł)
               </h3>
               <p className="text-sm text-[#544A44] leading-relaxed">
-                Zarabiasz ok. 70 zł od każdego zakupu z Twojego polecenia. Przy 20 mamach miesięcznie to ponad <strong>1 400 zł dodatkowego przychodu</strong>, wypłacanego regularnie co miesiąc.
+                Zarabiasz ok. 90 zł od każdego zakupu z Twojego polecenia. Przy 20 mamach miesięcznie to ponad <strong>1 800 zł dodatkowego przychodu</strong>, wypłacanego regularnie co miesiąc.
               </p>
             </div>
 

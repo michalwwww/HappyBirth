@@ -42,9 +42,11 @@ export default function RegulaminPage() {
             <strong>happybirth.pl</strong> oraz <strong>strefa.happybirth.pl</strong> (zwanej dalej „Platformą” lub „Serwisem”) jest:
           </p>
           <div className="p-5 rounded-2xl bg-white border border-[#EAE3DB] space-y-1.5 text-sm">
-            <p><strong>KLARSolutions sp. z o.o. (w organizacji)</strong></p>
-            <p>Adres siedziby: ul. Śląska 14, 60-614 Poznań</p>
-            <p>Kraj: Polska</p>
+            <p><strong>KLARSOLUTIONS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</strong> (skrót: <strong>KLARSolutions sp. z o.o.</strong>)</p>
+            <p>Adres siedziby: ul. Śląska 14, 60-614 Poznań, Polska</p>
+            <p>KRS: <strong>0001268396</strong> · NIP: <strong>7812118273</strong> · REGON: <strong>545782779</strong></p>
+            <p>Sąd Rejestrowy: Sąd Rejonowy Poznań - Nowe Miasto i Wilda w Poznaniu, VIII Wydział Gospodarczy Krajowego Rejestru Sądowego</p>
+            <p>Kapitał zakładowy: 5 000,00 PLN</p>
             <p>Adres poczty elektronicznej (e-mail): <strong>kontakt@happybirth.pl</strong></p>
             <p>Adres e-mail ds. reklamacji i obsługi kursantek: <strong>pomoc@happybirth.pl</strong></p>
           </div>
@@ -59,7 +61,7 @@ export default function RegulaminPage() {
             § 2. Definicje
           </h2>
           <ul className="list-disc pl-5 space-y-1.5">
-            <li><strong>Usługodawca / Sprzedawca</strong> – KLARSolutions sp. z o.o. w organizacji z siedzibą w Poznaniu.</li>
+            <li><strong>Usługodawca / Sprzedawca</strong> – KLARSOLUTIONS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ z siedzibą w Poznaniu (ul. Śląska 14, 60-614 Poznań), wpisana do rejestru przedsiębiorców Krajowego Rejestru Sądowego pod numerem KRS: 0001268396, NIP: 7812118273, REGON: 545782779, o kapitale zakładowym w wysokości 5 000,00 PLN.</li>
             <li><strong>Klient / Użytkownik / Kursantka</strong> – osoba fizyczna, osoba prawna lub jednostka organizacyjna nieposiadająca osobowości prawnej, która zawiera Umowę ze Sprzedawcą.</li>
             <li><strong>Konsument</strong> – osoba fizyczna zawierająca ze Sprzedawcą umowę niezwiązaną bezpośrednio z jej działalnością gospodarczą lub zawodową.</li>
             <li><strong>Kurs / Treść Cyfrowa</strong> – pakiet materiałów edukacyjnych wideo VOD (52 autorskie lekcje wideo w jakości Full HD), materiałów PDF i narzędzi interaktywnych dostępnych w Strefie Kursantki.</li>

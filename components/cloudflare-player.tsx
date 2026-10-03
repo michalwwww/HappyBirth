@@ -288,7 +288,7 @@ export function CloudflarePlayer({
               {/* Przycisk zakupu przez Stripe */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <BuyCourseButton className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white font-bold text-sm transition-all shadow-xl shadow-[#EC008C]/30 hover:scale-105 flex items-center justify-center gap-2 cursor-pointer">
-                  <span>Kup dostęp · 349 zł (BLIK / Karta)</span>
+                  <span>Kup dostęp · 489 zł (BLIK / Karta)</span>
                   <ArrowRight className="w-4 h-4" />
                 </BuyCourseButton>
 
