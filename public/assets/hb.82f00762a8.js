@@ -17,6 +17,8 @@
       btn.remove();
       var img = box.querySelector('img');
       if (img) img.remove();
+      var plakat = box.querySelector('.plakat');
+      if (plakat) plakat.remove();
     });
   });
 
@@ -147,6 +149,7 @@ window.SuwakEtapow = (function () {
     var kropka = el('span', 'se-kropka', nazwaBox);
     kropka.setAttribute('aria-hidden', 'true');
     var nazwa = el('span', 'se-nazwa-tekst', nazwaBox);
+    var rekBox = el('div', 'se-rekomendacja-box', kol);
 
     var etykieta = el('label', 'se-etykieta', frag);
     etykieta.setAttribute('for', id);
@@ -200,6 +203,32 @@ window.SuwakEtapow = (function () {
         el('b', '', li).textContent = m.tytul;
         el('span', '', li).textContent = m.meta;
       });
+
+      /* Dynamiczna sugestia filmu w zależności od konkretnego tygodnia ciąży */
+      var rekTekst = '';
+      if (v <= 280) {
+        var tydz = Math.max(1, Math.ceil(v / 7));
+        if (tydz <= 13) {
+          rekTekst = 'Lekcja 1: „Początek nowego życia i pierwsze tygodnie” oraz Lekcja 2: „Kalendarz badań w I trymestrze”';
+        } else if (tydz <= 20) {
+          rekTekst = 'Lekcja 6: „Kiedy i jak rozpocząć przygotowania” oraz Lekcja 13: „Komfort, sen i pozycje odciążające ciało”';
+        } else if (tydz <= 27) {
+          rekTekst = 'Lekcja 14: „Aktywność fizyczna i ćwiczenia z fizjoterapeutką” oraz Lekcja 16: „Zdrowa dieta i profilaktyka”';
+        } else if (tydz <= 34) {
+          rekTekst = 'Lekcja 19: „Wyprawka bez chaosu – co naprawdę kupić” oraz Lekcja 20: „Bezpieczny fotelik i wózek”';
+        } else {
+          rekTekst = 'Lekcja 26: „Godzina Zero: zwiastuny porodu, skurcze i torba” oraz Lekcja 28: „Oddech i pozycje wertykalne”';
+        }
+      } else {
+        var mies = Math.max(1, Math.ceil((v - 280) / 30.44));
+        if (mies <= 3) {
+          rekTekst = 'Lekcja 35: „Pierwsze 48 godzin, bezpieczna kąpiel i pielęgnacja noworodka” oraz Lekcja 44: „Połóg i regeneracja”';
+        } else {
+          rekTekst = 'Lekcja 48: „Karmienie i laktacja bez bólu” oraz Lekcja 50: „Bezpieczny sen i rozwój w 1. roku życia”';
+        }
+      }
+      rekBox.innerHTML = '<span class="se-rek-label">W Twoim obecnym tygodniu zacznij od filmu:</span><span class="se-rek-film">' + rekTekst + '</span>';
+
       znacznik.style.left = (x / 10).toFixed(3) + '%';
       suwak.setAttribute('aria-valuetext', podpis + (e.nazwa ? ', ' + e.nazwa : ''));
       Object.keys(segmenty).forEach(function (k) {

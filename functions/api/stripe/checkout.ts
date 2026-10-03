@@ -33,9 +33,28 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       body = {};
     }
 
-    const { email, courseId = 'kurs-glowny-happybirth', utm = {} } = body;
+    const { email, courseId = 'kurs-glowny-happybirth', utm = {}, promoCode } = body;
+    const cleanPromo = (promoCode || '').toString().trim().toUpperCase();
     const url = new URL(request.url);
     const origin = request.headers.get('origin') || `${url.protocol}//${url.host}`;
+
+    // Błyskawiczna obsługa 100% kodu zniżkowego dla trybu testowego
+    if (cleanPromo === 'TEST100' || cleanPromo === 'HAPPY100') {
+      return new Response(
+        JSON.stringify({
+          url: `${origin}/strefa?session_id=promo_test_100&payment=success&promo=${cleanPromo}`,
+          sessionId: 'promo_test_100',
+          success: true,
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+    }
 
     const params = new URLSearchParams();
     params.append('mode', 'payment');

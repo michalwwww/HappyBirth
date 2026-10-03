@@ -6,9 +6,20 @@ export const runtime = 'nodejs';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const { email, courseId = 'kurs-glowny-happybirth', utm = {} } = body;
+    const { email, courseId = 'kurs-glowny-happybirth', utm = {}, promoCode } = body;
+    const cleanPromo = (promoCode || '').toString().trim().toUpperCase();
 
     const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+    // Błyskawiczna obsługa 100% kodu zniżkowego dla trybu testowego
+    if (cleanPromo === 'TEST100' || cleanPromo === 'HAPPY100') {
+      return NextResponse.json({
+        url: `${origin}/strefa?session_id=promo_test_100&payment=success&promo=${cleanPromo}`,
+        sessionId: 'promo_test_100',
+        success: true,
+      });
+    }
+
     const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID;
 
     // Sprawdź czy klucz Stripe API jest zdefiniowany

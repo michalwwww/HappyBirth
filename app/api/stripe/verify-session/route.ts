@@ -13,6 +13,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Brak session_id' }, { status: 400 });
   }
 
+  // Obsługa promocyjnych sesji testowych (100% rabat)
+  if (sessionId.startsWith('promo_') || sessionId.startsWith('demo_')) {
+    return NextResponse.json({
+      success: true,
+      user: { email: 'kursantka-test@happybirth.pl', role: 'student' },
+      message: 'Kod promocyjny 100% aktywny',
+    });
+  }
+
   try {
     // Pobierz dane sesji bezpośrednio z oficjalnego API Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId);

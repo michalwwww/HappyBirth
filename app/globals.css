@@ -111,18 +111,173 @@ em.se {
 }
 
 /* Dark Mode Tokens */
-.dark {
+.dark,
+html.dark {
   --paper: #140513;
   --ink: #FBF8F4;
-  --ink2: #D7CCC3;
-  --ink3: #A2958C;
+  --ink2: #EAD5E5;
+  --ink3: #C4ADC0;
   --line: #3A1038;
+  --kosc: #140513;
+  --papier: #1C081A;
+  --len: #250A24;
+  --karta: #220820;
+  --noc: #2F0C2B;
+  --noc2: #461643;
+  --linia: #3D0E39;
+  --linia2: #52134C;
   color-scheme: dark;
 }
 
 .dark body {
   background-color: #140513;
   color: #FBF8F4;
+}
+
+/* Wyczyszczenie cieni pod buttonami i ujednolicenie czytelności krojów pisma */
+.btn,
+.btn.kup,
+.btn.zolty,
+.btn.cta,
+.btn.jasny,
+.nav .btn.kup,
+.nav .linki a,
+.menu nav a {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  text-transform: none !important;
+  letter-spacing: -0.01em !important;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+.btn.kup {
+  background-color: #DA0271 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-radius: 9999px !important;
+}
+
+.btn.kup:hover {
+  background-color: #C00265 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: none !important;
+}
+
+.btn.zolty {
+  background-color: #FECB22 !important;
+  color: #1A1512 !important;
+  font-weight: 700 !important;
+  border-radius: 9999px !important;
+}
+
+.btn.zolty:hover {
+  background-color: #F2BE12 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: none !important;
+}
+
+.btn.cta {
+  border-radius: 9999px !important;
+}
+
+.nav .linki a {
+  font-weight: 600 !important;
+  font-size: 14.5px !important;
+}
+
+/* Rekomendacja filmu na suwaku */
+.se-rekomendacja-box {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: rgba(218, 2, 113, 0.08);
+  border: 1px solid rgba(218, 2, 113, 0.22);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: all 0.2s ease;
+}
+
+.dark .se-rekomendacja-box {
+  background: rgba(218, 2, 113, 0.16);
+  border-color: rgba(218, 2, 113, 0.35);
+}
+
+.se-rek-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #DA0271;
+}
+
+.dark .se-rek-label {
+  color: #F472B6;
+}
+
+.se-rek-film {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+/* Przycisk przejścia do programu u góry modułu */
+.btn-program-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: 9999px;
+  background: var(--karta);
+  border: 1.5px solid var(--linia2);
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: none !important;
+}
+
+.btn-program-top:hover {
+  border-color: #DA0271;
+  color: #DA0271;
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.dark .btn-program-top:hover {
+  background: #2A0D28;
+}
+
+/* Wbudowany przycisk i sekcja rabatu w karcie oferty */
+.btn-oferta-zakup {
+  width: 100%;
+  min-height: 54px;
+  padding: 15px 24px;
+  border-radius: 9999px;
+  background: #DA0271;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: none !important;
+}
+
+.btn-oferta-zakup:hover {
+  background: #C00265;
+  transform: translateY(-1px);
+}
+
+.btn-oferta-zakup:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 /* WCAG 2.1 AA / EAA Accessibility Helpers */
