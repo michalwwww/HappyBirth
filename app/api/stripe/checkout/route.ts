@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Dynamiczny dobór pozycji: jeśli brak zdefiniowanego price_id, generujemy pozycję dynamicznie (489 zł brutto)
+    // Dynamiczny dobór pozycji: kurs HappyBirth 489 zł brutto (23% VAT wliczony w cenę)
     const lineItem = priceId
       ? { price: priceId, quantity: 1 }
       : {
@@ -37,7 +37,8 @@ export async function POST(req: NextRequest) {
               description: 'Dostęp edukacyjny e-learning na 12 miesięcy dla dwojga: 52 lekcje wideo, Notatnik Rodzica PDF i Strefa dla Taty.',
               tax_code: 'txcd_10000000',
             },
-            unit_amount: 48900, // 489.00 PLN
+            unit_amount: 48900, // 489.00 PLN brutto (zawiera VAT)
+            tax_behavior: 'inclusive' as const,
           },
           quantity: 1,
         };
@@ -65,6 +66,8 @@ export async function POST(req: NextRequest) {
       mode: 'payment',
       line_items: [lineItem],
       allow_promotion_codes: true,
+      invoice_creation: { enabled: true },
+      tax_id_collection: { enabled: true },
       metadata,
       locale: 'pl',
       success_url: `${origin}/strefa?session_id={CHECKOUT_SESSION_ID}&payment=success`,

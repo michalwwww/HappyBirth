@@ -41,19 +41,28 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('mode', 'payment');
     params.append('locale', 'pl');
     params.append('allow_promotion_codes', 'true');
+    params.append('invoice_creation[enabled]', 'true');
+    params.append('tax_id_collection[enabled]', 'true');
     params.append('success_url', `${origin}/strefa?session_id={CHECKOUT_SESSION_ID}&payment=success`);
     params.append('cancel_url', `${origin}/#cena`);
 
-    // Standardowa pozycja: 489.00 PLN brutto (z tax_code txcd_10000000 dla Managed Payments)
-    params.append('line_items[0][price_data][currency]', 'pln');
-    params.append('line_items[0][price_data][unit_amount]', '48900');
-    params.append('line_items[0][price_data][product_data][name]', 'Edukacyjny Kurs Online HappyBirth (52 Lekcje VOD dla Dwojga)');
-    params.append(
-      'line_items[0][price_data][product_data][description]',
-      'Dostęp edukacyjny e-learning na 12 miesięcy dla dwojga: 52 lekcje wideo, Notatnik Rodzica PDF i Strefa dla Taty.'
-    );
-    params.append('line_items[0][price_data][product_data][tax_code]', 'txcd_10000000');
-    params.append('line_items[0][quantity]', '1');
+    // Pozycja: kurs HappyBirth 489 zł brutto z 23% VAT wliczonym w cenę (tax_behavior: inclusive)
+    const priceId = env.NEXT_PUBLIC_STRIPE_PRICE_ID || 'price_1UMYzCEOuqHV8SrMz33uW4Un';
+    if (priceId) {
+      params.append('line_items[0][price]', priceId);
+      params.append('line_items[0][quantity]', '1');
+    } else {
+      params.append('line_items[0][price_data][currency]', 'pln');
+      params.append('line_items[0][price_data][unit_amount]', '48900');
+      params.append('line_items[0][price_data][product_data][name]', 'Edukacyjny Kurs Online HappyBirth (52 Lekcje VOD dla Dwojga)');
+      params.append(
+        'line_items[0][price_data][product_data][description]',
+        'Dostęp edukacyjny e-learning na 12 miesięcy dla dwojga: 52 lekcje wideo, Notatnik Rodzica PDF i Strefa dla Taty.'
+      );
+      params.append('line_items[0][price_data][product_data][tax_code]', 'txcd_10000000');
+      params.append('line_items[0][price_data][tax_behavior]', 'inclusive');
+      params.append('line_items[0][quantity]', '1');
+    }
 
     params.append('metadata[courseId]', courseId);
     params.append('metadata[platform]', 'HappyBirth');
