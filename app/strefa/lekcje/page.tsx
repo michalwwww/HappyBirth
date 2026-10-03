@@ -8,6 +8,7 @@ import { useCourseProgress } from '@/lib/progress';
 import { BuyCourseButton } from '@/components/buy-button';
 import { Search, Filter, Sparkles, CheckCircle2, ArrowLeft, Lock } from 'lucide-react';
 import Link from 'next/link';
+import { isCourseUnlockedLocally } from '@/lib/promo';
 
 function StrefaLessonsContent() {
   const searchParams = useSearchParams();
@@ -16,6 +17,11 @@ function StrefaLessonsContent() {
   const [selectedStage, setSelectedStage] = useState<string>(initialStage);
   const [search, setSearch] = useState<string>('');
   const { completedLessons, percentCompleted, role } = useCourseProgress();
+
+  const isCourseUnlocked =
+    role === 'student' ||
+    role === 'partner' ||
+    isCourseUnlockedLocally();
 
   useEffect(() => {
     const stageParam = searchParams.get('stage');
@@ -70,7 +76,7 @@ function StrefaLessonsContent() {
       </div>
 
       {/* Guest Notice & Buy CTA */}
-      {role === 'guest' && (
+      {!isCourseUnlocked && (
         <div className="rounded-2xl bg-gradient-to-r from-[#55406E] via-[#4A3A5E] to-[#3F3054] border border-[#DA0271]/40 p-4 sm:p-5 text-white shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#DA0271]/20 border border-[#DA0271]/40 text-[#DA0271] flex items-center justify-center shrink-0">

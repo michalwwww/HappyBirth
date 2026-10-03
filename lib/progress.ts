@@ -49,10 +49,11 @@ export function useCourseProgress() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // 1. Natychmiast załaduj z localStorage (domyślnie 'guest')
+    // 1. Natychmiast załaduj z localStorage (domyślnie 'guest', lub 'student' jeśli hb_unlocked)
     const localLessons = getStoredCompletedLessons();
     setCompletedLessons(localLessons);
-    const storedRole = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || 'guest';
+    const isUnlocked = localStorage.getItem('hb_unlocked') === 'true';
+    const storedRole = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || (isUnlocked ? 'student' : 'guest');
     setRole(storedRole);
     setIsLoaded(true);
 
@@ -67,7 +68,7 @@ export function useCourseProgress() {
             setRole(validRole);
             localStorage.setItem(CURRENT_ROLE_KEY, validRole);
             window.dispatchEvent(new Event('hb_role_updated'));
-          } else {
+          } else if (!isUnlocked) {
             setRole('guest');
           }
         }
@@ -91,7 +92,8 @@ export function useCourseProgress() {
     };
 
     const handleRoleUpdate = () => {
-      const updated = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || 'guest';
+      const isUnl = localStorage.getItem('hb_unlocked') === 'true';
+      const updated = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || (isUnl ? 'student' : 'guest');
       setRole(updated);
     };
 

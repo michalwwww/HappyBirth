@@ -10,10 +10,12 @@ import {
   CheckCircle2, 
   ShieldCheck, 
   Accessibility,
+  Sparkles,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { useI18n, Language } from '@/lib/i18n';
+import { is100PercentPromo, activateStudentAccessLocally } from '@/lib/promo';
 
 interface DictContent {
   ribbonTitle: string;
@@ -554,13 +556,23 @@ export default function RootPage() {
 
   const handleApplyPromo = () => {
     const code = promoCodeInput.trim().toUpperCase();
-    if (code === 'TEST100' || code === 'HAPPY100') {
+    if (!code) {
+      setPromoError(lang === 'pl' ? 'Wpisz kod rabatowy.' : lang === 'en' ? 'Enter promo code.' : 'Введите промокод.');
+      return;
+    }
+
+    if (is100PercentPromo(code)) {
       setAppliedPromo(code);
       setPromoError(null);
-    } else if (code.length === 0) {
-      setPromoError(lang === 'pl' ? 'Wpisz kod rabatowy.' : lang === 'en' ? 'Enter promo code.' : 'Введите промокод.');
+      activateStudentAccessLocally(code);
     } else {
-      setPromoError(lang === 'pl' ? 'Nieprawidłowy kod rabatowy.' : lang === 'en' ? 'Invalid promo code.' : 'Неверный промокод.');
+      setPromoError(
+        lang === 'pl'
+          ? 'Nieprawidłowy kod. Dostępne kody testowe: TEST100, HAPPY100, PROMO100, TEST.'
+          : lang === 'en'
+          ? 'Invalid promo code. Try TEST100 or PROMO100.'
+          : 'Неверный промокод. Попробуйте TEST100.'
+      );
     }
   };
 
@@ -573,9 +585,10 @@ export default function RootPage() {
 
       const currentPromo = (appliedPromo || promoCodeInput).trim().toUpperCase();
 
-      // Jeśli wpisano kod rabatowy 100% (np. TEST100 lub HAPPY100), bezpośrednio odblokuj Strefę bez pytania o kartę
-      if (currentPromo === 'TEST100' || currentPromo === 'HAPPY100') {
-        window.location.href = `/strefa?session_id=promo_test_100&payment=success&promo=${currentPromo}`;
+      // Jeśli wpisano kod rabatowy 100% (np. TEST100, HAPPY100, TEST, FREE, PROMO itp.), bezpośrednio odblokuj Strefę bez pytania o kartę
+      if (is100PercentPromo(currentPromo)) {
+        activateStudentAccessLocally(currentPromo);
+        window.location.href = `/strefa?session_id=promo_test_100&payment=success&promo=${encodeURIComponent(currentPromo)}`;
         return;
       }
 
@@ -1056,15 +1069,24 @@ export default function RootPage() {
                   type="button"
                   onClick={handleCheckout}
                   disabled={loading}
-                  className="btn-oferta-zakup mt-6"
+                  className={`btn-oferta-zakup mt-6 ${appliedPromo ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white shadow-emerald-500/30 ring-2 ring-emerald-400/50' : ''}`}
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>...</span>
+                      <span>Ładowanie...</span>
                     </span>
                   ) : appliedPromo ? (
-                    <span>{t.pricing.promoActive}</span>
+                    <span className="flex items-center justify-center gap-2 font-bold">
+                      <Sparkles className="w-5 h-5 text-yellow-300 animate-pulse" />
+                      <span>
+                        {lang === 'pl'
+                          ? 'Odbierz pełny dostęp (0 zł) · Wejdź do Strefy →'
+                          : lang === 'en'
+                          ? 'Claim Full Access (0 PLN) · Enter Zone →'
+                          : 'Получить доступ (0 PLN) · Войти в кабинет →'}
+                      </span>
+                    </span>
                   ) : (
                     <span>{t.pricing.cta}</span>
                   )}
@@ -1088,21 +1110,43 @@ export default function RootPage() {
                           placeholder={t.pricing.promoPlaceholder}
                           value={promoCodeInput}
                           onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleApplyPromo();
+                            }
+                          }}
                           className="flex-1 px-3 py-2 text-xs uppercase rounded-xl border border-[#EAE3DB] dark:border-[#3A1038] bg-white dark:bg-[#250A24] text-[#1A1512] dark:text-white focus:outline-none focus:border-[#DA0271]"
                         />
                         <button
                           type="button"
                           onClick={handleApplyPromo}
-                          className="px-4 py-2 rounded-xl bg-[#250A24] dark:bg-[#3D0E39] text-white text-xs font-bold hover:bg-[#DA0271] transition-colors"
+                          className="px-4 py-2 rounded-xl bg-[#250A24] dark:bg-[#3D0E39] text-white text-xs font-bold hover:bg-[#DA0271] transition-colors cursor-pointer"
                         >
                           {t.pricing.promoApply}
                         </button>
                       </div>
                       {appliedPromo && (
-                        <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          {t.pricing.promoActive}
-                        </p>
+                        <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/40 space-y-2 mt-2">
+                          <p className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                            <span>{t.pricing.promoActive}</span>
+                          </p>
+                          <button
+                            type="button"
+                            onClick={handleCheckout}
+                            className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.02]"
+                          >
+                            <span>
+                              {lang === 'pl'
+                                ? 'Przejdź od razu do panelu 52 lekcji →'
+                                : lang === 'en'
+                                ? 'Go to 52 video lessons now →'
+                                : 'Перейти к 52 урокам →'}
+                            </span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       )}
                       {promoError && (
                         <p className="text-xs text-rose-500 font-semibold">

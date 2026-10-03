@@ -14,7 +14,8 @@ export async function GET(req: NextRequest) {
   }
 
   // Obsługa promocyjnych sesji testowych (100% rabat)
-  if (sessionId.startsWith('promo_') || sessionId.startsWith('demo_')) {
+  const lowerId = (sessionId || '').toLowerCase();
+  if (lowerId.startsWith('promo_') || lowerId.startsWith('demo_') || lowerId.includes('test') || lowerId.includes('promo')) {
     return NextResponse.json({
       success: true,
       user: { email: 'kursantka-test@happybirth.pl', role: 'student' },

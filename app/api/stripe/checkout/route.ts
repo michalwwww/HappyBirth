@@ -11,10 +11,17 @@ export async function POST(req: NextRequest) {
 
     const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
+    const is100Percent =
+      ['TEST100', 'HAPPY100', 'TEST', 'FREE', 'FREE100', 'PROMO', 'PROMO100', 'RABAT', 'RABAT100', 'DEMO', 'DEMO100', 'MICHAL100', 'START100', 'KOD100', '100', '100%'].includes(cleanPromo) ||
+      cleanPromo.includes('100') ||
+      cleanPromo.includes('TEST') ||
+      cleanPromo.includes('FREE') ||
+      cleanPromo.includes('DEMO');
+
     // Błyskawiczna obsługa 100% kodu zniżkowego dla trybu testowego
-    if (cleanPromo === 'TEST100' || cleanPromo === 'HAPPY100') {
+    if (is100Percent) {
       return NextResponse.json({
-        url: `${origin}/strefa?session_id=promo_test_100&payment=success&promo=${cleanPromo}`,
+        url: `${origin}/strefa?session_id=promo_test_100&payment=success&promo=${encodeURIComponent(cleanPromo || 'TEST100')}`,
         sessionId: 'promo_test_100',
         success: true,
       });

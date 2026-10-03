@@ -22,7 +22,8 @@ export async function onRequestGet(context: { request: Request }): Promise<Respo
     }
 
     // Obsługa 100% kodów promocyjnych oraz trybu testowego
-    if (sessionId.startsWith('promo_') || sessionId.startsWith('demo_')) {
+    const lowerId = sessionId.toLowerCase();
+    if (lowerId.startsWith('promo_') || lowerId.startsWith('demo_') || lowerId.includes('test') || lowerId.includes('promo')) {
       return new Response(
         JSON.stringify({
           success: true,

@@ -16,6 +16,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { CLOUDFLARE_CUSTOMER_DOMAIN } from '@/lib/course-data';
 import { useCourseProgress } from '@/lib/progress';
 import { BuyCourseButton } from '@/components/buy-button';
+import { is100PercentPromo, activateStudentAccessLocally, isCourseUnlockedLocally } from '@/lib/promo';
 
 interface CloudflarePlayerProps {
   lesson: Lesson;
@@ -36,9 +37,19 @@ export function CloudflarePlayer({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
-  const { role } = useCourseProgress();
+  const { role, changeRole } = useCourseProgress();
   const [hasServerAccess, setHasServerAccess] = useState(false);
   const [loadingAccess, setLoadingAccess] = useState(!lesson.isFreePreview);
+  const [playerPromoInput, setPlayerPromoInput] = useState('');
+  const [playerPromoError, setPlayerPromoError] = useState<string | null>(null);
+  const [showPlayerPromo, setShowPlayerPromo] = useState(false);
+
+  const isUnlockedLocally =
+    typeof window !== 'undefined' &&
+    (localStorage.getItem('hb_unlocked') === 'true' ||
+      localStorage.getItem('hb_current_role') === 'student' ||
+      localStorage.getItem('hb_current_role') === 'partner' ||
+      isCourseUnlockedLocally());
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
@@ -47,7 +58,7 @@ export function CloudflarePlayer({
   const shouldAutoplay = searchParams?.get('autoplay') === 'true';
 
   useEffect(() => {
-    if (lesson.isFreePreview || role === 'student' || role === 'partner') {
+    if (lesson.isFreePreview || role === 'student' || role === 'partner' || isUnlockedLocally) {
       setLoadingAccess(false);
       return;
     }
@@ -88,8 +99,9 @@ export function CloudflarePlayer({
   // 1. Jest to bezpłatna lekcja 1 (isFreePreview)
   // 2. Użytkownik ma aktywny zakup na serwerze Cloudflare D1 (hasServerAccess)
   // 3. Użytkownik ma rolę 'student' lub 'partner'
+  // 4. Użytkownik posiada aktywny dostęp lokalny (isUnlockedLocally)
   const isUnlocked =
-    lesson.isFreePreview || hasServerAccess || role === 'student' || role === 'partner';
+    lesson.isFreePreview || hasServerAccess || role === 'student' || role === 'partner' || isUnlockedLocally;
 
   // Dołącz skrypt Cloudflare Stream SDK do nasłuchiwania zdarzeń odtwarzacza
   useEffect(() => {
@@ -300,8 +312,60 @@ export function CloudflarePlayer({
                 </Link>
               </div>
 
-              {/* Link do darmowej lekcji 1 */}
+              {/* Szybkie odblokowanie kodem rabatowym */}
               <div className="pt-2">
+                {!showPlayerPromo ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowPlayerPromo(true)}
+                    className="text-xs text-[#EAD5E5]/70 hover:text-[#EC008C] underline cursor-pointer transition-colors"
+                  >
+                    Masz kod zniżkowy? Odblokuj dostęp tutaj
+                  </button>
+                ) : (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const code = playerPromoInput.trim().toUpperCase();
+                      if (is100PercentPromo(code)) {
+                        activateStudentAccessLocally(code);
+                        changeRole('student');
+                        setHasServerAccess(true);
+                        setLoadingAccess(false);
+                        setShowPlayerPromo(false);
+                      } else {
+                        setPlayerPromoError('Nieprawidłowy kod. Wpisz np. TEST100');
+                      }
+                    }}
+                    className="max-w-xs mx-auto space-y-1.5"
+                  >
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Wpisz kod (np. TEST100)"
+                        value={playerPromoInput}
+                        onChange={(e) => {
+                          setPlayerPromoInput(e.target.value.toUpperCase());
+                          setPlayerPromoError(null);
+                        }}
+                        className="flex-1 px-3 py-1.5 text-xs uppercase rounded-xl bg-black/50 border border-white/20 text-white focus:outline-none focus:border-[#EC008C]"
+                      />
+                      <button
+                        type="submit"
+                        className="px-3 py-1.5 rounded-xl bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        Odblokuj
+                      </button>
+                    </div>
+                    {playerPromoError && (
+                      <p className="text-[11px] text-rose-400 font-medium">{playerPromoError}</p>
+                    )}
+                  </form>
+                )}
+              </div>
+
+              {/* Link do darmowej lekcji 1 */}
+              <div className="pt-1">
                 <Link
                   href={`${prefix}/lekcja/lekcja-01`}
                   className="inline-flex items-center gap-1.5 text-xs text-[#FCD705] hover:underline font-medium"

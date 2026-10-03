@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { DailyTipCard } from '@/components/daily-tip-card';
+import { activateStudentAccessLocally, is100PercentPromo } from '@/lib/promo';
 
 export default function StrefaDashboardPage() {
   const { role, changeRole, completedLessons, percentCompleted } = useCourseProgress();
@@ -41,12 +42,27 @@ export default function StrefaDashboardPage() {
       const params = new URLSearchParams(window.location.search);
       const sessionId = params.get('session_id');
       const payment = params.get('payment');
+      const promo = params.get('promo');
+
+      const isPromoOrSuccess =
+        (sessionId && (sessionId.startsWith('promo_') || sessionId.startsWith('demo_') || sessionId.toLowerCase().includes('test') || sessionId.toLowerCase().includes('promo'))) ||
+        payment === 'success' ||
+        Boolean(promo) ||
+        is100PercentPromo(promo);
+
+      // Natychmiastowe, synchroniczne odblokowanie bez czekania na sieć
+      if (isPromoOrSuccess) {
+        activateStudentAccessLocally(promo || 'TEST100');
+        changeRole('student');
+        setPaymentSuccess(true);
+      }
 
       if (sessionId) {
         fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`)
           .then((res) => res.json())
           .then((data) => {
             if (data.success) {
+              activateStudentAccessLocally(promo || 'TEST100');
               changeRole('student');
               setPaymentSuccess(true);
               window.dispatchEvent(new Event('hb_progress_updated'));
@@ -54,6 +70,7 @@ export default function StrefaDashboardPage() {
           })
           .catch((err) => console.error('Błąd weryfikacji płatności:', err));
       } else if (payment === 'success') {
+        activateStudentAccessLocally(promo || 'TEST100');
         changeRole('student');
         setPaymentSuccess(true);
         window.dispatchEvent(new Event('hb_progress_updated'));

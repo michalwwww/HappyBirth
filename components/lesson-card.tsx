@@ -4,6 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import { Lesson } from '@/lib/types';
 import { Play, CheckCircle2, Clock, Sparkles, Lock } from 'lucide-react';
+import { useCourseProgress } from '@/lib/progress';
+import { isCourseUnlockedLocally } from '@/lib/promo';
 
 import { usePathname } from 'next/navigation';
 
@@ -17,6 +19,11 @@ interface LessonCardProps {
 export function LessonCard({ lesson, isCompleted, isActive = false, autoplay = true }: LessonCardProps) {
   const pathname = usePathname();
   const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
+  const { role } = useCourseProgress();
+  const isCourseUnlocked =
+    role === 'student' ||
+    role === 'partner' ||
+    isCourseUnlockedLocally();
 
   return (
     <Link
@@ -60,6 +67,10 @@ export function LessonCard({ lesson, isCompleted, isActive = false, autoplay = t
             {lesson.isFreePreview ? (
               <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
                 <Sparkles className="w-2.5 h-2.5" /> Bezpłatna lekcja
+              </span>
+            ) : isCourseUnlocked ? (
+              <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
+                <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" /> W pakiecie
               </span>
             ) : (
               <span className="text-[10px] font-medium text-[#867A72] bg-[#F7F0E7] px-1.5 py-0.5 rounded border border-[#EADFD3] flex items-center gap-1">
