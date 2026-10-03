@@ -1,37 +1,38 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { stages, lessons, getLessonsByStage } from '@/lib/course-data';
+import {
+  stages,
+  lessons,
+  getLessonsByStage,
+  getStageDisplayTitle,
+  getStageShortBadge,
+  getStageFullDescription,
+} from '@/lib/course-data';
 import { useCourseProgress } from '@/lib/progress';
 import { StageIcon } from '@/components/stage-icons';
 import { PregnancyProfile, getSavedPregnancyProfile } from '@/lib/pregnancy';
 import { OnboardingWizard } from '@/components/onboarding-wizard';
-import { PregnancyTrackerCard } from '@/components/pregnancy-tracker-card';
 import { CloudflarePlayer } from '@/components/cloudflare-player';
-import { DailyTipCard } from '@/components/daily-tip-card';
 import { activateStudentAccessLocally, is100PercentPromo } from '@/lib/promo';
-import { Lesson } from '@/lib/types';
+import { Lesson, Stage } from '@/lib/types';
 import {
   Play,
   CheckCircle2,
   Sparkles,
-  AlertCircle,
-  User,
   Clock,
   ArrowRight,
   Download,
   BookOpen,
   Calendar,
-  ShieldCheck,
-  ChevronRight,
-  Heart,
-  Feather,
-  Activity,
-  Baby,
   FileText,
-  Tv,
+  User,
+  Heart,
+  ChevronRight,
+  ShieldCheck,
+  Flame,
 } from 'lucide-react';
 
 function StrefaDashboardContent() {
@@ -39,6 +40,9 @@ function StrefaDashboardContent() {
   const [pregnancyProfile, setPregnancyProfile] = useState<PregnancyProfile | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  // Referencja do odtwarzacza wideo (do centrowania ekranu po płatności)
+  const playerSectionRef = useRef<HTMLElement>(null);
 
   // Aktywna lekcja w kinie domowym na kokpicie
   const [activeLessonId, setActiveLessonId] = useState<string>('lekcja-01');
@@ -61,7 +65,7 @@ function StrefaDashboardContent() {
         Boolean(promo) ||
         is100PercentPromo(promo);
 
-      // Natychmiastowe synchroniczne odblokowanie bez czekania na sieć
+      // Natychmiastowe odblokowanie dostępu lokalnie
       if (isPromoOrSuccess) {
         activateStudentAccessLocally(promo || 'TEST100');
         changeRole('student');
@@ -87,7 +91,7 @@ function StrefaDashboardContent() {
         window.dispatchEvent(new Event('hb_progress_updated'));
       }
 
-      // Ustaw aktywną lekcję z URL lub domyślnie pierwszą nieukończoną
+      // Ustaw aktywną lekcję z parametru lub pierwszą nieukończoną
       if (lessonParam && lessons.some((l) => l.id === lessonParam)) {
         setActiveLessonId(lessonParam);
       } else {
@@ -97,9 +101,19 @@ function StrefaDashboardContent() {
         }
       }
 
-      // Autoplay jeśli po płatności lub jawnie w parametrze
+      // Autoplay po płatności lub parametrze
       if (isPromoOrSuccess || autoplayParam === 'true') {
         setShouldAutoplay(true);
+      }
+
+      // Automatyczne płynne wycentrowanie ekranu na filmie po zapłaceniu / zniżce
+      if (isPromoOrSuccess || payment === 'success' || sessionId) {
+        const timer = setTimeout(() => {
+          if (playerSectionRef.current) {
+            playerSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 300);
+        return () => clearTimeout(timer);
       }
     }
   }, [completedLessons]);
@@ -121,148 +135,83 @@ function StrefaDashboardContent() {
   const remainingHours = Math.floor(remainingMinutes / 60);
   const remainingMins = remainingMinutes % 60;
 
-  const handleSelectLesson = (lesson: Lesson) => {
+  const handleSelectLesson = (lesson: Lesson, scrollToVideo = false) => {
     setActiveLessonId(lesson.id);
     setShouldAutoplay(true);
+    if (scrollToVideo && playerSectionRef.current) {
+      playerSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  const handleSelectStage = (stage: Stage) => {
+    const stageLessons = lessons.filter((l) => l.stageId === stage.id);
+    const uncompletedInStage = stageLessons.find((l) => !completedLessons.includes(l.id));
+    const target = uncompletedInStage || stageLessons[0];
+    if (target) {
+      handleSelectLesson(target, true);
+    }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-10">
-      {/* Baner sukcesu po płatności Stripe / kodzie testowym */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
+      {/* 1. ELEGANCKI BANER SUKCESU PO ZAKUPIE / KODZIE PROMOCYJNYM */}
       {paymentSuccess && (
-        <div className="rounded-3xl bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-950 border border-emerald-500/40 p-6 sm:p-8 text-white shadow-2xl flex flex-col sm:flex-row items-start sm:items-center gap-5 animate-in fade-in slide-in-from-top-4 duration-500">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-400 flex items-center justify-center shrink-0 shadow-inner">
-            <CheckCircle2 className="w-8 h-8" />
-          </div>
-          <div className="space-y-1.5 flex-1">
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" /> Dostęp natychmiastowy aktywowany
+        <div className="rounded-2xl bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-950 border border-emerald-500/40 p-4 sm:p-5 text-white shadow-xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-400 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="w-5 h-5" />
             </div>
-            <h3 className="font-brand-display font-bold text-xl sm:text-2xl text-white">
-              Wspaniale! Twój dostęp do HappyBirth jest w 100% aktywny 🎉
-            </h3>
-            <p className="text-xs sm:text-sm text-emerald-100/80 leading-relaxed font-sans">
-              Odblokowaliśmy wszystkie 52 lekcje wideo w jakości 4K, materiały PDF i dedykowaną Strefę dla Partnera. Dostęp jest ważny przez 12 miesięcy dla Ciebie i Twojego partnera.
-            </p>
+            <div>
+              <div className="text-xs font-bold text-emerald-300 uppercase tracking-wide flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" /> Dostęp natychmiastowy aktywowany
+              </div>
+              <h3 className="font-brand-display font-bold text-base sm:text-lg text-white">
+                Wspaniale! Wszystkie 52 lekcje 4K są odblokowane dla Ciebie i Twojego partnera 🎉
+              </h3>
+            </div>
           </div>
+          <span className="hidden sm:inline-block text-xs bg-emerald-500/20 text-emerald-200 px-3 py-1.5 rounded-full border border-emerald-500/30 font-medium">
+            12 miesięcy bez limitu
+          </span>
         </div>
       )}
 
-      {/* 0. INTELIGENTNY TRACKER CIĄŻY I PERSONALIZACJA */}
-      {role === 'student' && (
-        <PregnancyTrackerCard 
-          profile={pregnancyProfile} 
-          onOpenWizard={() => setWizardOpen(true)} 
-        />
-      )}
-
-      {/* 1. HERO GREETING & PROGRESS CARD (Luksusowy fiolet #20071E / dark #180517) */}
-      <div className="rounded-3xl bg-gradient-to-r from-[#20071E] via-[#2A0B28] to-[#3A1038] dark:from-[#180517] dark:via-[#1F071D] dark:to-[#2A0B28] text-white p-6 sm:p-10 border border-[#461643] dark:border-[#3D0E39] shadow-xl relative overflow-hidden">
-        {/* Dekoracyjne tło */}
-        <div className="absolute right-0 top-0 w-96 h-96 bg-[#DA0271]/15 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-          <div className="max-w-2xl space-y-3">
-            <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#DA0271] animate-pulse"></span>
-              <span className="text-xs font-bold uppercase tracking-widest text-[#EAD5E5]/80">
-                {role === 'partner' ? 'Strefa dla Taty / Osoby Towarzyszącej' : 'Strefa dla Mamy'}
-              </span>
-            </div>
-
-            <h1 className="font-serif font-normal text-3xl sm:text-5xl text-white tracking-tight leading-tight">
-              {role === 'partner'
-                ? 'Witaj w Strefie dla Taty!'
-                : 'Cześć! Spokojnego dnia.'}
-            </h1>
-
-            <p className="text-sm sm:text-base text-[#EAD5E5]/80 leading-relaxed font-sans">
-              Program szkoły rodzenia oparty o 4 Filary Spokoju HappyBirth i Standard Opieki Okołoporodowej. Czuła wiedza dla Ciebie i Twojej rodziny, do której wracacie w dowolnym momencie.
-            </p>
-
-            <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-[#EAD5E5]/70">
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#DD7C9D]" />
-                Pozostało do ukończenia: {remainingHours}h {remainingMins}min
-              </span>
-              <span>·</span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#FCD705]" />
-                {completedLessons.length} z 52 lekcji ukończonych
-              </span>
-            </div>
-          </div>
-
-          {/* Duży wskaźnik ukończenia */}
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md flex items-center gap-6 shrink-0">
-            <div className="relative w-20 h-20 flex items-center justify-center">
-              <svg className="w-20 h-20 -rotate-90" viewBox="0 0 36 36">
-                <path
-                  className="text-white/10"
-                  strokeWidth="3.5"
-                  stroke="currentColor"
-                  fill="none"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                />
-                <path
-                  className="text-[#DA0271] transition-all duration-1000 ease-out"
-                  strokeDasharray={`${percentCompleted}, 100`}
-                  strokeWidth="3.5"
-                  strokeLinecap="round"
-                  stroke="currentColor"
-                  fill="none"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                />
-              </svg>
-              <span className="absolute font-mono font-bold text-lg text-white">
-                {percentCompleted}%
-              </span>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-xs uppercase tracking-wider text-[#EAD5E5]/70 font-semibold">
-                Twój postęp
-              </div>
-              <div className="font-semibold text-xl text-white">
-                {completedLessons.length === 52 ? 'Kurs ukończony!' : `${52 - completedLessons.length} lekcji przed Tobą`}
-              </div>
-              <div className="text-[11px] text-[#EAD5E5]/70">
-                Certyfikat imienny po 100%
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Daily Tip Widget */}
-      <DailyTipCard />
-
-      {/* 2. GŁÓWNY ODTWARZACZ VOD (Kino Domowe HappyBirth & Interaktywna Playlista Etapu) */}
-      <section id="odtwarzacz" className="space-y-4 scroll-mt-24">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+      {/* 2. GŁÓWNY PLAYER NA SAMEJ GÓRZE (Kino Domowe & Playlista) */}
+      <section
+        ref={playerSectionRef}
+        id="odtwarzacz"
+        className="space-y-3.5 scroll-mt-20 pt-1"
+      >
+        {/* Nagłówek sekcji odtwarzacza z czytelnym modułem */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#DA0271] animate-pulse" />
             <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
-              Kino Domowe HappyBirth · Odtwarzacz VOD
+              Odtwarzacz Kursu · 4K Master VOD
+            </span>
+            <span className="text-xs text-[#867A72] dark:text-[#C4ADC0]">·</span>
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#DA0271]/10 text-[#DA0271] dark:bg-[#DA0271]/20 dark:text-[#FF4BA8]">
+              {getStageDisplayTitle(activeStage)}
             </span>
           </div>
 
           <div className="flex items-center gap-3 text-xs text-[#544A44] dark:text-[#D7CCC3]">
-            <span className="hidden md:inline">
-              Odtwarzasz: <strong>Lekcja {activeLesson.lessonNumber} z 52</strong> ({activeLesson.durationFormatted})
+            <span>
+              Lekcja <strong>{activeLesson.lessonNumber} z 52</strong> ({activeLesson.durationFormatted})
             </span>
             <Link
               href={`/strefa/lekcja/${activeLesson.id}`}
               className="font-semibold text-[#DA0271] hover:underline flex items-center gap-1"
+              title="Otwórz lekcję w trybie pełnoekranowym"
             >
-              <span>Pełny ekran lekcji</span>
+              <span>Pełny ekran</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* LEWA KOLUMNA: GŁÓWNY ODTWARZACZ VOD (8 cols) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          {/* LEWA KOLUMNA: WŁAŚCIWY ODTWARZACZ (8 cols) */}
           <div className="lg:col-span-8 space-y-4">
             <div className="rounded-3xl overflow-hidden shadow-2xl border border-[#461643] dark:border-[#3D0E39] bg-[#20071E]">
               <CloudflarePlayer
@@ -272,73 +221,85 @@ function StrefaDashboardContent() {
                 prevLesson={prevLesson}
                 nextLesson={nextLesson}
                 autoplay={shouldAutoplay}
-                onSelectLesson={handleSelectLesson}
+                onSelectLesson={(l) => handleSelectLesson(l)}
               />
             </div>
 
             {/* Karta szczegółów aktualnie odtwarzanej lekcji */}
-            <div className="bg-[#FFFDFA] dark:bg-[#1C081A] rounded-3xl p-6 sm:p-7 border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm space-y-4">
+            <div className="bg-[#FFFDFA] dark:bg-[#1C081A] rounded-3xl p-5 sm:p-6 border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm space-y-3.5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <span
-                    className="text-xs font-bold px-3 py-1 rounded-full"
-                    style={{ backgroundColor: activeStage?.tint, color: activeStage?.deep }}
+                    className="text-xs font-bold px-3 py-1 rounded-full shadow-xs"
+                    style={{ backgroundColor: activeStage?.tint || '#FAE3EB', color: activeStage?.deep || '#C80077' }}
                   >
-                    Etap {activeStage?.number}: {activeStage?.title}
+                    Moduł {parseInt(activeStage?.num || '1', 10)}: {getStageDisplayTitle(activeStage)}
                   </span>
                   <span className="text-xs text-[#867A72] dark:text-[#C4ADC0]">
                     Lekcja {activeLesson.lessonNumber} z 52 · {activeLesson.durationFormatted}
                   </span>
                 </div>
 
-                <button
-                  onClick={() => toggleLessonCompletion(activeLesson.id)}
-                  className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                    completedLessons.includes(activeLesson.id)
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
-                      : 'bg-[#FBF8F4] dark:bg-[#250A24] text-[#544A44] dark:text-[#D7CCC3] hover:text-[#DA0271] border border-[#EAE3DB] dark:border-[#3D0E39]'
-                  }`}
-                >
-                  <CheckCircle2 className={`w-4 h-4 ${completedLessons.includes(activeLesson.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-[#867A72]'}`} />
-                  <span>
-                    {completedLessons.includes(activeLesson.id) ? 'Lekcja ukończona ✓' : 'Oznacz jako ukończoną'}
-                  </span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => toggleLessonCompletion(activeLesson.id)}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                      completedLessons.includes(activeLesson.id)
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
+                        : 'bg-[#FBF8F4] dark:bg-[#250A24] text-[#544A44] dark:text-[#D7CCC3] hover:text-[#DA0271] border border-[#EAE3DB] dark:border-[#3D0E39]'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-3.5 h-3.5 ${completedLessons.includes(activeLesson.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-[#867A72]'}`} />
+                    <span>
+                      {completedLessons.includes(activeLesson.id) ? 'Ukończona ✓' : 'Oznacz jako ukończoną'}
+                    </span>
+                  </button>
+
+                  {nextLesson && (
+                    <button
+                      onClick={() => handleSelectLesson(nextLesson)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#DA0271] hover:bg-[#B90260] text-white text-xs font-semibold transition-colors cursor-pointer"
+                    >
+                      <span>Następna</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div>
-                <h2 className="font-brand-display text-2xl sm:text-3xl font-bold text-[#250A24] dark:text-[#FBF8F4]">
+                <h1 className="font-brand-display font-semibold text-xl sm:text-2xl text-[#250A24] dark:text-[#FBF8F4]">
                   {activeLesson.title}
-                </h2>
-                <p className="text-sm text-[#544A44] dark:text-[#D7CCC3] mt-2 leading-relaxed">
+                </h1>
+                <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3] mt-1.5 leading-relaxed">
                   {activeLesson.description}
                 </p>
               </div>
 
               {/* Materiały PDF do pobrania dla tej lekcji */}
               {activeLesson.attachments && activeLesson.attachments.length > 0 && (
-                <div className="pt-4 border-t border-[#EAE3DB] dark:border-[#3D0E39] space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0] flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-[#DA0271]" /> Materiały do tej lekcji (PDF)
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] space-y-2.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0] flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-[#DA0271]" /> Materiały do tej lekcji (PDF do druku):
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {activeLesson.attachments.map((att) => (
                       <div
                         key={att.id}
-                        className="p-3 rounded-2xl bg-[#FBF8F4] dark:bg-[#220820] border border-[#EAE3DB] dark:border-[#3D0E39] flex items-center justify-between gap-3 text-xs"
+                        className="p-2.5 rounded-xl bg-[#FBF8F4] dark:bg-[#220820] border border-[#EAE3DB] dark:border-[#3D0E39] flex items-center justify-between gap-2.5 text-xs"
                       >
-                        <div className="flex items-center space-x-2.5">
-                          <div className="w-7 h-7 rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 flex items-center justify-center font-bold text-[10px]">
+                        <div className="flex items-center space-x-2">
+                          <span className="w-6 h-6 rounded-md bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 flex items-center justify-center font-bold text-[9px]">
                             PDF
-                          </div>
+                          </span>
                           <div>
-                            <div className="font-semibold text-[#250A24] dark:text-[#FBF8F4]">{att.name}</div>
-                            <div className="text-[11px] text-[#867A72] dark:text-[#C4ADC0]">{att.size}</div>
+                            <div className="font-semibold text-[#250A24] dark:text-[#FBF8F4] text-xs">{att.name}</div>
+                            <div className="text-[10px] text-[#867A72] dark:text-[#C4ADC0]">{att.size}</div>
                           </div>
                         </div>
                         <button
                           onClick={() => alert(`Pobieranie materiału: ${att.name}`)}
-                          className="p-1.5 rounded-lg bg-white dark:bg-[#1C081A] hover:bg-[#DA0271] hover:text-white border border-[#EAE3DB] dark:border-[#3D0E39] transition-colors cursor-pointer text-[#250A24] dark:text-[#FBF8F4]"
+                          className="p-1 rounded-md bg-white dark:bg-[#1C081A] hover:bg-[#DA0271] hover:text-white border border-[#EAE3DB] dark:border-[#3D0E39] transition-colors cursor-pointer text-[#250A24] dark:text-[#FBF8F4]"
                           title="Pobierz PDF"
                         >
                           <Download className="w-3.5 h-3.5" />
@@ -351,15 +312,15 @@ function StrefaDashboardContent() {
             </div>
           </div>
 
-          {/* PRAWA KOLUMNA: PLAYLISTA ETAPU (4 cols) */}
-          <div className="lg:col-span-4 bg-[#FFFDFA] dark:bg-[#1C081A] rounded-3xl p-5 sm:p-6 border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE3DB] dark:border-[#3D0E39]">
+          {/* PRAWA KOLUMNA: PLAYLISTA Z WYBOREM TEMATYCZNYM (4 cols) */}
+          <div className="lg:col-span-4 bg-[#FFFDFA] dark:bg-[#1C081A] rounded-3xl p-4 sm:p-5 border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm space-y-3.5">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#EAE3DB] dark:border-[#3D0E39]">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#DA0271]">
-                  Playlista Etapu {activeStage?.number}
+                  Moduł {parseInt(activeStage?.num || '1', 10)} z 9
                 </span>
-                <h3 className="font-brand-display font-bold text-lg text-[#250A24] dark:text-[#FBF8F4] leading-tight">
-                  {activeStage?.title}
+                <h3 className="font-brand-display font-bold text-base text-[#250A24] dark:text-[#FBF8F4] leading-tight">
+                  {getStageDisplayTitle(activeStage)}
                 </h3>
               </div>
               <span className="text-xs font-mono font-semibold text-[#867A72] dark:text-[#C4ADC0]">
@@ -367,8 +328,8 @@ function StrefaDashboardContent() {
               </span>
             </div>
 
-            {/* Lista lekcji w aktywnym etapie */}
-            <div className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+            {/* Lista lekcji w aktywnym module */}
+            <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
               {activeStageLessons.map((l) => {
                 const isActive = l.id === activeLesson.id;
                 const isDone = completedLessons.includes(l.id);
@@ -377,13 +338,13 @@ function StrefaDashboardContent() {
                   <button
                     key={l.id}
                     onClick={() => handleSelectLesson(l)}
-                    className={`w-full text-left p-3 rounded-2xl border transition-all flex items-start gap-3 cursor-pointer ${
+                    className={`w-full text-left p-2.5 rounded-xl border transition-all flex items-start gap-2.5 cursor-pointer ${
                       isActive
-                        ? 'bg-[#DA0271]/10 dark:bg-[#DA0271]/20 border-[#DA0271] shadow-sm'
+                        ? 'bg-[#DA0271]/10 dark:bg-[#DA0271]/20 border-[#DA0271] shadow-xs'
                         : 'bg-[#FBF8F4] dark:bg-[#250A24] hover:bg-[#F3EBE3] dark:hover:bg-[#2F0D2E] border-[#EAE3DB] dark:border-[#3D0E39]'
                     }`}
                   >
-                    <div className="relative w-14 h-10 rounded-lg overflow-hidden shrink-0 bg-black/20 flex items-center justify-center">
+                    <div className="relative w-12 h-9 rounded-md overflow-hidden shrink-0 bg-black/20 flex items-center justify-center">
                       <Image
                         src={l.thumbnailUrl}
                         alt={l.title}
@@ -392,9 +353,9 @@ function StrefaDashboardContent() {
                       />
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                         {isActive ? (
-                          <span className="w-2.5 h-2.5 rounded-full bg-[#FCD705] animate-ping" />
+                          <span className="w-2 h-2 rounded-full bg-[#FCD705] animate-ping" />
                         ) : (
-                          <Play className="w-3.5 h-3.5 text-white fill-current ml-0.5" />
+                          <Play className="w-3 h-3 text-white fill-current ml-0.5" />
                         )}
                       </div>
                     </div>
@@ -409,7 +370,7 @@ function StrefaDashboardContent() {
                             {l.durationFormatted}
                           </span>
                           {isDone && (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
                           )}
                         </div>
                       </div>
@@ -429,42 +390,38 @@ function StrefaDashboardContent() {
               })}
             </div>
 
-            {/* Szybki przełącznik między etapami */}
-            <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] space-y-2">
-              <span className="text-[11px] font-medium text-[#867A72] dark:text-[#C4ADC0] block">
-                Przełącz na inny etap kursu:
+            {/* Szybki wybór modułów tematycznych (bez tajemniczego "etap etap") */}
+            <div className="pt-2.5 border-t border-[#EAE3DB] dark:border-[#3D0E39] space-y-2">
+              <span className="text-[11px] font-semibold text-[#867A72] dark:text-[#C4ADC0] block">
+                Zmień moduł tematyczny:
               </span>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="grid grid-cols-3 gap-1.5">
                 {stages.map((st) => {
-                  const isCurrentStage = st.id === activeLesson.stageId;
-                  const firstLessonOfStage = lessons.find((l) => l.stageId === st.id);
-
+                  const isCurrent = st.id === activeLesson.stageId;
                   return (
                     <button
                       key={st.id}
-                      onClick={() => {
-                        if (firstLessonOfStage) handleSelectLesson(firstLessonOfStage);
-                      }}
-                      className={`text-[11px] px-2.5 py-1 rounded-full font-medium transition-colors cursor-pointer ${
-                        isCurrentStage
-                          ? 'bg-[#250A24] text-white dark:bg-[#DA0271] shadow-xs'
+                      onClick={() => handleSelectStage(st)}
+                      className={`text-[10px] py-1.5 px-1 rounded-lg font-semibold transition-all truncate text-center cursor-pointer ${
+                        isCurrent
+                          ? 'bg-[#DA0271] text-white shadow-xs'
                           : 'bg-[#FBF8F4] dark:bg-[#250A24] hover:bg-[#EAE3DB] dark:hover:bg-[#3D0E39] text-[#544A44] dark:text-[#D7CCC3] border border-[#EAE3DB] dark:border-[#3D0E39]'
                       }`}
-                      title={st.title}
+                      title={getStageDisplayTitle(st)}
                     >
-                      Etap {st.number}
+                      {getStageShortBadge(st)}
                     </button>
                   );
                 })}
               </div>
 
-              <div className="pt-2">
+              <div className="pt-1">
                 <Link
                   href="/strefa/lekcje"
-                  className="w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-[#DA0271] hover:underline py-1.5"
+                  className="w-full flex items-center justify-center gap-1 text-xs font-semibold text-[#DA0271] hover:underline py-1"
                 >
                   <BookOpen className="w-3.5 h-3.5" />
-                  <span>Katalog wszystkich 52 lekcji &rarr;</span>
+                  <span>Katalog wszystkich 52 lekcji VOD &rarr;</span>
                 </Link>
               </div>
             </div>
@@ -472,108 +429,145 @@ function StrefaDashboardContent() {
         </div>
       </section>
 
-      {/* 3. SZYBKI DOSTĘP SOS (Licznik 5-1-1, Apteczka, Partner) */}
-      <div className="space-y-4">
+      {/* 3. KOMPAKTOWY PASEK STATUSU KURSANTKI */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#20071E] dark:bg-[#250A24] text-[#FCD705] flex items-center justify-center shrink-0">
+            {role === 'partner' ? <User className="w-5 h-5 text-[#7FB3CC]" /> : <Heart className="w-5 h-5 text-[#DA0271]" />}
+          </div>
+          <div>
+            <div className="text-xs font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0]">
+              Status Twojego Konta
+            </div>
+            <div className="font-brand-display font-semibold text-sm sm:text-base text-[#250A24] dark:text-[#FBF8F4]">
+              {role === 'partner' ? 'Strefa dla Partnera / Taty aktywna' : 'Strefa dla Mamy aktywna'} · Dostęp ważny 12 miesięcy dla dwojga
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs">
+          <div className="flex items-center gap-1.5 text-[#544A44] dark:text-[#D7CCC3]">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span><strong>{completedLessons.length}</strong> z 52 lekcji ukończonych ({percentCompleted}%)</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-[#544A44] dark:text-[#D7CCC3]">
+            <Clock className="w-4 h-4 text-[#DA0271]" />
+            <span>Pozostało: <strong>{remainingHours}h {remainingMins}min</strong></span>
+          </div>
+
+          <button
+            onClick={() => setWizardOpen(true)}
+            className="text-xs font-semibold text-[#DA0271] hover:underline cursor-pointer flex items-center gap-1 border-l border-[#EAE3DB] dark:border-[#3D0E39] pl-3"
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{pregnancyProfile?.dueDate ? 'Edytuj termin porodu' : 'Ustaw termin porodu'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 4. SZYBKIE NARZĘDZIA SOS (3 najważniejsze kafelki dla rodziców) */}
+      <section className="space-y-3.5">
         <div className="flex items-center justify-between">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
-              Niezbędnik na każdy dzień i noc
+              Praktyczny Niezbędnik Porodowy
             </span>
-            <h2 className="font-brand-display font-semibold text-2xl sm:text-3xl text-[#250A24] dark:text-[#FBF8F4] mt-0.5">
-              Narzędzia SOS
+            <h2 className="font-brand-display font-semibold text-xl sm:text-2xl text-[#250A24] dark:text-[#FBF8F4]">
+              Narzędzia SOS na każdy dzień i noc
             </h2>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Plan Porodu (PDF) */}
+          {/* Plan Porodu */}
           <Link
             href="/strefa/plan-porodu"
-            className="p-6 rounded-2xl bg-gradient-to-br from-[#DA0271] to-[#250A24] text-white flex flex-col justify-between min-h-[190px] shadow-sm hover:shadow-xl transition-all group"
+            className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#DA0271] to-[#250A24] text-white flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-lg transition-all group"
           >
             <div>
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-widest text-white/80">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">
                   Dokument do Szpitala
                 </span>
                 <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full font-mono font-bold">
                   PDF
                 </span>
               </div>
-              <h3 className="font-brand-display font-semibold text-2xl mt-2 text-white">
+              <h3 className="font-brand-display font-semibold text-xl mt-1.5 text-white">
                 Kreator Planu Porodu
               </h3>
-              <p className="text-xs text-white/90 mt-2 leading-relaxed">
-                Zgodny ze Standardem MZ. Zaznacz preferencje, wydrukuj i weź ze sobą na izbę przyjęć.
+              <p className="text-xs text-white/90 mt-1 leading-relaxed">
+                Zgodny ze Standardem Opieki MZ. Zaznacz preferencje, wydrukuj i weź na izbę przyjęć.
               </p>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-white/20 mt-4 text-xs font-semibold">
-              <span>Wypełnij plan porodu</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <div className="flex items-center justify-between pt-3 border-t border-white/20 mt-3 text-xs font-semibold">
+              <span>Wypełnij formularz planu</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
 
-          {/* Cyfrowa Apteczka SOS */}
+          {/* Cyfrowa Apteczka */}
           <Link
             href="/strefa/apteczka"
-            className="p-6 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] text-[#1A1512] dark:text-[#FBF8F4] flex flex-col justify-between min-h-[190px] shadow-sm hover:shadow-lg transition-all group"
+            className="p-5 sm:p-6 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] text-[#1A1512] dark:text-[#FBF8F4] flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-md transition-all group"
           >
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-[#DA0271]">
-                Szybka Pomoc
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#DA0271]">
+                Szybka Pomoc 24/7
               </span>
-              <h3 className="font-brand-display font-semibold text-2xl mt-2 text-[#250A24] dark:text-[#FBF8F4]">
-                Cyfrowa Apteczka
+              <h3 className="font-brand-display font-semibold text-xl mt-1.5 text-[#250A24] dark:text-[#FBF8F4]">
+                Cyfrowa Apteczka SOS
               </h3>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-2 leading-relaxed">
-                Wpisz dolegliwość (ból pleców, zgaga, wody, nawał) i przejdź bezpośrednio do instrukcji.
+              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-1 leading-relaxed">
+                Wpisz dolegliwość (ból pleców, zgaga, wody, nawał) i przejdź do nagrania z instrukcją.
               </p>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-4 text-xs font-semibold text-[#DA0271]">
+            <div className="flex items-center justify-between pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 text-xs font-semibold text-[#DA0271]">
               <span>Szukaj objawu</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
 
           {/* Strefa dla Taty */}
           <Link
             href="/strefa/partner"
-            className="p-6 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] text-[#1A1512] dark:text-[#FBF8F4] flex flex-col justify-between min-h-[190px] shadow-sm hover:shadow-lg transition-all group"
+            className="p-5 sm:p-6 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] text-[#1A1512] dark:text-[#FBF8F4] flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-md transition-all group"
           >
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-[#7FB3CC]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#7FB3CC]">
                 Wsparcie w Porodzie
               </span>
-              <h3 className="font-brand-display font-semibold text-2xl mt-2 text-[#250A24] dark:text-[#FBF8F4]">
+              <h3 className="font-brand-display font-semibold text-xl mt-1.5 text-[#250A24] dark:text-[#FBF8F4]">
                 Strefa dla Taty
               </h3>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-2 leading-relaxed">
-                Pigułka wiedzy dla partnera: masaż krzyżowy, torba, prawa na izbie i zadania na sali.
+              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-1 leading-relaxed">
+                Pigułka wiedzy dla osoby towarzyszącej: masaż krzyżowy, prawa na izbie i sala porodowa.
               </p>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-4 text-xs font-semibold text-[#250A24] dark:text-[#FBF8F4]">
-              <span>Otwórz ściągę dla taty</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <div className="flex items-center justify-between pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 text-xs font-semibold text-[#7FB3CC]">
+              <span>Ściąga dla partnera</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
         </div>
-      </div>
+      </section>
 
-      {/* 4. KOKPIT 9 ETAPÓW (Interaktywne kafelki postępu) */}
-      <div className="space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+      {/* 5. PRZEJRZYSTA ŚCIEŻKA 9 MODUŁÓW KURSU (Zamiast tajemniczego "etap etap") */}
+      <section className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0]">
-              Ścieżka edukacyjna
+              Pełny Program Szkoły Rodzenia
             </span>
-            <h2 className="font-brand-display font-semibold text-2xl sm:text-3xl text-[#250A24] dark:text-[#FBF8F4] mt-0.5">
-              9 Etapów Twojej Ciąży i Porodu
+            <h2 className="font-brand-display font-semibold text-xl sm:text-2xl text-[#250A24] dark:text-[#FBF8F4] mt-0.5">
+              9 Tematycznych Modułów Programu
             </h2>
-            <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3] mt-1">
-              Kliknij dowolny etap, aby zobaczyć lekcje wideo dopasowane do Twojego trymestru.
+            <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3] mt-0.5">
+              Kliknięcie modułu ładuje go w odtwarzaczu u góry z pierwszą nieukończoną lekcją.
             </p>
           </div>
 
@@ -581,7 +575,7 @@ function StrefaDashboardContent() {
             href="/strefa/lekcje"
             className="text-xs font-semibold text-[#DA0271] hover:underline flex items-center gap-1 self-start sm:self-auto"
           >
-            <span>Pokaż całą listę 52 lekcji</span>
+            <span>Katalog wszystkich 52 lekcji</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -599,27 +593,33 @@ function StrefaDashboardContent() {
               stageLessons.reduce((acc, curr) => acc + curr.durationSeconds, 0) / 60
             );
 
+            const isCurrentModule = stage.id === activeLesson.stageId;
+
             return (
-              <Link
+              <div
                 key={stage.id}
-                href={`/strefa/lekcje?stage=${stage.id}`}
-                className="group p-6 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] hover:shadow-md transition-all flex flex-col justify-between min-h-[220px]"
+                onClick={() => handleSelectStage(stage)}
+                className={`group p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border transition-all flex flex-col justify-between min-h-[210px] cursor-pointer hover:shadow-md ${
+                  isCurrentModule
+                    ? 'border-[#DA0271] ring-1 ring-[#DA0271]/50 shadow-xs'
+                    : 'border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271]/60'
+                }`}
               >
                 <div>
                   <div className="flex items-start justify-between">
                     <div
-                      className="w-11 h-11 transition-transform group-hover:scale-110"
+                      className="w-10 h-10 transition-transform group-hover:scale-105"
                       style={{ color: stage.deep }}
                     >
                       <StageIcon name={stage.id.replace('e-', '')} />
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <span
                         className="text-[10px] font-bold px-2 py-0.5 rounded-full"
                         style={{ backgroundColor: stage.tint, color: stage.deep }}
                       >
-                        Etap {stage.number}
+                        Moduł {stage.num}
                       </span>
                       {stagePercent === 100 && (
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -627,15 +627,15 @@ function StrefaDashboardContent() {
                     </div>
                   </div>
 
-                  <h3 className="font-brand-display font-semibold text-xl text-[#250A24] dark:text-[#FBF8F4] mt-4 group-hover:text-[#DA0271] transition-colors">
-                    {stage.title}
+                  <h3 className="font-brand-display font-semibold text-lg text-[#250A24] dark:text-[#FBF8F4] mt-3 group-hover:text-[#DA0271] transition-colors leading-snug">
+                    {getStageDisplayTitle(stage)}
                   </h3>
-                  <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-1 line-clamp-2">
-                    {stage.subtitle}
+                  <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-1 line-clamp-2 leading-relaxed">
+                    {getStageFullDescription(stage)}
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-4 space-y-2">
+                <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 space-y-2">
                   <div className="flex items-center justify-between text-[11px] text-[#867A72] dark:text-[#C4ADC0]">
                     <span>
                       {stageLessons.length} lekcji · {totalStageMins} min
@@ -655,157 +655,30 @@ function StrefaDashboardContent() {
                     />
                   </div>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* 5. 4 FILARY SPOKOJU HAPPYBIRTH & STANDARD MEDYCZNY */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-[#FBF8F4] dark:bg-[#170516] border border-[#EAE3DB] dark:border-[#3D0E39] space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#DA0271]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
-                Metodologia i fundament opieki
-              </span>
-            </div>
-            <h2 className="font-brand-display font-semibold text-2xl sm:text-3xl text-[#250A24] dark:text-[#FBF8F4] mt-1">
-              4 Filary Spokoju HappyBirth
-            </h2>
-            <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3] mt-1">
-              Oparte o 14 lat doświadczenia szkoły rodzenia Mama Gaja (od 2012 r.), 18 000 porodów i Standard Opieki Okołoporodowej MZ.
-            </p>
-          </div>
-
-          <Link
-            href="/standard-merytoryczny"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#DA0271] hover:bg-[#B90260] text-white text-xs font-semibold transition-all shrink-0 shadow-md shadow-[#DA0271]/25 hover:scale-105"
-          >
-            <ShieldCheck className="w-4 h-4 text-[#FCD705]" />
-            <span>Standard merytoryczny & E-E-A-T</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link
-            href="/strefa/lekcje?stage=stage-05"
-            className="p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DD7C9D] transition-all group flex flex-col justify-between"
-          >
-            <div className="space-y-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#FCF4F6] dark:bg-[#DA0271]/20 text-[#DD7C9D] flex items-center justify-center font-bold">
-                <Feather className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono font-bold text-[#867A72] dark:text-[#C4ADC0]">FILAR 01</span>
-                <h3 className="font-brand-display font-semibold text-base text-[#250A24] dark:text-[#FBF8F4] group-hover:text-[#DA0271] transition-colors">
-                  Poród & Oddech
-                </h3>
-              </div>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
-                Pozycje wertykalne, oddech przeponowy, niefarmakologiczne łagodzenie bólu i ochrona krocza.
-              </p>
-            </div>
-            <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 text-[11px] font-semibold text-[#DA0271] flex items-center justify-between">
-              <span>Zobacz lekcje porodu</span>
-              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-
-          <Link
-            href="/strefa/lekcje?stage=stage-03"
-            className="p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#E9C46A] transition-all group flex flex-col justify-between"
-          >
-            <div className="space-y-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#FDF9EE] dark:bg-[#E9C46A]/20 text-[#E9C46A] flex items-center justify-center font-bold">
-                <Activity className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono font-bold text-[#867A72] dark:text-[#C4ADC0]">FILAR 02</span>
-                <h3 className="font-brand-display font-semibold text-base text-[#250A24] dark:text-[#FBF8F4] group-hover:text-[#DA0271] transition-colors">
-                  Ciało & Dno Miednicy
-                </h3>
-              </div>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
-                Fizjoterapia uroginekologiczna, masaż krzyżowy z partnerem, mobilność miednicy i bezpieczny połóg.
-              </p>
-            </div>
-            <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 text-[11px] font-semibold text-[#250A24] dark:text-[#FBF8F4] flex items-center justify-between">
-              <span>Lekcje fizjoterapii</span>
-              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-
-          <Link
-            href="/strefa/lekcje?stage=stage-08"
-            className="p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#E79A62] transition-all group flex flex-col justify-between"
-          >
-            <div className="space-y-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#FCF5EF] dark:bg-[#E79A62]/20 text-[#E79A62] flex items-center justify-center font-bold">
-                <Heart className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono font-bold text-[#867A72] dark:text-[#C4ADC0]">FILAR 03</span>
-                <h3 className="font-brand-display font-semibold text-base text-[#250A24] dark:text-[#FBF8F4] group-hover:text-[#DA0271] transition-colors">
-                  Laktacja & Więź
-                </h3>
-              </div>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
-                Fizjologia karmienia, asymetryczny chwyt, nawały pokarmowe oraz czułe karmienie bez presji.
-              </p>
-            </div>
-            <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 text-[11px] font-semibold text-[#E79A62] flex items-center justify-between">
-              <span>Lekcje laktacji</span>
-              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-
-          <Link
-            href="/strefa/lekcje?stage=stage-09"
-            className="p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#7FB3CC] transition-all group flex flex-col justify-between"
-          >
-            <div className="space-y-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#F3F8FB] dark:bg-[#7FB3CC]/20 text-[#7FB3CC] flex items-center justify-center font-bold">
-                <Baby className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono font-bold text-[#867A72] dark:text-[#C4ADC0]">FILAR 04</span>
-                <h3 className="font-brand-display font-semibold text-base text-[#250A24] dark:text-[#FBF8F4] group-hover:text-[#DA0271] transition-colors">
-                  Noworodek & I Rok
-                </h3>
-              </div>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
-                Kąpiel noworodka, kikut pępowinowy, bezpieczny sen, pierwsza pomoc i zdrowy rozsądek o 3:00 w nocy.
-              </p>
-            </div>
-            <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 text-[11px] font-semibold text-[#7FB3CC] flex items-center justify-between">
-              <span>Opieka nad dzieckiem</span>
-              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* 6. PLIKI I CHECKLISTY DO POBRANIA */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#EAE3DB] dark:border-[#3D0E39]">
+      {/* 6. PLIKI I CHECKLISTY DO POBRANIA (PDF) */}
+      <section className="p-5 sm:p-6 rounded-3xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-4 border-b border-[#EAE3DB] dark:border-[#3D0E39]">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
-              Pliki do druku i na telefon
+              Pliki do druku A4 i na telefon
             </span>
-            <h2 className="font-brand-display font-semibold text-2xl text-[#250A24] dark:text-[#FBF8F4] mt-0.5">
-              Materiały do pobrania
+            <h2 className="font-brand-display font-semibold text-xl text-[#250A24] dark:text-[#FBF8F4] mt-0.5">
+              Materiały i szablony do pobrania (PDF)
             </h2>
           </div>
           <span className="text-xs text-[#867A72] dark:text-[#C4ADC0]">
-            Formaty PDF przygotowane do druku A4
+            Formaty PDF gotowe do druku
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6">
-          <div className="p-4 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-4">
+          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-[#DA0271] uppercase tracking-wider">
                 PDF · 2 strony
@@ -815,13 +688,13 @@ function StrefaDashboardContent() {
                 16 kluczowych punktów do przekazania położnej na izbie przyjęć.
               </p>
             </div>
-            <Link href="/strefa/plan-porodu" className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#DA0271] hover:underline">
+            <Link href="/strefa/plan-porodu" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#DA0271] hover:underline">
               <Download className="w-3.5 h-3.5" />
               <span>Otwórz wzór PDF</span>
             </Link>
           </div>
 
-          <div className="p-4 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
+          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-[#DA0271] uppercase tracking-wider">
                 PDF · 3 strefy
@@ -831,13 +704,16 @@ function StrefaDashboardContent() {
                 Pakowanie: dokumenty, strefa porodu, strefa połogu i noworodka.
               </p>
             </div>
-            <button className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] dark:text-[#FBF8F4] hover:text-[#DA0271] cursor-pointer">
+            <button
+              onClick={() => alert('Pobieranie: Torba do szpitala (PDF)')}
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] dark:text-[#FBF8F4] hover:text-[#DA0271] cursor-pointer"
+            >
               <Download className="w-3.5 h-3.5" />
               <span>Pobierz checklistę</span>
             </button>
           </div>
 
-          <div className="p-4 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
+          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-[#DA0271] uppercase tracking-wider">
                 PDF · Kalendarz
@@ -847,13 +723,16 @@ function StrefaDashboardContent() {
                 Tabela badań laboratoryjnych i USG wg Standardu Opieki Okołoporodowej.
               </p>
             </div>
-            <button className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] dark:text-[#FBF8F4] hover:text-[#DA0271] cursor-pointer">
+            <button
+              onClick={() => alert('Pobieranie: Badania w ciąży (PDF)')}
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] dark:text-[#FBF8F4] hover:text-[#DA0271] cursor-pointer"
+            >
               <Download className="w-3.5 h-3.5" />
               <span>Pobierz kalendarz</span>
             </button>
           </div>
 
-          <div className="p-4 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#7FB3CC] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
+          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#7FB3CC] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-[#7FB3CC] uppercase tracking-wider">
                 PDF · Ściąga
@@ -863,15 +742,15 @@ function StrefaDashboardContent() {
                 Ściąga na porodówkę: punkty ucisku, pozycje i zadania osoby towarzyszącej.
               </p>
             </div>
-            <Link href="/strefa/partner" className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#7FB3CC] hover:underline">
+            <Link href="/strefa/partner" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#7FB3CC] hover:underline">
               <Download className="w-3.5 h-3.5" />
               <span>Pobierz ściągę</span>
             </Link>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* MODAL ONBOARDINGU / PERSONALIZACJI */}
+      {/* MODAL ONBOARDINGU / PERSONALIZACJI TERMINU */}
       <OnboardingWizard
         isOpen={wizardOpen}
         onClose={() => setWizardOpen(false)}
