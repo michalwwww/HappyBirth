@@ -74,12 +74,5 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     return Response.redirect(`https://partnerzy.happybirth.pl${url.pathname.replace(/^\/partnerzy/, '') || '/'}`, 302);
   }
 
-  // Przepisz stronę główną / na stronę lifestylowo-marketingową /marketing
-  if (url.pathname === '/' || url.pathname === '') {
-    const targetUrl = new URL(url.toString());
-    targetUrl.pathname = '/marketing';
-    return context.env.ASSETS.fetch(targetUrl);
-  }
-
   return context.next();
 }

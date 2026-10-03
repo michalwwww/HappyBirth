@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
             product_data: {
               name: 'Edukacyjny Kurs Online HappyBirth (52 Lekcje VOD dla Dwojga)',
               description: 'Dostęp edukacyjny e-learning na 12 miesięcy dla dwojga: 52 lekcje wideo, Notatnik Rodzica PDF i Strefa dla Taty.',
+              tax_code: 'txcd_10000000',
             },
             unit_amount: 48900, // 489.00 PLN
           },
