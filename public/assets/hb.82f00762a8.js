@@ -129,16 +129,184 @@ window.SuwakEtapow = (function () {
     return e;
   }
 
+  /* Pełny słownik wielojęzyczny dla suwaka i kafelków etapów */
+  var SUWAK_I18N = {
+    pl: {
+      etykieta: 'Przesuń suwak na swój obecny tydzień ciąży',
+      meta: '{podpis} · etap {nr} z 4',
+      stopka: 'Suwak działa bezpośrednio w Twojej przeglądarce. Nie pytamy o termin i nie zapisujemy danych wrażliwych.',
+      skala: ['Tydzień 1', 'Dzień zero', 'Pierwsze urodziny'],
+      rekLabel: 'W Twoim obecnym tygodniu zacznij od filmu:',
+      podpisTydz: 'Tydzień {n} ciąży',
+      podpisMies: 'Miesiąc {n} z dzieckiem',
+      stages: [
+        {
+          nazwa: 'Dwie kreski',
+          zakres: 'tydzień 1 do 13',
+          moduly: [
+            { tytul: 'Moduł 1. Twoja ciąża tydzień po tygodniu', meta: '5 lekcji · 18 min' },
+            { tytul: 'Moduł 2. Zdrowie, profilaktyka i samopoczucie', meta: '7 lekcji · 34 min' }
+          ]
+        },
+        {
+          nazwa: 'Wreszcie lepiej',
+          zakres: 'tydzień 14 do 27',
+          moduly: [
+            { tytul: 'Moduł 3. Komfort i aktywność na co dzień', meta: '6 lekcji · 38 min' }
+          ]
+        },
+        {
+          nazwa: 'Torba spakowana',
+          zakres: 'tydzień 28 do porodu',
+          moduly: [
+            { tytul: 'Moduł 4. Projekt „Gniazdo”, wyprawka i pokój dziecka', meta: '7 lekcji · 44 min' },
+            { tytul: 'Moduł 5. Godzina „Zero”, świadomy i aktywny poród', meta: '9 lekcji · 54 min' }
+          ]
+        },
+        {
+          nazwa: 'Pierwszy rok',
+          zakres: 'od dnia zero do pierwszych urodzin',
+          moduly: [
+            { tytul: 'Moduł 6. Połóg, regeneracja i fizjoterapia mamy', meta: '5 lekcji · 32 min' },
+            { tytul: 'Moduł 7. Opieka nad noworodkiem i bezpieczeństwo', meta: '9 lekcji · 44 min' }
+          ]
+        }
+      ],
+      rek: function (v) {
+        if (v <= 280) {
+          var tydz = Math.max(1, Math.ceil(v / 7));
+          if (tydz <= 13) return 'Lekcja 1: „Początek nowego życia i pierwsze tygodnie” oraz Lekcja 2: „Kalendarz badań w I trymestrze”';
+          if (tydz <= 20) return 'Lekcja 6: „Kiedy i jak rozpocząć przygotowania” oraz Lekcja 13: „Komfort, sen i pozycje odciążające ciało”';
+          if (tydz <= 27) return 'Lekcja 14: „Aktywność fizyczna i ćwiczenia z fizjoterapeutką” oraz Lekcja 16: „Zdrowa dieta i profilaktyka”';
+          if (tydz <= 34) return 'Lekcja 19: „Wyprawka bez chaosu – co naprawdę kupić” oraz Lekcja 20: „Bezpieczny fotelik i wózek”';
+          return 'Lekcja 26: „Godzina Zero: zwiastuny porodu, skurcze i torba” oraz Lekcja 28: „Oddech i pozycje wertykalne”';
+        }
+        var mies = Math.max(1, Math.ceil((v - 280) / 30.44));
+        if (mies <= 3) return 'Lekcja 35: „Pierwsze 48 godzin, bezpieczna kąpiel i pielęgnacja noworodka” oraz Lekcja 44: „Połóg i regeneracja”';
+        return 'Lekcja 48: „Karmienie i laktacja bez bólu” oraz Lekcja 50: „Bezpieczny sen i rozwój w 1. roku życia”';
+      }
+    },
+    en: {
+      etykieta: 'Move the slider to your current pregnancy week',
+      meta: '{podpis} · stage {nr} of 4',
+      stopka: 'The slider runs entirely in your browser without saving any personal data.',
+      skala: ['Week 1', 'Day Zero', 'First Birthday'],
+      rekLabel: 'In your current week, start with:',
+      podpisTydz: 'Pregnancy week {n}',
+      podpisMies: 'Month {n} with baby',
+      stages: [
+        {
+          nazwa: 'Two Lines',
+          zakres: 'weeks 1 to 13',
+          moduly: [
+            { tytul: 'Module 1. Pregnancy week by week', meta: '5 lessons · 18 min' },
+            { tytul: 'Module 2. Health, prevention and wellbeing', meta: '7 lessons · 34 min' }
+          ]
+        },
+        {
+          nazwa: 'Finally Better',
+          zakres: 'weeks 14 to 27',
+          moduly: [
+            { tytul: 'Module 3. Comfort and daily activity', meta: '6 lessons · 38 min' }
+          ]
+        },
+        {
+          nazwa: 'Hospital Bag',
+          zakres: 'week 28 to birth',
+          moduly: [
+            { tytul: 'Module 4. Nesting, layette and nursery', meta: '7 lessons · 44 min' },
+            { tytul: 'Module 5. Hour Zero: mindful & active labor', meta: '9 lessons · 54 min' }
+          ]
+        },
+        {
+          nazwa: 'First Year',
+          zakres: 'from birth to 1st birthday',
+          moduly: [
+            { tytul: 'Module 6. Postpartum recovery & physiotherapy', meta: '5 lessons · 32 min' },
+            { tytul: 'Module 7. Newborn care and safety', meta: '9 lessons · 44 min' }
+          ]
+        }
+      ],
+      rek: function (v) {
+        if (v <= 280) {
+          var tydz = Math.max(1, Math.ceil(v / 7));
+          if (tydz <= 13) return 'Lesson 1: "Beginning of a New Life and First Weeks" & Lesson 2: "First Trimester Tests Schedule"';
+          if (tydz <= 20) return 'Lesson 6: "When and How to Start Preparing" & Lesson 13: "Comfort, Sleep and Relieving Postures"';
+          if (tydz <= 27) return 'Lesson 14: "Physical Activity with a Physical Therapist" & Lesson 16: "Healthy Diet and Wellness"';
+          if (tydz <= 34) return 'Lesson 19: "Layette Without Chaos – What to Actually Buy" & Lesson 20: "Safe Stroller and Car Seat"';
+          return 'Lesson 26: "Hour Zero: Labor Signs, Contractions and Hospital Bag" & Lesson 28: "Breathing and Upright Postures"';
+        }
+        var mies = Math.max(1, Math.ceil((v - 280) / 30.44));
+        if (mies <= 3) return 'Lesson 35: "First 48 Hours, Safe Bathing and Newborn Care" & Lesson 44: "Postpartum Recovery"';
+        return 'Lesson 48: "Comfortable Breastfeeding" & Lesson 50: "Safe Sleep and Development in the 1st Year"';
+      }
+    },
+    ru: {
+      etykieta: 'Передвиньте ползунок на вашу текущую неделю беременности',
+      meta: '{podpis} · этап {nr} из 4',
+      stopka: 'Ползунок работает прямо в браузере без сохранения личных данных.',
+      skala: ['Неделя 1', 'День Ноль', 'Первый Год'],
+      rekLabel: 'На вашем текущем сроке начните с урока:',
+      podpisTydz: 'Неделя {n} беременности',
+      podpisMies: 'Месяц {n} с ребенком',
+      stages: [
+        {
+          nazwa: 'Две полоски',
+          zakres: 'недели 1–13',
+          moduly: [
+            { tytul: 'Модуль 1. Беременность неделя за неделей', meta: '5 уроков · 18 мин' },
+            { tytul: 'Модуль 2. Здоровье и самочувствие', meta: '7 уроков · 34 мин' }
+          ]
+        },
+        {
+          nazwa: 'Второй триместр',
+          zakres: 'недели 14–27',
+          moduly: [
+            { tytul: 'Модуль 3. Комфорт и активность на каждый день', meta: '6 уроков · 38 мин' }
+          ]
+        },
+        {
+          nazwa: 'Сумка в роддом',
+          zakres: 'неделя 28 – роды',
+          moduly: [
+            { tytul: 'Модуль 4. Приданое, покупки и детская комната', meta: '7 уроков · 44 мин' },
+            { tytul: 'Модуль 5. Час Ноль: осознанные и активные роды', meta: '9 уроков · 54 мин' }
+          ]
+        },
+        {
+          nazwa: 'Первый год',
+          zakres: 'от родов до 1 года',
+          moduly: [
+            { tytul: 'Модуль 6. Послеродовой период и восстановление', meta: '5 уроков · 32 мин' },
+            { tytul: 'Модуль 7. Уход за новорожденным и безопасность', meta: '9 уроков · 44 мин' }
+          ]
+        }
+      ],
+      rek: function (v) {
+        if (v <= 280) {
+          var tydz = Math.max(1, Math.ceil(v / 7));
+          if (tydz <= 13) return 'Урок 1: «Начало новой жизни и первые недели» и Урок 2: «Календарь анализов в I триместре»';
+          if (tydz <= 20) return 'Урок 6: «Когда и как начинать подготовку» и Урок 13: «Комфорт, сон и разгрузка тела»';
+          if (tydz <= 27) return 'Урок 14: «Физическая активность и упражнения с физиотерапевтом» и Урок 16: «Питание и профилактика»';
+          if (tydz <= 34) return 'Урок 19: «Приданое без хаоса – что действительно нужно» и Урок 20: «Безопасная коляска и автокресло»';
+          return 'Урок 26: «Час Ноль: предвестники родов, схватки и сумка» и Урок 28: «Дыхание и вертикальные позы»';
+        }
+        var mies = Math.max(1, Math.ceil((v - 280) / 30.44));
+        if (mies <= 3) return 'Урок 35: «Первые 48 часов, безопасное купание и уход» и Урок 44: «Послеродовое восстановление»';
+        return 'Урок 48: «Грудное вскармливание без боли» и Урок 50: «Безопасный сон и развитие в 1-й год»';
+      }
+    }
+  };
+
   function utworz(host, kon) {
     if (!host || !kon || !kon.etapy.length) return null;
     var poz = pozycje(kon);
     var m = mapa(kon, poz);
     var koniec = m.length ? m[m.length - 1].x + m[m.length - 1].w : 1000;
-    var tydzienJedn = koniec / Math.max(1, kon.dniRazem || 645) * 7;   // tydzień w jednostkach wstęgi
+    var tydzienJedn = koniec / Math.max(1, kon.dniRazem || 645) * 7;
     var id = 'se-suwak-' + Math.random().toString(36).slice(2, 8);
 
     host.classList.add('se');
-    /* Cała konstrukcja powstaje w odłączonym fragmencie: jedno dołożenie do strony, jeden układ. */
     var frag = document.createDocumentFragment();
     var gora = el('div', 'se-gora', frag);
     var nr = el('div', 'se-nr', gora);
@@ -153,7 +321,6 @@ window.SuwakEtapow = (function () {
 
     var etykieta = el('label', 'se-etykieta', frag);
     etykieta.setAttribute('for', id);
-    etykieta.textContent = kon.teksty.etykieta || '';
 
     var suwak = el('input', 'se-suwak', frag);
     suwak.id = id;
@@ -177,104 +344,64 @@ window.SuwakEtapow = (function () {
     var znacznik = el('span', 'se-znacznik', wstega);
     znacznik.setAttribute('aria-hidden', 'true');
 
-    if (kon.skala && kon.skala.length) {
-      var skala = el('div', 'se-skala', frag);
-      skala.setAttribute('aria-hidden', 'true');
-      kon.skala.forEach(function (s) { el('span', '', skala).textContent = s; });
-    }
+    var skala = el('div', 'se-skala', frag);
+    skala.setAttribute('aria-hidden', 'true');
+    el('span', '', skala);
+    el('span', '', skala);
+    el('span', '', skala);
+
     var opis = el('ul', 'se-moduly', frag);
-    if (kon.teksty.stopka) el('p', 'se-stopka', frag).textContent = kon.teksty.stopka;
+    var stopkaEl = el('p', 'se-stopka', frag);
 
     function rysuj() {
+      var lang = document.documentElement.lang || localStorage.getItem('hb_lang') || 'pl';
+      if (lang !== 'pl' && lang !== 'en' && lang !== 'ru') lang = 'pl';
+      var dict = SUWAK_I18N[lang] || SUWAK_I18N.pl;
+
+      // 1. Etykieta i stopka
+      etykieta.textContent = dict.etykieta;
+      stopkaEl.textContent = dict.stopka;
+
+      // 2. Skala na dole
+      var spans = skala.querySelectorAll('span');
+      if (spans.length >= 3) {
+        spans[0].textContent = dict.skala[0];
+        spans[1].textContent = dict.skala[1];
+        spans[2].textContent = dict.skala[2];
+      }
+
+      // 3. Pozycja i kalkulacja etapu
       var x = Number(suwak.value);
       var v = dzienDla(m, x);
       var i = etapDla(kon, v), e = kon.etapy[i];
       var pasmo = kon.pasma.filter(function (p) { return p.id === e.pasmo; })[0] || {};
-      var podpis = podpisDla(e, v);
+
+      var wzorPodpis = e.jednostka === 'miesiac' ? dict.podpisMies : dict.podpisTydz;
+      var n = v;
+      if (e.jednostka === 'tydzien') n = Math.max(1, Math.ceil(v / 7));
+      if (e.jednostka === 'miesiac') n = Math.max(1, Math.ceil((v - (e.baza || 0)) / 30.44));
+      var podpis = wzorPodpis.replace('{n}', n);
 
       host.style.setProperty('--se-kolor', pasmo.kolorCzysty || pasmo.kolor || 'currentColor');
       nr.textContent = podpis.replace(/[^0-9]/g, '');
-      meta.textContent = (kon.teksty.meta || '')
-        .replace('{podpis}', podpis).replace('{nr}', String(i + 1));
-      nazwa.textContent = e.nazwa || '';
+      meta.textContent = dict.meta.replace('{podpis}', podpis).replace('{nr}', String(i + 1));
+
+      // 4. Nazwa etapu i moduły wewnątrz suwaka
+      var stg = dict.stages[i] || dict.stages[0];
+      nazwa.textContent = stg.nazwa;
       opis.textContent = '';
-      (e.moduly || []).forEach(function (m) {
+      (stg.moduly || []).forEach(function (mod) {
         var li = el('li', '', opis);
-        el('b', '', li).textContent = m.tytul;
-        el('span', '', li).textContent = m.meta;
+        el('b', '', li).textContent = mod.tytul;
+        el('span', '', li).textContent = mod.meta;
       });
 
-      /* Dynamiczna sugestia filmu w zależności od konkretnego tygodnia ciąży i wybranego języka */
-      var lang = document.documentElement.lang || 'pl';
-      var rekTekst = '';
-      if (v <= 280) {
-        var tydz = Math.max(1, Math.ceil(v / 7));
-        if (tydz <= 13) {
-          if (lang === 'en') {
-            rekTekst = 'Lesson 1: "Beginning of a New Life and First Weeks" & Lesson 2: "First Trimester Tests Schedule"';
-          } else if (lang === 'ru') {
-            rekTekst = 'Урок 1: «Начало новой жизни и первые недели» и Урок 2: «Календарь анализов в I триместре»';
-          } else {
-            rekTekst = 'Lekcja 1: „Początek nowego życia i pierwsze tygodnie” oraz Lekcja 2: „Kalendarz badań w I trymestrze”';
-          }
-        } else if (tydz <= 20) {
-          if (lang === 'en') {
-            rekTekst = 'Lesson 6: "When and How to Start Preparing" & Lesson 13: "Comfort, Sleep and Relieving Postures"';
-          } else if (lang === 'ru') {
-            rekTekst = 'Урок 6: «Когда и как начинать подготовку» и Урок 13: «Комфорт, сон и разгрузка тела»';
-          } else {
-            rekTekst = 'Lekcja 6: „Kiedy i jak rozpocząć przygotowania” oraz Lekcja 13: „Komfort, sen i pozycje odciążające ciało”';
-          }
-        } else if (tydz <= 27) {
-          if (lang === 'en') {
-            rekTekst = 'Lesson 14: "Physical Activity with a Physical Therapist" & Lesson 16: "Healthy Diet and Wellness"';
-          } else if (lang === 'ru') {
-            rekTekst = 'Урок 14: «Физическая активность и упражнения с физиотерапевтом» и Урок 16: «Питание и профилактика»';
-          } else {
-            rekTekst = 'Lekcja 14: „Aktywność fizyczna i ćwiczenia z fizjoterapeutką” oraz Lekcja 16: „Zdrowa dieta i profilaktyka”';
-          }
-        } else if (tydz <= 34) {
-          if (lang === 'en') {
-            rekTekst = 'Lesson 19: "Layette Without Chaos – What to Actually Buy" & Lesson 20: "Safe Stroller and Car Seat"';
-          } else if (lang === 'ru') {
-            rekTekst = 'Урок 19: «Приданое без хаоса – что действительно нужно» и Урок 20: «Безопасная коляска и автокресло»';
-          } else {
-            rekTekst = 'Lekcja 19: „Wyprawka bez chaosu – co naprawdę kupić” oraz Lekcja 20: „Bezpieczny fotelik i wózek”';
-          }
-        } else {
-          if (lang === 'en') {
-            rekTekst = 'Lesson 26: "Hour Zero: Labor Signs, Contractions and Hospital Bag" & Lesson 28: "Breathing and Upright Postures"';
-          } else if (lang === 'ru') {
-            rekTekst = 'Урок 26: «Час Ноль: предвестники родов, схватки и сумка» и Урок 28: «Дыхание и вертикальные позы»';
-          } else {
-            rekTekst = 'Lekcja 26: „Godzina Zero: zwiastuny porodu, skurcze i torba” oraz Lekcja 28: „Oddech i pozycje wertykalne”';
-          }
-        }
-      } else {
-        var mies = Math.max(1, Math.ceil((v - 280) / 30.44));
-        if (mies <= 3) {
-          if (lang === 'en') {
-            rekTekst = 'Lesson 35: "First 48 Hours, Safe Bathing and Newborn Care" & Lesson 44: "Postpartum Recovery"';
-          } else if (lang === 'ru') {
-            rekTekst = 'Урок 35: «Первые 48 часов, безопасное купание и уход» и Урок 44: «Послеродовое восстановление»';
-          } else {
-            rekTekst = 'Lekcja 35: „Pierwsze 48 godzin, bezpieczna kąpiel i pielęgnacja noworodka” oraz Lekcja 44: „Połóg i regeneracja”';
-          }
-        } else {
-          if (lang === 'en') {
-            rekTekst = 'Lesson 48: "Comfortable Breastfeeding" & Lesson 50: "Safe Sleep and Development in the 1st Year"';
-          } else if (lang === 'ru') {
-            rekTekst = 'Урок 48: «Грудное вскармливание без боли» и Урок 50: «Безопасный сон и развитие в 1-й год»';
-          } else {
-            rekTekst = 'Lekcja 48: „Karmienie i laktacja bez bólu” oraz Lekcja 50: „Bezpieczny sen i rozwój w 1. roku życia”';
-          }
-        }
-      }
-      var labelText = lang === 'en' ? 'In your current week, start with:' : lang === 'ru' ? 'На вашем текущем сроке начните с урока:' : 'W Twoim obecnym tygodniu zacznij od filmu:';
-      rekBox.innerHTML = '<span class="se-rek-label">' + labelText + '</span><span class="se-rek-film">' + rekTekst + '</span>';
+      // 5. Dynamiczna sugestia filmu
+      var rekTekst = dict.rek(v);
+      rekBox.innerHTML = '<span class="se-rek-label">' + dict.rekLabel + '</span><span class="se-rek-film">' + rekTekst + '</span>';
 
       znacznik.style.left = (x / 10).toFixed(3) + '%';
-      suwak.setAttribute('aria-valuetext', podpis + (e.nazwa ? ', ' + e.nazwa : ''));
+      suwak.setAttribute('aria-valuetext', podpis + ', ' + stg.nazwa);
       Object.keys(segmenty).forEach(function (k) {
         segmenty[k].classList.toggle('se-akt', k === e.pasmo);
       });
@@ -284,13 +411,27 @@ window.SuwakEtapow = (function () {
           c.classList.toggle('akt', c.getAttribute('data-etap') === String(i + 1));
         });
       }
+
+      // 6. Synchronizacja kafelków etapów poniżej suwaka
+      var pasmaNodes = document.querySelectorAll('.pasmo');
+      pasmaNodes.forEach(function (pEl, pIdx) {
+        if (dict.stages[pIdx]) {
+          var h3 = pEl.querySelector('h3');
+          if (h3) h3.textContent = dict.stages[pIdx].nazwa;
+          var zak = pEl.querySelector('.zakres');
+          if (zak) zak.textContent = dict.stages[pIdx].zakres;
+          var links = pEl.querySelectorAll('ul li a');
+          if (links.length >= 1 && dict.stages[pIdx].moduly[0]) {
+            links[0].textContent = dict.stages[pIdx].moduly[0].tytul;
+          }
+          if (links.length >= 2 && dict.stages[pIdx].moduly[1]) {
+            links[1].textContent = dict.stages[pIdx].moduly[1].tytul;
+          }
+        }
+      });
     }
 
-    /* Płynne ciągnięcie: w czasie przeciągania znacznik idzie bez animacji, za palcem.
-       Po puszczeniu i przy klawiaturze wraca miękkie dojście. */
     suwak.addEventListener('input', rysuj);
-    /* Krok wstęgi to ułamek dnia, więc strzałka przestawiałaby o pół dnia.
-       Przejmujemy klawisze i chodzimy tygodniami, bo tak czyta się ta mapa. */
     suwak.addEventListener('keydown', function (e2) {
       var kroki = { ArrowLeft: -1, ArrowRight: 1, ArrowDown: -1, ArrowUp: 1, PageDown: -4, PageUp: 4 };
       if (e2.key in kroki) {
@@ -307,34 +448,25 @@ window.SuwakEtapow = (function () {
     ['pointerup', 'pointercancel', 'blur'].forEach(function (z) {
       suwak.addEventListener(z, function () { host.removeAttribute('data-ciagnie'); });
     });
+
+    // Reakcja suwaka na natychmiastową zmianę języka na stronie
+    window.addEventListener('hb_lang_updated', rysuj);
+
     rysuj();
     host.textContent = '';
     host.appendChild(frag);
-    return { host: host, ustaw: function (v) { suwak.value = v; rysuj(); }, wartosc: function () { return Number(suwak.value); } };
+    return { host: host, ustaw: function (v) { suwak.value = v; rysuj(); }, wartosc: function () { return Number(suwak.value); }, odswiez: rysuj };
   }
 
-  /* Suwak jest pod pierwszym ekranem, więc budujemy go, gdy przeglądarka ma wolną chwilę.
-     Do tego czasu w jego miejscu stoi tekst zapasowy, ten sam co przy wyłączonym skrypcie. */
   var zrodlo = document.getElementById('konfig-suwak');
   var miejsce = document.getElementById('suwak');
   if (zrodlo && miejsce) {
     var start = function () {
       try { utworz(miejsce, JSON.parse(zrodlo.textContent)); }
-      catch (e) { /* zostaje tekst zapasowy */ }
+      catch (e) {}
     };
     if (window.requestIdleCallback) requestIdleCallback(start, { timeout: 1200 });
     else setTimeout(start, 200);
-
-    /* Dynamiczne odświeżenie suwaka przy zmianie języka strony */
-    window.addEventListener('hb_lang_updated', function () {
-      setTimeout(function () {
-        var freshZrodlo = document.getElementById('konfig-suwak');
-        if (freshZrodlo && miejsce) {
-          try { utworz(miejsce, JSON.parse(freshZrodlo.textContent)); }
-          catch (e) {}
-        }
-      }, 50);
-    });
   }
   return { utworz: utworz };
 })();
