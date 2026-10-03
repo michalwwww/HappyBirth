@@ -24,6 +24,8 @@ interface CloudflarePlayerProps {
   onToggleComplete: () => void;
   prevLesson?: Lesson;
   nextLesson?: Lesson;
+  autoplay?: boolean;
+  onSelectLesson?: (lesson: Lesson) => void;
 }
 
 export function CloudflarePlayer({
@@ -32,6 +34,8 @@ export function CloudflarePlayer({
   onToggleComplete,
   prevLesson,
   nextLesson,
+  autoplay,
+  onSelectLesson,
 }: CloudflarePlayerProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -55,7 +59,7 @@ export function CloudflarePlayer({
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
 
   // Czy film ma wystartować automatycznie
-  const shouldAutoplay = searchParams?.get('autoplay') === 'true';
+  const shouldAutoplay = autoplay ?? (searchParams?.get('autoplay') === 'true');
 
   useEffect(() => {
     if (lesson.isFreePreview || role === 'student' || role === 'partner' || isUnlockedLocally) {
@@ -169,7 +173,11 @@ export function CloudflarePlayer({
 
     if (autoNextCountdown <= 0) {
       if (nextLesson) {
-        router.push(`${prefix}/lekcja/${nextLesson.id}?autoplay=true`);
+        if (onSelectLesson) {
+          onSelectLesson(nextLesson);
+        } else {
+          router.push(`${prefix}/lekcja/${nextLesson.id}?autoplay=true`);
+        }
       }
       setAutoNextCountdown(null);
       return;

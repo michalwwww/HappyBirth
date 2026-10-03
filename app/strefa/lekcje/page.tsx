@@ -42,10 +42,10 @@ function StrefaLessonsContent() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#EADFD3] pb-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#EAE3DB] dark:border-[#3D0E39] pb-8">
         <div>
-          <div className="flex items-center space-x-2 text-xs text-[#867A72] mb-2">
-            <Link href="/strefa" className="hover:text-[#4A3A5E] transition-colors flex items-center gap-1">
+          <div className="flex items-center space-x-2 text-xs text-[#867A72] dark:text-[#C4ADC0] mb-2">
+            <Link href="/strefa" className="hover:text-[#250A24] dark:hover:text-[#FBF8F4] transition-colors flex items-center gap-1">
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Wróć do kokpitu</span>
             </Link>
@@ -53,22 +53,22 @@ function StrefaLessonsContent() {
           <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
             Kompletny program edukacyjny
           </span>
-          <h1 className="font-semibold text-3xl sm:text-5xl text-[#4A3A5E] mt-1">
+          <h1 className="font-brand-display font-semibold text-3xl sm:text-5xl text-[#250A24] dark:text-[#FBF8F4] mt-1">
             52 Lekcje VOD
           </h1>
-          <p className="text-sm text-[#544A44] mt-2 max-w-xl">
+          <p className="text-sm text-[#544A44] dark:text-[#D7CCC3] mt-2 max-w-xl">
             Od badań w I trymestrze, przez aktywny poród i pozycje wertykalne, aż po karmienie piersią i pierwszą pomoc noworodka.
           </p>
         </div>
 
         {/* Progress Box */}
-        <div className="p-4 rounded-2xl bg-[#FFFDFA] border border-[#EADFD3] shadow-sm flex items-center space-x-4 shrink-0">
+        <div className="p-4 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm flex items-center space-x-4 shrink-0">
           <div className="w-12 h-12 rounded-xl bg-[#DA0271]/10 text-[#DA0271] flex items-center justify-center font-bold font-mono text-sm">
             {percentCompleted}%
           </div>
           <div>
-            <div className="text-xs font-bold text-[#4A3A5E]">Twój postęp kursu</div>
-            <div className="text-xs text-[#867A72]">
+            <div className="text-xs font-bold text-[#250A24] dark:text-[#FBF8F4]">Twój postęp kursu</div>
+            <div className="text-xs text-[#867A72] dark:text-[#C4ADC0]">
               Ukończono {completedLessons.length} z 52 lekcji
             </div>
           </div>
@@ -77,7 +77,7 @@ function StrefaLessonsContent() {
 
       {/* Guest Notice & Buy CTA */}
       {!isCourseUnlocked && (
-        <div className="rounded-2xl bg-gradient-to-r from-[#55406E] via-[#4A3A5E] to-[#3F3054] border border-[#DA0271]/40 p-4 sm:p-5 text-white shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="rounded-2xl bg-gradient-to-r from-[#20071E] via-[#2A0B28] to-[#3A1038] dark:from-[#180517] dark:via-[#1F071D] dark:to-[#2A0B28] border border-[#461643] dark:border-[#3D0E39] p-4 sm:p-5 text-white shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#DA0271]/20 border border-[#DA0271]/40 text-[#DA0271] flex items-center justify-center shrink-0">
               <Lock className="w-5 h-5" />
@@ -86,7 +86,7 @@ function StrefaLessonsContent() {
               <div className="text-xs font-bold text-[#FCD705] flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5" /> Lekcja 1 jest bezpłatna dla każdego
               </div>
-              <p className="text-xs text-[#FDFAF6]/90 mt-0.5">
+              <p className="text-xs text-[#EAD5E5]/90 mt-0.5">
                 Dostęp do pozostałych 51 filmów VOD, apteczki i planu porodu odblokujesz po zakupie kursu.
               </p>
             </div>
@@ -102,13 +102,13 @@ function StrefaLessonsContent() {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Search */}
         <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#867A72]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#867A72] dark:text-[#C4ADC0]" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Szukaj lekcji (np. oddech, kąpiel, ZZO)..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-full border border-[#EADFD3] bg-[#FFFDFA] text-sm focus:outline-none focus:ring-2 focus:ring-[#DA0271]"
+            className="w-full pl-10 pr-4 py-2.5 rounded-full border border-[#EAE3DB] dark:border-[#3D0E39] bg-[#FFFDFA] dark:bg-[#1C081A] text-[#1A1512] dark:text-[#FBF8F4] text-sm focus:outline-none focus:ring-2 focus:ring-[#DA0271]"
           />
         </div>
 
@@ -116,10 +116,10 @@ function StrefaLessonsContent() {
         <div className="w-full sm:w-auto flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
           <button
             onClick={() => setSelectedStage('all')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               selectedStage === 'all'
                 ? 'bg-[#DA0271] text-white shadow-sm shadow-[#DA0271]/25'
-                : 'bg-[#FFFDFA] border border-[#EADFD3] text-[#544A44] hover:border-[#4A3A5E]'
+                : 'bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] text-[#544A44] dark:text-[#D7CCC3] hover:border-[#DA0271]'
             }`}
           >
             Wszystkie (52)
@@ -128,10 +128,10 @@ function StrefaLessonsContent() {
             <button
               key={st.id}
               onClick={() => setSelectedStage(st.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 selectedStage === st.id
                   ? 'text-white shadow-sm'
-                  : 'bg-[#FFFDFA] border border-[#EADFD3] text-[#544A44] hover:border-[#4A3A5E]'
+                  : 'bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] text-[#544A44] dark:text-[#D7CCC3] hover:border-[#DA0271]'
               }`}
               style={selectedStage === st.id ? { backgroundColor: st.color } : {}}
             >
@@ -152,7 +152,7 @@ function StrefaLessonsContent() {
             />
           ))
         ) : (
-          <div className="p-12 text-center text-[#867A72] bg-[#FFFDFA] rounded-2xl border border-[#EADFD3]">
+          <div className="p-12 text-center text-[#867A72] dark:text-[#C4ADC0] bg-[#FFFDFA] dark:bg-[#1C081A] rounded-2xl border border-[#EAE3DB] dark:border-[#3D0E39]">
             Nie znaleziono lekcji dla podanych kryteriów wyszukiwania.
           </div>
         )}
