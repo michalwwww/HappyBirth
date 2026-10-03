@@ -19,29 +19,29 @@ export default function StrefaPartnerPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-8">
       {/* Breadcrumb */}
       <div className="flex items-center space-x-2 text-xs text-[#867A72]">
-        <Link href="/strefa" className="hover:text-[#1A1512] transition-colors flex items-center gap-1">
+        <Link href="/strefa" className="hover:text-[#4A3A5E] transition-colors flex items-center gap-1">
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Wróć do kokpitu</span>
         </Link>
       </div>
 
       <div className="max-w-3xl space-y-3">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-100 text-indigo-800">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#F3F8FB] text-[#7FB3CC] border border-[#7FB3CC]/30">
           <HeartHandshake className="w-3.5 h-3.5" /> Dostęp dla dwojga w cenie
         </span>
         
         {partnerName ? (
           <div className="space-y-1">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-[#98269C] uppercase tracking-wider">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#6E5C7D] uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Dedykowana ściąga dla Ciebie</span>
             </div>
-            <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-[#1A1512]">
+            <h1 className="font-semibold text-3xl sm:text-5xl text-[#4A3A5E]">
               Cześć {partnerName}! Twoja rola przy narodzinach {babyLabel}
             </h1>
           </div>
         ) : (
-          <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-[#1A1512]">
+          <h1 className="font-semibold text-3xl sm:text-5xl text-[#4A3A5E]">
             Strefa dla Taty i Partnera przy Porodzie
           </h1>
         )}

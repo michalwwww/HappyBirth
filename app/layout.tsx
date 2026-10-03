@@ -103,9 +103,15 @@ export default function RootLayout({
   return (
     <html
       lang="pl"
+      data-fonty="a"
       className={`scroll-smooth ${bricolage.variable} ${instrumentSerif.variable} ${inter.variable}`}
     >
       <head>
+        <link rel="stylesheet" href="/assets/hb.e90a1fdd5e.css" />
+        <link as="font" crossOrigin="" href="/f/hanken-lat.woff2" rel="preload" type="font/woff2" />
+        <link as="font" crossOrigin="" href="/f/instrument-sans-rg-lat.woff2" rel="preload" type="font/woff2" />
+        <link as="font" crossOrigin="" href="/f/instrument-serif-rg-lat.woff2" rel="preload" type="font/woff2" />
+        <link as="font" crossOrigin="" href="/f/instrument-serif-it-lat.woff2" rel="preload" type="font/woff2" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(educationalJsonLd) }}

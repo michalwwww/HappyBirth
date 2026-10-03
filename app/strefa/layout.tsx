@@ -18,7 +18,7 @@ export default function StrefaLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FDFBF9] text-[#1A1512]">
+    <div className="min-h-screen flex flex-col bg-[#FDFAF6] text-[#2A2421] font-sans antialiased selection:bg-[#DD7C9D]/30 selection:text-[#4A3A5E]">
       <StrefaNavbar />
       <main className="flex-1">{children}</main>
       <StrefaFooter />

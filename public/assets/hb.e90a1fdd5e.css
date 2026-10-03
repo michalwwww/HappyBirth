@@ -1,0 +1,620 @@
+/* HappyBirth · strona v1 · system Mapa w wersji czterech pasm
+   Kroje lokalne, bez zewnętrznych połączeń. Bez stylów w atrybutach, zgodnie z CSP. */
+
+/* Kroje: dwa zestawy nagłówkowe do wyboru, tekst wspólny. Wybór w dane.json, pole zestaw_fontow,
+   trafia na <html data-fonty="a|b">. Przeglądarka pobiera wyłącznie pliki zestawu, do którego sięga CSS. */
+@font-face{font-family:"Instrument Sans";src:url(/f/instrument-sans-rg-lat.woff2) format("woff2");font-weight:500 700;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+@font-face{font-family:"Instrument Sans";src:url(/f/instrument-sans-rg-ext.woff2) format("woff2");font-weight:500 700;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Instrument Serif";src:url(/f/instrument-serif-it-lat.woff2) format("woff2");font-style:italic;font-weight:400;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+@font-face{font-family:"Instrument Serif";src:url(/f/instrument-serif-it-ext.woff2) format("woff2");font-style:italic;font-weight:400;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Schibsted Grotesk";src:url(/f/schibsted-rg-lat.woff2) format("woff2");font-weight:500 800;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+@font-face{font-family:"Schibsted Grotesk";src:url(/f/schibsted-rg-ext.woff2) format("woff2");font-weight:500 800;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Instrument Serif";src:url(/f/instrument-serif-rg-lat.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+@font-face{font-family:"Instrument Serif";src:url(/f/instrument-serif-rg-ext.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Newsreader";src:url(/f/newsreader-rg-lat.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+@font-face{font-family:"Newsreader";src:url(/f/newsreader-rg-ext.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Newsreader";src:url(/f/newsreader-it-lat.woff2) format("woff2");font-style:italic;font-weight:300 500;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+@font-face{font-family:"Newsreader";src:url(/f/newsreader-it-ext.woff2) format("woff2");font-style:italic;font-weight:300 500;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Hanken Grotesk";src:url(/f/hanken-lat.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+@font-face{font-family:"Hanken Grotesk";src:url(/f/hanken-ext.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+2C60-2C7F,U+A720-A7FF}
+
+/* ── Tokeny. Baza pastelowa bez zmian, atrament schodzi z czerni w stronę fioletu (poprawki, sekcja 8) ── */
+:root{
+  --kosc:#FDFAF6;--papier:#F7F0E7;--len:#EFE5D8;--karta:#FFFDFA;
+  --ink:#4A3A5E;      /* atrament fiołkowy, 9,8:1 na kości, dawniej #332826 */
+  --ink2:#6E5C7D;     /* tekst drugiego planu, 5,8:1 na kości, 4,8:1 na lnie */
+  --ink3:#7A6786;     /* podpisy, tylko na kości i karcie, 4,9:1 */
+  --noc:#55406E;      /* ciemne powierzchnie: pasek statusu, plakat lekcji. Biały tekst 9:1 */
+  --noc2:#3F3054;     /* cień i obrys powierzchni nocnych */
+  --linia:#EADFD3;--linia2:#DCCDBE;
+  --cta:#B4525A;--cta-h:#A04650;
+  /* pasma, trzy poziomy tego samego koloru (poprawki tura 2, sekcje 4 i 6):
+     pastel na wstęgi i paski, rozjaśniony pastel na kafelki pod tekst atramentowy,
+     wersja ciemniejsza pod najechanie. Wersje głębokie zostają pod biały tekst tam,
+     gdzie tekst jest duży: numer modułu i plakat lekcji. */
+  --p1:#DD7C9D;--p2:#E9C46A;--p3:#E79A62;--p4:#7FB3CC;
+  --p1t:#EAADC0;--p2t:#F1DAA1;--p3t:#F0C09C;--p4t:#B0CFDD;
+  /* czysty odpowiednik pasma, do podświetlenia wybranego etapu */
+  --p1c:var(--a-mag);--p2c:var(--a-zol);--p3c:var(--a-pom);--p4c:var(--a-nie);
+  --p1h:#E59BB3;--p2h:#EED28D;--p3h:#EDB286;--p4h:#9EC5D7;
+  --p1s:#C57193;--p2s:#D0AE68;--p3s:#CE8B61;--p4s:#77A0BA;
+  --p1g:#C33C6A;--p2g:#8E6A14;--p3g:#AA4F16;--p4g:#3F758F;
+  --roz:#B22E5D;   /* róż drugiej linijki: 5,9 na kości, 5,4 na papierze, 4,9 na lnie */
+
+  /* ── Akcenty: czyste kolory z logo w pełnym kolorze (tura 3, zasada kolorów) ──
+     Wersje bez przyrostka to barwy prosto z pliku logo, do plam bez tekstu:
+     podświetlenie etapu, obwódki, paski. Wersje „m” to ta sama barwa w pełnym
+     nasyceniu, zeszła tylko jasnością, żeby uniosła biały tekst. Żółty nie ma
+     wersji „m”: biel na żółtym daje 1,52 na 1 przy każdej jasności, więc żółty
+     nosi tekst atramentowy (6,70 na 1). */
+  --a-mag:#DA0271;   --a-mag-m:#DA0271;   /* biel 4,97 */
+  --a-pom:#E87322;   --a-pom-m:#BF4E00;   /* biel 4,88 */
+  --a-nie:#0097DB;   --a-nie-m:#0078AD;   /* biel 4,90 */
+  --a-zol:#FECB22;                        /* atrament 6,70 */
+  --t:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --out:cubic-bezier(.16,.84,.24,1);
+  --max:1200px;--gut:clamp(18px,4vw,44px);--r:22px;
+}
+/* Zestaw A: Instrument Sans i Instrument Serif w kursywie */
+:root,[data-fonty="a"]{
+  --d:"Instrument Sans","Hanken Grotesk",system-ui,sans-serif;
+  --akcent:"Instrument Serif",Georgia,serif;
+  --hero:"Instrument Serif",Georgia,serif;
+  --d-spacing:-.025em;--akcent-skala:.88;--akcent-waga:400;--hero-spacing:-.012em;--hero-waga:400;
+}
+/* Zestaw B: Schibsted Grotesk i Newsreader w kursywie */
+[data-fonty="b"]{
+  --d:"Schibsted Grotesk","Hanken Grotesk",system-ui,sans-serif;
+  --akcent:"Newsreader",Georgia,serif;
+  --hero:"Newsreader",Georgia,serif;
+  --d-spacing:-.022em;--akcent-skala:.90;--akcent-waga:300;--hero-spacing:-.008em;--hero-waga:400;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--kosc);color:var(--ink);font-family:var(--t);font-size:17.5px;line-height:1.62;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,h4{margin:0;font-family:var(--d);font-weight:700;letter-spacing:var(--d-spacing);line-height:1.06;text-wrap:balance}
+/* druga część nagłówka: kursywa szeryfowa, mniejsza od pierwszej linijki i różowa
+   (tura 1 sekcja 7, zmienione w turze 2, zasady globalne) */
+.kursywa{display:block;font-family:var(--akcent);font-style:italic;font-weight:var(--akcent-waga);
+  font-size:calc(1em * var(--akcent-skala));letter-spacing:-.005em;color:var(--roz);text-wrap:balance}
+p{margin:0;text-wrap:pretty}
+ul,ol{margin:0;padding:0;list-style:none}
+a{color:inherit}
+img,svg,video,iframe{display:block;max-width:100%}
+figure{margin:0}
+button,input{font:inherit;color:inherit}
+::selection{background:var(--noc);color:#fff}
+:focus-visible{outline:2.5px solid var(--cta);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--max);margin-inline:auto;padding-inline:var(--gut)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skok{position:absolute;left:12px;top:-60px;background:var(--noc);color:#fff;padding:10px 16px;border-radius:12px;z-index:100;text-decoration:none;font-weight:700}
+.skok:focus{top:12px}
+section[id],[id].kotwica{scroll-margin-top:92px}
+
+/* pasek górny: jeden napis, jeden cel. Tor jedzie w lewo, więc napisy suną od lewej do prawej
+   przez okno paska. Dwie identyczne grupy pozwalają zapętlić ruch bez przeskoku.
+   Napis czyta czytnik ekranu raz, z etykiety .sr, tor jest ukryty przed czytnikami. */
+.pasek{background:var(--a-mag);color:#fff;overflow:hidden}
+.pasek-in{display:block;text-decoration:none;padding-block:15px}
+.pasek-tor{display:flex;width:max-content;animation:pasek-jazda 46s linear infinite}
+.pasek-grupa{display:flex;flex:none}
+.pasek-tor b{flex:none;font:700 15px/1.2 var(--t);letter-spacing:.11em;text-transform:uppercase;padding-inline:30px;white-space:nowrap}
+.pasek-tor b::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.75);vertical-align:2px;margin-left:26px}
+.pasek-in:hover .pasek-tor,.pasek-in:focus-visible .pasek-tor{animation-play-state:paused}
+@keyframes pasek-jazda{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+@media(prefers-reduced-motion:reduce){
+  .pasek-tor{animation:none;width:100%;justify-content:center}
+  .pasek-grupa:last-child,.pasek-tor b:not(:first-child){display:none}
+  .pasek-tor b::after{display:none}
+}
+
+/* pasek prawny pod stopką: jedna linia, mocny kolor, biały tekst (tura 2, sekcja 10) */
+.pasek-prawny{background:var(--noc);color:#fff;padding:14px var(--gut)}
+.pasek-prawny p{max-width:var(--max);margin-inline:auto;font-size:14px;line-height:1.5;text-align:center}
+
+/* nawigacja */
+/* nagłówek w ciemniejszym odcieniu ecru, półprzezroczysty (tura 2, sekcja 2) */
+.nav{position:sticky;top:0;z-index:50;background:rgba(239,229,216,.82);backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid var(--linia2)}
+@supports not (backdrop-filter:blur(2px)){.nav{background:rgba(239,229,216,.97)}}
+/* Logo, menu i KUP w jednym rzędzie: logo trzyma się przycisków, menu rozkłada się
+   na środku, KUP stoi osobno po prawej (tura 3, sekcja Menu). */
+.nav .in{display:flex;align-items:center;gap:clamp(12px,2.4vw,34px);max-width:1360px;margin-inline:auto;padding:10px var(--gut);min-height:96px}
+/* Logo w pełnym kolorze, mniejsze: 92 px (tura 3, wersja B) */
+.nav .znak{flex:none;display:block;width:clamp(76px,6.4vw,92px)}
+.nav .znak img{width:100%;height:auto}
+/* przyciski menu: pigułki z własną powierzchnią, nie same napisy (poprawki, sekcja 1) */
+.nav .linki{display:flex;gap:clamp(6px,1vw,14px);flex:1;justify-content:center}
+.nav .linki a{text-decoration:none;font:700 14px/1.2 var(--t);letter-spacing:.11em;text-transform:uppercase;color:var(--ink);
+  padding:15px clamp(16px,2vw,28px);border-radius:99px;border:1.5px solid var(--linia2);background:rgba(255,253,250,.6);
+  transition:background-color .2s,border-color .2s,color .2s}
+.nav .linki a:hover{background:var(--karta);border-color:var(--ink3)}
+/* KUP: inny kształt niż pigułki menu (prostokąt o miękkim narożniku) i inny kolor
+   (czysta magenta z logo, biel 4,97 na 1). Widoczny od razu, bez najeżdżania. */
+.btn.kup{background:var(--a-mag-m);color:#fff;border-radius:16px;border:0;min-height:56px;padding:15px clamp(22px,2.4vw,34px);
+  font:800 15px/1.1 var(--t);letter-spacing:.1em;text-transform:uppercase;
+  box-shadow:0 12px 26px -14px rgba(218,2,113,.9),inset 0 -3px 0 rgba(0,0,0,.16)}
+.btn.kup:hover{background:#C00265}
+.nav .btn.kup{flex:none;min-height:52px;padding:13px clamp(18px,2vw,28px);font-size:14px}
+.nav .btn{flex:none}
+.menu{display:none;position:relative}
+.menu summary{list-style:none;width:52px;height:52px;border:1px solid var(--linia);border-radius:14px;background:var(--karta);cursor:pointer;display:grid;place-items:center}
+.menu summary::-webkit-details-marker{display:none}
+.menu summary i{display:block;width:20px;height:2px;background:var(--ink);border-radius:2px;box-shadow:0 -6px 0 var(--ink),0 6px 0 var(--ink)}
+.menu summary:hover{background:var(--papier);border-color:var(--linia2)}
+.menu nav{position:absolute;right:0;top:56px;background:var(--karta);border:1px solid var(--linia);border-radius:18px;padding:8px;min-width:240px;box-shadow:0 24px 60px -30px rgba(63,48,84,.45)}
+/* Pozycje menu mobilnego mają co najmniej 48 px wysokości (MASTER_SPECIFICATION 4, telefon). */
+.menu nav a{display:flex;align-items:center;min-height:48px;text-decoration:none;font:700 13px/1.2 var(--t);letter-spacing:.09em;text-transform:uppercase;padding:14px}
+.menu nav a:hover{background:var(--papier)}
+@media(max-width:980px){.nav .linki{display:none}.menu{display:block;margin-left:auto}}
+@media(max-width:520px){.nav .btn{display:none}}
+
+/* przyciski */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:12px 22px;border-radius:99px;font:700 16px/1.15 var(--t);text-decoration:none;border:1.5px solid transparent;cursor:pointer;transition:transform .3s var(--out),background-color .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn.cta{background:var(--cta);color:#fff}
+.btn.cta:hover{background:var(--cta-h)}
+.btn.jasny{background:transparent;border-color:var(--linia2);color:var(--ink)}
+.btn.jasny:hover{background:var(--karta)}
+/* Bezpłatna lekcja: czysty żółty z logo. Biel na żółtym daje 1,52 na 1, więc tekst
+   jest atramentowy (6,70 na 1). Wielkość jak KUP, żeby para była równorzędna. */
+.btn.zolty{background:var(--a-zol);color:var(--ink);border:0;border-radius:16px;min-height:56px;
+  padding:15px clamp(20px,2.2vw,30px);font:800 15px/1.1 var(--t);letter-spacing:.06em;
+  box-shadow:0 12px 26px -16px rgba(180,140,0,.9),inset 0 -3px 0 rgba(0,0,0,.13)}
+.btn.zolty:hover{background:#F2BE12}
+.btn.zolty .graj{border-left-color:var(--ink)}
+.btn.maly{min-height:42px;padding:9px 16px;font-size:15px}
+.btn .graj{width:0;height:0;border-left:9px solid currentColor;border-top:6px solid transparent;border-bottom:6px solid transparent}
+
+/* typografia */
+.kicker{font:700 12.5px/1.2 var(--t);letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+.lead{font-size:clamp(18px,1.6vw,20.5px);line-height:1.56;color:var(--ink2);max-width:54ch}
+.h2{font-size:clamp(32px,4.4vw,56px)}
+/* „duzy”: nagłówek sekcji wiodącej, o stopień wyżej od reszty (tura 3) */
+.h2.duzy,h1.duzy{font-size:clamp(38px,5.4vw,70px);letter-spacing:-.032em}
+.h2.krotki{font-size:clamp(28px,3.2vw,40px)}
+.kursywa.mniejsza{font-size:calc(1em * .66)}
+.h3{font-size:clamp(21px,2.2vw,26px);letter-spacing:-.015em}
+.maly{font-size:14px;line-height:1.55;color:var(--ink3)}
+.sek{padding-block:clamp(64px,9vw,116px)}
+.papier{background:var(--papier)}
+.len{background:var(--len)}
+.naglowek{max-width:760px}
+.kicker+h1,.kicker+h2,.kicker+.h2,.kicker+.h3{margin-top:14px}
+.h2+.lead,h2+.lead{margin-top:18px}
+
+/* Hero na pełnej szerokości układu, obie kolumny równane do tych samych linii:
+   góra nagłówka do góry karuzeli, dół faktów do dołu karuzeli (tura 3, sekcja Hero). */
+.hero{padding-block:clamp(20px,2.6vw,36px) clamp(44px,5.4vw,80px)}
+.hero .wrap{max-width:1480px}
+.hero .g{display:grid;grid-template-columns:minmax(0,10fr) minmax(0,11fr);
+  column-gap:clamp(28px,4vw,64px);row-gap:22px;align-items:stretch}
+.hero-tekst{display:flex;flex-direction:column;justify-content:space-between;padding-block:clamp(4px,1vw,14px)}
+.hero-tekst .fakty{margin-top:18px}
+@media(max-width:920px){.hero .g{grid-template-columns:1fr}.hero-tekst{justify-content:flex-start}}
+/* nagłówek hero: krój szeryfowy, prosty, lżejszy od grotesku (tura 2, sekcja 3) */
+.hero h1{font-family:var(--hero);font-weight:var(--hero-waga);font-size:clamp(44px,6.4vw,96px);
+  margin-top:0;letter-spacing:var(--hero-spacing);line-height:1}
+.hero h1 .kursywa{margin-top:6px;font-size:calc(1em * .58);letter-spacing:.005em}
+.hero .lead{margin-top:18px;font-size:clamp(16px,1.2vw,18px);line-height:1.55;color:var(--roz);
+  font-weight:600;max-width:50ch}
+.hero .ctas{margin-top:26px}
+.hero .fakty{font-size:16px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.fakty{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:26px;font-size:15px;font-weight:700;color:var(--ink2)}
+.fakty li{display:flex;align-items:center;gap:8px}
+.fakty li::before{content:"";width:18px;height:18px;border-radius:50%;background:var(--p2) center/10px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l3 3 5-6' fill='none' stroke='%234A3A5E' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.foto{position:relative;border-radius:26px;overflow:hidden;background:var(--len)}
+.foto img{width:100%;height:100%;object-fit:cover}
+.foto.poziom{aspect-ratio:4/3.4}
+.foto.pion{aspect-ratio:4/5}
+
+/* karuzela hero: cztery kadry 3 na 2, jeden widoczny (tura 2, sekcja 3a).
+   Slajdy leżą na sobie, zmienia się krycie, więc przejście nie rusza układu strony.
+   Bez skryptu widać pierwszy kadr, reszta jest schowana i nie zbiera fokusu. */
+/* W hero karuzela trzyma się linii kolumny tekstu: ta sama góra i ten sam dół,
+   bez uskoku (tura 3, Hero). Proporcja 3 na 2 wraca na wąskim ekranie. */
+.kar{position:relative;border-radius:26px;overflow:hidden;background:var(--len);touch-action:pan-y;
+  height:100%;min-height:clamp(300px,31vw,470px)}
+@media(max-width:920px){.kar{height:auto;aspect-ratio:3/2;min-height:0}}
+.kar-slajd{position:absolute;inset:0;opacity:0;transition:opacity .7s var(--out)}
+.kar-slajd:first-child,.kar-slajd.akt{opacity:1}
+.kar-slajd img{width:100%;height:100%;object-fit:cover}
+.kar-kropki{position:absolute;left:0;right:0;bottom:6px;display:flex;justify-content:center;z-index:2}
+/* Przycisk ma 26 px pola dotyku, sama kropka 9 px. Na ekranie dotykowym pole rośnie do 48 na 48 px
+   (MASTER_SPECIFICATION 4, telefon), kropka zostaje ta sama. */
+.kar-kropka{width:26px;height:26px;padding:0;border:0;background:transparent;cursor:pointer;display:grid;place-items:center}
+@media(pointer:coarse){.kar-kropka{width:48px;height:48px}}
+.kar-kropka::before{content:"";width:9px;height:9px;border-radius:50%;background:rgba(253,250,246,.6);
+  box-shadow:0 1px 4px rgba(63,48,84,.5);transition:background .25s,transform .25s var(--out)}
+.kar-kropka[aria-current="true"]::before{background:var(--kosc);transform:scale(1.35)}
+.kar-kropka:hover::before{background:var(--kosc)}
+.kar .ai-lab{z-index:2}
+.kar .graj-link{z-index:2}
+@media(max-width:920px){.kar{aspect-ratio:3/2}}
+.ai-lab{position:absolute;right:14px;bottom:13px;background:rgba(253,250,246,.9);color:var(--ink2);border-radius:99px;padding:5px 10px;font:700 10.5px/1 var(--t);letter-spacing:.08em;text-transform:uppercase}
+.foto .graj-link{position:absolute;left:20px;bottom:20px;display:flex;align-items:center;gap:12px;background:var(--kosc);border-radius:99px;padding:8px 18px 8px 8px;font-weight:700;font-size:15px;text-decoration:none;box-shadow:0 10px 30px -12px rgba(0,0,0,.35)}
+.graj-link i,.wideo-start i{width:40px;height:40px;border-radius:50%;background:var(--cta);display:grid;place-items:center;flex:none}
+.graj-link i::after,.wideo-start i::after{content:"";border-left:11px solid #fff;border-top:7px solid transparent;border-bottom:7px solid transparent;margin-left:3px}
+
+/* Mapa programu na pełnej szerokości układu, jak hero (tura 3, Kalendarz) */
+#mapa .wrap{max-width:1480px}
+.doc.program .wrap{max-width:1480px}
+.doc.program .lead{max-width:62ch}
+.mapa{border:1px solid var(--linia2);border-radius:28px;background:var(--len);padding:clamp(22px,3vw,40px);
+  box-shadow:0 34px 80px -60px rgba(63,48,84,.75)}
+.mapa .top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 28px;align-items:flex-end}
+.mapa .h3{max-width:34ch}
+/* „To nie jest grafik”: pod nagłówkiem mapy, kursywą szeryfową, żeby czytało się
+   jak dopisek autora, a nie jak kolejna etykieta (tura 3, Kalendarz) */
+.mapa .uwaga{margin-top:10px;font-family:var(--akcent);font-style:italic;font-weight:var(--akcent-waga);
+  font-size:clamp(16px,1.5vw,19px);line-height:1.35;color:var(--roz);max-width:62ch}
+
+/* wstęga statyczna: strona programu i miejsca bez suwaka */
+.wstega{display:flex;gap:4px;height:28px;margin-top:6px;position:relative}
+.wstega i{display:block;border-radius:5px}
+.wstega .p1{flex:91;background:var(--p1)}
+.wstega .p2{flex:98;background:var(--p2)}
+.wstega .p3{flex:91;background:var(--p3)}
+.wstega .p4{flex:365;background:var(--p4)}
+.wstega .zero{flex:0 0 3px;background:var(--ink);border-radius:2px;margin-inline:2px}
+.skala{position:relative;display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--ink3);margin-top:8px;min-height:18px}
+.skala span:nth-child(2){position:absolute;left:43.4%;transform:translateX(-50%);white-space:nowrap}
+@media(max-width:520px){.skala span:nth-child(2){display:none}}
+
+/* suwak etapów: komponent suwak-etapow w tokenach strony */
+/* Wysokość zarezerwowana pod gotowy suwak: tekst zapasowy jest niższy, więc bez niej
+   strona przeskakiwałaby w chwili, gdy skrypt buduje komponent. */
+.se{--se-kolor:var(--p1);display:block;margin-top:24px;background:var(--karta);border:1px solid var(--linia);
+  border-radius:22px;padding:clamp(18px,2.6vw,28px);min-height:clamp(330px,26vw,360px)}
+@media(max-width:620px){.se{min-height:400px}}
+.se-gora{display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px 26px}
+.se-nr{font:700 clamp(54px,7vw,96px)/.82 var(--d);letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.se-meta{font-size:13.5px;font-weight:700;color:var(--ink3)}
+.se-nazwa{display:flex;align-items:center;gap:10px;margin-top:4px;font:700 clamp(21px,2.6vw,32px)/1.06 var(--d);letter-spacing:var(--d-spacing)}
+.se-kropka{flex:none;width:15px;height:15px;border-radius:50%;background:var(--se-kolor);transition:background .35s var(--out)}
+.se-etykieta{display:block;font-size:13.5px;font-weight:700;color:var(--ink3);margin:20px 0 2px}
+.se-suwak{-webkit-appearance:none;appearance:none;display:block;width:100%;height:40px;margin:0;background:transparent;cursor:grab}
+/* Na ekranie dotykowym pole suwaka ma 48 px wysokości (MASTER_SPECIFICATION 4, telefon). */
+@media(pointer:coarse){.se-suwak{height:48px}}
+.se-suwak:active{cursor:grabbing}
+.se-suwak:focus-visible{outline:2.5px solid var(--cta);outline-offset:3px;border-radius:99px}
+.se-suwak::-webkit-slider-runnable-track{height:4px;background:var(--linia2);border-radius:4px}
+.se-suwak::-moz-range-track{height:4px;background:var(--linia2);border-radius:4px}
+.se-suwak::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:var(--se-kolor);
+  border:3px solid var(--ink);margin-top:-13px;box-shadow:0 6px 16px -8px rgba(63,48,84,.9)}
+.se-suwak::-moz-range-thumb{width:30px;height:30px;border-radius:50%;background:var(--se-kolor);border:3px solid var(--ink)}
+/* Wcięcie 15 px to promień kropki suwaka. Kropka wędruje od 15 px do szerokości
+   minus 15 px, więc wstęga z takim samym wcięciem ma identyczną oś. Bez tego
+   kropka i znacznik rozjeżdżają się przy końcach (tura 3, Kalendarz). */
+.se-wstega{position:relative;height:38px;margin:18px 15px 0}
+/* Pasma kalendarza ciemnieją pod kursorem, żeby było widać, że wstęga jest do przesuwania.
+   Filtr działa na każdym kolorze z konfiguracji, więc nie dubluje tokenów. */
+.se-pasmo{position:absolute;top:0;height:38px;border-radius:6px;background:var(--se-p);
+  transition:background-color .3s var(--out),filter .25s var(--out)}
+.se-wstega:hover .se-pasmo{filter:brightness(.94)}
+.se-pasmo:hover{filter:brightness(.86) saturate(1.1)}
+/* wybrany etap w czystym, wysyconym kolorze swojego pasma (tura 3, Kalendarz) */
+.se-pasmo.se-akt{background:var(--se-c,var(--se-p));filter:none}
+.se-pasmo.se-kreska{border-radius:2px;background:var(--ink)}
+/* Kreska sięga od kropki suwaka po dolną krawędź wstęgi, więc kropka stoi dokładnie
+   na jej środku, a nie obok niej (tura 3, Kalendarz). */
+.se-znacznik{position:absolute;top:-26px;width:3px;height:74px;border-radius:2px;background:var(--ink);
+  transform:translateX(-50%);transition:left .3s var(--out)}
+.se[data-ciagnie] .se-znacznik{transition:none}
+.se-skala{position:relative;display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--ink3);margin:10px 15px 0;min-height:18px}
+.se-skala span:nth-child(2){position:absolute;left:43.4%;transform:translateX(-50%);white-space:nowrap}
+@media(max-width:520px){.se-skala span:nth-child(2){display:none}}
+.se-moduly{margin-top:16px;display:grid;gap:8px;max-width:72ch}
+.se-moduly li{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;padding-top:8px;border-top:1px solid var(--linia)}
+.se-moduly b{font-size:16px;font-weight:700}
+.se-moduly span{font-size:13.5px;font-weight:700;color:var(--ink3);white-space:nowrap}
+.se-opis{margin-top:14px;color:var(--ink2);font-size:16px;max-width:70ch}
+.se-stopka{margin-top:12px;font-size:13.5px;color:var(--ink3)}
+
+/* Kafelki pasm w kolorze pasma, w wersji pastelowej (tura 2, sekcje 4 i 6).
+   Biały tekst na pastelu daje od 1,7 do 2,8 na 1, więc tekst jest atramentowy:
+   na rozjaśnionym pastelu trzyma od 5,5 do 7,4 na 1, czyli z zapasem ponad AA.
+   Kolor pełny zostaje paskiem u góry kafelka, tam gdzie nie niesie tekstu. */
+.pasma{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:22px}
+.mapa .skala+.pasma{margin-top:18px}
+@media(max-width:900px){.pasma{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.pasma{grid-template-columns:1fr}}
+.pasmo{--kol:var(--p1t);--kolh:var(--p1h);--pelny:var(--p1);--czysty:var(--p1c);background:var(--kol);color:var(--ink);
+  border-radius:18px;padding:18px 18px 18px;position:relative;overflow:hidden;
+  transition:background-color .3s var(--out),transform .3s var(--out),box-shadow .3s var(--out)}
+.pasmo::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:var(--pelny);transition:height .3s var(--out),background-color .3s var(--out)}
+.pasmo.p1{--kol:var(--p1t);--kolh:var(--p1h);--pelny:var(--p1);--czysty:var(--p1c)}
+.pasmo.p2{--kol:var(--p2t);--kolh:var(--p2h);--pelny:var(--p2);--czysty:var(--p2c)}
+.pasmo.p3{--kol:var(--p3t);--kolh:var(--p3h);--pelny:var(--p3);--czysty:var(--p3c)}
+.pasmo.p4{--kol:var(--p4t);--kolh:var(--p4h);--pelny:var(--p4);--czysty:var(--p4c)}
+.pasmo h3{font-size:19px;margin-top:4px}
+.pasmo .zakres{font-size:13px;font-weight:700;margin-top:3px;color:var(--ink)}
+.pasmo ul{margin-top:12px;display:grid;gap:7px}
+.pasmo a{font-size:14.5px;color:var(--ink);text-decoration:none;border-bottom:1px solid rgba(74,58,94,.45)}
+.pasmo a:hover{border-color:var(--ink)}
+/* najechanie: kafelek ciemnieje, żeby było widać, że jest klikalny (tura 2, sekcja 4) */
+.pasmo:hover{background:var(--kolh)}
+/* Wybrany etap: obwódka i pasek w czystym kolorze z logo. Tło kafelka zostaje
+   pastelowe, bo czysty kolor pod tekstem schodzi do 2,0 na 1 (tura 3). */
+.pasmo.akt{background:var(--kolh);transform:translateY(-4px);box-shadow:0 0 0 3px var(--len),0 0 0 7px var(--czysty)}
+.pasmo.akt::before{height:10px;background:var(--czysty)}
+
+/* sala i online */
+.sek-g{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(28px,5vw,80px);align-items:start}
+@media(max-width:900px){.sek-g{grid-template-columns:1fr}}
+.dwa{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.dwa{grid-template-columns:1fr}}
+.pole{border-radius:var(--r);padding:26px;border:1px solid var(--linia)}
+.pole.sala{background:var(--papier);color:var(--ink2)}
+.pole.online{background:var(--karta);box-shadow:inset 0 -6px 0 var(--p2)}
+.pole h3{font-size:22px;margin-bottom:12px}
+.pole li{padding:10px 0;border-top:1px solid var(--linia);font-size:16px}
+.sek-g .foto{margin-top:28px}
+
+/* Nagłówek sekcji programu: krój szeryfowy, większy, w fiolecie nagłówków.
+   Tura 3 cofa róż z tury 2 i podnosi stopień. */
+#program .naglowek .h2{font-family:var(--hero);font-weight:var(--hero-waga);
+  letter-spacing:var(--hero-spacing);line-height:1.02;color:var(--ink)}
+#program .naglowek .h2 .kursywa{font-size:calc(1em * .58);color:var(--roz)}
+
+/* moduły: kafelek w pastelu pasma, tekst atramentowy, numer w kolorze pełnym */
+.moduly{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:clamp(28px,4vw,48px)}
+@media(max-width:760px){.moduly{grid-template-columns:1fr}}
+.modul{--kol:var(--p1t);--kolh:var(--p1h);--gleb:var(--p1g);position:relative;display:grid;grid-template-columns:auto 1fr;gap:6px 18px;
+  background:var(--kol);color:var(--ink);border-radius:var(--r);padding:22px 24px;overflow:hidden;
+  transition:background-color .3s var(--out)}
+.modul.p1{--kol:var(--p1t);--kolh:var(--p1h);--gleb:var(--p1g)}
+.modul.p2{--kol:var(--p2t);--kolh:var(--p2h);--gleb:var(--p2g)}
+.modul.p3{--kol:var(--p3t);--kolh:var(--p3h);--gleb:var(--p3g)}
+.modul.p4{--kol:var(--p4t);--kolh:var(--p4h);--gleb:var(--p4g)}
+.modul:hover{background:var(--kolh)}
+.modul .nr{grid-row:span 3;font:700 38px/1 var(--d);letter-spacing:-.04em;color:var(--ink);font-variant-numeric:tabular-nums;min-width:40px}
+.modul h3{font-size:clamp(19px,1.9vw,23px)}
+.modul .meta{font-size:13.5px;font-weight:700;color:var(--ink)}
+.modul p{font-size:15.5px;color:var(--ink)}
+.darmo{display:inline-block;margin-left:8px;font-size:12px;font-weight:700;background:var(--cta);color:#fff;
+  border-radius:99px;padding:3px 9px;vertical-align:2px;text-decoration:none}
+a.darmo:hover{background:var(--cta-h)}
+/* pełna lista lekcji: wejście wyróżnione, nie zwykły odnośnik (poprawki, sekcja 4) */
+.dalej{margin-top:24px}
+.pelna-lista{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 24px;margin-top:26px;
+  background:var(--karta);border:1.5px solid var(--linia2);border-radius:22px;padding:20px clamp(20px,3vw,28px)}
+.pelna-lista b{display:block;font:700 clamp(19px,2vw,24px)/1.15 var(--d);letter-spacing:var(--d-spacing)}
+.pelna-lista span{display:block;margin-top:4px;font-size:15px;color:var(--ink2)}
+
+/* lekcja bezpłatna */
+.lekcja{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(24px,4vw,56px);align-items:center}
+@media(max-width:900px){.lekcja{grid-template-columns:1fr}}
+.wideo{position:relative;aspect-ratio:16/9;border-radius:24px;overflow:hidden;background:var(--noc2)}
+.wideo img{width:100%;height:100%;object-fit:cover;opacity:.92}
+.wideo iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.wideo-start{position:absolute;inset:0;display:flex;align-items:flex-end;padding:20px;background:transparent;border:0;cursor:pointer}
+.wideo-start span{display:flex;align-items:center;gap:12px;background:var(--kosc);border-radius:99px;padding:8px 18px 8px 8px;font-weight:700;font-size:15px}
+.lekcja .maly{margin-top:14px}
+/* „Zacznijcie od lekcji 1” jedną linią, kursywą szeryfową (tura 3) */
+#lekcja .h2{font-family:var(--akcent);font-style:italic;font-weight:var(--akcent-waga);
+  font-size:clamp(30px,3.6vw,46px);letter-spacing:-.005em;line-height:1.08;text-wrap:nowrap}
+@media(max-width:560px){#lekcja .h2{text-wrap:balance;font-size:30px}}
+
+/* dla dwojga */
+.tata{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,5vw,72px);align-items:center}
+@media(max-width:900px){.tata{grid-template-columns:1fr}}
+.lista-ik{margin-top:26px}
+.lista-ik li{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:16px 0;border-top:1px solid var(--linia2)}
+.lista-ik img{width:40px;height:40px}
+.lista-ik b{display:block;font:700 18px/1.25 var(--d);letter-spacing:-.01em}
+.lista-ik span{font-size:15.5px;color:var(--ink2)}
+
+/* kto za tym stoi */
+.liczby{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:clamp(28px,4vw,44px)}
+@media(max-width:760px){.liczby{grid-template-columns:1fr}}
+.liczba{--kol:var(--p1t);--gleb:var(--p1g);background:var(--kol);color:var(--ink);border-radius:var(--r);padding:24px}
+.liczby .liczba:nth-child(2){--kol:var(--p3t);--gleb:var(--p3g)}
+.liczby .liczba:nth-child(3){--kol:var(--p4t);--gleb:var(--p4g)}
+.liczba b{display:block;font:700 clamp(44px,5vw,64px)/.95 var(--d);letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--ink)}
+.liczba span{display:block;margin-top:10px;font-size:15.5px;color:var(--ink)}
+.kto-tekst{margin-top:28px;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(20px,4vw,56px)}
+@media(max-width:900px){.kto-tekst{grid-template-columns:1fr}}
+.kto-tekst p+p{margin-top:12px}
+.linki-dalej{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+
+/* cena i zapis */
+/* Cena: dwie ramki obok siebie, zapis jako pas pod nimi na całą szerokość.
+   Ramki mają różną wysokość treści, więc stretch wyrównuje je do wyższej. */
+.cena{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:clamp(20px,3vw,32px);align-items:stretch}
+.zapis.szeroki, .kasa.szeroki{grid-column:1/-1;background:var(--noc2);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);
+  gap:clamp(20px,4vw,56px);align-items:center;margin-top:4px;border-radius:26px;padding:clamp(22px,3vw,36px);color:#fff}
+.zapis.szeroki>div:first-child h3, .kasa.szeroki>div:first-child h3{margin-top:0;font-size:clamp(23px,2.4vw,30px);color:#fff}
+.zapis.szeroki>div:first-child p, .kasa.szeroki>div:first-child p{color:#EBE2F2;margin-top:8px}
+.zapis.szeroki form,.zapis.szeroki .pole-f{margin-top:0}
+.kasa.szeroki .btn.kup{width:100%;font-size:18px;cursor:pointer}
+.kasa.szeroki .info{font-size:12.5px;line-height:1.45;color:#D6C8E6;margin-top:12px}
+.kasa.szeroki .info a{color:#fff;text-decoration:underline}
+@media(max-width:900px){.zapis.szeroki, .kasa.szeroki{grid-template-columns:1fr}}
+@media(max-width:900px){.cena{grid-template-columns:1fr}}
+.oferta{background:var(--karta);border:1px solid var(--linia);border-radius:26px;padding:clamp(22px,3vw,34px)}
+.oferta .kwota{font:700 clamp(56px,7vw,84px)/.9 var(--d);letter-spacing:-.04em}
+.oferta .kwota small{font:700 18px/1 var(--t);letter-spacing:0;color:var(--ink3);margin-left:6px}
+.oferta ul{margin-top:20px}
+.oferta li{padding:11px 0 11px 28px;border-top:1px solid var(--linia);position:relative;font-size:16px}
+.oferta li::before{content:"";position:absolute;left:0;top:15px;width:16px;height:16px;border-radius:50%;background:var(--p2) center/9px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l3 3 5-6' fill='none' stroke='%234A3A5E' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+/* Fioletowa ramka obok ceny: cztery argumenty, biały tekst (tura 2, sekcja 7).
+   W trybie listy pod argumentami zostaje zapis, żeby strona nie straciła jedynej konwersji. */
+.argumenty{background:var(--noc);color:#fff;border-radius:26px;padding:clamp(22px,3vw,36px)}
+.argumenty .kicker{color:#D6C8E6}
+.argumenty h3{font-size:clamp(23px,2.4vw,30px);margin-top:10px}
+.arg{margin-top:22px;display:grid;gap:2px}
+.arg li{padding:16px 0 0;border-top:1px solid rgba(255,255,255,.22)}
+.arg li:first-child{border-top:0;padding-top:0}
+.arg b{display:block;font:700 clamp(18px,1.8vw,21px)/1.25 var(--d);letter-spacing:-.01em;color:#fff}
+.arg span{display:block;margin-top:5px;font-size:15.5px;line-height:1.5;color:#EBE2F2}
+.argumenty .zapis-w{margin-top:26px;padding-top:24px;border-top:1px solid rgba(255,255,255,.22)}
+.argumenty .zapis-w h4{margin:0;font:700 17px/1.3 var(--d);letter-spacing:-.01em}
+.argumenty .zapis-w p{margin-top:8px;font-size:15px;color:#EBE2F2}
+
+.zapis{background:var(--noc);color:#fff;border-radius:26px;padding:clamp(22px,3vw,36px)}
+.zapis .kicker{color:#D6C8E6}
+.zapis h3{font-size:clamp(24px,2.6vw,32px);margin-top:10px}
+.zapis p{color:#EBE2F2;margin-top:10px}
+.pole-f{margin-top:20px}
+.pole-f label{display:block;font-weight:700;font-size:15px;margin-bottom:6px}
+.pole-f input[type=email]{width:100%;min-height:52px;border-radius:14px;border:1.5px solid #8877A0;background:#fff;color:var(--ink);padding:12px 14px;font-size:17px}
+.pole-f input[type=email]:focus{outline:2.5px solid var(--p2);outline-offset:2px}
+.zgoda{display:grid;grid-template-columns:22px 1fr;gap:12px;margin-top:16px;font-size:14.5px;line-height:1.5;color:#EBE2F2}
+.zgoda input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--p2)}
+.zgoda a{color:#fff}
+.zapis .btn,.argumenty .btn{margin-top:18px;width:100%}
+.zapis .btn.cta,.argumenty .btn.cta{background:#fff;color:var(--ink)}
+.zapis .btn.cta:hover,.argumenty .btn.cta:hover{background:#fff}
+.pulapka{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.komunikat{margin-top:14px;border-radius:12px;padding:12px 14px;font-weight:700;font-size:15px;background:#7C3350;color:#fff}
+.komunikat[hidden]{display:none}
+.zapis .info,.argumenty .info{font-size:13px;color:#D6C8E6;margin-top:14px}
+.zapis .info a,.argumenty .info a{color:#fff}
+
+/* FAQ */
+.faq{margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--linia2);max-width:880px}
+.faq details{border-bottom:1px solid var(--linia2)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:20px;align-items:center;padding:20px 2px;font:700 clamp(18px,1.8vw,21px)/1.3 var(--d);letter-spacing:-.01em}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"";flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--linia2);background:center/12px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1 6h10M6 1v10' stroke='%234A3A5E' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E")}
+.faq details[open] summary::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1 6h10' stroke='%234A3A5E' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E")}
+.faq details p{padding:0 2px 20px;color:var(--ink2);max-width:70ch}
+
+/* finał: zdjęcie po lewej, treść po prawej; kolumna tekstu szersza, bo niesie dwa kafle */
+.final{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:clamp(24px,4vw,56px);align-items:center}
+@media(max-width:900px){.final{grid-template-columns:1fr}}
+.final .foto{aspect-ratio:1/1}
+
+/* zastrzeżenie */
+.zastrzezenie{border-left:6px solid var(--p4);background:var(--karta);border-radius:14px;padding:16px 18px;font-size:15px;color:var(--ink2);max-width:880px}
+
+/* Plansza: zdjęcie na całą ramkę sekcji, tekst na przesłonie od lewej.
+   Przesłona trzyma kontrast bieli niezależnie od tego, co jest na kadrze (tura 3, O nas). */
+.plansza{position:relative;border-radius:26px;overflow:hidden;background:var(--noc2)}
+.plansza img{width:100%;height:100%;object-fit:cover;aspect-ratio:16/9}
+.plansza figcaption{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(22px,4.2vw,64px);max-width:62%;
+  background:linear-gradient(90deg,rgba(45,33,60,.82) 0%,rgba(45,33,60,.66) 55%,rgba(45,33,60,0) 100%)}
+.plansza h2{color:#fff}
+.plansza .kursywa{color:#FFD9E6}
+.plansza figcaption p{margin-top:14px;color:#F3ECF7;font-family:var(--akcent);font-style:italic;
+  font-weight:var(--akcent-waga);font-size:clamp(17px,1.7vw,22px);line-height:1.4;max-width:34ch}
+@media(max-width:760px){
+  .plansza img{aspect-ratio:4/3}
+  .plansza figcaption{max-width:100%;justify-content:flex-end;
+    background:linear-gradient(0deg,rgba(45,33,60,.88) 0%,rgba(45,33,60,.7) 55%,rgba(45,33,60,.15) 100%)}
+}
+
+/* Kafle wezwania: dwa równorzędne, w czystych kolorach z logo (tura 3, O nas) */
+.kafle{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px}
+@media(max-width:640px){.kafle{grid-template-columns:1fr}}
+.kafel{display:block;text-decoration:none;border-radius:20px;padding:22px 24px;border:0;
+  transition:transform .3s var(--out),box-shadow .3s var(--out)}
+.kafel b{display:block;font:800 clamp(19px,2vw,23px)/1.15 var(--d);letter-spacing:-.015em}
+.kafel span{display:block;margin-top:6px;font-size:14.5px;line-height:1.45}
+.kafel:hover{transform:translateY(-3px)}
+.kafel.zolty{background:var(--a-zol);color:var(--ink);box-shadow:0 18px 34px -22px rgba(180,140,0,.95)}
+.kafel.mag{background:var(--a-mag-m);color:#fff;box-shadow:0 18px 34px -22px rgba(218,2,113,.95)}
+.kafel-ik{display:block;width:0;height:0;border-left:15px solid currentColor;
+  border-top:10px solid transparent;border-bottom:10px solid transparent;margin-bottom:12px}
+
+/* Liczniki na O nas w czystych kolorach z logo (tura 3) */
+.liczba.l1{background:var(--a-zol);color:var(--ink)}
+.liczba.l2{background:var(--a-pom-m);color:#fff}
+.liczba.l3{background:var(--a-mag-m);color:#fff}
+.liczba.l1 b,.liczba.l1 span{color:var(--ink)}
+.liczba.l2 b,.liczba.l2 span,.liczba.l3 b,.liczba.l3 span{color:#fff}
+.liczba b{font-variant-numeric:tabular-nums}
+.liczba .kursywa{display:block;margin-top:2px;font-size:1em;color:inherit}
+
+/* Pas domykający podstronę programu, na całą szerokość okna (tura 3) */
+.pas-kup{background:var(--noc);color:#fff;padding-block:clamp(36px,5vw,64px);margin-top:clamp(40px,5vw,72px)}
+.pas-kup .wrap{max-width:1480px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 40px}
+.pas-kup h2{font-size:clamp(26px,3vw,40px)}
+.pas-kup p{margin-top:10px;color:#EBE2F2;font-size:16.5px}
+.btn.kup.duzy{min-height:68px;padding:20px 40px;font-size:17px;border-radius:20px}
+
+/* stopka */
+.stopka{background:var(--papier);border-top:1px solid var(--linia);padding-block:clamp(48px,6vw,72px) 36px;font-size:15px}
+.stopka .g{display:grid;grid-template-columns:minmax(0,4fr) repeat(3,minmax(0,2fr));gap:28px}
+@media(max-width:900px){.stopka .g{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.stopka .g{grid-template-columns:1fr}}
+.stopka .znak img{width:clamp(132px,13vw,168px);height:auto}
+.stopka .opis{margin-top:14px;color:var(--ink2);max-width:36ch}
+.stopka h2{font:700 12.5px/1.2 var(--t);letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.stopka li{margin:7px 0}
+.stopka a{text-decoration:none;border-bottom:1px solid transparent}
+.stopka a:hover{border-color:var(--ink)}
+.stopka .dane{margin-top:36px;padding-top:22px;border-top:1px solid var(--linia2);font-size:13.5px;color:var(--ink2);display:grid;gap:8px}
+.wstega-mini{display:flex;height:6px;gap:3px;margin-top:22px;max-width:220px}
+.wstega-mini i{display:block;border-radius:3px}
+.wstega-mini .p1{flex:91;background:var(--p1)}.wstega-mini .p2{flex:98;background:var(--p2)}.wstega-mini .p3{flex:91;background:var(--p3)}.wstega-mini .p4{flex:365;background:var(--p4)}
+
+/* strony treściowe */
+.okruchy{font-size:14px;color:var(--ink3);padding-top:26px}
+.okruchy a{color:var(--ink2)}
+.okruchy ol{display:flex;flex-wrap:wrap;gap:6px}
+.okruchy li+li::before{content:"/";margin-right:6px;color:var(--linia2)}
+.doc{padding-block:clamp(28px,4vw,56px) clamp(64px,8vw,100px)}
+.doc h1{font-size:clamp(36px,4.6vw,60px);letter-spacing:-.03em}
+.doc .lead{margin-top:18px}
+.prose{max-width:760px;margin-top:clamp(28px,4vw,44px)}
+.prose h2{font-size:clamp(24px,2.6vw,32px);margin-top:44px;margin-bottom:12px}
+.prose h3{font-size:20px;margin-top:28px;margin-bottom:8px}
+.prose p,.prose ul,.prose ol{margin-top:12px}
+.prose ul{list-style:disc;padding-left:22px}
+.prose ol{list-style:decimal;padding-left:24px}
+.prose li{margin:6px 0}
+.prose a{color:var(--cta);font-weight:600}
+.prose table{border-collapse:collapse;width:100%;margin-top:16px;font-size:15px}
+.prose th,.prose td{border-top:1px solid var(--linia2);padding:10px 8px;text-align:left;vertical-align:top}
+.prose th{font-weight:700;color:var(--ink2)}
+.prose blockquote{margin:16px 0;border-left:6px solid var(--p2);background:var(--karta);padding:14px 18px;border-radius:12px}
+.projekt{display:flex;gap:12px;align-items:flex-start;background:#FBEFD9;border:1px solid #EFD9AE;border-radius:14px;padding:14px 16px;font-size:14.5px;margin-top:22px;max-width:760px}
+.projekt b{white-space:nowrap}
+.program-mod{margin-top:clamp(36px,5vw,56px);scroll-margin-top:92px}
+/* Pasek modułu: ciemny, biały tekst, mniejszy niż wcześniej. Kolor pasma zostaje
+   jako listwa po lewej, żeby przynależność była widoczna (tura 3, podstrona Program). */
+.program-mod .top{--pelny:var(--p1);--czysty:var(--p1c);display:flex;align-items:baseline;gap:8px 16px;flex-wrap:wrap;
+  background:var(--noc);color:#fff;border-radius:16px;padding:14px clamp(16px,2vw,22px);
+  border-left:9px solid var(--pelny);transition:border-color .3s var(--out)}
+.program-mod .top.p1{--pelny:var(--p1);--czysty:var(--p1c)}.program-mod .top.p2{--pelny:var(--p2);--czysty:var(--p2c)}
+.program-mod .top.p3{--pelny:var(--p3);--czysty:var(--p3c)}.program-mod .top.p4{--pelny:var(--p4);--czysty:var(--p4c)}
+/* Moduły wybranego etapu: listwa po lewej szersza i w czystym kolorze pasma.
+   Bez przygaszania pozostałych, bo lista 52 lekcji ma być czytelna cała naraz. */
+.program-mod.akt .top{border-left-width:18px;border-left-color:var(--czysty)}
+.program-mod .kol{display:none}
+/* nagłówek modułu krojem szeryfowym, zdecydowanie mniejszy (tura 3) */
+.program-mod h2{font-family:var(--hero);font-weight:var(--hero-waga);font-size:clamp(19px,2vw,25px);
+  letter-spacing:var(--hero-spacing);line-height:1.12;color:#fff}
+.program-mod .meta{font-size:13px;font-weight:700;color:#E7DCF0;white-space:nowrap}
+.program-mod p.opis{margin-top:8px;color:var(--ink2);max-width:70ch}
+.lista-lekcji{margin-top:16px;border-top:1px solid var(--linia2);counter-reset:none}
+/* Podpisy lekcji: jedna linia, kursywa szeryfowa. Ten sam stopień co wcześniej,
+   zmienia się tylko krój, żeby lista odróżniała się od nagłówków (tura 3). */
+.lista-lekcji li{display:grid;grid-template-columns:44px 1fr auto;gap:12px;padding:11px 2px;border-bottom:1px solid var(--linia);align-items:baseline}
+.lista-lekcji .n{font:700 14px/1 var(--d);color:var(--ink3);font-variant-numeric:tabular-nums}
+.lista-lekcji .tyt{font-family:var(--akcent);font-style:italic;font-weight:var(--akcent-waga);
+  font-size:17.5px;line-height:1.3;color:var(--ink)}
+.lista-lekcji .c{font-size:13.5px;font-weight:700;color:var(--ink3);font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-width:560px){.lista-lekcji li{grid-template-columns:32px 1fr}.lista-lekcji .c{grid-column:2;margin-top:2px}}
+.formularz-wzor{background:var(--karta);border:1px dashed var(--linia2);border-radius:16px;padding:20px 22px;margin-top:16px}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+@media print{.nav,.pasek,.stopka,.menu,.kar-kropki{display:none}body{background:#fff}}
+
+/* plakat lekcji bezpłatnej i odstęp zastrzeżenia */
+.plakat{position:absolute;inset:0;display:flex;flex-direction:column;padding:clamp(18px,3vw,32px);background:linear-gradient(160deg,#63508A,#3B2D4F);color:#fff}
+.plakat-nr{font:700 clamp(72px,10vw,140px)/.8 var(--d);letter-spacing:-.05em;color:var(--p2)}
+.plakat-t{margin-top:16px;font:700 clamp(18px,2.1vw,26px)/1.15 var(--d);letter-spacing:-.01em;max-width:24ch}
+.plakat-w{display:flex;gap:3px;height:6px;margin-top:16px;width:min(260px,60%)}
+.plakat-w i{display:block;border-radius:3px}
+.plakat-w .p1{flex:91;background:var(--p1)}.plakat-w .p2{flex:98;background:var(--p2)}.plakat-w .p3{flex:91;background:var(--p3)}.plakat-w .p4{flex:365;background:var(--p4)}
+.sek-zastrz{padding-block:0 clamp(48px,6vw,72px)}
+.sek.len + .sek-zastrz{padding-top:clamp(40px,5vw,56px);background:var(--kosc)}
+.sek-g .foto.pion{aspect-ratio:1/1}
+@media(max-width:600px){.wideo{aspect-ratio:4/3.4}.plakat-nr{font-size:64px}.plakat-t{font-size:17px;margin-top:10px}.plakat-w{margin-top:10px}}
+
+/* System Mapa, 03 Kolor: atrament 3 tylko na kości i bieli. Na papierze i lnie podpisy przechodzą na atrament 2. */
+.papier,.len,.mapa,.pole.sala,.stopka{--ink3:var(--ink2)}

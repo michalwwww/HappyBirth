@@ -62,7 +62,6 @@ export async function POST(req: NextRequest) {
 
     const sessionParams: any = {
       mode: 'payment',
-      payment_method_types: ['card', 'blik', 'p24'],
       line_items: [lineItem],
       allow_promotion_codes: true,
       metadata,

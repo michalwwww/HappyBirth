@@ -87,7 +87,7 @@ export default function StrefaLoginPage() {
           <Link href="/" className="inline-block">
             <Logo className="h-12 w-auto mx-auto object-contain" priority />
           </Link>
-          <h1 className="font-brand-display font-bold text-3xl text-[#1A1512]">
+          <h1 className="font-semibold text-3xl text-[#4A3A5E]">
             Strefa Rodziców
           </h1>
           <p className="text-sm text-[#544A44]">
@@ -96,7 +96,7 @@ export default function StrefaLoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-3xl p-8 border border-[#EAE3DB] shadow-lg space-y-6">
+        <div className="bg-[#FFFDFA] rounded-3xl p-8 border border-[#EADFD3] shadow-lg space-y-6">
           {errorMessage && (
             <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 flex items-start gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -109,7 +109,7 @@ export default function StrefaLoginPage() {
               <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <h3 className="font-brand-display font-bold text-xl text-[#1A1512]">
+              <h3 className="font-semibold text-xl text-[#4A3A5E]">
                 Sprawdź swoją skrzynkę!
               </h3>
               <p className="text-xs sm:text-sm text-[#544A44] leading-relaxed">
@@ -118,7 +118,7 @@ export default function StrefaLoginPage() {
               <div className="pt-2">
                 <button
                   onClick={() => handleQuickDemo('student')}
-                  className="w-full py-3 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold transition-all shadow-md shadow-[#EC008C]/25"
+                  className="w-full py-3 rounded-full bg-[#DA0271] hover:bg-[#B90260] text-white text-xs font-semibold transition-all shadow-md shadow-[#DA0271]/25"
                 >
                   Wejdź od razu do panelu (Demo)
                 </button>
@@ -140,7 +140,7 @@ export default function StrefaLoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="twoj-email@example.com"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#EAE3DB] focus:outline-none focus:ring-2 focus:ring-[#EC008C] text-sm text-[#1A1512]"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#EADFD3] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-sm text-[#2A2421] bg-[#FDFAF6]"
                     />
                   </div>
                 </div>
@@ -148,7 +148,7 @@ export default function StrefaLoginPage() {
                 <button
                   type="submit"
                   disabled={loadingProvider === 'email'}
-                  className="w-full py-3.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full py-3.5 rounded-full bg-[#DA0271] hover:bg-[#B90260] text-white text-sm font-semibold transition-all shadow-md shadow-[#DA0271]/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {loadingProvider === 'email' ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -162,17 +162,17 @@ export default function StrefaLoginPage() {
               </form>
 
               {/* Szybki Dostęp Demo */}
-              <div className="pt-4 border-t border-[#EAE3DB] space-y-2">
+              <div className="pt-4 border-t border-[#EADFD3] space-y-2">
                 <div className="text-[11px] text-[#867A72] text-center relative">
-                  <span className="bg-white px-2 relative z-10 font-medium uppercase tracking-wider">SZYBKI PODGLĄD DEMO</span>
-                  <div className="absolute inset-0 top-1/2 border-t border-[#EAE3DB]" />
+                  <span className="bg-[#FFFDFA] px-2 relative z-10 font-medium uppercase tracking-wider">SZYBKI PODGLĄD DEMO</span>
+                  <div className="absolute inset-0 top-1/2 border-t border-[#EADFD3]" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 pt-1">
                   <button
                     type="button"
                     onClick={() => handleQuickDemo('student')}
-                    className="py-2.5 px-3 rounded-xl bg-[#FAE3EB] hover:bg-[#EC008C] text-[#EC008C] hover:text-white border border-[#F3CAD9] text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+                    className="py-2.5 px-3 rounded-xl bg-[#FCF4F6] hover:bg-[#DA0271] text-[#DA0271] hover:text-white border border-[#DD7C9D]/40 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
                   >
                     <Heart className="w-3.5 h-3.5" />
                     <span>Dla Mamy</span>
@@ -181,7 +181,7 @@ export default function StrefaLoginPage() {
                   <button
                     type="button"
                     onClick={() => handleQuickDemo('partner')}
-                    className="py-2.5 px-3 rounded-xl bg-[#EAD5E5] hover:bg-[#98269C] text-[#98269C] hover:text-white border border-[#D5B8CF] text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+                    className="py-2.5 px-3 rounded-xl bg-[#FDF9EE] hover:bg-[#E9C46A] text-[#4A3A5E] hover:text-[#1E1A17] border border-[#E9C46A]/50 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>Dla Taty</span>
@@ -191,13 +191,13 @@ export default function StrefaLoginPage() {
             </div>
           )}
 
-          <div className="pt-4 border-t border-[#EAE3DB] flex items-center justify-between text-xs text-[#867A72]">
+          <div className="pt-4 border-t border-[#EADFD3] flex items-center justify-between text-xs text-[#867A72]">
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>Bezpieczne szyfrowanie SSL</span>
             </div>
 
-            <BuyCourseButton className="text-[#EC008C] font-semibold hover:underline bg-transparent border-0 p-0 text-xs cursor-pointer shadow-none">
+            <BuyCourseButton className="text-[#DA0271] font-semibold hover:underline bg-transparent border-0 p-0 text-xs cursor-pointer shadow-none">
               Kup kurs (489 zł) &rarr;
             </BuyCourseButton>
           </div>

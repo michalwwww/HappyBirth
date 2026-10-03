@@ -23,8 +23,8 @@ export function LessonCard({ lesson, isCompleted, isActive = false, autoplay = t
       href={`${prefix}/lekcja/${lesson.id}${autoplay ? '?autoplay=true' : ''}`}
       className={`group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl border transition-all duration-200 ${
         isActive
-          ? 'bg-white border-[#EC008C] shadow-md ring-1 ring-[#EC008C]'
-          : 'bg-white/80 border-[#EAE3DB] hover:border-[#867A72]/40 hover:bg-white hover:shadow-sm'
+          ? 'bg-[#FFFDFA] border-[#DA0271] shadow-md ring-1 ring-[#DA0271]'
+          : 'bg-[#FFFDFA] border-[#EADFD3] hover:border-[#4A3A5E]/40 hover:shadow-sm'
       }`}
     >
       <div className="flex items-start sm:items-center space-x-3.5 w-full sm:w-auto">
@@ -34,8 +34,8 @@ export function LessonCard({ lesson, isCompleted, isActive = false, autoplay = t
             isCompleted
               ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
               : isActive
-              ? 'bg-[#EC008C] text-white shadow-sm'
-              : 'bg-[#FBF8F4] text-[#544A44] border border-[#EAE3DB] group-hover:bg-[#EC008C] group-hover:text-white group-hover:border-[#EC008C]'
+              ? 'bg-[#DA0271] text-white shadow-sm'
+              : 'bg-[#FDFAF6] text-[#544A44] border border-[#EADFD3] group-hover:bg-[#DA0271] group-hover:text-white group-hover:border-[#DA0271]'
           }`}
         >
           {isCompleted ? (
@@ -62,13 +62,13 @@ export function LessonCard({ lesson, isCompleted, isActive = false, autoplay = t
                 <Sparkles className="w-2.5 h-2.5" /> Bezpłatna lekcja
               </span>
             ) : (
-              <span className="text-[10px] font-medium text-[#867A72] bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200 flex items-center gap-1">
-                <Lock className="w-2.5 h-2.5 text-[#EC008C]" /> Pełny kurs
+              <span className="text-[10px] font-medium text-[#867A72] bg-[#F7F0E7] px-1.5 py-0.5 rounded border border-[#EADFD3] flex items-center gap-1">
+                <Lock className="w-2.5 h-2.5 text-[#DA0271]" /> Pełny kurs
               </span>
             )}
           </div>
 
-          <h4 className="text-sm font-semibold text-[#1A1512] group-hover:text-[#EC008C] transition-colors line-clamp-1">
+          <h4 className="text-sm font-semibold text-[#4A3A5E] group-hover:text-[#DA0271] transition-colors line-clamp-1">
             {lesson.title}
           </h4>
 
