@@ -42,8 +42,8 @@ export function CloudflarePlayer({
   const searchParams = useSearchParams();
   const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
   const { role, changeRole } = useCourseProgress();
-  const [hasServerAccess, setHasServerAccess] = useState(false);
-  const [loadingAccess, setLoadingAccess] = useState(!lesson.isFreePreview);
+  const [hasServerAccess, setHasServerAccess] = useState(true);
+  const [loadingAccess, setLoadingAccess] = useState(false);
   const [playerPromoInput, setPlayerPromoInput] = useState('');
   const [playerPromoError, setPlayerPromoError] = useState<string | null>(null);
   const [showPlayerPromo, setShowPlayerPromo] = useState(false);
@@ -99,13 +99,8 @@ export function CloudflarePlayer({
       .finally(() => setLoadingAccess(false));
   }, [lesson.isFreePreview, role, searchParams]);
 
-  // Lekcja odblokowana jeśli:
-  // 1. Jest to bezpłatna lekcja 1 (isFreePreview)
-  // 2. Użytkownik ma aktywny zakup na serwerze Cloudflare D1 (hasServerAccess)
-  // 3. Użytkownik ma rolę 'student' lub 'partner'
-  // 4. Użytkownik posiada aktywny dostęp lokalny (isUnlockedLocally)
-  const isUnlocked =
-    lesson.isFreePreview || hasServerAccess || role === 'student' || role === 'partner' || isUnlockedLocally;
+  // Wolny dostęp zespołu: wszystkie filmy odblokowane bezwarunkowo
+  const isUnlocked = true;
 
   // Dołącz skrypt Cloudflare Stream SDK do nasłuchiwania zdarzeń odtwarzacza
   useEffect(() => {

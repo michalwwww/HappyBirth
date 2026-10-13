@@ -64,9 +64,11 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny'];
   const isStudentRoute = studentRoutes.some((route) => url.pathname.startsWith(route));
 
-  // Przekieruj ścieżki kursantki z domeny głównej do strefy (tylko na produkcji)
+  // Ścieżki kursantki na domenie głównej happybirth.pl - serwuj bezpośrednio (wolny dostęp zespołu pod happybirth.pl)
   if (isMainProdHost && isStudentRoute) {
-    return Response.redirect(`https://strefa.happybirth.pl${url.pathname}${url.search}`, 302);
+    const targetUrl = new URL(url.toString());
+    targetUrl.pathname = `/strefa${url.pathname}`;
+    return context.env.ASSETS.fetch(targetUrl);
   }
 
   // Przekieruj /partnerzy na dedykowaną subdomenę (tylko na produkcji)

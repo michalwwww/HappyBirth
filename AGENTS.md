@@ -107,5 +107,5 @@ Każdy asystent AI (Antigravity / Claude) pracujący nad integracjami marketingo
    - Kategoryczny zakaz instalowania pikseli wewnątrz strefy kursantki (`/strefa/*`), odtwarzacza lekcji czy licznika skurczów (ochrona przed karami RODO i banem Mety za wyciek danych wrażliwych zdrowotnych).
 6. **Zgodność Prawna (UOKiK, Prawo Konsumenckie, Omnibus)**:
    - W procesie zakupu Stripe obowiązkowa klauzula z art. 38 pkt 13 Ustawy o prawach konsumenta (wygaśnięcie prawa odstąpienia z chwilą rozpoczęcia świadczenia).
-   - Żadnych sztucznych cen przekreślonych – stała cena regularna 349 zł, a rabaty wyłącznie przez indywidualne kody promocyjne w Stripe.
+   - Żadnych sztucznych cen przekreślonych – stała cena regularna 489 zł, a rabaty wyłącznie przez indywidualne kody promocyjne w Stripe.
 

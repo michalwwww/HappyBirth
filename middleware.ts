@@ -54,14 +54,10 @@ export function middleware(request: NextRequest) {
   const isStudentRoute = studentRoutes.some((route) => url.pathname.startsWith(route));
 
   if (isStudentRoute) {
-    if (!isDev) {
-      return NextResponse.redirect(`https://strefa.happybirth.pl${url.pathname}${url.search}`);
-    } else {
-      url.pathname = `/strefa${url.pathname}`;
-      const response = NextResponse.rewrite(url);
-      response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
-      return response;
-    }
+    url.pathname = `/strefa${url.pathname}`;
+    const response = NextResponse.rewrite(url);
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    return response;
   }
 
   // Jeśli użytkownik wchodzi na /partnerzy na produkcji

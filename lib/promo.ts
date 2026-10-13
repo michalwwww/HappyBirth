@@ -42,12 +42,6 @@ export function activateStudentAccessLocally(promoCode: string = 'TEST100') {
 }
 
 export function isCourseUnlockedLocally(): boolean {
-  if (typeof window === 'undefined') return false;
-  try {
-    const role = localStorage.getItem('hb_current_role');
-    const unlocked = localStorage.getItem('hb_unlocked');
-    return role === 'student' || role === 'partner' || unlocked === 'true';
-  } catch {
-    return false;
-  }
+  // Wolny dostęp zespołowy na czas przeglądu filmów
+  return true;
 }

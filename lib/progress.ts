@@ -52,25 +52,19 @@ export function useCourseProgress() {
     // 1. Natychmiast załaduj z localStorage (domyślnie 'guest', lub 'student' jeśli hb_unlocked)
     const localLessons = getStoredCompletedLessons();
     setCompletedLessons(localLessons);
-    const isUnlocked = localStorage.getItem('hb_unlocked') === 'true';
-    const storedRole = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || (isUnlocked ? 'student' : 'guest');
+    // Wolny dostęp zespołu: domyślna rola to student
+    const storedRole = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || 'student';
     setRole(storedRole);
     setIsLoaded(true);
 
-    // Weryfikacja ze stanem serwera (tylko jeśli brak ręcznego wyboru w localStorage)
+    // Weryfikacja ze stanem serwera
     fetch('/api/auth/me')
       .then((res) => res.json())
       .then((data) => {
-        const stored = localStorage.getItem(CURRENT_ROLE_KEY);
-        if (!stored) {
-          if (data.authenticated && (data.user?.hasActiveCourse || data.user?.role === 'student' || data.user?.role === 'partner')) {
-            const validRole = (data.user.role as UserRole) || 'student';
-            setRole(validRole);
-            localStorage.setItem(CURRENT_ROLE_KEY, validRole);
-            window.dispatchEvent(new Event('hb_role_updated'));
-          } else if (!isUnlocked) {
-            setRole('guest');
-          }
+        if (data.authenticated && (data.user?.hasActiveCourse || data.user?.role === 'student' || data.user?.role === 'partner')) {
+          const validRole = (data.user.role as UserRole) || 'student';
+          setRole(validRole);
+          localStorage.setItem(CURRENT_ROLE_KEY, validRole);
         }
       })
       .catch(() => {});

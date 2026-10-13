@@ -23,7 +23,7 @@ Projekt HappyBirth na obecnym etapie osiągnął **stan produkcyjnej doskonało�
 ### 1. Model Uwierzytelniania i Stanu (Client-side LocalStorage)
 - **Stan obecny:** Autoryzacja i postępy kursantki (`completedLessons`, `role`) opierają się w całości na API `localStorage` przeglądarki w pliku `lib/progress.ts`. Magic Link na ekranie logowania symuluje wysyłkę i oferuje szybkie przejście Demo.
 - **Krytyka seniora:**
-  - W architekturze komercyjnego VOD za 349 zł brak serwerowej weryfikacji torebki JWT / sesji to ryzyko. Użytkownik z minimalną wiedzą o narzędziach deweloperskich (DevTools) może ręcznie ustawić `localStorage.setItem('hb_current_role', 'student')` i zyskać dostęp do płatnych materiałów.
+  - W architekturze komercyjnego VOD za 489 zł brak serwerowej weryfikacji torebki JWT / sesji to ryzyko. Użytkownik z minimalną wiedzą o narzędziach deweloperskich (DevTools) może ręcznie ustawić `localStorage.setItem('hb_current_role', 'student')` i zyskać dostęp do płatnych materiałów.
   - Wyczyszczenie pamięci podręcznej przeglądarki lub zmiana urządzenia (np. z iPhone na laptop) powoduje utratę oznaczonych postępów ukończonych lekcji.
 - **Rekomendacja:** Wdrożenie bezserwerowej bazy na brzegu sieci (**Cloudflare D1** – SQLite) w połączeniu z Cloudflare Pages Functions (`/api/auth/magic-link` oraz `/api/user/progress`).
 
@@ -34,7 +34,7 @@ Projekt HappyBirth na obecnym etapie osiągnął **stan produkcyjnej doskonało�
 - **Rekomendacja:** Włączenie w Cloudflare Stream wymogu podpisywania adresów URL (HMAC-SHA256) oraz wygenerowanie w Pages Function (`functions/api/token.ts`) krótkotrwałych tokenów wideo ważnych np. 2 godziny, wydawanych tylko zweryfikowanej sesji kursantki.
 
 ### 3. Ścieżka Zakupowa i Onboarding Transakcyjny
-- **Stan obecny:** Przyciski CTA `Dołącz · 349 zł` kierują do `#cena`, a przycisk zakupu prowadzi do Strefy Kursantki w trybie demonstracyjnym.
+- **Stan obecny:** Przyciski CTA `Dołącz · 489 zł` kierują do `#cena`, a przycisk zakupu prowadzi do Strefy Kursantki w trybie demonstracyjnym.
 - **Krytyka seniora:**
   - W pełni uzasadnione na ten moment, gdyż spółka **KLARSolutions sp. z o.o.** jest w trakcie rejestracji w KRS. Należy jednak pamiętać, że podpięcie Stripe to nie tylko przycisk "Pay", ale obsługa:
     - Webhooka Stripe (`checkout.session.completed`).
@@ -95,7 +95,7 @@ Projekt HappyBirth na obecnym etapie osiągnął **stan produkcyjnej doskonało�
 ### 2. Architektura Routingu i Subdomen
 | Domena / Ścieżka | Rola | Status Indeksowania |
 |---|---|---|
-| `happybirth.pl/` | Landing page marketingowy, oferta, Dwa Światy, cennik 349 zł | Public / SEO Index |
+| `happybirth.pl/` | Landing page marketingowy, oferta, Dwa Światy, cennik 489 zł | Public / SEO Index |
 | `happybirth.pl/regulamin` | Regulamin platformy i sprzedaży treści cyfrowych | Public / SEO Index |
 | `happybirth.pl/polityka-prywatnosci` | Polityka prywatności i plików cookies (RODO) | Public / SEO Index |
 | `happybirth.pl/llms.txt` | Standard AI dla modeli językowych (zwięzły) | Public / Text |
@@ -138,7 +138,7 @@ Projekt HappyBirth na obecnym etapie osiągnął **stan produkcyjnej doskonało�
 
 1. **Jutro (Po rejestracji KRS spółki):**
    - Założenie konta Stripe na spółkę KLARSolutions sp. z o.o.
-   - Wdrożenie Stripe Checkout Session w cenie 349 zł brutto.
+   - Wdrożenie Stripe Checkout Session w cenie 489 zł brutto.
    - Wdrożenie endpointu Cloudflare Pages Function `/functions/api/stripe-webhook.ts`.
 2. **Automatyzacja E-mail:**
    - Podpięcie domeny `happybirth.pl` w Resend (rekordy DKIM, SPF, DMARC w Cloudflare DNS).

@@ -154,27 +154,25 @@ function StrefaDashboardContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
-      {/* 1. ELEGANCKI BANER SUKCESU PO ZAKUPIE / KODZIE PROMOCYJNYM */}
-      {paymentSuccess && (
-        <div className="rounded-2xl bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-950 border border-emerald-500/40 p-4 sm:p-5 text-white shadow-xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-400 flex items-center justify-center shrink-0">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-emerald-300 uppercase tracking-wide flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" /> Dostęp natychmiastowy aktywowany
-              </div>
-              <h3 className="font-brand-display font-bold text-base sm:text-lg text-white">
-                Wspaniale! Wszystkie 52 lekcje 4K są odblokowane dla Ciebie i Twojego partnera 🎉
-              </h3>
-            </div>
+      {/* 1. BANER WOLNEGO DOSTĘPU DLA ZESPOŁU */}
+      <div className="rounded-2xl bg-gradient-to-r from-[#20071E] via-[#2E0B2C] to-[#1A0519] border border-[#DA0271]/50 p-4 sm:p-5 text-white shadow-xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#DA0271]/20 border border-[#DA0271]/40 text-[#FF4BA8] flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5" />
           </div>
-          <span className="hidden sm:inline-block text-xs bg-emerald-500/20 text-emerald-200 px-3 py-1.5 rounded-full border border-emerald-500/30 font-medium">
-            12 miesięcy bez limitu
-          </span>
+          <div>
+            <div className="text-xs font-bold text-[#FF4BA8] uppercase tracking-wide flex items-center gap-1.5">
+              🎬 Wolny dostęp zespołu (Wszystkie 52 filmy odblokowane)
+            </div>
+            <h3 className="font-brand-display font-bold text-base sm:text-lg text-white">
+              Blokady zdjęte – możesz swobodnie oglądać i testować wszystkie lekcje 4K.
+            </h3>
+          </div>
         </div>
-      )}
+        <span className="hidden sm:inline-block text-xs bg-[#DA0271]/20 text-[#FFD1EB] px-3.5 py-1.5 rounded-full border border-[#DA0271]/40 font-semibold">
+          Tryb zespołu aktywny
+        </span>
+      </div>
 
       {/* 2. GŁÓWNY PLAYER NA SAMEJ GÓRZE (Kino Domowe & Playlista) */}
       <section

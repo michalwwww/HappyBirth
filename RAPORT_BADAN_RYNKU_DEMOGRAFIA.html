@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Raport Badań Rynku i Demografii HappyBirth</title>
+  <style>
+    @page { size: A4; margin: 15mm; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1A1512; line-height: 1.45; font-size: 9.5pt; }
+    .header-bar { border-bottom: 3px solid #EC008C; padding-bottom: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-text { font-size: 18pt; font-weight: 800; color: #250A24; letter-spacing: -0.5px; }
+    .logo-badge { background: #EC008C; color: white; padding: 4px 10px; border-radius: 99px; font-size: 8pt; font-weight: bold; text-transform: uppercase; }
+    .main-title { font-size: 15pt; color: #250A24; margin-top: 6px; margin-bottom: 4px; font-weight: 800; }
+    .sec-title { font-size: 12pt; color: #EC008C; margin-top: 16px; margin-bottom: 6px; border-bottom: 1px solid #EAE3DB; padding-bottom: 3px; font-weight: bold; }
+    .sub-title { font-size: 10.5pt; color: #250A24; margin-top: 10px; margin-bottom: 4px; font-weight: bold; }
+    .sub-sub-title { font-size: 9.5pt; color: #78207A; margin-top: 8px; margin-bottom: 2px; font-weight: bold; }
+    p { margin-bottom: 8px; color: #443B35; }
+    ul, ol { margin-left: 18px; margin-bottom: 10px; color: #443B35; }
+    li { margin-bottom: 3px; }
+    code { background: #F3ECE5; padding: 2px 4px; border-radius: 4px; font-family: Consolas, monospace; font-size: 8.5pt; color: #98269C; }
+    blockquote { background: #FFF5F9; border-left: 4px solid #EC008C; padding: 8px 12px; margin: 10px 0; font-style: italic; color: #443B35; border-radius: 0 6px 6px 0; }
+    hr { border: 0; border-top: 1px solid #EAE3DB; margin: 12px 0; }
+    
+    .data-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 8.5pt; }
+    .data-table th, .data-table td { border: 1px solid #EAE3DB; padding: 6px 8px; text-align: left; }
+    .data-table th { background: #F9F5F1; color: #250A24; font-weight: bold; }
+    .data-table tr:nth-child(even) { background: #FDFAF8; }
+    
+    .footer-note { margin-top: 20px; padding-top: 8px; border-top: 1px solid #EAE3DB; font-size: 8pt; color: #867A72; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="header-bar">
+    <div class="logo-text">HAPPYBIRTH</div>
+    <div class="logo-badge">Market Intelligence & Demografia GUS</div>
+  </div>
+  <h1 class="main-title">RAPORT BADAŃ RYNKU, DEMOGRAFII GŁÓWNEGO URZĘDU STATYSTYCZNEGO I DEKONSTRUKCJI KAMPANII WOKÓŁ PORODÓW W POLSCE</h1>
+<h2 class="sec-title">Projekt: HappyBirth · Nowoczesna Szkoła Rodzenia Online VOD</h2>
+<strong>Data opracowania:</strong> 17 września 2026 r.
+<strong>Autor:</strong> Antigravity AI (AdOps & Market Intelligence Lead)
+<strong>Cel:</strong> Kompleksowa analiza konkurencji, reverse-engineering wiralowych reklam błędów okołoporodowych, demograficzna mapa ciąż w Polsce oraz gotowa architektura kampanii reklamowych Meta & TikTok.</p><p><hr/></p><p><h2 class="sec-title">SPIS TREŚCI</h2>
+<li><strong>Analiza Konkurencji i Benchmark Rynkowy</strong> (Kto, za ile, z jakimi lejkami i słabymi punktami).</li>
+<li><strong>Dekonstrukcja Fenomenu: „Reklamy Odszkodowań za Błędy przy Porodzie”</strong> (Dlaczego mają 10k+ reakcji, jak omijają bany Mety i jak HappyBirth tworzy z tego etyczną przewagę).</li>
+<li><strong>Demograficzno-Geograficzna Mapa Kobiet w Ciąży w Polsce (GUS 2024–2026)</strong> (Tabela 16 województw, kohorty wiekowe, zjawisko „pustyń porodowych”).</li>
+<li><strong>Matryca Kampanii Reklamowych Meta Ads & TikTok</strong> (4 gotowe linie kreatywne, targetowanie, skrypty wideo, hooki i UTM-y).</li>
+<li><strong>Plan Wdrożenia i Rekomendacje Budżetowe</strong>.</li></p><p><hr/></p><p><h2 class="sec-title">1. ANALIZA KONKURENCJI I BENCHMARK RYNKOWY</h2></p><p>Rynek szkół rodzenia w Polsce dzieli się na cztery główne segmenty: liderzy online, stacjonarne placówki NFZ, prywatne kliniki (np. Medicover) oraz solistki/influencerki w mediach społecznościowych.</p><p><h3 class="sub-title">Tabela Porównawcza Konkurencji</h3></p><p><table class="data-table">
+<thead><tr><th>Podmiot / Marka</th><th>Model & Format</th><th>Cena</th><th>Mocne Strony</th><th>Słabe Punkty i Luki Rynkowe</th></tr></thead>
+<tbody>
+<tr><td><strong>Zaufaj Położnej</strong> (<code>zaufajpoloznej.pl</code>)</td><td>Kurs VOD (35–50h) + LMS</td><td>199 – 400 zł (przekreślenia z 700 zł)</td><td>Duża baza materiałów, rozpoznawalność, szeroki zasięg organiczny.</td><td>Przestarzały interfejs (LMS z 2018), brak interaktywnych narzędzi webowych (brak licznika skurczów, brak kreatora planu porodu), materiały rozwlekłe.</td></tr>
+<tr><td><strong>Zapytaj Położną</strong> (Kasia Płaza-Piekarzewska)</td><td>Kurs VOD (12 msc)</td><td>267 – 597 zł</td><td>Silna marka osobista na IG/TikTok, duża lojalność matek.</td><td>100% zależność od jednej osoby, mały nacisk na warsztat fizyczny dla partnera, brak nowoczesnych narzędzi cyfrowych.</td></tr>
+<tr><td><strong>Medicover / Szpitale Prywatne</strong></td><td>Warsztaty stacjonarne</td><td>1 400 – 1 600 zł</td><td>Prestiż, kontakt fizyczny, zwiedzanie oddziału.</td><td>Dostępne tylko w 4-5 największych miastach, astronomiczna cena, sztywne weekendowe terminy.</td></tr>
+<tr><td><strong>Szkoły Rodzenia NFZ</strong></td><td>Zajęcia stacjonarne w szpitalach</td><td>0 zł (w ramach NFZ)</td><td>Bezpłatne, blisko lokalnego szpitala.</td><td>Sztywne godziny (np. czwartek 13:00 – partner pracujący odpada), archaiczny program, brak wsparcia po wypisie, masowa likwidacja w powiatach.</td></tr>
+<tr><td><strong>HappyBirth</strong> (Nasza Pozycja)</td><td>Nowoczesna platforma VOD 4K + Web App</td><td><strong>349 zł (dla dwojga)</strong></td><td>Standard kinowy 4K, 52 skondensowane lekcje, interaktywny Licznik Skurczów SOS, Generator Planu Porodu PDF, Strefa Partnera, dostęp na 12 msc.</td><td>Młoda marka (wymaga budowy dowodu społecznego i sterylnego lejka lead magnetu).</td></tr>
+</tbody></table></p><p>
+<h3 class="sub-title">Kluczowe Wnioski z Benchmarking'u:</h3>
+<li><strong>Luka „Wideo 4K / Netflix-Grade”:</strong> Większość konkurentów nagrywała swoje kursy 4–6 lat temu kamerami domowymi w jakości 1080p z przeciętnym audio. HappyBirth z Cloudflare Stream i jakością filmową 4K wygląda o dwie klasy nowocześniej.</li>
+<li><strong>Luka „Moduł dla Partnera”:</strong> Konkurenci traktują partnera marginalnie („niech partner też posłucha”). HappyBirth traktuje partnera jako aktywnego asystenta i obrońcę rodzącej (masaż lędźwi, oddech, komunikacja z personelem).</li>
+<li><strong>Luka Narzędziowa:</strong> Żadna konkurencyjna szkoła rodzenia online nie ma wbudowanego, estetycznego generatora Planu Porodu z natychmiastowym wydrukiem PDF oraz interaktywnego Licznika Skurczów z algorytmem 5-1-1.</li></p><p><hr/></p><p><h2 class="sec-title">2. DEKONSTRUKCJA FENOMENU: „REKLAMY ODSZKODOWAŃ ZA BŁĘDY PRZY PORODZIE”</h2></p><p>W ostatnich miesiącach na Facebooku i Instagramie ogromną popularność zyskały reklamy podmiotów odszkodowawczych (np. <strong>Krajowy Rejestr Osób Poszkodowanych - KROP</strong>, <strong>Auxilia</strong>, <strong>Lazer & Hudziak / Błąd Przy Porodzie</strong>, <strong>BFP Kancelaria</strong>).</p><p><h3 class="sub-title">2.1. Dlaczego te reklamy mają dziesiątki tysięcy reakcji i komentarzy?</h3>
+* <strong>Niezagojona trauma systemowa:</strong> W Polsce poród w szpitalu publicznym wciąż budzi ogromny podskórny lęk. Raporty Fundacji Rodzić po Ludzku wskazują, że ponad 50% kobiet doświadcza naruszenia praw pacjenta: rutynowe nacięcia krocza (episiotomia) bez wskazań, agresywne podawanie oksytocyny, ignorowanie spadków tętna płodu, odmowa znieczulenia zewnątrzoponowego czy przedmiotowe traktowanie.
+* <strong>Sekcja komentarzy jako wstrząsająca grupa wsparcia:</strong> Kobiety w komentarzach piszą swoje autobiografie porodowe, wylewając żal i ból.
+* <strong>Efekt kuli śnieżnej algorytmu Mety:</strong> Algorytm Meta Ads mierzy współczynnik zaangażowania (Engagement Rate). Setki długich komentarzy i tysiące udostępnień sprawiają, że algorytm kwalifikuje kreację jako „niezwykle interesującą dla odbiorców”, drastycznie obniżając CPM (koszt dotarcia) i pompując zasięgi organiczne za darmo.</p><p><h3 class="sub-title">2.2. Jak te podmioty omijają restrykcje reklamowe Meta Policy?</h3>
+<li><strong>Kwalifikacja branżowa:</strong> Reklamują się jako <strong>usługi prawne, pomoc prawna i ochrona praw obywatelskich</strong>, a nie jako usługi medyczne czy produkty farmaceutyczne. Dzięki temu nie podlegają surowym restrykcjom dotyczącym procedur medycznych.</li>
+<li><strong>Struktura językowa bez cech osobistych (Personal Attributes):</strong> Zamiast pisać: <em>„Czy Twoje dziecko jest niepełnosprawne?”</em> (co skutkuje natychmiastowym banem bota Mety), stosują pytania o procedury: <em>„Czy podczas Twojego porodu doszło do powikłań okołoporodowych? Sprawdź, jak interpretować dokumentację medyczną.”</em></li>
+<li><strong>Edukacyjny Lead Magnet:</strong> Zbierają leady przez „Bezpłatną analizę dokumentacji medycznej” lub pobranie poradnika prawnego.</li></p><p><h3 class="sub-title">2.3. Etyczny Pivot dla HappyBirth: TARCZA OCHRONNA ZAMIAST PROCESU</h3></p><p>Kancelarie prawne wchodzą do gry <strong>PO TRAGEDII</strong> – gdy dziecko doznało niedotlenienia, matka ma pęknięcie krocza III stopnia, a sprawa w sądzie potrwa 5–8 lat.</p><p><strong>HappyBirth staje się TARCZĄ OCHRONNĄ PRZED PORODEM:</strong>
+* <strong>Główna idea:</strong> Zamiast bać się szpitala i czekać na błędy, para wchodzi na porodówkę uzbrojona w wiedzę, oficjalny dokument medyczny i przeszkolonego partnera.
+* <strong>3 Filary Tarczy HappyBirth:</strong>
+<li><strong>Standard Opieki Okołoporodowej Ministra Zdrowia:</strong> Uczymy rodziców, co personel medyczny MOŻE, a czego NIE MA PRAWA zrobić bez pisemnej zgody rodzącej (np. nacięcie krocza, przebicie pęcherza, podanie oksytocyny).</li>
+<li><strong>Oficjalny Plan Porodu PDF:</strong> Dokument prawny, który kobieta wręcza na izbie przyjęć. Położna ma ustawowy obowiązek dołączyć go do historii choroby.</li>
+<li><strong>Rola Partnera (Rzecznik Rodzącej):</strong> Partner w HappyBirth uczy się, jak asertywnie i spokojnie komunikować się z lekarzami, pilnować praw rodzącej i nie dać się wyprosić na korytarz.</li></p><p><hr/></p><p><h2 class="sec-title">3. DEMOGRAFICZNO-GEOGRAFICZNA MAPA CIĄŻ W POLSCE (GUS 2024–2026)</h2></p><p><h3 class="sub-title">3.1. Wolumen Rynku i Średni Wiek Matki</h3>
+* <strong>Roczna liczba porodów w Polsce:</strong> ok. <strong>238 000 – 252 000</strong>.
+* <strong>Średni wiek rodzącej pierwsze dziecko:</strong> <strong>29,5 roku</strong> (w 2025 r.), a mediana wieku wszystkich rodzących to <strong>31 lat</strong>.
+* <strong>Kluczowe kohorty wiekowe:</strong>
+<li><strong>30–34 lata (ok. 40% rynku – ~95 000 porodów):</strong> <strong>Złota kohorta zakupowa</strong>. Kobiety ustabilizowane zawodowo, dysponujące budżetem, kupujące kursy premium (349 zł) bez wahania.</li>
+<li><strong>25–29 lat (ok. 29% rynku – ~70 000 porodów):</strong> Kobiety rodzące pierwsze dziecko. Najwyższy poziom lęku przed nieznanym, ogromna potrzeba wiedzy, naturalne środowisko Instagrama i TikToka.</li>
+<li><strong>35–39 lat (ok. 19% rynku – ~45 000 porodów):</strong> Często ciąże planowane po latach, wysoka świadomość powikłań, priorytet: absolutne bezpieczeństwo i spokój.</li>
+<li><em>20–24 lata (~7%) oraz 40+ (<4%):</em> Grupy marginalne pod kątem zakupu kursów VOD (wykluczamy je z płatnych kampanii konwersyjnych).</li></p><p><hr/></p><p><h3 class="sub-title">3.2. Rozkład Terytorialny: Urodzenia i Potencjał w 16 Województwach</h3></p><p><table class="data-table">
+<thead><tr><th>Województwo</th><th>Szacunkowa Liczba Urodzeń (Rocznie)</th><th>Współczynnik Dzietności (TFR)</th><th>Dominujący Profil Rynku</th><th>Rekomendowany Kąt Reklamowy</th><th>Udział w Budżecie Ads</th></tr></thead>
+<tbody>
+<tr><td><strong>Mazowieckie</strong></td><td>~43 000 – 46 000</td><td>1,155 (Najwyższy)</td><td>Aglomeracja warszawska + powiaty</td><td>Brak czasu, wygoda kanapy, standard 4K</td><td><strong>25%</strong></td></tr>
+<tr><td><strong>Małopolskie</strong></td><td>~25 000 – 27 000</td><td>1,125</td><td>Kraków + Podhale / Nowy Sącz</td><td>Świadomy poród, wsparcie partnera</td><td><strong>14%</strong></td></tr>
+<tr><td><strong>Wielkopolskie</strong></td><td>~24 000 – 26 000</td><td>1,119</td><td>Poznań + silne ośrodki powiatowe</td><td>Praktyczne przygotowanie, organizacja</td><td><strong>12%</strong></td></tr>
+<tr><td><strong>Śląskie</strong></td><td>~24 000 – 25 500</td><td>1,045</td><td>Konurbacja śląska (wysoka gęstość)</td><td>Dostępność online bez korków</td><td><strong>11%</strong></td></tr>
+<tr><td><strong>Dolnośląskie</strong></td><td>~18 500 – 20 000</td><td>1,090</td><td>Wrocław + Sudety / Legnica</td><td>Nowoczesność, prawa pacjenta</td><td><strong>10%</strong></td></tr>
+<tr><td><strong>Pomorskie</strong></td><td>~17 500 – 19 000</td><td>1,107</td><td>Trójmiasto + Kaszuby</td><td>Partner na sali, spokój, techniki</td><td><strong>9%</strong></td></tr>
+<tr><td><strong>Łódzkie</strong></td><td>~12 500 – 13 500</td><td>1,060</td><td>Łódź + miasta satelickie</td><td>Elastyczność, bezpieczeństwo</td><td><strong>5%</strong></td></tr>
+<tr><td><strong>Podkarpackie</strong></td><td>~12 000 – 13 000</td><td>1,085</td><td>Prowincja, Rzeszów, małe powiaty</td><td>Pustynie porodowe, wiedza ekspertek</td><td><strong>4%</strong></td></tr>
+<tr><td><strong>Lubelskie</strong></td><td>~11 000 – 12 000</td><td>1,070</td><td>Lublin + tereny wschodnie</td><td>Pustynie porodowe, brak szkół NFZ</td><td><strong>3%</strong></td></tr>
+<tr><td><strong>Kujawsko-Pomorskie</strong></td><td>~11 000 – 12 000</td><td>1,065</td><td>Bydgoszcz, Toruń, powiaty</td><td>Wygoda, dostęp 24/7</td><td><strong>3%</strong></td></tr>
+<tr><td><strong>Zachodniopomorskie</strong></td><td>~9 000 – 10 000</td><td>1,050</td><td>Szczecin, Koszalin, pas nadmorski</td><td>Dostęp online z każdego miejsca</td><td><strong>2%</strong></td></tr>
+<tr><td><strong>Warmińsko-Mazurskie</strong></td><td>~7 500 – 8 500</td><td>1,060</td><td>Olsztyn + rozproszone powiaty</td><td>Pustynie porodowe (brak oddziałów)</td><td><strong>2%</strong></td></tr>
+<tr><td><strong>Świętokrzyskie</strong></td><td>~6 500 – 7 200</td><td>1,030</td><td>Kielce + małe miejscowości</td><td>Dostęp do topowych ekspertów</td><td><strong>1.5%</strong></td></tr>
+<tr><td><strong>Podlaskie</strong></td><td>~6 500 – 7 200</td><td>1,116</td><td>Białystok + wschodnie powiaty</td><td>Spokojny poród, wsparcie rodziny</td><td><strong>1.5%</strong></td></tr>
+<tr><td><strong>Lubuskie</strong></td><td>~5 500 – 6 200</td><td>1,040</td><td>Zielona Góra, Gorzów Wlkp.</td><td>Pustynie porodowe, szkoła w domu</td><td><strong>1%</strong></td></tr>
+<tr><td><strong>Opolskie</strong></td><td>~5 000 – 5 500</td><td>1,020 (Najniższy)</td><td>Opole + powiaty</td><td>Wygoda, nauka we dwoje</td><td><strong>1%</strong></td></tr>
+</tbody></table></p><p>
+<hr/></p><p><h3 class="sub-title">3.3. Dwa Kluczowe Bieguny Rynkowe</h3></p><p><h4 class="sub-sub-title">Biegun 1: Wielkie Aglomeracje (Warszawa, Kraków, Wrocław, Poznań, Trójmiasto, Katowice)</h4>
+* <strong>Kto:</strong> Kobiety w wieku 28–35 lat, wykształcenie wyższe, praca w korporacjach/biznesie.
+* <strong>Bariera główna:</strong> Chroniczny brak czasu. Godziny szczytu w Warszawie czy Krakowie uniemożliwiają dojazd na zajęcia o 17:00.
+<em> <strong>Komunikacja:</strong> </em>„Zajęcia stacjonarne o 16:30 w korkach? Oglądacie w kinowej jakości 4K na kanapie przy herbacie wtedy, kiedy macie wolny wieczór.”*</p><p><h4 class="sub-sub-title">Biegun 2: Polska Powiatowa i „Pustynie Porodowe”</h4>
+* <strong>Zjawisko systemowe:</strong> W latach 2022–2026 w Polsce zamknięto ponad 35 oddziałów położniczych w szpitalach powiatowych (wymóg minimum 400 porodów rocznie). Kobiety muszą jeździć do szpitali oddalonych o 40–70 km. W ich miastach <strong>nie ma żadnej stacjonarnej szkoły rodzenia</strong>.
+* <strong>Bariera główna:</strong> Fizyczny brak dostępu do edukacji okołoporodowej na poziomie.
+<em> <strong>Komunikacja:</strong> </em>„W Twoim mieście zamknięto szkołę rodzenia lub do szpitala masz 50 km? Wprowadź najlepsze położne i fizjoterapeutki prosto do swojego salonu. Ucz się z partnerem bez dojazdów.”*</p><p><hr/></p><p><h2 class="sec-title">4. MATRYCA KAMPANII REKLAMOWYCH META ADS & TIKTOK</h2></p><p>Poniżej znajduje się 4-liniowa architektura kampanii testowych przygotowana pod ścisłe wytyczne ochrony kapitału (ABO, Cost Cap, brak rozszerzeń Advantage+).</p><p><hr/></p><p><h3 class="sub-title">🎯 LINIA 1: „Tarcza Porodowa” (Lead Magnet + Upsell do 349 zł)</h3>
+* <strong>Cel w Meta Ads:</strong> <strong>Kontakty (Leads)</strong>.
+* <strong>Target:</strong> Kobiety 24–36 lat, Cała Polska. Zainteresowania: Ciąża, Prawa pacjenta, Szkoła rodzenia, Ginekologia. <code>enable_audience_expansion: false</code>.
+* <strong>Budżet:</strong> 30 zł / dzień (ABO).
+* <strong>Kreacja:</strong> Pojedyncza grafika z podglądem 1-stronicowego dokumentu Planu Porodu z pieczęcią „Zgodny ze Standardem MZ”.
+* <strong>Nagłówek:</strong> <strong>Oficjalny Szablon Planu Porodu PDF (Pobierz bezpłatnie)</strong>
+* <strong>Treść (Copy):</strong>
+> *Czy wiesz, że personel szpitala ma ustawowy obowiązek dołączyć Twój Plan Porodu do historii choroby?
+> Zamiast martwić się procedurami na izbie przyjęć, przygotujcie z partnerem czytelny, 1-stronicowy dokument w 3 minuty. Zaznaczcie swoje preferencje dotyczące ochrony krocza, znieczulenia i obecności partnera.
+> Pobierz bezpłatny wzór zgodny ze Standardem Opieki Okołoporodowej i weź go ze sobą do szpitala.*
+* <strong>URL:</strong> <code>https://happybirth.pl/plan-porodu?utm_source=meta&utm_medium=cpc&utm_campaign=lead_plan_porodu</code>
+* <strong>CTA:</strong> <strong>Pobierz teraz</strong>.
+<em> <strong>Mechanizm Upsell:</strong> Po wpisaniu e-maila użytkowniczka otrzymuje natychmiast PDF na maila oraz trafia na stronę podziękowania z ofertą specjalną: </em>„Plan porodu to 5% sukcesu. Zobacz 52 lekcje wideo, jak go zrealizować w praktyce z partnerem – odbierz dostęp za 349 zł.”*</p><p><hr/></p><p><h3 class="sub-title">🎯 LINIA 2: „Nie Stój Bezradnie” (Wideo Reels / TikTok · Kąt Partnera)</h3>
+* <strong>Cel:</strong> <strong>Sprzedaż (Purchase)</strong>. Cost Cap: 70 zł.
+* <strong>Target:</strong> Kobiety i Mężczyźni 24–36 lat, Polska.
+* <strong>Format:</strong> Wideo pionowe 9:16 (czas trwania: 25–30 sekund).
+* <strong>Scenariusz Wideo:</strong>
+<li><code>0:00 - 0:03</code> <strong>(Hook wizualny i tekstowy):</strong> Zbliżenie na dłonie partnera uciskające kość krzyżową rodzącej na piłce. Napis na ekranie: <em>„3 chwyty masażu dla faceta, które uśmierzają ból skurczu o 60%.”</em></li>
+<li><code>0:04 - 0:15</code> <strong>(Treść merytoryczna):</strong> Fizjoterapeutka z HappyBirth w 4K pokazuje ułożenie rąk: <em>„Nie masuj po kręgosłupie. Dociśnij nasadę dłoni w tym trójkącie lędźwiowym w szczycie skurczu.”</em></li>
+<li><code>0:16 - 0:25</code> <strong>(Przejście i korzyść):</strong> Kadr z uśmiechniętą, zrelaksowaną parą. Głos lektora: <em>„Na porodówce facet nie może stać w kącie z telefonem. W HappyBirth uczymy partnera konkretnych zadań: jak masować, jak oddychać i jak chronić Twoje prawa.”</em></li>
+<li><code>0:26 - 0:30</code> <strong>(CTA):</strong> Plansza z ofertą: <em>„52 lekcje 4K dla dwojga. Dostęp na 12 miesięcy. Dołącz na HappyBirth.pl”</em>.</li>
+* <strong>Nagłówek w reklamie:</strong> <strong>Szkoła rodzenia, w której partner realnie Ci pomaga</strong>
+* <strong>URL:</strong> <code>https://happybirth.pl/#cena?utm_source=meta&utm_medium=cpc&utm_campaign=partner_masaz&utm_content=reels_chwyty</code>
+* <strong>CTA:</strong> <strong>Kup teraz</strong>.</p><p><hr/></p><p><h3 class="sub-title">🎯 LINIA 3: „Pustynie Porodowe” (Target: Polska Powiatowa poza Top 7 Miast)</h3>
+* <strong>Cel:</strong> <strong>Sprzedaż (Purchase)</strong>.
+* <strong>Target:</strong> Kobiety 24–36 lat, Polska z WYKLUCZENIEM Warszawy, Krakowa, Wrocławia, Poznania, Gdańska, Łodzi i Katowic (+promień 20 km).
+* <strong>Format:</strong> Karuzela 3-kartowa lub statyczna grafika wizerunkowa.
+* <strong>Nagłówek:</strong> <strong>Brak szkoły rodzenia w okolicy? Ucz się z partnerem w domu</strong>
+* <strong>Treść (Copy):</strong>
+> *W Twojej okolicy zlikwidowano oddział lub szkołę rodzenia? Nie musisz jeździć 50 km na sztywne wykłady w szpitalu.
+> Z HappyBirth zyskujesz dostęp do najlepszych warszawskich położnych, urofizjoterapeutek i psychologów prosto w swoim salonie.
+> Oglądacie we dwoje o dowolnej porze na telefonie lub telewizorze. W pakiecie interaktywny Licznik Skurczów SOS i generator Planu Porodu. Dołącz do kursu za jednorazowe 349 zł dla dwojga.*
+* <strong>URL:</strong> <code>https://happybirth.pl/#cena?utm_source=meta&utm_medium=cpc&utm_campaign=prowincja_pustynie</code>
+* <strong>CTA:</strong> <strong>Zarejestruj się / Kup teraz</strong>.</p><p><hr/></p><p><h3 class="sub-title">🎯 LINIA 4: „Korki vs Kanapa” (Target: Top Aglomeracje Wielkomiejskie)</h3>
+* <strong>Cel:</strong> <strong>Sprzedaż (Purchase)</strong>.
+* <strong>Target:</strong> Warszawa, Kraków, Wrocław, Poznań, Trójmiasto, Aglomeracja Śląska (+15 km). Kobiety 26–36 lat.
+* <strong>Format:</strong> Grafika typu Split-Screen (Podzielony ekran).
+<li>Po lewej stronie: Zdjęcie deszczu, korka samochodowego o 16:30, zegarek, zmęczenie. Podpis: <em>Tradycyjna szkoła rodzenia: dojazdy, pośpiech po pracy, sztywne godziny.</em></li>
+<li>Po prawej stronie: Przytulny salon, para na kanapie pod kocem, laptop z filmem 4K HappyBirth, ciepła herbata. Podpis: <em>HappyBirth: 21:00 na kanapie, nielimitowane powtórki, spokój we dwoje.</em></li>
+* <strong>Nagłówek:</strong> <strong>52 lekcje 4K dla dwojga · Oglądajcie kiedy chcecie</strong>
+* <strong>URL:</strong> <code>https://happybirth.pl/#cena?utm_source=meta&utm_medium=cpc&utm_campaign=aglomeracje_kanapa</code>
+* <strong>CTA:</strong> <strong>Kup teraz</strong>.</p><p><hr/></p><p><h2 class="sec-title">5. PLAN WDROŻENIA I REKOMENDACJE BUDŻETOWE</h2></p><p><h3 class="sub-title">Etap 1: Test Cold-Start (Dni 1–7) · Budżet: 100 zł / dzień</h3>
+* <strong>Zestaw 1 (30 zł/dzień):</strong> Linia 1 – Magnes Leadowy (Plan Porodu PDF). Cel: zebranie pierwszych 70–100 tanich kontaktów (CPL 2–3 zł) i natychmiastowe nakarmienie Piksela zdarzeniami.
+* <strong>Zestaw 2 (40 zł/dzień):</strong> Linia 2 – Wideo Reels (Partner & Masaż). Cel: bezpośrednia sprzedaż z Cost Cap 70 zł.
+* <strong>Zestaw 3 (30 zł/dzień):</strong> Linia 3 lub 4 (Test A/B: Aglomeracje vs Pustynie porodowe).</p><p><h3 class="sub-title">Etap 2: Skalowanie i Retargeting (Dni 8–21) · Budżet: 150–250 zł / dzień</h3>
+* Uruchomienie kampanii retargetingowej (kobiety, które pobrały bezpłatny Plan Porodu lub odwiedziły landing page, ale nie kupiły w ciągu 48h) z budżetem 40 zł/dzień.
+* Zwiększanie budżetu o 15% co 48h wyłącznie na zestawach, które utrzymują CPA < 55 zł.</p><p><hr/>
+<em>Dokument operacyjny opracowany autonomicznie przez Google Antigravity AI dla serwisu HappyBirth. Wszelkie prawa zastrzeżone.</em>
+
+  <div class="footer-note">
+    Dokument badawczo-strategiczny wygenerowany przez Google Antigravity AI dla projektu HappyBirth · Poufne
+  </div>
+</body>
+</html>

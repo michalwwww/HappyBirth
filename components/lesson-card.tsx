@@ -19,11 +19,8 @@ interface LessonCardProps {
 export function LessonCard({ lesson, isCompleted, isActive = false, autoplay = true }: LessonCardProps) {
   const pathname = usePathname();
   const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
-  const { role } = useCourseProgress();
-  const isCourseUnlocked =
-    role === 'student' ||
-    role === 'partner' ||
-    isCourseUnlockedLocally();
+  // Wolny dostęp zespołu: wszystkie lekcje odblokowane
+  const isCourseUnlocked = true;
 
   return (
     <Link

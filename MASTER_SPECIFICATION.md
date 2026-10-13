@@ -124,7 +124,7 @@ Na wszystkich stronach publicznych (`/`, `/marketing`, `/lp/*`) obowiązuje filt
 [POZIOM 02] STICKY NAVBAR (DESKTOP & MOBILE)
             • Lewo: Logo HappyBirth + sygnet jakości
             • Środek: Kotwice [#program] [#dla-taty] [#narzedzia] [#eksperci] [#faq]
-            • Prawo: Przycisk "Zaloguj" + CTA "Kup kurs (349 zł)"
+            • Prawo: Przycisk "Zaloguj" + CTA "Kup kurs (489 zł)"
             • Mobile: Hamburger Drawer (powierzchnia dotyku min. 48x48px w Thumb Zone)
             • Na landingach płatnych (/lp/*): Menu całkowicie usunięte (Leaky Bucket Shield)
 
@@ -132,7 +132,7 @@ Na wszystkich stronach publicznych (`/`, `/marketing`, `/lp/*`) obowiązuje filt
             • Badge zaufania: "Rekomendacja Certyfikowanych Położnych"
             • H1: Spokojny poród i pewność w pierwszych dniach życia malucha
             • Podtytuł: Kompletny kurs szkoły rodzenia online dla dwojga. 52 lekcje VOD.
-            • Przyciski: [Kupuję kurs — 349 zł] oraz [Zobacz darmową lekcję]
+            • Przyciski: [Kupuję kurs — 489 zł] oraz [Zobacz darmową lekcję]
             • Cloudflare Stream Player (Zwiastun 4K)
             • 3 mikro-bullety: Natychmiastowy start | 12 m-cy dostępu | Dostęp dla dwojga
 
@@ -168,7 +168,7 @@ Na wszystkich stronach publicznych (`/`, `/marketing`, `/lp/*`) obowiązuje filt
             • Autentyczne opinie rodziców oznaczone: "Opinia potwierdzona zakupem"
 
 [POZIOM 10] TRANSPARENTNY BOX OFERTOWY
-            • Cena stała: 349 zł brutto (brak sztucznych obniżek)
+            • Cena stała: 489 zł brutto (brak sztucznych obniżek)
             • 52 lekcje VOD, 12 miesięcy dostępu, 2 konta bez dopłat
             • Płatności: BLIK, Apple Pay, Google Pay, Przelewy24, Karty przez Stripe
             • Zgoda prawna: Klauzula Art. 38 pkt 13
@@ -194,10 +194,10 @@ Na wszystkich stronach publicznych (`/`, `/marketing`, `/lp/*`) obowiązuje filt
 
 ## 6. Ekosystem Znaczników i Nowa Era AI (Schema.org & llms.txt)
 
-* **`public/llms.txt`**: Czysty Markdown dla robotów SearchGPT, Perplexity i Gemini. Podaje twarde fakty: szkoła rodzenia online dla par, 52 lekcje, 349 zł, Standard MZ 2024.
+* **`public/llms.txt`**: Czysty Markdown dla robotów SearchGPT, Perplexity i Gemini. Podaje twarde fakty: szkoła rodzenia online dla par, 52 lekcje, 489 zł, Standard MZ 2024.
 * **JSON-LD**:
   - `EducationalOrganization`: Informacje o wydawcy edukacyjnym.
-  - `Course` & `CourseInstance`: 52 lekcje, 15 godzin, cena 349 PLN.
+  - `Course` & `CourseInstance`: 52 lekcje, 15 godzin, cena 489 PLN.
   - `FAQPage`: Rozwijane pytania i odpowiedzi w wynikach Google.
   - `MedicalWebPage`: Recenzje medyczne (`reviewedBy`) z numerami PWZL autorek pod kątem Google YMYL.
 
@@ -243,7 +243,7 @@ Na wszystkich stronach publicznych (`/`, `/marketing`, `/lp/*`) obowiązuje filt
 
 ## 10. Zgodność Prawna, Podatki i Bezpieczeństwo Medyczne
 
-1. **Dyrektywa Omnibus**: Stała cena 349 zł brutto. Brak sztucznych promocji bez historii 30 dni.
+1. **Dyrektywa Omnibus**: Stała cena 489 zł brutto. Brak sztucznych promocji bez historii 30 dni.
 2. **Art. 38 pkt 13 Ustawy o prawach konsumenta**: Wymuszona zgoda na natychmiastowe świadczenie treści cyfrowych.
 3. **Stawka VAT**: Zwolnienie podmiotowe (art. 113 ust. 1 do 200k zł/rok) lub 23% VAT przy pełnym obrocie.
 4. **Medical Liability Disclaimer**: Informacja przed lekcjami i w stopce: materiały mają charakter edukacyjny i nie zastępują pomocy lekarskiej w stanach zagrożenia życia.

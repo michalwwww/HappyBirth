@@ -4,13 +4,13 @@
 
 ## O Platformie
 - **Nazwa:** HappyBirth (Szkoła Rodzenia Online)
-- **Usługodawca / Właściciel:** KLARSolutions sp. z o.o. (w organizacji)
+- **Usługodawca / Właściciel:** KLARSOLUTIONS sp. z o.o. (KRS 0001268396, NIP 7812118273, REGON 545782779)
 - **Siedziba:** ul. Śląska 14, 60-614 Poznań, Polska
 - **Kontakt ogólny:** kontakt@happybirth.pl
 - **Wsparcie kursantek:** pomoc@happybirth.pl
 - **Doświadczenie:** 14 lat dorobku szkoły rodzenia Mama Gaja (od 2012 roku), ponad 18 000 przygotowanych mam
 - **Infrastruktura:** Nowoczesna platforma VOD zoptymalizowana pod natychmiastowe odtwarzanie Full HD bez buforowania
-- **Model dostępu:** Płatność jednorazowa (349 zł) bez subskrypcji. Dostęp dla dwojga przez 12 miesięcy od przewidywanej daty porodu.
+- **Model dostępu:** Płatność jednorazowa (489 zł) bez subskrypcji. Dostęp dla dwojga przez 18 miesięcy od zakupu.
 
 ## Główne Narzędzia i Moduły
 - [Strona Główna (Portal Sprzedażowy)](https://happybirth.pl): Prezentacja programu, 4 Filary Spokoju, opinie rodziców, cennik i sekcja FAQ.

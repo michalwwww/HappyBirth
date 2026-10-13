@@ -688,14 +688,11 @@ export default function RootPage() {
               <span>@happybirth.pl</span>
             </a>
 
-            <span className="text-[#EAD5E5]/60 hidden lg:inline border-l border-[#461643] pl-2.5">
-              {t.haveAccount}
-            </span>
             <Link
               href="/strefa"
-              className="inline-flex items-center gap-1 font-semibold text-white hover:text-[#EC008C] transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 font-bold text-white bg-[#DA0271] hover:bg-[#B5005E] px-3.5 py-1.5 rounded-full transition-all shadow-md whitespace-nowrap text-xs"
             >
-              <span>{t.enterZone}</span>
+              <span>🎬 Oglądaj filmy (Wolny dostęp)</span>
             </Link>
           </div>
         </div>
@@ -765,11 +762,11 @@ export default function RootPage() {
                 {t.hero.lead}
               </p>
               <div className="ctas">
-                <a className="btn kup" href="#cena">{t.hero.ctaBuy}</a>
-                <a className="btn zolty" href="#zwiastun">
+                <Link className="btn zolty" href="/strefa">
                   <span aria-hidden="true" className="graj" />
-                  {t.hero.ctaTrailer}
-                </a>
+                  🎬 Oglądaj filmy (Wolny dostęp)
+                </Link>
+                <a className="btn kup" href="#cena">{t.hero.ctaBuy}</a>
               </div>
               <ul className="fakty">
                 {t.hero.facts.map((fact, idx) => (
