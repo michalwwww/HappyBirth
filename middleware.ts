@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { AFFILIATE_COOKIE_NAME, AFFILIATE_COOKIE_MAX_AGE_SECONDS } from '@/lib/affiliate';
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
@@ -14,21 +15,34 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const isDev = hostname.includes('localhost') || hostname.includes('127.0.0.1');
+  // [D2] Obsługa 30-dniowego ciasteczka atrybucji afiliacyjnej First-Party (?ref=)
+  const refParam = url.searchParams.get('ref');
+  const attachAffiliateCookie = (res: NextResponse) => {
+    if (refParam && /^[a-zA-Z0-9_-]{2,40}$/.test(refParam)) {
+      res.cookies.set(AFFILIATE_COOKIE_NAME, refParam.trim(), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: AFFILIATE_COOKIE_MAX_AGE_SECONDS,
+        path: '/',
+      });
+    }
+    return res;
+  };
 
   // -------------------------------------------------------------
-  // A. STREFA PARTNERA / AFILIACJA B2B (partnerzy.happybirth.pl)
+  // A. SUBDOMENA PARTNERZY (partnerzy.happybirth.pl -> /partnerzy)
   // -------------------------------------------------------------
   const isPartnerzyHost = hostname.startsWith('partnerzy.');
   if (isPartnerzyHost) {
     if (!url.pathname.startsWith('/partnerzy')) {
       url.pathname = `/partnerzy${url.pathname === '/' ? '' : url.pathname}`;
     }
-    return NextResponse.rewrite(url);
+    return attachAffiliateCookie(NextResponse.rewrite(url));
   }
 
   // -------------------------------------------------------------
-  // B. STREFA KURSANTKI (strefa.happybirth.pl lub strefa.localhost)
+  // B. STREFA KURSANTKI (strefa.happybirth.pl lub /strefa/*)
   // -------------------------------------------------------------
   const isStrefaHost = hostname.startsWith('strefa.');
   const isStrefaPath = url.pathname.startsWith('/strefa');
@@ -41,15 +55,16 @@ export function middleware(request: NextRequest) {
     }
 
     const response = NextResponse.rewrite(url);
-    // Bezwzględna ochrona prywatności medycznej przed botami Meta Ads i Google Ads
+    // [E5] Bezwzględna ochrona prywatności medycznej przed botami Meta Ads i Google Ads
     response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
     return response;
   }
 
   // -------------------------------------------------------------
-  // C. DOMENA GŁÓWNA MARKETINGOWA (happybirth.pl lub localhost:3000)
+  // C. DOMENA GŁÓWNA (happybirth.pl / localhost:3000)
+  //    Obsługuje bezpośrednio: /, /program, /o-nas, /partnerzy,
+  //    /afiliacja, /odstap-od-umowy, /plan-porodu, /kalkulator-wyprawki
   // -------------------------------------------------------------
-  // Jeśli użytkownik wpisze ścieżkę kursantki na domenie głównej:
   const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny'];
   const isStudentRoute = studentRoutes.some((route) => url.pathname.startsWith(route));
 
@@ -60,18 +75,7 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Jeśli użytkownik wchodzi na /partnerzy na produkcji
-  if (!isDev && url.pathname.startsWith('/partnerzy')) {
-    return NextResponse.redirect(`https://partnerzy.happybirth.pl${url.pathname.replace(/^\/partnerzy/, '') || '/'}`);
-  }
-
-  // Przepisz główną ścieżkę / na dedykowaną stronę marketingową
-  if (url.pathname === '/' || url.pathname === '') {
-    url.pathname = '/marketing';
-    return NextResponse.rewrite(url);
-  }
-
-  return NextResponse.next();
+  return attachAffiliateCookie(NextResponse.next());
 }
 
 export const config = {

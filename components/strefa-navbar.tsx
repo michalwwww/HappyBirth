@@ -31,7 +31,13 @@ export function StrefaNavbar() {
   const { role, changeRole, percentCompleted, completedLessons } = useCourseProgress();
   const { t } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{ email: string; role: string; hasActiveCourse: boolean } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{
+    email: string;
+    role: string;
+    hasActiveCourse: boolean;
+    expiresAt?: string | null;
+    daysRemaining?: number | null;
+  } | null>(null);
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -62,7 +68,7 @@ export function StrefaNavbar() {
             </span>
             <span className="text-[#EAD5E5]/40 hidden xl:inline">|</span>
             <span className="text-[#EAD5E5]/80 hidden xl:inline truncate max-w-md">
-              {t('ribbonSubtitle')}
+              {currentUser?.daysRemaining ? `Dostęp aktywny: pozostało ${currentUser.daysRemaining} dni (z 548 dni / 18 msc)` : t('ribbonSubtitle')}
             </span>
           </div>
 

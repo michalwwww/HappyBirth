@@ -59,7 +59,7 @@ export default function PolitykaPrywatnosciPage() {
           <p>Przetwarzamy Twoje dane w następujących celach:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li>
-              <strong>Realizacja zamówienia i dostęp do Strefy Kursantki</strong> (art. 6 ust. 1 lit. b RODO – niezbędność do wykonania umowy): przetwarzamy Twój adres e-mail, imię, dane transakcji oraz opcjonalnie przewidywaną datę porodu w celu naliczenia 12-miesięcznego okresu dostępu.
+              <strong>Realizacja zamówienia i dostęp do Strefy Kursantki</strong> (art. 6 ust. 1 lit. b RODO – niezbędność do wykonania umowy): przetwarzamy Twój adres e-mail, imię, dane transakcji oraz rejestr dowodowy zgód konsumenckich w celu udostępnienia kursu na okres <strong>18 miesięcy (548 dni) od momentu zakupu</strong>.
             </li>
             <li>
               <strong>Wypełnienie obowiązków prawno-podatkowych</strong> (art. 6 ust. 1 lit. c RODO): wystawianie faktur, prowadzenie księgowości i archiwizacja dokumentów rozliczeniowych.

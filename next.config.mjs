@@ -18,8 +18,6 @@ const nextConfig = {
   },
   async rewrites() {
     return [
-      { source: '/program', destination: '/program.html' },
-      { source: '/o-nas', destination: '/o-nas.html' },
       { source: '/standard-merytoryczny', destination: '/standard-merytoryczny.html' },
       { source: '/polityka-cookies', destination: '/polityka-cookies.html' },
     ];

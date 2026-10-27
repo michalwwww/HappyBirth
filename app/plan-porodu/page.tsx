@@ -86,10 +86,10 @@ export default function PublicPlanPoroduLeadPage() {
             <Logo className="h-9 w-auto object-contain group-hover:scale-105 transition-transform" />
             <div className="border-l border-[#EAE3DB] pl-2.5">
               <span className="font-brand-display font-bold text-sm text-[#1A1512] block leading-none">
-                Plan Porodu
+                Plan Porodu PDF
               </span>
               <span className="text-[10px] uppercase tracking-wider text-[#867A72] font-semibold">
-                standard mz 2024
+                standard opieki okołoporodowej
               </span>
             </div>
           </Link>

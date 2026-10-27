@@ -154,7 +154,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
   pl: {
     nav: {
       ribbonTitle: 'Platforma Edukacyjna dla Rodziców:',
-      ribbonDesc: '52 lekcje e-learning VOD · Dostęp dla dwojga na 12 miesięcy',
+      ribbonDesc: '52 lekcje e-learning VOD · Dostęp dla dwojga na 18 miesięcy (548 dni) od zakupu',
       a11yBtn: 'Udogodnienia UE',
       haveAccount: 'Masz już konto?',
       enterZone: 'Wejdź do Strefy',
@@ -162,7 +162,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       brandSubtitle2: 'kurs online dla dwojga',
       links: {
         pillars: '4 Filary Spokoju',
-        stages: '9 Etapów',
+        stages: '8 Modułów',
         tools: 'Patenty & Narzędzia',
         reviews: 'Opinie rodziców',
         price: 'Cena 489 zł',
@@ -182,14 +182,14 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       ctaBuy: 'Rozpocznij przygotowania · 489 zł',
       ctaPreview: 'Zobacz bezpłatny zwiastun',
       bullets: [
-        'Dostęp na 12 miesięcy dla dwojga',
-        '52 filmowe lekcje w jakości 4K',
+        'Dostęp na 18 miesięcy (548 dni) od zakupu dla dwojga',
+        '52 filmowe lekcje w jakości 4K (ok. 5h / 288 min)',
         'Notatnik rodzica i ściągi PDF',
       ],
       stats: {
         lessons: '52 lekcje wideo',
-        hours: '15+ godzin wiedzy',
-        modules: '9 modułów tematycznych',
+        hours: 'ok. 5h (288 min) esencji',
+        modules: '8 modułów tematycznych',
         rating: 'Ocena 4.9/5 od rodziców',
       },
     },
@@ -296,7 +296,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       traditionalFoot2: 'Ograniczony czas',
       happybirthBadge: 'HappyBirth Online · Dla Dwojga',
       happybirthTitle: 'Spokój, czułość i pełna wolność',
-      happybirthSubtitle: '52 filmowe lekcje 4K, do których wracacie przez 12 miesięcy po porodzie – na Smart TV i telefonie.',
+      happybirthSubtitle: '52 filmowe lekcje 4K, do których wracacie przez 18 miesięcy (548 dni) od zakupu – na Smart TV i telefonie.',
       happybirthPoints: [
         {
           bold: 'Ciepła herbata, kanapa i własny salon',
@@ -307,8 +307,8 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
           text: 'Praktyczne wideo-instrukcje dla partnera: masaż relaksacyjny, wsparcie mamy, gotowe zadania i pewność na porodówce.',
         },
         {
-          bold: 'Dostęp przez 12 miesięcy od narodzin malucha',
-          text: 'Najwięcej pytań pojawia się po powrocie do domu. Włączacie lekcje o laktacji, kąpieli, śnie czy pierwszej pomocy dokładnie wtedy, gdy ich potrzebujecie.',
+          bold: 'Dostęp przez 18 miesięcy (548 dni) od zakupu',
+          text: 'Obejmuje cały okres ciąży, porodu, połogu oraz pierwszy rok życia maluszka. Włączacie lekcje o laktacji, kąpieli i śnie wtedy, gdy ich potrzebujecie.',
         },
         {
           bold: 'Narzędzia nocne w telefonie i ściągi',
@@ -320,7 +320,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
         },
       ],
       priceLabel: 'Płatność jednorazowa za dwoje:',
-      priceSub: 'pełny pakiet na rok',
+      priceSub: 'pełny pakiet na 18 miesięcy',
       cta: 'Wybierz HappyBirth · 489 zł',
     },
     testimonials: {
@@ -359,8 +359,8 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       price: '489 zł',
       unit: 'jednorazowo',
       features: [
-        '52 filmowe lekcje w jakości 4K (ponad 15 godzin materiałów)',
-        'Dostęp dla dwojga na 12 miesięcy od terminu porodu',
+        '52 filmowe lekcje w jakości 4K (ok. 5h / 288 min esencji)',
+        'Dostęp dla dwojga na 18 miesięcy (548 dni) od momentu zakupu',
         'Dedykowana Strefa dla Taty i wideo-ściągi',
         'Cyfrowy Notatnik Rodzica i szablony PDF do druku',
         'Aplikacja mobilna i odtwarzacz na Smart TV',
@@ -368,8 +368,8 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       ],
       cta: 'Dołącz do kursu · 489 zł',
       statusBadge: 'Status: Usługa Edukacyjno-Szkoleniowa (E-learning VOD)',
-      statusText: 'Gwarancja 14 dni na zwrot bez zbędnych pytań',
-      guarantee: '14 dni gwarancji satysfakcji. Jeśli kurs nie spełni Twoich oczekiwań, zwrócimy 100% wpłaty.',
+      statusText: 'Natychmiastowy dostęp po płatności (Art. 38 ust. 1 pkt 13 u.p.k.)',
+      guarantee: 'Bezpłatnie przetestuj Lekcję 1 przed zakupem. Dostęp do pełnego pakietu aktywowany jest natychmiast po opłaceniu.',
     },
     faq: {
       tag: 'Często zadawane pytania',
@@ -377,7 +377,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       items: [
         {
           q: 'Na jak długo otrzymujemy dostęp do kursu?',
-          a: 'Dostęp jest aktywny przez 12 miesięcy od przewidywanego terminu porodu. Oznacza to, że kurs służy Wam przez całą ciążę oraz przez cały pierwszy rok życia maluszka.',
+          a: 'Dostęp jest aktywny przez 18 miesięcy (548 dni) od momentu zakupu. Oznacza to, że kurs służy Wam przez całą ciążę, poród, połóg oraz pierwszy rok życia maluszka — bez pytania o prywatną datę porodu.',
         },
         {
           q: 'Czy partner może korzystać z kursu na osobnym urządzeniu?',
@@ -409,7 +409,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
   en: {
     nav: {
       ribbonTitle: 'Parent Educational Platform:',
-      ribbonDesc: '52 e-learning VOD lessons · 12 months access for two',
+      ribbonDesc: '52 e-learning VOD lessons · 18 months (548 days) access from purchase for two',
       a11yBtn: 'EU Accessibility',
       haveAccount: 'Already have an account?',
       enterZone: 'Enter Zone',
@@ -437,7 +437,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       ctaBuy: 'Start Preparing · 489 PLN',
       ctaPreview: 'Watch Free Preview',
       bullets: [
-        '12 months access for two',
+        '18 months (548 days) access from purchase for two',
         '52 cinema-grade 4K lessons',
         'Parent notebook & PDF cheatsheets',
       ],
@@ -551,7 +551,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       traditionalFoot2: 'Limited time',
       happybirthBadge: 'HappyBirth Online · For Two',
       happybirthTitle: 'Serenity, tenderness & complete freedom',
-      happybirthSubtitle: '52 cinema-grade 4K lessons you can rewatch for 12 months after birth – on Smart TV and smartphone.',
+      happybirthSubtitle: '52 cinema-grade 4K lessons you can rewatch for 18 months (548 days) from purchase – on Smart TV and smartphone.',
       happybirthPoints: [
         {
           bold: 'Hot tea, your sofa, your living room',
@@ -562,7 +562,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
           text: 'Actionable video guides for partner: soothing massage techniques, shower support, and birth room confidence.',
         },
         {
-          bold: '12 months access from your due date',
+          bold: '18 months (548 days) access from purchase',
           text: 'Most questions arise after coming home. Rewatch feeding, bath, sleep, and first-aid lessons when you actually need them.',
         },
         {
@@ -615,7 +615,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       unit: 'one-time payment',
       features: [
         '52 cinema-grade 4K lessons (over 15 hours of video content)',
-        'Access for two for 12 months from the estimated due date',
+        'Access for two for 18 months (548 days) from purchase',
         'Dedicated Dad Zone & fast video cheatsheets',
         'Digital Parent Notebook and printable PDF templates',
         'Mobile web application and Smart TV player support',
@@ -632,7 +632,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       items: [
         {
           q: 'How long does our access last?',
-          a: 'Your access remains active for 12 months from your estimated due date. It supports you throughout pregnancy and your baby’s entire first year.',
+          a: 'Your access remains active for 18 months (548 days) from purchase. It supports you throughout pregnancy, birth, postpartum, and your baby’s entire first year.',
         },
         {
           q: 'Can both partners log in on separate devices?',
@@ -664,7 +664,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
   ru: {
     nav: {
       ribbonTitle: 'Образовательная Платформа для Родителей:',
-      ribbonDesc: '52 видеоурока VOD · Доступ для двоих на 12 месяцев',
+      ribbonDesc: '52 видеоурока VOD · Доступ для двоих на 18 месяцев (548 дней)',
       a11yBtn: 'Доступность ЕС',
       haveAccount: 'Уже есть аккаунт?',
       enterZone: 'Войти в Зону',
@@ -692,7 +692,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       ctaBuy: 'Начать подготовку · 489 zł',
       ctaPreview: 'Смотреть демо-урок',
       bullets: [
-        'Доступ на 12 месяцев для двоих',
+        'Доступ на 18 месяцев (548 дней) с момента покупки для двоих',
         '52 кинематографичных урока 4K',
         'Блокнот родителя и шпаргалки PDF',
       ],
@@ -806,7 +806,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       traditionalFoot2: 'Ограниченное время',
       happybirthBadge: 'HappyBirth Online · Для двоих',
       happybirthTitle: 'Спокойствие, забота и полная свобода',
-      happybirthSubtitle: '52 фильма 4K, к которым вы возвращаетесь в течение 12 месяцев после родов – на Smart TV и телефоне.',
+      happybirthSubtitle: '52 фильма 4K, к которым вы возвращаетесь в течение 18 месяцев (548 дней) с момента покупки – на Smart TV и телефоне.',
       happybirthPoints: [
         {
           bold: 'Теплый чай, диван и своя гостиная',
@@ -817,7 +817,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
           text: 'Практические видео-шпаргалки: расслабляющий массаж, поддержка в душе, четкие задачи и уверенность.',
         },
         {
-          bold: 'Доступ на 12 месяцев с даты родов',
+          bold: 'Доступ на 18 месяцев (548 дней) с момента покупки',
           text: 'Больше всего вопросов возникает дома. Смотрите уроки по кормлению, купанию, сну и первой помощи, когда они нужны.',
         },
         {
@@ -870,7 +870,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       unit: 'единоразово',
       features: [
         '52 фильма в качестве 4K (более 15 часов материалов)',
-        'Доступ для двоих на 12 месяцев с даты родов',
+        'Доступ для двоих на 18 месяцев (548 дней) с момента покупки',
         'Специальная Зона для Папы и видеошпаргалки',
         'Цифровой Блокнот Родителя и шаблоны PDF для печати',
         'Мобильное веб-приложение и поддержка Smart TV',
@@ -887,7 +887,7 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
       items: [
         {
           q: 'На какой срок мы получаем доступ к курсу?',
-          a: 'Доступ действует 12 месяцев с предполагаемой даты родов. Это значит, что курс будет поддерживать вас всю беременность и весь первый год малыша.',
+          a: 'Доступ действует 18 месяцев (548 дней) с момента покупки. Это значит, что курс будет поддерживать вас всю беременность, роды, послеродовой период и весь первый год малыша.',
         },
         {
           q: 'Может ли партнер смотреть курс с другого устройства?',

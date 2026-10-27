@@ -16,6 +16,8 @@ import { StageIcon } from '@/components/stage-icons';
 import { PregnancyProfile, getSavedPregnancyProfile } from '@/lib/pregnancy';
 import { OnboardingWizard } from '@/components/onboarding-wizard';
 import { CloudflarePlayer } from '@/components/cloudflare-player';
+import { StudentReferralBox } from '@/components/student-referral-box';
+import { FinalQuizAndCertificate } from '@/components/final-quiz-certificate';
 import { activateStudentAccessLocally, is100PercentPromo } from '@/lib/promo';
 import { Lesson, Stage } from '@/lib/types';
 import {
@@ -154,23 +156,23 @@ function StrefaDashboardContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
-      {/* 1. BANER WOLNEGO DOSTĘPU DLA ZESPOŁU */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#20071E] via-[#2E0B2C] to-[#1A0519] border border-[#DA0271]/50 p-4 sm:p-5 text-white shadow-xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+      {/* 1. BANER STATUSU DOSTĘPU 18 MIESIĘCY (548 DNI) DLA DWOJGA ([C1]) */}
+      <div className="rounded-2xl bg-gradient-to-r from-[#20071E] via-[#2E0B2C] to-[#1A0519] border border-[#DA0271]/50 p-4 sm:p-5 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#DA0271]/20 border border-[#DA0271]/40 text-[#FF4BA8] flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5" />
+            <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
             <div className="text-xs font-bold text-[#FF4BA8] uppercase tracking-wide flex items-center gap-1.5">
-              🎬 Wolny dostęp zespołu (Wszystkie 52 filmy odblokowane)
+              Aktywny Pakiet · Dostęp ważny przez 18 miesięcy (548 dni) od zakupu
             </div>
             <h3 className="font-brand-display font-bold text-base sm:text-lg text-white">
-              Blokady zdjęte – możesz swobodnie oglądać i testować wszystkie lekcje 4K.
+              Pełny dostęp dla dwojga: 52 lekcje w jakości 4K, Notatnik Rodzica PDF oraz Strefa Taty.
             </h3>
           </div>
         </div>
-        <span className="hidden sm:inline-block text-xs bg-[#DA0271]/20 text-[#FFD1EB] px-3.5 py-1.5 rounded-full border border-[#DA0271]/40 font-semibold">
-          Tryb zespołu aktywny
+        <span className="inline-block self-start sm:self-auto text-xs bg-emerald-500/20 text-emerald-200 px-3.5 py-1.5 rounded-full border border-emerald-500/40 font-semibold whitespace-nowrap">
+          Dostęp aktywny (548 dni)
         </span>
       </div>
 
@@ -438,7 +440,7 @@ function StrefaDashboardContent() {
               Status Twojego Konta
             </div>
             <div className="font-brand-display font-semibold text-sm sm:text-base text-[#250A24] dark:text-[#FBF8F4]">
-              {role === 'partner' ? 'Strefa dla Partnera / Taty aktywna' : 'Strefa dla Mamy aktywna'} · Dostęp ważny 12 miesięcy dla dwojga
+              {role === 'partner' ? 'Strefa dla Partnera / Taty aktywna' : 'Strefa dla Mamy aktywna'} · Dostęp ważny 18 miesięcy (548 dni) od zakupu dla dwojga
             </div>
           </div>
         </div>
@@ -747,6 +749,12 @@ function StrefaDashboardContent() {
           </div>
         </div>
       </section>
+
+      {/* 7. [C4] STUDENT REFERRAL BOX (Poleć kurs przyjaciółce w ciąży -> -10% dla niej + E-book Kulinarny PDF dla Ciebie) */}
+      <StudentReferralBox />
+
+      {/* 8. [C3] KRÓTKI QUIZ KOŃCOWY + IMIENNY CERTYFIKAT UKOŃCZENIA SZKOŁY RODZENIA */}
+      <FinalQuizAndCertificate />
 
       {/* MODAL ONBOARDINGU / PERSONALIZACJI TERMINU */}
       <OnboardingWizard

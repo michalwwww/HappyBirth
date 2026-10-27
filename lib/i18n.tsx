@@ -20,9 +20,9 @@ export const translations: Translations = {
     ru: 'Зона Родителей HappyBirth',
   },
   ribbonSubtitle: {
-    pl: 'Dla naszych Mam i Tatów · Dostęp na 12 msc od terminu porodu dla dwojga',
-    en: 'For our Moms and Dads · 12 months access from due date for two',
-    ru: 'Для наших Мам и Пап · Доступ на 12 месяцев с даты родов для двоих',
+    pl: 'Dla naszych Mam i Tatów · Dostęp na 18 miesięcy (548 dni) od zakupu dla dwojga',
+    en: 'For our Moms and Dads · 18 months (548 days) access from purchase for two',
+    ru: 'Для наших Мам и Пап · Доступ на 18 месяцев (548 дней) с момента покупки для двоих',
   },
   viewMode: {
     pl: 'Perspektywa:',

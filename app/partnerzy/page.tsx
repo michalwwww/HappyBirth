@@ -4,287 +4,317 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import {
-  Users,
+  Building2,
   CheckCircle2,
-  Gift,
-  QrCode,
-  DollarSign,
   ShieldCheck,
   ArrowRight,
   Sparkles,
-  TrendingUp,
+  Gift,
+  Award,
+  Users,
+  Calendar,
   FileText,
-  Mail,
-  ChevronRight,
-  Lock,
-  Percent,
 } from 'lucide-react';
 
-export default function PartnerzyPage() {
+/**
+ * [D4a-2] Podstrona https://happybirth.pl/partnerzy
+ * Dedykowana, wizerunkowa wizytówka B2B dla marek, producentów wyprawki,
+ * dystrybutorów, klinik medycznych, szpitali i pracodawców.
+ * (Program prowizyjny dla położnych i twórców został wydzielony na /afiliacja).
+ */
+export default function PartnerzyB2BPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    role: 'Położna środowiskowa / szpitalna',
-    city: '',
+    companyOrBrand: '',
+    fullName: '',
     email: '',
     phone: '',
-    freePack: true,
+    roleOrArea: 'Producent wyprawki / Ekspozycja w Module 4 i Kalkulatorze Wyprawki PDF',
+    message: '',
+    rodoConsent: true,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    try {
+      setLoading(true);
+      await fetch('/api/partners/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          channel: 'partnerzy_b2b',
+          ...formData,
+        }),
+      });
+      setSubmitted(true);
+    } catch {
+      setSubmitted(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="space-y-0">
+    <div className="min-h-screen bg-[#FBF8F4] text-[#1A1512]">
       {/* Header B2B */}
       <header className="border-b border-[#EAE3DB] bg-white/95 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center space-x-3 group">
-            <Logo className="h-10 w-auto object-contain group-hover:scale-105 transition-transform" />
+            <Logo className="h-9 w-auto object-contain" />
             <div className="border-l border-[#EAE3DB] pl-3">
               <span className="font-brand-display font-bold text-sm text-[#1A1512] block leading-none">
-                Strefa Partnera
+                Partnerstwa Strategiczne B2B
               </span>
-              <span className="text-[10px] uppercase tracking-wider text-[#867A72] font-semibold">
-                program afiliacyjny b2b
+              <span className="text-[10px] uppercase tracking-wider text-[#867A72] font-bold">
+                dla marek, producentów, klinik i pracodawców
               </span>
             </div>
           </Link>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-3 sm:gap-5">
+            <Link
+              href="/afiliacja"
+              className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-[#DA0271] hover:underline"
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Program dla Położnych i Twórców (/afiliacja) →</span>
+            </Link>
             <Link
               href="/"
-              className="text-xs font-semibold text-[#544A44] hover:text-[#EC008C] transition-colors"
+              className="text-xs font-semibold text-[#544A44] hover:text-[#DA0271]"
             >
-              ← Wróć do HappyBirth
+              ← Strona główna
             </Link>
             <a
-              href="#formularz"
-              className="px-5 py-2 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold transition-all shadow-sm shadow-[#EC008C]/25 hover:scale-105"
+              href="#kontakt-b2b"
+              className="px-5 py-2.5 rounded-full bg-[#250A24] hover:bg-[#DA0271] text-white text-xs font-bold transition-all"
             >
-              Dołącz do programu
+              Zapytaj o współpracę B2B
             </a>
           </div>
         </div>
       </header>
 
-      {/* Hero B2B */}
+      {/* 1. NAGŁÓWEK HERO B2B */}
       <section className="pt-12 sm:pt-20 pb-16 px-4 sm:px-6 max-w-7xl mx-auto">
-        <div className="max-w-3xl space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] border border-[#F3CAD9] text-xs font-semibold text-[#EC008C]">
-            <Users className="w-3.5 h-3.5" />
-            <span>Dedykowany program dla Położnych, Gabinetów i Fizjoterapeutek</span>
+        <div className="max-w-4xl space-y-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] border border-[#F3CAD9] text-xs font-bold text-[#DA0271]">
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Współpraca dla Marek, Producentów Wyprawki, Dystrybutorów, Klinik i Sponsorów</span>
           </div>
 
-          <h1 className="font-brand-display font-medium text-4xl sm:text-6xl text-[#1A1512] leading-tight">
-            Wspieraj przyszłe mamy i buduj{' '}
-            <em className="font-brand-serif italic font-normal text-[#EC008C]">
-              dodatkowy przychód.
-            </em>
+          <h1 className="font-brand-display font-bold text-3xl sm:text-5xl lg:text-6xl text-[#1A1512] leading-tight">
+            Zostań Partnerem Strategicznym HappyBirth.pl —{' '}
+            <span className="text-[#DA0271]">
+              dotrzyj do przyszłych rodziców w najbardziej decyzyjnym momencie ich życia.
+            </span>
           </h1>
 
-          <p className="text-base sm:text-xl text-[#544A44] leading-relaxed">
-            Polecaj nowoczesną szkołę rodzenia online, której możesz zaufać. Przyszłe mamy zyskują <strong>rabat -30 zł</strong>, a Ty otrzymujesz <strong>20% prowizji (ok. 70 zł)</strong> od każdej poleconej rodziny.
+          <p className="text-base sm:text-lg text-[#544A44] leading-relaxed max-w-3xl">
+            Łączymy marki najwyższej jakości z rodzicami kompletującymi wyprawkę, wózek, fotelik, łóżeczko i domową apteczkę. Wszystkie rekomendacje przechodzą rygorystyczną selekcję jakościową położnych i fizjoterapeutek z poznańskiej szkoły rodzenia <strong>Mama Gaja (działającej od 2012 r.)</strong>.
           </p>
 
           <div className="pt-2 flex flex-wrap items-center gap-4">
             <a
-              href="#formularz"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white font-semibold text-sm sm:text-base transition-all shadow-lg shadow-[#EC008C]/25 hover:scale-105"
+              href="#kontakt-b2b"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#DA0271] hover:bg-[#B8005F] text-white font-bold text-sm sm:text-base transition-all shadow-lg"
             >
-              <span>Zarejestruj się i odbierz pakiet startowy</span>
+              <span>Porozmawiajmy o partnerstwie marki</span>
               <ArrowRight className="w-4 h-4" />
             </a>
-
-            <a
-              href="#jak-to-dziala"
-              className="inline-flex items-center gap-2 px-6 py-4 rounded-full border border-[#EAE3DB] bg-white hover:bg-stone-50 text-sm font-semibold text-[#1A1512] transition-colors"
+            <Link
+              href="/afiliacja"
+              className="inline-flex items-center gap-2 px-6 py-4 rounded-full border border-[#EAE3DB] bg-white hover:bg-stone-50 text-xs sm:text-sm font-bold text-[#1A1512]"
             >
-              <span>Jak to działa?</span>
-            </a>
+              <span>Szukasz programu prowizyjnego dla położnych i twórców? Przejdź do /afiliacja →</span>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* 3 Filary Programu Partnerskiego (Model Win-Win) */}
-      <section className="py-16 px-4 sm:px-6 bg-white border-y border-[#EAE3DB]" id="jak-to-dziala">
-        <div className="max-w-7xl mx-auto space-y-12">
+      {/* 2. DLACZEGO MARKI WYBIERAJĄ WSPÓŁPRACĘ Z HAPPYBIRTH.PL */}
+      <section className="py-16 px-4 sm:px-6 bg-white border-y border-[#EAE3DB]">
+        <div className="max-w-7xl mx-auto space-y-10">
           <div className="max-w-2xl space-y-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#EC008C]">
-              Korzyści dla Ciebie i Rodzin
+            <span className="text-xs font-bold uppercase tracking-widest text-[#DA0271]">
+              Przewaga Strategiczna B2B
             </span>
-            <h2 className="font-brand-display font-medium text-3xl sm:text-4xl text-[#1A1512]">
-              Dlaczego warto współpracować z HappyBirth?
+            <h2 className="font-brand-display font-bold text-2xl sm:text-4xl text-[#1A1512]">
+              Dlaczego marki wybierają współpracę z HappyBirth.pl?
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Karta 1: Przyszła Mama */}
-            <div className="p-8 rounded-3xl bg-[#FAF7F2] border border-[#EAE3DB] space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#FAE3EB] text-[#EC008C] flex items-center justify-center font-bold">
-                <Gift className="w-6 h-6" />
+            <div className="p-8 rounded-3xl bg-[#FAF7F2] border border-[#EAE3DB] space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-[#FAE3EB] text-[#DA0271] flex items-center justify-center">
+                <FileText className="w-6 h-6" />
               </div>
-              <h3 className="font-brand-display font-medium text-2xl text-[#1A1512]">
-                Dla Przyszłej Mamy: Zniżka -40 zł
+              <h3 className="font-brand-display font-bold text-xl text-[#1A1512]">
+                1. Precyzyjny moment zakupowy
               </h3>
-              <p className="text-sm text-[#544A44] leading-relaxed">
-                Każda mama, której przekażesz swoją wizytówkę lub link, otrzymuje kod rabatowy obniżający cenę kursu z 489 zł do 449 zł. Dajesz jej realną korzyść i sprawdzoną opiekę.
+              <p className="text-xs sm:text-sm text-[#544A44] leading-relaxed">
+                Docierasz bezpośrednio do rodziców podejmujących pierwsze decyzje zakupowe w ramach <strong>Modułu 4: Projekt „Gniazdo”, wyprawka i kącik</strong> oraz naszego interaktywnego <strong>Kalkulatora Wyprawki PDF</strong> (wózek, fotelik samochodowy, łóżeczko, materac, kosmetyki i apteczka).
               </p>
             </div>
 
-            {/* Karta 2: Prowizja */}
-            <div className="p-8 rounded-3xl bg-[#FAF7F2] border border-[#EAE3DB] space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#D0EBF3] text-[#0088BC] flex items-center justify-center font-bold">
-                <Percent className="w-6 h-6" />
+            <div className="p-8 rounded-3xl bg-[#FAF7F2] border border-[#EAE3DB] space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-[#D0EBF3] text-[#006A96] flex items-center justify-center">
+                <Calendar className="w-6 h-6" />
               </div>
-              <h3 className="font-brand-display font-medium text-2xl text-[#1A1512]">
-                Dla Ciebie: 20% Prowizji (~90 zł)
+              <h3 className="font-brand-display font-bold text-xl text-[#1A1512]">
+                2. Długofalowa relacja: 18 miesięcy dostępu
               </h3>
-              <p className="text-sm text-[#544A44] leading-relaxed">
-                Zarabiasz ok. 90 zł od każdego zakupu z Twojego polecenia. Przy 20 mamach miesięcznie to ponad <strong>1 800 zł dodatkowego przychodu</strong>, wypłacanego regularnie co miesiąc.
+              <p className="text-xs sm:text-sm text-[#544A44] leading-relaxed">
+                W przeciwieństwie do kursów wygasających po porodzie, <strong>18 miesięcy dostępu (548 dni)</strong> w HappyBirth.pl oznacza obecność Twojej marki w życiu rodziców od pierwszych tygodni ciąży aż do ukończenia 1. roku życia dziecka.
               </p>
             </div>
 
-            {/* Karta 3: Transparentność */}
-            <div className="p-8 rounded-3xl bg-[#FAF7F2] border border-[#EAE3DB] space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#DFEED4] text-[#347A22] flex items-center justify-center font-bold">
+            <div className="p-8 rounded-3xl bg-[#FAF7F2] border border-[#EAE3DB] space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-[#DFEED4] text-[#347A22] flex items-center justify-center">
                 <ShieldCheck className="w-6 h-6" />
               </div>
-              <h3 className="font-brand-display font-medium text-2xl text-[#1A1512]">
-                Dedykowany Kod i Panel
+              <h3 className="font-brand-display font-bold text-xl text-[#1A1512]">
+                3. Zaufanie kliniczne i selekcja Mama Gaja
               </h3>
-              <p className="text-sm text-[#544A44] leading-relaxed">
-                Otrzymujesz swój unikalny kod rabatowy (np. <code>KOWALSKA30</code>) oraz dostęp do panelu, w którym widzisz liczbę zamówień i stan swoich prowizji w czasie rzeczywistym.
+              <p className="text-xs sm:text-sm text-[#544A44] leading-relaxed">
+                Nie prowadzimy agresywnego lokowania produktów w lekcjach. Współpracujemy wyłącznie z markami i producentami, których produkty spełniają rygorystyczne kryteria bezpieczeństwa położnych, doradczyń laktacyjnych i fizjoterapeutek ze szkoły <strong>Mama Gaja</strong>.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Symulator Zarobków */}
-      <section className="py-16 px-4 sm:px-6 bg-[#250A24] text-white">
-        <div className="max-w-5xl mx-auto space-y-10 text-center">
-          <div className="space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#EC008C]">
-              Kalkulator partnerski
-            </span>
-            <h2 className="font-brand-display font-medium text-3xl sm:text-5xl">
-              Ile możesz zyskać polecając HappyBirth?
-            </h2>
-            <p className="text-sm text-[#EAD5E5]/80 max-w-xl mx-auto">
-              Wypłacamy 20% od każdej zrealizowanej transakcji przelewem na konto bankowe raz w miesiącu na podstawie faktury lub rachunku.
+      {/* 3. OBSZARY WSPÓŁPRACY DLA MAREK, PRODUCENTÓW I SPONSORÓW */}
+      <section className="py-16 px-4 sm:px-6 max-w-7xl mx-auto space-y-10">
+        <div className="max-w-2xl space-y-2">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#DA0271]">
+            Formaty Partnerstwa
+          </span>
+          <h2 className="font-brand-display font-bold text-2xl sm:text-4xl text-[#1A1512]">
+            Obszary współpracy dla marek, producentów i klinik
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-7 rounded-3xl bg-white border border-[#EAE3DB] shadow-xs space-y-3">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#DA0271] uppercase tracking-wider">
+              <Award className="w-4 h-4" />
+              <span>Format 1 · Ekspozycja Produktowa</span>
+            </div>
+            <h3 className="font-brand-display font-bold text-xl text-[#1A1512]">
+              Partnerstwo Merytoryczne i Produktowe
+            </h3>
+            <p className="text-xs sm:text-sm text-[#544A44] leading-relaxed">
+              Ekspozycja bezpiecznych, rekomendowanych produktów w materiałach dodatkowych PDF, Notatniku Rodzica, checklistach wyprawkowych (Moduł 4) oraz w publicznym Kalkulatorze Wyprawki PDF.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-2">
-              <div className="text-xs text-[#EAD5E5]/70 uppercase tracking-wider">10 mam / msc</div>
-              <div className="font-brand-display text-4xl font-bold text-[#FCD705]">~700 zł</div>
-              <div className="text-xs text-[#EAD5E5]/60">miesięcznie dodatkowego zysku</div>
+          <div className="p-7 rounded-3xl bg-white border border-[#EAE3DB] shadow-xs space-y-3">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#DA0271] uppercase tracking-wider">
+              <Gift className="w-4 h-4" />
+              <span>Format 2 · Strefa Benefitów</span>
             </div>
+            <h3 className="font-brand-display font-bold text-xl text-[#1A1512]">
+              Strefa Benefitów i Rabatów dla Kursantek
+            </h3>
+            <p className="text-xs sm:text-sm text-[#544A44] leading-relaxed">
+              Umieszczenie dedykowanej oferty powitalnej lub kodu zniżkowego Twojej marki wewnątrz zamkniętej Strefy Kursantki dla zweryfikowanych rodziców, którzy zakupili kurs.
+            </p>
+          </div>
 
-            <div className="p-6 rounded-3xl bg-[#EC008C]/20 border border-[#EC008C] space-y-2 relative">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#EC008C] text-white text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full">
-                Średnia dla gabinetu
-              </span>
-              <div className="text-xs text-[#EAD5E5]/70 uppercase tracking-wider">25 mam / msc</div>
-              <div className="font-brand-display text-4xl font-bold text-[#FCD705]">~1 750 zł</div>
-              <div className="text-xs text-[#EAD5E5]/60">miesięcznie dodatkowego zysku</div>
+          <div className="p-7 rounded-3xl bg-white border border-[#EAE3DB] shadow-xs space-y-3">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#DA0271] uppercase tracking-wider">
+              <Sparkles className="w-4 h-4" />
+              <span>Format 3 · Licencje Korporacyjne i Medyczne</span>
             </div>
-
-            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-2">
-              <div className="text-xs text-[#EAD5E5]/70 uppercase tracking-wider">50 mam / msc</div>
-              <div className="font-brand-display text-4xl font-bold text-[#FCD705]">~3 500 zł</div>
-              <div className="text-xs text-[#EAD5E5]/60">miesięcznie dodatkowego zysku</div>
-            </div>
+            <h3 className="font-brand-display font-bold text-xl text-[#1A1512]">
+              Pakiety Licencyjne B2B dla Klinik, Szpitali i Pracodawców
+            </h3>
+            <p className="text-xs sm:text-sm text-[#544A44] leading-relaxed">
+              Pakiety 18-miesięcznych dostępów do kursu jako nowoczesny benefit pracowniczy dla przyszłych rodziców w firmach (HR Wellbeing) lub pakiet edukacyjny dla pacjentek klinik medycznych i centrów diagnostycznych.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Formularz Rejestracji B2B */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 max-w-3xl mx-auto" id="formularz">
-        <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#EAE3DB] shadow-lg space-y-6">
+      {/* 4. FORMULARZ KONTAKTOWY DLA MAREK I SPONSORÓW */}
+      <section className="py-12 sm:py-20 px-4 sm:px-6 max-w-3xl mx-auto" id="kontakt-b2b">
+        <div className="bg-white rounded-3xl p-7 sm:p-12 border border-[#EAE3DB] shadow-xl space-y-6">
           <div className="space-y-2 text-center">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#EC008C]">
-              Krok do współpracy
+            <span className="text-xs font-bold uppercase tracking-widest text-[#DA0271]">
+              Kontakt bezpośredni z zarządem
             </span>
-            <h2 className="font-brand-display font-medium text-3xl text-[#1A1512]">
-              Dołącz do Programu Partnerskiego
+            <h2 className="font-brand-display font-bold text-2xl sm:text-3xl text-[#1A1512]">
+              Formularz Kontaktowy dla Marek, Klinik i Sponsorów
             </h2>
             <p className="text-xs sm:text-sm text-[#544A44]">
-              Wypełnij krótki formularz. W ciągu 24 godzin wygenerujemy Twój unikalny kod i prześlemy dostęp do panelu partnerskiego.
+              Zostaw krótki opis propozycji — odpowiemy z dopasowaną ofertą współpracy w ciągu 24 godzin roboczych.
             </p>
           </div>
 
           {submitted ? (
-            <div className="text-center py-10 space-y-4">
+            <div className="text-center py-8 space-y-4">
               <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
               <h3 className="font-brand-display font-bold text-2xl text-[#1A1512]">
-                Dziękujemy za zgłoszenie!
+                Dziękujemy za wiadomość!
               </h3>
-              <p className="text-sm text-[#544A44] max-w-md mx-auto leading-relaxed">
-                Skontaktujemy się z Tobą pod adresem <strong>{formData.email}</strong> z Twoim kodem partnerskim oraz potwierdzeniem wysyłki bezpłatnego pakietu materiałów do gabinetu.
+              <p className="text-xs sm:text-sm text-[#544A44] max-w-md mx-auto leading-relaxed">
+                Otrzymaliśmy Twoje zapytanie dotyczące marki <strong>{formData.companyOrBrand}</strong>. Skontaktujemy się z Tobą pod adresem <strong>{formData.email}</strong>.
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
-                    Imię i Nazwisko
+                    Nazwa firmy / marki
                   </label>
                   <input
                     type="text"
                     required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="np. Anna Kowalska"
-                    className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+                    value={formData.companyOrBrand}
+                    onChange={(e) => setFormData({ ...formData, companyOrBrand: e.target.value })}
+                    placeholder="np. BabySafe Polska Sp. z o.o."
+                    className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
-                    Zawód / Specjalizacja
+                    Imię i nazwisko osoby reprezentującej
                   </label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C] bg-white"
-                  >
-                    <option>Położna środowiskowa / szpitalna</option>
-                    <option>Fizjoterapeutka uroginekologiczna</option>
-                    <option>Gabinety ginekologiczne / NZOZ</option>
-                    <option>Certyfikowana Doradczyni Laktacyjna (CDL/IBCLC)</option>
-                    <option>Doula / Instruktorka hipnoporodu</option>
-                    <option>Twórczyni internetowa / Influencerka</option>
-                    <option>Inne</option>
-                  </select>
+                  <input
+                    type="text"
+                    required
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    placeholder="np. Jan Nowak"
+                    className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
-                    Adres e-mail
+                    E-mail służbowy
                   </label>
                   <input
                     type="email"
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="kontakt@twojgabinet.pl"
-                    className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+                    placeholder="imie.nazwisko@marka.pl"
+                    className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
-                    Numer telefonu
+                    Telefon kontaktowy
                   </label>
                   <input
                     type="tel"
@@ -292,56 +322,87 @@ export default function PartnerzyPage() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+48 600 000 000"
-                    className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+                    className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
-                  Miasto i adres do wysyłki bezpłatnego pakietu materiałów
+                  Obszar współpracy
                 </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  placeholder="np. Warszawa, ul. Medyczna 12/4"
-                  className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+                <select
+                  value={formData.roleOrArea}
+                  onChange={(e) => setFormData({ ...formData, roleOrArea: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm bg-white focus:outline-none focus:border-[#DA0271]"
+                >
+                  <option>Producent wyprawki / Ekspozycja w Module 4 i Kalkulatorze Wyprawki PDF</option>
+                  <option>Sponsoring merytoryczny i partnerstwo strategiczne</option>
+                  <option>Benefity i kody rabatowe dla kursantek w Strefie Rodziców</option>
+                  <option>Licencje B2B dla klinik medycznych, szpitali i pracodawców</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
+                  Krótki opis propozycji
+                </label>
+                <textarea
+                  rows={3}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  placeholder="Opisz krótko profil marki lub zakres planowanej współpracy..."
+                  className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
                 />
               </div>
 
-              <div className="pt-2 flex items-center gap-2 text-xs text-[#544A44]">
+              <div className="pt-1 flex items-start gap-2.5 text-xs text-[#544A44]">
                 <input
                   type="checkbox"
-                  id="pack"
-                  checked={formData.freePack}
-                  onChange={(e) => setFormData({ ...formData, freePack: e.target.checked })}
-                  className="w-4 h-4 rounded text-[#EC008C] focus:ring-[#EC008C]"
+                  id="b2b-rodo"
+                  required
+                  checked={formData.rodoConsent}
+                  onChange={(e) => setFormData({ ...formData, rodoConsent: e.target.checked })}
+                  className="mt-0.5 w-4 h-4 rounded text-[#DA0271] focus:ring-[#DA0271]"
                 />
-                <label htmlFor="pack">
-                  Chcę bezpłatnie otrzymać fizyczny stojak na biurko oraz pakiet wizytówek z kodem QR do gabinetu
+                <label htmlFor="b2b-rodo">
+                  Wyrażam zgodę na przetwarzanie danych kontaktowych przez KLARSOLUTIONS Sp. z o.o. (ul. Śląska 14, 60-614 Poznań) w celu obsługi zapytania B2B zgodnie z <Link href="/polityka-prywatnosci" className="underline">Polityką Prywatności</Link>.
                 </label>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-4 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white font-semibold text-sm transition-all shadow-md shadow-[#EC008C]/25 mt-4 hover:scale-[1.01]"
+                disabled={loading}
+                className="w-full py-4 rounded-full bg-[#250A24] hover:bg-[#DA0271] text-white font-bold text-sm transition-all shadow-md cursor-pointer disabled:opacity-60"
               >
-                Wyślij zgłoszenie do programu
+                {loading ? 'Wysyłanie zapytania...' : 'Wyślij zapytanie o współpracę B2B →'}
               </button>
-
-              <div className="text-center text-[11px] text-[#867A72] pt-2">
-                Rejestracja w programie jest całkowicie bezpłatna i nie zobowiązuje do wyłączności.
-              </div>
             </form>
           )}
+
+          {/* Przycisk przekierowujący dla twórców i położnych */}
+          <div className="pt-4 border-t border-[#EAE3DB] text-center">
+            <Link
+              href="/afiliacja"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#DA0271] hover:underline"
+            >
+              <span>Szukasz programu prowizyjnego dla położnych i twórców? Przejdź do zakładki /afiliacja →</span>
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Stopka B2B */}
-      <footer className="border-t border-[#EAE3DB] py-8 text-center text-xs text-[#867A72] bg-white">
-        <p>© {new Date().getFullYear()} HappyBirth B2B. Wszelkie prawa zastrzeżone. Program Partnerski dla Profesjonalistów.</p>
+      {/* Stopka */}
+      <footer className="border-t border-[#EAE3DB] py-8 px-4 text-center text-xs text-[#867A72] bg-white space-y-2">
+        <div>
+          Operator prawny: <strong>KLARSOLUTIONS Sp. z o.o.</strong>, ul. Śląska 14, 60-614 Poznań · NIP: 7812118273 · KRS: 0001268396 · REGON: 545782779
+        </div>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Link href="/" className="underline hover:text-[#DA0271]">Strona główna</Link>
+          <Link href="/afiliacja" className="underline hover:text-[#DA0271]">Program Afiliacyjny (/afiliacja)</Link>
+          <Link href="/regulamin" className="underline hover:text-[#DA0271]">Regulamin</Link>
+          <Link href="/odstap-od-umowy" className="underline hover:text-[#DA0271]">Odstąp od umowy</Link>
+        </div>
       </footer>
     </div>
   );

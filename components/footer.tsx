@@ -3,13 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import { Logo } from './logo';
-import { ShieldCheck, Heart, ArrowUpRight, Sparkles, Users } from 'lucide-react';
+import { ArrowUpRight, Sparkles, Users, Building2, FileText } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { getMarketingTranslations } from '@/lib/marketing-i18n';
 
 export function Footer() {
   const isDev = typeof window !== 'undefined' && window.location.hostname.includes('localhost');
-  const partnerzyUrl = isDev ? '/partnerzy' : 'https://partnerzy.happybirth.pl';
   const strefaUrl = isDev ? '/strefa' : 'https://strefa.happybirth.pl';
   const { lang } = useI18n();
   const t = getMarketingTranslations(lang);
@@ -38,7 +37,7 @@ export function Footer() {
             </p>
             <div className="flex items-center space-x-2 text-xs text-[#EAD5E5]/90 pt-1">
               <Sparkles className="w-4 h-4 text-[#FCD705]" />
-              <span>{t.footer.familyCount}</span>
+              <span>52 lekcje 4K · Dostęp na 18 miesięcy (548 dni) od zakupu</span>
             </div>
 
             {/* Social media links z wektorowymi ikonami */}
@@ -82,75 +81,82 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Kolumna 2: Nawigacja Kursu */}
+          {/* Kolumna 2: Nawigacja Kursu i Narzędzia */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-white">
-              {t.footer.navTitle}
+              Program i Bezpłatne Narzędzia
             </h4>
             <ul className="space-y-2 text-xs text-[#EAD5E5]/80">
               <li>
-                <a href="#filary" className="hover:text-white transition-colors">
-                  {t.nav.links.pillars}
-                </a>
+                <Link href="/program" className="hover:text-white transition-colors">
+                  Pełny program (52 lekcje w 8 modułach)
+                </Link>
               </li>
               <li>
-                <a href="#etapy" className="hover:text-white transition-colors">
-                  {t.nav.links.stages}
-                </a>
+                <Link href="/o-nas" className="hover:text-white transition-colors">
+                  O nas i zespół ekspertek (Mama Gaja)
+                </Link>
               </li>
               <li>
-                <a href="#narzedzia" className="hover:text-white transition-colors">
-                  {t.nav.links.tools}
-                </a>
+                <Link href="/standard-merytoryczny" className="hover:text-white transition-colors">
+                  Standard merytoryczny (E-E-A-T)
+                </Link>
               </li>
               <li>
-                <a href="#cena" className="hover:text-white transition-colors">
-                  {t.nav.links.price}
-                </a>
+                <Link href="/plan-porodu" className="hover:text-[#FCD705] transition-colors flex items-center gap-1 font-medium">
+                  <FileText className="w-3.5 h-3.5 text-[#FCD705]" />
+                  <span>Kreator Planu Porodu PDF</span>
+                </Link>
               </li>
               <li>
-                <a href={strefaUrl} className="hover:text-[#EC008C] transition-colors font-medium">
+                <Link href="/kalkulator-wyprawki" className="hover:text-[#FCD705] transition-colors flex items-center gap-1 font-medium">
+                  <FileText className="w-3.5 h-3.5 text-[#FCD705]" />
+                  <span>Kalkulator Torby do Szpitala PDF</span>
+                </Link>
+              </li>
+              <li>
+                <a href={strefaUrl} className="hover:text-[#EC008C] transition-colors font-semibold text-white">
                   {t.nav.zoneBtn}
-                </a>
-              </li>
-              <li>
-                <a href={`${strefaUrl}/standard-medyczny`} className="hover:text-white transition-colors">
-                  {lang === 'pl' ? 'Standard Rzetelnej Wiedzy' : lang === 'en' ? 'Evidence-Based Standard' : 'Медицинский стандарт'}
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Kolumna 3: Współpraca B2B & Afiliacja */}
+          {/* Kolumna 3: Współpraca & Afiliacja (Trójpodział) */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-white">
-              Dla Profesjonalistów
+              Współpraca i Afiliacja
             </h4>
-            <ul className="space-y-2 text-xs text-[#EAD5E5]/80">
+            <ul className="space-y-2.5 text-xs text-[#EAD5E5]/80">
               <li>
-                <a
-                  href={partnerzyUrl}
+                <Link
+                  href="/afiliacja"
                   className="hover:text-[#EC008C] transition-colors flex items-center gap-1 font-semibold text-white"
                 >
                   <Users className="w-3.5 h-3.5 text-[#EC008C]" />
-                  <span>Strefa Partnera (Program Afiliacyjny)</span>
+                  <span>Afiliacja dla Położnych i Twórczyń</span>
                   <ArrowUpRight className="w-3 h-3 text-[#EC008C]" />
-                </a>
+                </Link>
               </li>
               <li>
-                <a href={partnerzyUrl} className="hover:text-white transition-colors">
-                  Dla Położnych i Praktyk
-                </a>
+                <Link
+                  href="/partnerzy"
+                  className="hover:text-[#FCD705] transition-colors flex items-center gap-1 font-semibold text-white"
+                >
+                  <Building2 className="w-3.5 h-3.5 text-[#FCD705]" />
+                  <span>Współpraca B2B (Marki, Kliniki, HR)</span>
+                  <ArrowUpRight className="w-3 h-3 text-[#FCD705]" />
+                </Link>
               </li>
               <li>
-                <a href={partnerzyUrl} className="hover:text-white transition-colors">
-                  Dla Gabinetów i Fizjoterapeutek
-                </a>
+                <Link href="/afiliacja#kalkulator" className="hover:text-white transition-colors">
+                  Kalkulator Prowizji (20%–30% CPA)
+                </Link>
               </li>
               <li>
-                <a href={partnerzyUrl} className="hover:text-white transition-colors">
-                  Zamów bezpłatne materiały z kodem QR
-                </a>
+                <Link href="/partnerzy#formularz" className="hover:text-white transition-colors">
+                  Pakiety B2B dla Pracodawców i Klinik
+                </Link>
               </li>
             </ul>
           </div>
@@ -168,10 +174,16 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <span className="text-[#EAD5E5]/60">Dostęp aktywny 24/7 na telefonie i TV</span>
+                <a href="mailto:partnerzy@happybirth.pl" className="hover:text-white transition-colors flex items-center gap-1">
+                  <span>partnerzy@happybirth.pl</span>
+                  <ArrowUpRight className="w-3 h-3 text-[#FCD705]" />
+                </a>
               </li>
               <li>
-                <span className="text-[#EAD5E5]/60">Płatność jednorazowa BLIK / Karta</span>
+                <span className="text-[#EAD5E5]/60">Dostęp 18 miesięcy (548 dni) na telefonie i TV</span>
+              </li>
+              <li>
+                <span className="text-[#EAD5E5]/60">Płatność jednorazowa 489,00 zł (BLIK / Karta)</span>
               </li>
             </ul>
           </div>
@@ -188,19 +200,23 @@ export function Footer() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 text-[11px] text-[#EAD5E5]/50 border-t border-[#461643]/50">
             <div className="space-y-1 leading-relaxed">
               <div>
-                Usługodawca: <strong>KLARSolutions sp. z o.o.</strong> · ul. Śląska 14, 60-614 Poznań · KRS: <strong>0001268396</strong> · NIP: <strong>7812118273</strong> · REGON: <strong>545782779</strong> · Kapitał zakładowy: 5 000,00 zł.
+                Usługodawca: <strong>KLARSOLUTIONS Sp. z o.o.</strong> · ul. Śląska 14, 60-614 Poznań · KRS: <strong>0001268396</strong> · NIP: <strong>7812118273</strong> · REGON: <strong>545782779</strong> · Kapitał zakładowy: 5 000,00 zł.
               </div>
               <div className="text-[10px] text-[#EAD5E5]/50">
                 Sąd Rejonowy Poznań - Nowe Miasto i Wilda w Poznaniu, VIII Wydz. Gospodarczy KRS · © {new Date().getFullYear()} HappyBirth. Wszelkie prawa zastrzeżone.
               </div>
             </div>
-            <div className="flex items-center space-x-3 text-[#EAD5E5]/80">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[#EAD5E5]/80">
               <Link href="/regulamin" className="hover:text-white transition-colors underline">
                 Regulamin platformy
               </Link>
               <span>·</span>
               <Link href="/polityka-prywatnosci" className="hover:text-white transition-colors underline">
                 Polityka prywatności (RODO)
+              </Link>
+              <span>·</span>
+              <Link href="/odstap-od-umowy" className="hover:text-white transition-colors underline font-semibold text-[#FCD705]">
+                Odstąp od umowy
               </Link>
             </div>
           </div>

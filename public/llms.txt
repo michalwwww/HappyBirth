@@ -1,30 +1,31 @@
 # HappyBirth — Szkoła Rodzenia Online
 
-> Nowoczesna, cyfrowa szkoła rodzenia online dla przyszłych mam i osób towarzyszących. 52 autorskie lekcje wideo w jakości Full HD, 4 Filary Spokoju, Cyfrowa Apteczka Porodowa SOS oraz Licznik Skurczów 5-1-1.
+> Nowoczesna, cyfrowa szkoła rodzenia online dla przyszłych mam i osób towarzyszących. 52 autorskie lekcje wideo w jakości 4K (288 min) w 8 modułach i 4 etapach fizjologicznych, Notatnik Rodzica PDF, Cyfrowa Apteczka Porodowa SOS oraz Licznik Skurczów 5-1-1.
 
 ## O Platformie
 - **Nazwa:** HappyBirth (Szkoła Rodzenia Online)
-- **Usługodawca / Właściciel:** KLARSOLUTIONS sp. z o.o. (KRS 0001268396, NIP 7812118273, REGON 545782779)
+- **Usługodawca / Właściciel:** KLARSOLUTIONS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ (KRS 0001268396, NIP 7812118273, REGON 545782779)
 - **Siedziba:** ul. Śląska 14, 60-614 Poznań, Polska
 - **Kontakt ogólny:** kontakt@happybirth.pl
 - **Wsparcie kursantek:** pomoc@happybirth.pl
-- **Doświadczenie:** 14 lat dorobku szkoły rodzenia Mama Gaja (od 2012 roku), ponad 18 000 przygotowanych mam
-- **Infrastruktura:** Nowoczesna platforma VOD zoptymalizowana pod natychmiastowe odtwarzanie Full HD bez buforowania
-- **Model dostępu:** Płatność jednorazowa (489 zł) bez subskrypcji. Dostęp dla dwojga przez 18 miesięcy od zakupu.
+- **Doświadczenie:** 14 lat dorobku szkoły rodzenia Mama Gaja (od 2012 roku), ponad 18 000 przygotowanych rodzin
+- **Infrastruktura:** Nowoczesna platforma VOD zoptymalizowana pod natychmiastowe odtwarzanie 4K HLS bez buforowania
+- **Model dostępu:** Płatność jednorazowa (489,00 zł brutto) bez subskrypcji. Dostęp dla dwojga przez 18 miesięcy (548 dni) od momentu zakupu.
 
 ## Główne Narzędzia i Moduły
-- [Strona Główna (Portal Sprzedażowy)](https://happybirth.pl): Prezentacja programu, 4 Filary Spokoju, opinie rodziców, cennik i sekcja FAQ.
-- [Strefa Kursantki (Kokpit VOD)](https://strefa.happybirth.pl): Zamknięty portal kursantki z 52 lekcjami wideo, kartami pracy PDF i wskaźnikiem postępu.
-- [Katalog 52 Lekcji VOD](https://strefa.happybirth.pl/lekcje): Kompletny spis lekcji podzielonych na 9 etapów od planowania, przez ciążę, po poród i pierwszy rok życia dziecka.
-- [Cyfrowa Apteczka Porodowa SOS](https://strefa.happybirth.pl/apteczka): Błyskawiczna wyszukiwarka i 12 pigułek wiedzy na najczęstsze dolegliwości i pytania okołoporodowe.
-- [Licznik Skurczów 5-1-1](https://strefa.happybirth.pl/licznik): Interaktywne narzędzie porodowe z algorytmem reguły 5-1-1 informujące o optymalnym momencie wyjazdu do szpitala.
-- [Strefa dla Taty / Partnera](https://strefa.happybirth.pl/partner): Dedykowana pigułka wiedzy dla osoby towarzyszącej (punkty ucisku łagodzące napięcie, masaż krzyżowy, chwyt Rebozo, prawa na sali porodowej).
-- [Standard Merytoryczny & E-E-A-T](https://strefa.happybirth.pl/standard-medyczny): Zgodność ze Standardem Organizacyjnym Opieki Okołoporodowej (Rozporządzenie MZ) oraz Ustawą o zawodach pielęgniarki i położnej.
-- [Program Afiliacyjny B2B](https://partnerzy.happybirth.pl): Dedykowany portal dla położnych środowiskowych, gabinetów ginekologicznych i fizjoterapeutek uroginekologicznych.
+- [Strona Główna (Portal Sprzedażowy)](https://happybirth.pl): Prezentacja programu, mapa tygodni ciąży, otwarta lekcja próbna 4K bez rejestracji, cennik i sekcja FAQ.
+- [Program Kursu (8 Modułów / 52 Lekcje 4K / 288 min)](https://happybirth.pl/program): Kompletny spis 52 lekcji podzielonych na 8 modułów w 4 etapach fizjologicznych.
+- [O Nas i Ekspertki Mama Gaja](https://happybirth.pl/o-nas): Biogramy i kwalifikacje położnych, doradczyń laktacyjnych i fizjoterapeutek uroginekologicznych.
+- [Strefa Kursantki (Kokpit VOD)](https://strefa.happybirth.pl): Zamknięty portal kursantki z 52 lekcjami wideo, testem końcowym, certyfikatem PDF i boksem poleceń koleżeńskich.
+- [Generator Planu Porodu PDF](https://happybirth.pl/plan-porodu): Bezpłatne narzędzie zgodne ze Standardem Opieki Okołoporodowej.
+- [Interaktywny Kalkulator Wyprawki i Torby PDF](https://happybirth.pl/kalkulator-wyprawki): Bezpłatny kalkulator „Co kupić na start, a z czym poczekać” na bazie Modułu 4.
+- [Program Afiliacyjny dla Położnych i Twórców](https://happybirth.pl/afiliacja): Model 2-Tier Capped CPA (Daj 10% rabatu odbiorcom, odbierz 20%–30% prowizji + 5% Broker Override).
+- [Współpraca Strategiczna B2B dla Marek i Sponsorów](https://happybirth.pl/partnerzy): Partnerstwa dla producentów wyprawki, dystrybutorów, klinik medycznych i pracodawców.
 
 ## Informacje Prawne i Ochrona Danych
-- [Regulamin Platformy](https://happybirth.pl/regulamin): Warunki zakupu, licencja, prawa konsumenta, procedura reklamacji oraz klauzula z art. 38 pkt 13 ustawy o prawach konsumenta.
-- [Polityka Prywatności (RODO)](https://happybirth.pl/polityka-prywatnosci): Klauzula informacyjna art. 13 RODO, zasady przetwarzania danych oraz gwarancja braku pikseli reklamowych w portalu kursantki.
+- [Regulamin Platformy](https://happybirth.pl/regulamin): Warunki zakupu, 18-miesięczna licencja, prawa konsumenta oraz klauzula z art. 38 ust. 1 pkt 13 ustawy o prawach konsumenta.
+- [Odstąp od umowy](https://happybirth.pl/odstap-od-umowy): Elektroniczny formularz konsumencki zgodny z wymogami obowiązującymi od 19.06.2026 r.
+- [Polityka Prywatności (RODO)](https://happybirth.pl/polityka-prywatnosci): Klauzula informacyjna art. 13 RODO oraz gwarancja braku pikseli reklamowych w portalu kursantki.
 
 ## Pełna Dokumentacja Programu
 Kompletny sylabus wszystkich 52 lekcji, transkrypcje modułów i szczegóły techniczne znajdują się w pliku:
