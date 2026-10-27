@@ -7,6 +7,7 @@ import { getLessonById, getAdjacentLessons, getLessonsByStage, getStageById } fr
 import { CloudflarePlayer } from '@/components/cloudflare-player';
 import { LessonCard } from '@/components/lesson-card';
 import { useCourseProgress } from '@/lib/progress';
+import { openPrintableLessonWorksheet } from '@/lib/printable-worksheets';
 import { FileText, Download, ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface StrefaLessonClientProps {
@@ -130,9 +131,9 @@ export default function StrefaLessonClient({ lessonId }: StrefaLessonClientProps
                       </div>
 
                       <button
-                        onClick={() => alert(`Pobieranie materiału: ${att.name}`)}
+                        onClick={() => openPrintableLessonWorksheet(lesson, att.name)}
                         className="p-2 rounded-lg bg-white dark:bg-[#1C081A] hover:bg-[#DA0271] hover:text-white hover:border-[#DA0271] border border-[#EAE3DB] dark:border-[#3D0E39] transition-colors cursor-pointer text-[#250A24] dark:text-[#FBF8F4]"
-                        title="Pobierz PDF"
+                        title="Otwórz i wydrukuj Kartę Pracy PDF"
                       >
                         <Download className="w-3.5 h-3.5" />
                       </button>

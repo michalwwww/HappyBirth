@@ -714,12 +714,12 @@ export default function RootPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert(data.error || 'Wystąpił problem przy inicjalizacji płatności.');
+        setCheckboxError(data.error || 'Wystąpił problem przy inicjalizacji płatności.');
         setLoading(false);
       }
     } catch (err) {
       console.error('Błąd checkoutu:', err);
-      alert('Nie udało się połączyć z bramką płatności.');
+      setCheckboxError('Nie udało się połączyć z bramką płatności.');
       setLoading(false);
     }
   };

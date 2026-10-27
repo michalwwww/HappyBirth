@@ -258,7 +258,7 @@ export default function PublicPlanPoroduLeadPage() {
                   Chcecie rodzić w pełnym spokoju?
                 </h3>
                 <p className="text-xs sm:text-sm text-[#EAD5E5]/80 max-w-xl">
-                  52 filmowe lekcje 4K, techniki oddechowe, masaż dla partnera i wsparcie na pierwsze 12 miesięcy w domu.
+                  52 filmowe lekcje 4K, techniki oddechowe, masaż dla partnera i wsparcie przez 18 miesięcy (548 dni) od zakupu.
                 </p>
               </div>
 

@@ -21,17 +21,16 @@ export async function onRequestGet(context: { request: Request }): Promise<Respo
       });
     }
 
-    // Obsługa 100% kodów promocyjnych oraz trybu testowego
+    // [A4] Blokada publicznych kodów testowych 100% na produkcji
     const lowerId = sessionId.toLowerCase();
-    if (lowerId.startsWith('promo_') || lowerId.startsWith('demo_') || lowerId.includes('test') || lowerId.includes('promo')) {
+    if (lowerId.includes('test') || lowerId.startsWith('promo_') || lowerId.startsWith('demo_')) {
       return new Response(
         JSON.stringify({
-          success: true,
-          user: { email: 'kursantka-test@happybirth.pl', role: 'student' },
-          message: 'Kod promocyjny 100% zatwierdzony',
+          success: false,
+          error: 'Publiczne sesje testowe są wyłączone na produkcji.',
         }),
         {
-          status: 200,
+          status: 403,
           headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         }
       );
@@ -40,7 +39,7 @@ export async function onRequestGet(context: { request: Request }): Promise<Respo
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Sesja płatności zweryfikowana',
+        message: 'Sesja płatności Stripe zweryfikowana',
       }),
       {
         status: 200,

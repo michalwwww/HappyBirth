@@ -18,6 +18,7 @@ import { OnboardingWizard } from '@/components/onboarding-wizard';
 import { CloudflarePlayer } from '@/components/cloudflare-player';
 import { StudentReferralBox } from '@/components/student-referral-box';
 import { FinalQuizAndCertificate } from '@/components/final-quiz-certificate';
+import { openPrintableLessonWorksheet } from '@/lib/printable-worksheets';
 import { activateStudentAccessLocally, is100PercentPromo } from '@/lib/promo';
 import { Lesson, Stage } from '@/lib/types';
 import {
@@ -298,9 +299,9 @@ function StrefaDashboardContent() {
                           </div>
                         </div>
                         <button
-                          onClick={() => alert(`Pobieranie materiału: ${att.name}`)}
+                          onClick={() => openPrintableLessonWorksheet(activeLesson, att.name)}
                           className="p-1 rounded-md bg-white dark:bg-[#1C081A] hover:bg-[#DA0271] hover:text-white border border-[#EAE3DB] dark:border-[#3D0E39] transition-colors cursor-pointer text-[#250A24] dark:text-[#FBF8F4]"
-                          title="Pobierz PDF"
+                          title="Otwórz i wydrukuj Kartę Pracy PDF"
                         >
                           <Download className="w-3.5 h-3.5" />
                         </button>
@@ -704,13 +705,13 @@ function StrefaDashboardContent() {
                 Pakowanie: dokumenty, strefa porodu, strefa połogu i noworodka.
               </p>
             </div>
-            <button
-              onClick={() => alert('Pobieranie: Torba do szpitala (PDF)')}
+            <Link
+              href="/kalkulator-wyprawki"
               className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] dark:text-[#FBF8F4] hover:text-[#DA0271] cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Pobierz checklistę</span>
-            </button>
+              <span>Otwórz checklistę PDF</span>
+            </Link>
           </div>
 
           <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
@@ -723,29 +724,36 @@ function StrefaDashboardContent() {
                 Tabela badań laboratoryjnych i USG wg Standardu Opieki Okołoporodowej.
               </p>
             </div>
-            <button
-              onClick={() => alert('Pobieranie: Badania w ciąży (PDF)')}
+            <a
+              href="/materialy/kalendarz-badan-w-ciazy-happybirth.html"
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] dark:text-[#FBF8F4] hover:text-[#DA0271] cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Pobierz kalendarz</span>
-            </button>
+              <span>Pobierz kalendarz PDF</span>
+            </a>
           </div>
 
           <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#7FB3CC] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-[#7FB3CC] uppercase tracking-wider">
-                PDF · Ściąga
+                PDF · 4 Karty Sytuacyjne
               </span>
-              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">Ściąga dla Taty</h4>
+              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">Pakiet Kart dla Taty</h4>
               <p className="text-xs text-[#544A44] dark:text-[#D7CCC3]">
-                Ściąga na porodówkę: punkty ucisku, pozycje i zadania osoby towarzyszącej.
+                4 karty na salę porodową, punkty ucisku krzyżowego i lista 3 reklamówek.
               </p>
             </div>
-            <Link href="/strefa/partner" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#7FB3CC] hover:underline">
+            <a
+              href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#7FB3CC] hover:underline"
+            >
               <Download className="w-3.5 h-3.5" />
-              <span>Pobierz ściągę</span>
-            </Link>
+              <span>Pobierz karty PDF (A4)</span>
+            </a>
           </div>
         </div>
       </section>
