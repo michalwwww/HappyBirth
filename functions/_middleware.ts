@@ -46,9 +46,21 @@ export async function onRequest(context: PagesContext): Promise<Response> {
 
   // 2. SUBDOMENA B2B: partnerzy.happybirth.pl
   if (host.startsWith('partnerzy.')) {
-    if (!url.pathname.startsWith('/partnerzy')) {
+    if (url.pathname === '/' || url.pathname === '') {
       const targetUrl = new URL(url.toString());
-      targetUrl.pathname = `/partnerzy${url.pathname === '/' ? '' : url.pathname}`;
+      targetUrl.pathname = '/partnerzy';
+      const res = await context.env.ASSETS.fetch(targetUrl);
+      return withAffiliateCookieIfPresent(res, refParam);
+    }
+    const res = await context.next();
+    return withAffiliateCookieIfPresent(res, refParam);
+  }
+
+  // 2b. SUBDOMENA AFILIACJI: afiliacja.happybirth.pl
+  if (host.startsWith('afiliacja.')) {
+    if (url.pathname === '/' || url.pathname === '') {
+      const targetUrl = new URL(url.toString());
+      targetUrl.pathname = '/afiliacja';
       const res = await context.env.ASSETS.fetch(targetUrl);
       return withAffiliateCookieIfPresent(res, refParam);
     }

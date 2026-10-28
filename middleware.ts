@@ -35,10 +35,23 @@ export function middleware(request: NextRequest) {
   // -------------------------------------------------------------
   const isPartnerzyHost = hostname.startsWith('partnerzy.');
   if (isPartnerzyHost) {
-    if (!url.pathname.startsWith('/partnerzy')) {
-      url.pathname = `/partnerzy${url.pathname === '/' ? '' : url.pathname}`;
+    if (url.pathname === '/' || url.pathname === '') {
+      url.pathname = '/partnerzy';
+      return attachAffiliateCookie(NextResponse.rewrite(url));
     }
-    return attachAffiliateCookie(NextResponse.rewrite(url));
+    return attachAffiliateCookie(NextResponse.next());
+  }
+
+  // -------------------------------------------------------------
+  // A2. SUBDOMENA AFILIACJA (afiliacja.happybirth.pl -> /afiliacja)
+  // -------------------------------------------------------------
+  const isAfiliacjaHost = hostname.startsWith('afiliacja.');
+  if (isAfiliacjaHost) {
+    if (url.pathname === '/' || url.pathname === '') {
+      url.pathname = '/afiliacja';
+      return attachAffiliateCookie(NextResponse.rewrite(url));
+    }
+    return attachAffiliateCookie(NextResponse.next());
   }
 
   // -------------------------------------------------------------
