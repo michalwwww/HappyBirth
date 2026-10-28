@@ -1,13 +1,28 @@
 interface Env {
+  DB?: any;
   STRIPE_SECRET_KEY?: string;
   NEXT_PUBLIC_STRIPE_PRICE_ID?: string;
   NEXT_PUBLIC_APP_URL?: string;
 }
 
 const CHECKBOX_2_ART38_WAIVER_TEXT =
-  'Żądam natychmiastowego rozpoczęcia dostarczania treści cyfrowych przed upływem 14-dniowego terminu do odstąpienia od umowy i przyjmuję do wiadomości, że z chwilą uzyskania dostępu do platformy kursowej tracę prawo do odstąpienia od umowy zgodnie z art. 38 ust. 1 pkt 13 ustawy o prawach konsumenta.';
+  'Żądam natychmiastowego rozpoczęcia dostarczania treści cyfrowych przed upływem 14-dniowego terminu do odstąpienia od umowy i przyjmuję do wiadomości, że z chwilą uzyskania dostępu do platformy kursowej tracę prawo do odstąpienia od umowy (art. 38 ust. 1 pkt 13 u.p.k.).';
 
 const TERMS_VERSION_SHA256 = 'a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447';
+
+const OFFICIAL_PROMO_ALLOWLIST = new Set([
+  'MAMAGAJA10',
+  'MAMAGAJA',
+  'POLOZNA10',
+  'FIZJO10',
+  'LAKTACJA10',
+  'PARTNER10',
+  'HAPPY10',
+  'SPOKOJ10',
+  'KOWALSKA10',
+  'NOWAK10',
+  'MAMA-2026',
+]);
 
 function parseCookie(cookieHeader: string | null, name: string): string {
   if (!cookieHeader) return '';
@@ -15,29 +30,36 @@ function parseCookie(cookieHeader: string | null, name: string): string {
   return match ? decodeURIComponent(match[1]) : '';
 }
 
-function isValid10PercentPromo(code: string): boolean {
+async function isAuthorized10PercentPromo(code: string, db?: any): Promise<boolean> {
   if (!code) return false;
-  const known = [
-    'MAMAGAJA10',
-    'MAMAGAJA',
-    'POLOZNA10',
-    'FIZJO10',
-    'LAKTACJA10',
-    'PARTNER10',
-    'HAPPY10',
-    'SPOKOJ10',
-    'KOWALSKA10',
-    'NOWAK10',
-  ];
-  return (
-    known.includes(code) ||
-    code.startsWith('MAMA-') ||
-    (code.startsWith('MAMA') && code.length >= 5) ||
-    code.startsWith('HB-') ||
-    code.startsWith('POLOZNA-') ||
-    code.startsWith('FIZJO-') ||
-    code.endsWith('10')
-  );
+  if (
+    OFFICIAL_PROMO_ALLOWLIST.has(code) ||
+    /^MAMA-[A-Z0-9]{3,12}$/.test(code) ||
+    /^HB-[A-Z0-9]{3,14}$/.test(code) ||
+    /^POLOZNA-[A-Z0-9]{3,14}$/.test(code) ||
+    /^FIZJO-[A-Z0-9]{3,14}$/.test(code)
+  ) {
+    return true;
+  }
+
+  if (db) {
+    try {
+      const aff = await db
+        .prepare(`SELECT id FROM affiliates WHERE promo_code = ? AND status = 'active'`)
+        .bind(code)
+        .first();
+      if (aff?.id) return true;
+
+      const usr = await db
+        .prepare(`SELECT id FROM users WHERE referral_code = ?`)
+        .bind(code)
+        .first();
+      if (usr?.id) return true;
+    } catch {
+      // Fallback do oficjalnej listy
+    }
+  }
+  return false;
 }
 
 export async function onRequestOptions(): Promise<Response> {
@@ -92,7 +114,17 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       return new Response(
         JSON.stringify({
           error:
-            'Kod testowy jest wyłączony. Możesz skorzystać z kodu rabatowego (-10%) od swojej położnej, partnera lub koleżanki.',
+            'Kod testowy jest wyłączony. Możesz skorzystać z autoryzowanego kodu rabatowego (-10%) od swojej położnej, partnera lub koleżanki.',
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+      );
+    }
+
+    const has10Discount = cleanPromo ? await isAuthorized10PercentPromo(cleanPromo, env.DB) : false;
+    if (cleanPromo && !has10Discount) {
+      return new Response(
+        JSON.stringify({
+          error: 'Podany kod rabatowy jest nieaktywny lub nieprawidłowy. Sprawdź pisownię kodu.',
         }),
         { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
       );
@@ -106,7 +138,6 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       });
     }
 
-    const has10Discount = isValid10PercentPromo(cleanPromo);
     const activeCourseAmount = has10Discount ? '44010' : '48900'; // 440,10 zł lub 489,00 zł brutto
     const buyerIp =
       request.headers.get('cf-connecting-ip') ||
@@ -121,10 +152,12 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('allow_promotion_codes', has10Discount ? 'false' : 'true');
     params.append('invoice_creation[enabled]', 'true');
     params.append('tax_id_collection[enabled]', 'true');
-    params.append('success_url', `${origin}/strefa?session_id={CHECKOUT_SESSION_ID}&payment=success`);
+    params.append(
+      'success_url',
+      'https://strefa.happybirth.pl/?session_id={CHECKOUT_SESSION_ID}&payment=success'
+    );
     params.append('cancel_url', `${origin}/#cena`);
 
-    // Pozycja 0: Kurs główny 489,00 zł brutto (lub 440,10 zł z kodem -10%), dostęp na 18 miesięcy (548 dni) od zakupu
     const priceId = env.NEXT_PUBLIC_STRIPE_PRICE_ID;
     if (priceId && !has10Discount) {
       params.append('line_items[0][price]', priceId);
@@ -180,16 +213,6 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('metadata[terms_sha256]', TERMS_VERSION_SHA256);
     params.append('metadata[waiver_checkbox_text]', CHECKBOX_2_ART38_WAIVER_TEXT.slice(0, 480));
 
-    if (utm && typeof utm === 'object') {
-      if (utm.utm_source) params.append('metadata[utm_source]', String(utm.utm_source).slice(0, 100));
-      if (utm.utm_medium) params.append('metadata[utm_medium]', String(utm.utm_medium).slice(0, 100));
-      if (utm.utm_campaign) params.append('metadata[utm_campaign]', String(utm.utm_campaign).slice(0, 100));
-      if (utm.utm_content) params.append('metadata[utm_content]', String(utm.utm_content).slice(0, 100));
-      if (utm.ad_id) params.append('metadata[ad_id]', String(utm.ad_id).slice(0, 100));
-      if (utm.ref) params.append('metadata[ref]', String(utm.ref).slice(0, 100));
-      if (utm.fbclid) params.append('metadata[fbclid]', String(utm.fbclid).slice(0, 100));
-    }
-
     if (email && typeof email === 'string' && email.includes('@')) {
       params.append('customer_email', email.trim());
     }
@@ -206,34 +229,23 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const sessionData: any = await stripeRes.json();
 
     if (!stripeRes.ok) {
-      console.error('Stripe API error:', sessionData);
       return new Response(
         JSON.stringify({ error: sessionData.error?.message || 'Błąd inicjalizacji Stripe' }),
         {
           status: stripeRes.status,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-          },
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         }
       );
     }
 
     return new Response(JSON.stringify({ url: sessionData.url, sessionId: sessionData.id }), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   } catch (err: any) {
-    console.error('Błąd checkoutu edge:', err);
     return new Response(JSON.stringify({ error: err.message || 'Wewnętrzny błąd serwera płatności.' }), {
       status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
 }

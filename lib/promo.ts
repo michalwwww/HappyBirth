@@ -75,8 +75,8 @@ export function validatePromoCode(rawCode?: string | null): PromoValidationResul
     };
   }
 
-  // 1. Kody poleceń koleżeńskich z panelu kursantki [C4] (np. MAMA-KASIA, MAMA-1024)
-  if (clean.startsWith('MAMA-') || clean.startsWith('MAMA') && clean.length >= 5) {
+  // 1. Kody poleceń koleżeńskich z panelu kursantki [C4] (np. MAMA-KASIA, MAMA-2026)
+  if (/^MAMA-[A-Z0-9]{3,12}$/.test(clean)) {
     return {
       valid: true,
       code: clean,
@@ -104,12 +104,11 @@ export function validatePromoCode(rawCode?: string | null): PromoValidationResul
 
   const isAffiliatePattern =
     knownAffiliateCodes.includes(clean) ||
-    clean.startsWith('HB-') ||
-    clean.startsWith('POLOZNA-') ||
-    clean.startsWith('FIZJO-') ||
-    clean.endsWith('10');
+    /^HB-[A-Z0-9]{3,14}$/.test(clean) ||
+    /^POLOZNA-[A-Z0-9]{3,14}$/.test(clean) ||
+    /^FIZJO-[A-Z0-9]{3,14}$/.test(clean);
 
-  if (isAffiliatePattern && clean.length >= 4 && clean.length <= 24) {
+  if (isAffiliatePattern) {
     return {
       valid: true,
       code: clean,

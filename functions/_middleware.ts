@@ -1,12 +1,16 @@
 // Cloudflare Pages Functions - Native Edge Middleware
 // Wymusza twardą separację subdomen (strefa.happybirth.pl, partnerzy.happybirth.pl, afiliacja.happybirth.pl),
+// chroni płatne lekcje wideo (lekcja-02..52) za Paywallem sesyjnym HMAC-SHA256,
 // dodaje nagłówki bezpieczeństwa OWASP, blokuje boty reklamowe Meta/Google przed skanowaniem strefy medycznej
 // i afiliacji ([E5] & Zero-Burn Guardrails) oraz obsługuje 30-dniowe ciasteczko afiliacyjne hb_aff_ref ([D2]).
+
+import { getEdgeSession } from './_shared/session';
 
 interface PagesContext {
   request: Request;
   next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
   env: {
+    SESSION_SECRET?: string;
     ASSETS: {
       fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
     };
@@ -45,6 +49,13 @@ function withSecurityAndTrackingHeaders(
     statusText: response.statusText,
     headers: newHeaders,
   });
+}
+
+function isProtectedPaidLessonPath(pathname: string): boolean {
+  // lekcja-01 jest otwartą lekcją pokazową; lekcje 02..52 wymagają aktywnej sesji kursantki
+  const m = pathname.match(/^\/(?:strefa\/)?lekcja\/(lekcja-\d+)/);
+  if (!m) return false;
+  return m[1] !== 'lekcja-01';
 }
 
 export async function onRequest(context: PagesContext): Promise<Response> {
@@ -122,6 +133,22 @@ export async function onRequest(context: PagesContext): Promise<Response> {
         },
       });
     }
+
+    // Paywall na poziomie Edge dla płatnych lekcji wideo (lekcja-02 .. lekcja-52)
+    if (isProtectedPaidLessonPath(url.pathname)) {
+      const session = await getEdgeSession(context.request, context.env);
+      if (!session) {
+        return new Response(null, {
+          status: 302,
+          headers: {
+            Location: `https://strefa.happybirth.pl/login?redirect=${encodeURIComponent(url.pathname)}`,
+            'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+            'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+          },
+        });
+      }
+    }
+
     let targetUrl = url;
     if (!url.pathname.startsWith('/strefa')) {
       targetUrl = new URL(url.toString());
