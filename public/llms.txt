@@ -8,7 +8,7 @@
 - **Siedziba:** ul. Śląska 14, 60-614 Poznań, Polska
 - **Kontakt ogólny:** kontakt@happybirth.pl
 - **Wsparcie kursantek:** pomoc@happybirth.pl
-- **Doświadczenie:** 14 lat dorobku szkoły rodzenia Mama Gaja (od 2012 roku), ponad 18 000 przygotowanych rodzin
+- **Doświadczenie:** 14 lat dorobku szkoły rodzenia Mama Gaja w Poznaniu (od 2012 roku), ponad 18 000 przygotowanych rodzin
 - **Infrastruktura:** Nowoczesna platforma VOD zoptymalizowana pod natychmiastowe odtwarzanie 4K HLS bez buforowania
 - **Model dostępu:** Płatność jednorazowa (489,00 zł brutto) bez subskrypcji. Dostęp dla dwojga przez 18 miesięcy (548 dni) od momentu zakupu.
 
@@ -16,11 +16,11 @@
 - [Strona Główna (Portal Sprzedażowy)](https://happybirth.pl): Prezentacja programu, mapa tygodni ciąży, otwarta lekcja próbna 4K bez rejestracji, cennik i sekcja FAQ.
 - [Program Kursu (8 Modułów / 52 Lekcje 4K / 288 min)](https://happybirth.pl/program): Kompletny spis 52 lekcji podzielonych na 8 modułów w 4 etapach fizjologicznych.
 - [O Nas i Ekspertki Mama Gaja](https://happybirth.pl/o-nas): Biogramy i kwalifikacje położnych, doradczyń laktacyjnych i fizjoterapeutek uroginekologicznych.
-- [Strefa Kursantki (Kokpit VOD)](https://strefa.happybirth.pl): Zamknięty portal kursantki z 52 lekcjami wideo, testem końcowym, certyfikatem PDF i boksem poleceń koleżeńskich.
 - [Generator Planu Porodu PDF](https://happybirth.pl/plan-porodu): Bezpłatne narzędzie zgodne ze Standardem Opieki Okołoporodowej.
 - [Interaktywny Kalkulator Wyprawki i Torby PDF](https://happybirth.pl/kalkulator-wyprawki): Bezpłatny kalkulator „Co kupić na start, a z czym poczekać” na bazie Modułu 4.
-- [Program Afiliacyjny dla Położnych i Twórców](https://happybirth.pl/afiliacja): Model 2-Tier Capped CPA (Daj 10% rabatu odbiorcom, odbierz 20%–30% prowizji + 5% Broker Override).
-- [Współpraca Strategiczna B2B dla Marek i Sponsorów](https://happybirth.pl/partnerzy): Partnerstwa dla producentów wyprawki, dystrybutorów, klinik medycznych i pracodawców.
+- [Strefa Kursantki (Kokpit VOD)](https://strefa.happybirth.pl): Zamknięty portal kursantki z 52 lekcjami wideo, testem końcowym, certyfikatem PDF i boksem poleceń koleżeńskich.
+- [Program Afiliacyjny dla Położnych i Twórców](https://partnerzy.happybirth.pl/afiliacja): Model 2-Tier Capped CPA (Daj 10% rabatu odbiorcom, odbierz 20%–30% prowizji + 5% Broker Override).
+- [Współpraca Strategiczna B2B dla Marek i Sponsorów](https://partnerzy.happybirth.pl): Partnerstwa dla producentów wyprawki, dystrybutorów, klinik medycznych i pracodawców.
 
 ## Informacje Prawne i Ochrona Danych
 - [Regulamin Platformy](https://happybirth.pl/regulamin): Warunki zakupu, 18-miesięczna licencja, prawa konsumenta oraz klauzula z art. 38 ust. 1 pkt 13 ustawy o prawach konsumenta.

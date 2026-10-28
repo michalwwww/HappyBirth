@@ -9,22 +9,18 @@ export function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   const isAdBot = AD_BOT_REGEX.test(userAgent);
 
-  // 1. Bypass statycznych zasobów, obrazów, fontów i API
-  if (
-    url.pathname.startsWith('/_next') ||
-    url.pathname.startsWith('/api') ||
-    url.pathname.includes('.') ||
-    url.pathname.startsWith('/favicon')
-  ) {
-    return NextResponse.next();
-  }
+  const attachSecurityAndTracking = (res: NextResponse, noIndex = false) => {
+    res.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+    res.headers.set('X-Content-Type-Options', 'nosniff');
+    res.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()');
 
-  // [D2] Obsługa 30-dniowego ciasteczka atrybucji afiliacyjnej First-Party (?ref=)
-  const refParam = url.searchParams.get('ref');
-  const attachHeaders = (res: NextResponse, noIndex = false) => {
     if (noIndex) {
       res.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
     }
+
+    const refParam = url.searchParams.get('ref');
     if (refParam && /^[a-zA-Z0-9_-]{2,40}$/.test(refParam)) {
       res.cookies.set(AFFILIATE_COOKIE_NAME, refParam.trim(), {
         httpOnly: true,
@@ -36,6 +32,17 @@ export function middleware(request: NextRequest) {
     }
     return res;
   };
+
+  // 1. Bypass statycznych zasobów, arkuszy /materialy/*, obrazów, fontów i API
+  if (
+    url.pathname.startsWith('/_next') ||
+    url.pathname.startsWith('/api') ||
+    url.pathname.startsWith('/materialy') ||
+    url.pathname.includes('.') ||
+    url.pathname.startsWith('/favicon')
+  ) {
+    return attachSecurityAndTracking(NextResponse.next(), false);
+  }
 
   // -------------------------------------------------------------
   // A. SUBDOMENA PARTNERZY (partnerzy.happybirth.pl -> /partnerzy)
@@ -49,9 +56,9 @@ export function middleware(request: NextRequest) {
     }
     if (url.pathname === '/' || url.pathname === '') {
       url.pathname = '/partnerzy';
-      return attachHeaders(NextResponse.rewrite(url), true);
+      return attachSecurityAndTracking(NextResponse.rewrite(url), true);
     }
-    return attachHeaders(NextResponse.next(), true);
+    return attachSecurityAndTracking(NextResponse.next(), true);
   }
 
   // -------------------------------------------------------------
@@ -66,9 +73,9 @@ export function middleware(request: NextRequest) {
     }
     if (url.pathname === '/' || url.pathname === '') {
       url.pathname = '/afiliacja';
-      return attachHeaders(NextResponse.rewrite(url), true);
+      return attachSecurityAndTracking(NextResponse.rewrite(url), true);
     }
-    return attachHeaders(NextResponse.next(), true);
+    return attachSecurityAndTracking(NextResponse.next(), true);
   }
 
   // -------------------------------------------------------------
@@ -84,7 +91,7 @@ export function middleware(request: NextRequest) {
     if (!url.pathname.startsWith('/strefa')) {
       url.pathname = `/strefa${url.pathname === '/' ? '' : url.pathname}`;
     }
-    return attachHeaders(NextResponse.rewrite(url), true);
+    return attachSecurityAndTracking(NextResponse.rewrite(url), true);
   }
 
   // -------------------------------------------------------------
@@ -118,13 +125,13 @@ export function middleware(request: NextRequest) {
   // Lokalny development (localhost:3000)
   if (isStudentShortRoute) {
     url.pathname = `/strefa${url.pathname}`;
-    return attachHeaders(NextResponse.rewrite(url), true);
+    return attachSecurityAndTracking(NextResponse.rewrite(url), true);
   }
   if (isStrefaPath || isPartnerzyPath || isAfiliacjaPath) {
-    return attachHeaders(NextResponse.next(), true);
+    return attachSecurityAndTracking(NextResponse.next(), true);
   }
 
-  return attachHeaders(NextResponse.next(), false);
+  return attachSecurityAndTracking(NextResponse.next(), false);
 }
 
 export const config = {

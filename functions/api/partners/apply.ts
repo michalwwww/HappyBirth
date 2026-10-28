@@ -18,19 +18,17 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
   try {
     const { request, env } = context;
     const body: any = await request.json().catch(() => ({}));
-    const {
-      inquiryType = 'affiliate',
-      companyOrPracticeName,
-      contactName,
-      email,
-      phone,
-      websiteOrSocial,
-      cooperationModel,
-      message,
-      preferredPromoCode,
-    } = body;
+    const fullName = (body.fullName || body.contactName || '').trim();
+    const email = (body.email || '').trim().toLowerCase();
+    const channel = body.channel || (body.inquiryType === 'b2b_brand' ? 'partnerzy_b2b' : 'afiliacja');
+    const companyOrBrand = (body.companyOrBrand || body.companyOrPracticeName || '').trim() || null;
+    const phone = (body.phone || '').trim() || null;
+    const roleOrArea = (body.roleOrArea || body.cooperationModel || 'Położna / Twórca').trim();
+    const profileUrl = (body.profileUrl || body.websiteOrSocial || '').trim() || null;
+    const message = (body.message || '').trim() || null;
+    const rodoConsent = body.rodoConsent === false ? 0 : 1;
 
-    if (!contactName || !email || typeof email !== 'string' || !email.includes('@')) {
+    if (!fullName || !email || !email.includes('@')) {
       return new Response(
         JSON.stringify({ error: 'Podaj imię i nazwisko oraz poprawny adres e-mail.' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
@@ -38,26 +36,26 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     }
 
     const id = `inq_${crypto.randomUUID()}`;
-    const cleanEmail = email.trim().toLowerCase();
 
     if (env.DB) {
       try {
         await env.DB.prepare(
           `INSERT INTO partnership_inquiries (
-             id, inquiry_type, company_or_practice_name, contact_name, email, phone,
-             website_or_social, cooperation_model, message, status
-           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'NEW')`
+             id, channel, full_name, company_or_brand, email, phone,
+             role_or_area, profile_url, message, rodo_consent
+           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
         )
           .bind(
             id,
-            inquiryType === 'b2b_brand' ? 'b2b_brand' : 'affiliate',
-            companyOrPracticeName || null,
-            contactName.trim(),
-            cleanEmail,
-            phone || null,
-            websiteOrSocial || null,
-            cooperationModel || null,
-            message || null
+            channel,
+            fullName,
+            companyOrBrand,
+            email,
+            phone,
+            roleOrArea,
+            profileUrl,
+            message,
+            rodoConsent
           )
           .run();
       } catch (e) {
@@ -65,26 +63,27 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       }
     }
 
-    let generatedRefCode: string | null = null;
-    if (inquiryType === 'affiliate') {
-      const baseCode = (preferredPromoCode || contactName)
+    let promoCode: string | null = null;
+    if (channel === 'afiliacja') {
+      const baseCode = (body.preferredPromoCode || fullName)
         .toUpperCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
         .replace(/[^A-Z0-9]/g, '')
         .slice(0, 8);
-      generatedRefCode = `${baseCode || 'PARTNER'}10`;
+      promoCode = `${baseCode || 'PARTNER'}10`;
     }
 
     return new Response(
       JSON.stringify({
         success: true,
         inquiryId: id,
-        inquiryType,
-        suggestedPromoCode: generatedRefCode,
-        suggestedAffiliateLink: generatedRefCode
-          ? `https://happybirth.pl/?ref=${generatedRefCode}`
-          : null,
+        channel,
+        promoCode,
+        suggestedPromoCode: promoCode,
+        suggestedAffiliateLink: promoCode ? `https://happybirth.pl/?ref=${promoCode}` : null,
         message:
-          inquiryType === 'affiliate'
+          channel === 'afiliacja'
             ? 'Twoje zgłoszenie do Programu Afiliacyjnego HappyBirth zostało przyjęte. W ciągu 24h prześlemy aktywny kod rabatowy (-10%) oraz bezpłatny dostęp recenzencki do 52 lekcji.'
             : 'Twoje zapytanie B2B zostało zarejestrowane. Opiekun partnerstw KLARSOLUTIONS Sp. z o.o. skontaktuje się z Tobą w ciągu 1 dnia roboczego.',
       }),

@@ -72,7 +72,7 @@ const educationalJsonLd = {
       '@id': 'https://happybirth.pl/#course',
       name: 'Edukacyjny Kurs Przygotowania do Porodu i Rodzicielstwa Online',
       description:
-        'Kompleksowy program edukacyjny online w formule e-learning VOD dla mam i ojców. 52 filmowe lekcje w 9 modułach tematycznych.',
+        'Kompleksowy program edukacyjny online w formule e-learning VOD dla mam i ojców. 52 filmowe lekcje 4K w 8 modułach tematycznych (288 min) z 18-miesięcznym dostępem.',
       provider: {
         '@id': 'https://happybirth.pl/#organization',
       },

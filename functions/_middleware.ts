@@ -1,7 +1,7 @@
 // Cloudflare Pages Functions - Native Edge Middleware
 // Wymusza twardą separację subdomen (strefa.happybirth.pl, partnerzy.happybirth.pl, afiliacja.happybirth.pl),
-// blokuje boty reklamowe Meta/Google przed skanowaniem strefy medycznej i afiliacji ([E5] & Zero-Burn Guardrails)
-// oraz obsługuje 30-dniowe ciasteczko afiliacyjne hb_aff_ref ([D2]).
+// dodaje nagłówki bezpieczeństwa OWASP, blokuje boty reklamowe Meta/Google przed skanowaniem strefy medycznej
+// i afiliacji ([E5] & Zero-Burn Guardrails) oraz obsługuje 30-dniowe ciasteczko afiliacyjne hb_aff_ref ([D2]).
 
 interface PagesContext {
   request: Request;
@@ -16,11 +16,18 @@ interface PagesContext {
 const AFFILIATE_COOKIE_MAX_AGE = 30 * 24 * 60 * 60; // 30 dni
 const AD_BOT_REGEX = /Facebot|facebookexternalhit|Meta-ExternalAgent|AdsBot-Google|Mediapartners-Google|Bytespider|TikTok/i;
 
-function withHeaders(
+function withSecurityAndTrackingHeaders(
   response: Response,
   options: { refParam?: string | null; noIndex?: boolean }
 ): Response {
   const newHeaders = new Headers(response.headers);
+
+  // Enterprise OWASP Security Headers
+  newHeaders.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  newHeaders.set('X-Content-Type-Options', 'nosniff');
+  newHeaders.set('X-Frame-Options', 'SAMEORIGIN');
+  newHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  newHeaders.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()');
 
   if (options.noIndex) {
     newHeaders.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
@@ -47,14 +54,16 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   const refParam = url.searchParams.get('ref');
   const isAdBot = AD_BOT_REGEX.test(userAgent);
 
-  // 1. Przepuść bez zmian pliki statyczne, chunki JS, CSS, obrazy, favicon oraz endpointy API
+  // 1. Przepuść bez zmian pliki statyczne, arkusze PDF/HTML (/materialy/*), chunki JS, CSS, obrazy, favicon oraz endpointy API
   if (
     url.pathname.startsWith('/api') ||
     url.pathname.startsWith('/_next') ||
+    url.pathname.startsWith('/materialy') ||
     url.pathname.includes('.') ||
     url.pathname.startsWith('/favicon')
   ) {
-    return context.next();
+    const res = await context.next();
+    return withSecurityAndTrackingHeaders(res, { noIndex: false });
   }
 
   // 2. SUBDOMENA B2B I AFILIACJI: partnerzy.happybirth.pl
@@ -62,17 +71,21 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     if (isAdBot) {
       return new Response('Access restricted for ad crawlers.', {
         status: 403,
-        headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+          'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+          'X-Content-Type-Options': 'nosniff',
+        },
       });
     }
     if (url.pathname === '/' || url.pathname === '') {
       const targetUrl = new URL(url.toString());
       targetUrl.pathname = '/partnerzy';
       const res = await context.env.ASSETS.fetch(targetUrl);
-      return withHeaders(res, { refParam, noIndex: true });
+      return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
     }
     const res = await context.next();
-    return withHeaders(res, { refParam, noIndex: true });
+    return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
   }
 
   // 3. SUBDOMENA AFILIACJI: afiliacja.happybirth.pl
@@ -80,17 +93,21 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     if (isAdBot) {
       return new Response('Access restricted for ad crawlers.', {
         status: 403,
-        headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+          'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+          'X-Content-Type-Options': 'nosniff',
+        },
       });
     }
     if (url.pathname === '/' || url.pathname === '') {
       const targetUrl = new URL(url.toString());
       targetUrl.pathname = '/afiliacja';
       const res = await context.env.ASSETS.fetch(targetUrl);
-      return withHeaders(res, { refParam, noIndex: true });
+      return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
     }
     const res = await context.next();
-    return withHeaders(res, { refParam, noIndex: true });
+    return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
   }
 
   // 4. SUBDOMENA KURSANTKI: strefa.happybirth.pl
@@ -98,7 +115,11 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     if (isAdBot) {
       return new Response('Medical student area restricted for ad crawlers.', {
         status: 403,
-        headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+          'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+          'X-Content-Type-Options': 'nosniff',
+        },
       });
     }
     let targetUrl = url;
@@ -107,7 +128,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       targetUrl.pathname = `/strefa${url.pathname === '/' ? '' : url.pathname}`;
     }
     const response = await context.env.ASSETS.fetch(targetUrl);
-    return withHeaders(response, { noIndex: true });
+    return withSecurityAndTrackingHeaders(response, { noIndex: true });
   }
 
   // 5. DOMENA GŁÓWNA PRODUKCYJNA (happybirth.pl / www.happybirth.pl):
@@ -137,6 +158,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
         headers: {
           Location: `https://strefa.happybirth.pl${cleanSubpath}${url.search}`,
           'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+          'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
         },
       });
     }
@@ -153,6 +175,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
         headers: {
           Location: `https://partnerzy.happybirth.pl/${url.search}`,
           'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+          'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
         },
       });
     }
@@ -169,6 +192,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
         headers: {
           Location: `https://partnerzy.happybirth.pl/afiliacja${url.search}`,
           'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+          'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
         },
       });
     }
@@ -180,12 +204,12 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       const targetUrl = new URL(url.toString());
       targetUrl.pathname = `/strefa${url.pathname}`;
       const res = await context.env.ASSETS.fetch(targetUrl);
-      return withHeaders(res, { noIndex: true });
+      return withSecurityAndTrackingHeaders(res, { noIndex: true });
     }
     const res = await context.next();
-    return withHeaders(res, { refParam, noIndex: true });
+    return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
   }
 
   const res = await context.next();
-  return withHeaders(res, { refParam, noIndex: false });
+  return withSecurityAndTrackingHeaders(res, { refParam, noIndex: false });
 }

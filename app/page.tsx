@@ -1231,7 +1231,7 @@ export default function RootPage() {
               <ul>
                 <li><Link href="/regulamin">{t.footer.terms}</Link></li>
                 <li><Link href="/polityka-prywatnosci">{t.footer.privacy}</Link></li>
-                <li><Link href="/polityka-cookies">{t.footer.cookies}</Link></li>
+                <li><Link href="/polityka-prywatnosci#cookies">{t.footer.cookies}</Link></li>
                 <li><Link href="/odstap-od-umowy" className="font-semibold text-[#FCD705]">{t.footer.withdrawal}</Link></li>
               </ul>
             </div>
