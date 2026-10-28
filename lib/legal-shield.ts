@@ -25,10 +25,10 @@ export const OPERATOR_LEGAL_DATA = {
  * [E1] Dwa osobne, niezaznaczone domyślnie checkboxy w koszyku
  */
 export const CHECKBOX_1_TERMS_TEXT =
-  'Akceptuję Regulamin Sklepu happybirth.pl (operator: KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań) oraz zapoznałam/em się z Polityką Prywatności.';
+  'Akceptuję Regulamin i Politykę Prywatności.';
 
 export const CHECKBOX_2_ART38_WAIVER_TEXT =
-  'Żądam natychmiastowego rozpoczęcia dostarczania treści cyfrowych przed upływem 14-dniowego terminu do odstąpienia od umowy i przyjmuję do wiadomości, że z chwilą uzyskania dostępu do platformy kursowej tracę prawo do odstąpienia od umowy zgodnie z art. 38 ust. 1 pkt 13 ustawy o prawach konsumenta.';
+  'Chcę otrzymać dostęp do kursu od razu po opłaceniu i wiem, że tracę wtedy 14-dniowe prawo do odstąpienia od umowy (art. 38 ust. 1 pkt 13 u.p.k.).';
 
 export const TERMS_VERSION_ID = '2026-10-27-v2.0-18M';
 

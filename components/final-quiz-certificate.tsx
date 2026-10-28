@@ -197,13 +197,13 @@ export function FinalQuizAndCertificate() {
         <div className="space-y-1.5">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAE3EB] dark:bg-[#3B0D36] text-[#DA0271] dark:text-[#FF4BA8] text-xs font-bold">
             <Award className="w-3.5 h-3.5" />
-            <span>Test Końcowy i Imienny Certyfikat PDF</span>
+            <span>Test Końcowy i Certyfikat PDF</span>
           </div>
           <h3 className="font-brand-display text-xl sm:text-2xl font-bold text-[#1A1512] dark:text-[#FBF8F4]">
-            Certyfikat Ukończenia Szkoły Rodzenia Online HappyBirth.pl
+            Imienny Certyfikat Ukończenia Kursu
           </h3>
           <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3]">
-            Rozwiąż krótki test podsumowujący (10 pytań z porodu, laktacji i opieki nad noworodkiem, próg zaliczenia 80%) i pobierz imienny certyfikat PDF do karty ciąży.
+            Rozwiąż test (10 pytań, próg 80%) i pobierz certyfikat PDF do karty ciąży.
           </p>
         </div>
 

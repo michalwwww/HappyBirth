@@ -18,9 +18,9 @@ export const ACCESS_DURATION_MONTHS = 18;
 export const OMNIBUS_LOWEST_30_DAYS_TEXT = 'Najniższa cena z 30 dni przed obniżką: 489,00 zł';
 export const OMNIBUS_LOWEST_30D_NOTICE_PL = OMNIBUS_LOWEST_30_DAYS_TEXT;
 export const ORDER_BUMP_TITLE_PL =
-  'Pakiet Kart Sytuacyjnych na Porodówkę dla Taty + Checklisty Szpitalne (PDF do druku A4 i na telefon)';
+  'Pakiet Kart na Porodówkę dla Taty (PDF)';
 export const ORDER_BUMP_DESC_PL =
-  'Gotowe karty wsparcia w 4 okresach porodu, mapa punktów ucisku krzyżowego, ściąga rozmowy z personelem na izbie przyjęć oraz lista kontrolna 3 reklamówek do szpitala.';
+  '4 karty krok po kroku na salę porodową, punkty ucisku i lista 3 reklamówek do szpitala.';
 
 export function is10PercentAffiliatePromo(code?: string | null): boolean {
   const res = validatePromoCode(code);

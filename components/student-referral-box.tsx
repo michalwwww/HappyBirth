@@ -54,13 +54,13 @@ export function StudentReferralBox() {
         <div className="space-y-1.5">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAE3EB] dark:bg-[#3B0D36] text-[#DA0271] dark:text-[#FF4BA8] text-xs font-bold">
             <Gift className="w-3.5 h-3.5" />
-            <span>Program dla Kursantek · Prezent za Polecenie (0 dni czekania)</span>
+            <span>Prezent za Polecenie</span>
           </div>
           <h3 className="font-brand-display text-xl sm:text-2xl font-bold text-[#1A1512] dark:text-[#FBF8F4]">
-            Podaruj koleżance z grupy ciążowej -10% zniżki i odbierz e-book z przepisami PDF
+            Daj koleżance -10% rabatu i odbierz e-book z przepisami PDF
           </h3>
           <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3] max-w-3xl leading-relaxed">
-            Twoja koleżanka kupuje pełny kurs <strong>440,10 zł zamiast 489,00 zł (-10%)</strong>, a w tej samej sekundzie, w której opłaci zamówienie, w Twoim panelu automatycznie odblokowuje się ekskluzywny e-book kulinarny PDF.
+            Koleżanka kupuje kurs za <strong>440,10 zł zamiast 489,00 zł (-10%)</strong>, a Ty od razu odblokowujesz e-book kulinarny PDF.
           </p>
         </div>
 
