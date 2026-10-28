@@ -83,7 +83,9 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   // 4. DOMENA GŁÓWNA: happybirth.pl (bezpośrednio obsługuje /partnerzy, /afiliacja, /odstap-od-umowy, /program, /o-nas)
   const isMainProdHost = host === 'happybirth.pl' || host === 'www.happybirth.pl';
   const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny'];
-  const isStudentRoute = studentRoutes.some((route) => url.pathname.startsWith(route));
+  const isStudentRoute = studentRoutes.some(
+    (route) => url.pathname === route || url.pathname.startsWith(`${route}/`)
+  );
 
   if (isMainProdHost && isStudentRoute) {
     const targetUrl = new URL(url.toString());

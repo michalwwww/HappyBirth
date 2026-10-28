@@ -66,7 +66,9 @@ export function middleware(request: NextRequest) {
   //    /afiliacja, /odstap-od-umowy, /plan-porodu, /kalkulator-wyprawki
   // -------------------------------------------------------------
   const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny'];
-  const isStudentRoute = studentRoutes.some((route) => url.pathname.startsWith(route));
+  const isStudentRoute = studentRoutes.some(
+    (route) => url.pathname === route || url.pathname.startsWith(`${route}/`)
+  );
 
   if (isStudentRoute) {
     url.pathname = `/strefa${url.pathname}`;
