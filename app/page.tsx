@@ -665,12 +665,13 @@ export default function RootPage() {
               <Accessibility className="w-3.5 h-3.5 text-[#FCD705]" />
               <span className="hidden sm:inline">{t.a11yBtn}</span>
             </button>
-            <Link
-              href="/strefa"
+            <a
+              href="https://strefa.happybirth.pl"
+              rel="nofollow"
               className="inline-flex items-center font-bold text-white bg-[#DA0271] hover:bg-[#B5005E] px-3 py-1 rounded-full transition-all text-xs"
             >
               {t.enterZone}
-            </Link>
+            </a>
           </div>
         </div>
       </div>
@@ -687,7 +688,7 @@ export default function RootPage() {
             <a href="#bezplatna-lekcja">{t.nav.trailer}</a>
             <Link href="/o-nas">{t.nav.experts}</Link>
             <a href="#faq">{t.nav.faq}</a>
-            <Link href="/strefa" className="text-[#DA0271] font-semibold hover:underline">{t.nav.zone}</Link>
+            <a href="https://strefa.happybirth.pl" rel="nofollow" className="text-[#DA0271] font-semibold hover:underline">{t.nav.zone}</a>
           </nav>
           <details className="menu">
             <summary aria-label="Menu"><i /></summary>
@@ -1213,16 +1214,15 @@ export default function RootPage() {
                 <li><a href="#bezplatna-lekcja">{t.nav.trailer}</a></li>
                 <li><Link href="/plan-porodu">Plan Porodu PDF</Link></li>
                 <li><Link href="/kalkulator-wyprawki">Kalkulator Wyprawki PDF</Link></li>
-                <li><Link href="/strefa">{t.nav.zone}</Link></li>
+                <li><a href="https://strefa.happybirth.pl" rel="nofollow">{t.nav.zone}</a></li>
               </ul>
             </div>
             <div>
               <h2>{t.footer.happybirth}</h2>
               <ul>
                 <li><Link href="/o-nas">{t.nav.experts}</Link></li>
-                <li><Link href="/standard-merytoryczny">Standard merytoryczny</Link></li>
-                <li><Link href="/afiliacja">{t.footer.affiliate}</Link></li>
-                <li><Link href="/partnerzy">{t.footer.b2bPartners}</Link></li>
+                <li><a href="https://partnerzy.happybirth.pl/afiliacja" rel="nofollow noopener">{t.footer.affiliate}</a></li>
+                <li><a href="https://partnerzy.happybirth.pl" rel="nofollow noopener">{t.footer.b2bPartners}</a></li>
                 <li><a href="https://www.instagram.com/happybirth.pl/" rel="noreferrer" target="_blank">Instagram</a></li>
               </ul>
             </div>

@@ -78,14 +78,14 @@ export default function PartnerzyB2BPage() {
               className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-[#DA0271] hover:underline"
             >
               <Users className="w-3.5 h-3.5" />
-              <span>Program dla Położnych i Twórców (/afiliacja) →</span>
+              <span>Program dla Położnych i Twórców →</span>
             </Link>
-            <Link
-              href="/"
+            <a
+              href="https://happybirth.pl"
               className="text-xs font-semibold text-[#544A44] hover:text-[#DA0271]"
             >
-              ← Strona główna
-            </Link>
+              ← Strona główna (happybirth.pl)
+            </a>
             <a
               href="#kontakt-b2b"
               className="px-5 py-2.5 rounded-full bg-[#250A24] hover:bg-[#DA0271] text-white text-xs font-bold transition-all"

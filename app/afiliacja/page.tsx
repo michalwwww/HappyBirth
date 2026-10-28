@@ -78,19 +78,19 @@ export default function AfiliacjaPage() {
           </Link>
 
           <div className="flex items-center gap-3 sm:gap-5">
-            <Link
-              href="/partnerzy"
+            <a
+              href="https://partnerzy.happybirth.pl"
               className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-[#544A44] hover:text-[#DA0271]"
             >
               <Building2 className="w-3.5 h-3.5" />
-              <span>Dla Marek i Sponsorów B2B (/partnerzy)</span>
-            </Link>
-            <Link
-              href="/"
+              <span>Dla Marek i Sponsorów B2B</span>
+            </a>
+            <a
+              href="https://happybirth.pl"
               className="text-xs font-semibold text-[#544A44] hover:text-[#DA0271]"
             >
-              ← Strona główna
-            </Link>
+              ← Strona główna (happybirth.pl)
+            </a>
             <a
               href="#zgloszenie"
               className="px-5 py-2.5 rounded-full bg-[#DA0271] hover:bg-[#B8005F] text-white text-xs font-bold transition-all shadow-sm"
