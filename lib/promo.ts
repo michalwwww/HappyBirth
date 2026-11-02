@@ -195,16 +195,38 @@ export const ORDER_BUMP_GLOBAL_CATALOG: Record<string, OrderBumpEditionConfig> =
       '5-1-1 triage rule, peanut ball & counter-pressure cards, B.R.A.I.N. informed consent guide, $0 ACA breast pump checklist & itemized hospital bill audit.',
     url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=en-us',
   },
-  'en-au-ae': {
-    editionKey: 'en-au-ae',
-    targetMarket: 'Australia (Medicare) & UAE / Dubai Expats',
-    languageLabel: 'English (AU / UAE)',
+  'en-au': {
+    editionKey: 'en-au',
+    targetMarket: 'Australia & New Zealand (Medicare / MGP & Private)',
+    languageLabel: 'English (AU/NZ)',
     currency: 'aud',
-    priceDisplay: '$29.00 AUD / 89 AED',
-    title: 'Partner Labour Ward Flashcards, Visual Birth Plan & Medicare / UAE 120-Day Expat Visa Checklist',
+    priceDisplay: '$29.00 AUD',
+    title: 'Australian Birth Partner Flashcards, B.R.A.I.N. Advocacy, Colostrum Log & Medicare FA081 Guide',
     description:
-      'Partner labour action cards, colostrum syringe log, Australian Medicare FA081 guide & Dubai DHA Guarantee of Payment (GOP) + 120-day newborn visa tracker.',
-    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=en-au-ae',
+      '4 labour ward partner cards, sacral counter-pressure, 36w+ colostrum syringe log, Australian Medicare / Centrelink FA081 newborn declaration & AS/NZS 1754 capsule checklist.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=en-au',
+  },
+  'en-ae': {
+    editionKey: 'en-ae',
+    targetMarket: 'UAE / Dubai Expat Edition (DHA Private Hospital)',
+    languageLabel: 'English (UAE Expat)',
+    currency: 'aed',
+    priceDisplay: '89.00 AED',
+    title: 'Dubai / UAE Expat Birth Partner Cards, DHA GOP Checklist & 120-Day Newborn Visa Tracker',
+    description:
+      'Labour room partner cards, B.R.A.I.N. consent matrix, Insurance Guarantee of Payment (GOP), MOFA-Attested Marriage Certificate checklist & 120-day newborn residence visa countdown.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=en-ae',
+  },
+  'en-au-ae': {
+    editionKey: 'en-au',
+    targetMarket: 'Australia & New Zealand (Medicare / MGP & Private)',
+    languageLabel: 'English (AU/NZ)',
+    currency: 'aud',
+    priceDisplay: '$29.00 AUD',
+    title: 'Australian Birth Partner Flashcards, B.R.A.I.N. Advocacy, Colostrum Log & Medicare FA081 Guide',
+    description:
+      '4 labour ward partner cards, sacral counter-pressure, 36w+ colostrum syringe log, Australian Medicare / Centrelink FA081 newborn declaration & AS/NZS 1754 capsule checklist.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=en-au',
   },
   de: {
     editionKey: 'de',
@@ -428,19 +450,32 @@ export function detectClientOrderBumpEdition(options?: {
     };
   }
 
-  if (country === 'AU' || country === 'NZ' || country === 'AE') {
-    const cfg = ORDER_BUMP_GLOBAL_CATALOG['en-au-ae'];
+  if (country === 'AU' || country === 'NZ') {
+    const cfg = ORDER_BUMP_GLOBAL_CATALOG['en-au'];
     return {
-      editionKey: 'en-au-ae',
+      editionKey: 'en-au',
       countryCode: country,
       isAbroad: true,
       isPolishDiaspora: speaksPolish,
-      autoDetectedBadge:
-        country === 'AE'
-          ? '🇦🇪 Automatycznie dopasowano do ZEA/Dubaju (DHA GOP + Wiza 120 Dni)'
-          : '🇦🇺 Automatycznie dopasowano do Australii (Medicare FA081 + MGP)',
+      autoDetectedBadge: '🇦🇺 Automatycznie dopasowano do Australii (Medicare FA081 + MGP)',
       checkoutTitlePl: speaksPolish
-        ? 'Pakiet Porodowy Australia & Dubaj (Expat): Karty na Salę, Siara 36w+, Medicare FA081 i Wiza 120 Dni'
+        ? 'Pakiet Porodowy Australia (Medicare / MGP): Karty na Salę, Siara 36w+ i Formularz Centrelink FA081'
+        : cfg.title,
+      checkoutDescPl: cfg.description,
+      editionConfig: cfg,
+    };
+  }
+
+  if (country === 'AE' || country === 'QA' || country === 'OM') {
+    const cfg = ORDER_BUMP_GLOBAL_CATALOG['en-ae'];
+    return {
+      editionKey: 'en-ae',
+      countryCode: country,
+      isAbroad: true,
+      isPolishDiaspora: speaksPolish,
+      autoDetectedBadge: '🇦🇪 Automatycznie dopasowano do ZEA/Dubaju (DHA GOP + Wiza 120 Dni)',
+      checkoutTitlePl: speaksPolish
+        ? 'Pakiet Porodowy Dubaj / ZEA (Expat): Karty na Salę, Teczka DHA GOP, Akt Małżeństwa MOFA i Wiza 120 Dni'
         : cfg.title,
       checkoutDescPl: cfg.description,
       editionConfig: cfg,
@@ -604,7 +639,7 @@ export function formatPlnPrice(amount: number): string {
   return amount.toFixed(2).replace('.', ',') + ' zł';
 }
 
-export function activateStudentAccessLocally(promoCode: string = '') {
+export function activateStudentAccessLocally(promoCode: string = '', includeOrderBump: boolean = false) {
   if (typeof window === 'undefined') return;
   try {
     const clean = promoCode.trim().toUpperCase();
@@ -612,6 +647,9 @@ export function activateStudentAccessLocally(promoCode: string = '') {
     localStorage.setItem('hb_current_role', 'student');
     localStorage.setItem('hb_unlocked', 'true');
     localStorage.setItem('hb_access_expires_at', expiresAt);
+    if (includeOrderBump) {
+      localStorage.setItem('hb_order_bump_unlocked', 'true');
+    }
     if (clean) localStorage.setItem('hb_active_promo', clean);
     localStorage.setItem('hb_payment_status', 'success');
     sessionStorage.setItem('hb_payment', 'success');
@@ -619,6 +657,15 @@ export function activateStudentAccessLocally(promoCode: string = '') {
     window.dispatchEvent(new Event('hb_progress_updated'));
   } catch (e) {
     console.error('Error activating student access:', e);
+  }
+}
+
+export function isOrderBumpUnlockedLocally(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return localStorage.getItem('hb_order_bump_unlocked') === 'true';
+  } catch {
+    return false;
   }
 }
 

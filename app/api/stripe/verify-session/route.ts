@@ -63,6 +63,7 @@ export async function GET(req: NextRequest) {
       .toLowerCase();
     const customerName = session.customer_details?.name || 'Mama HappyBirth';
     const courseId = session.metadata?.courseId || 'kurs-glowny-happybirth';
+    const orderBumpIncluded = session.metadata?.order_bump_included === 'true' ? 1 : 0;
 
     if (!customerEmail) {
       return NextResponse.json(
@@ -99,10 +100,10 @@ export async function GET(req: NextRequest) {
     const stripeCustomerId = typeof session.customer === 'string' ? session.customer : null;
 
     await d1Run(
-      `INSERT INTO enrollments (id, user_id, course_id, stripe_session_id, stripe_customer_id, status, granted_at, expires_at)
-       VALUES (?, ?, ?, ?, ?, 'active', datetime('now'), ?)
-       ON CONFLICT(stripe_session_id) DO UPDATE SET status = 'active', expires_at = excluded.expires_at`,
-      [enrollmentId, userId, courseId, session.id, stripeCustomerId, expiresAt]
+      `INSERT INTO enrollments (id, user_id, course_id, stripe_session_id, stripe_customer_id, status, order_bump_included, granted_at, expires_at)
+       VALUES (?, ?, ?, ?, ?, 'active', ?, datetime('now'), ?)
+       ON CONFLICT(stripe_session_id) DO UPDATE SET status = 'active', order_bump_included = excluded.order_bump_included, expires_at = excluded.expires_at`,
+      [enrollmentId, userId, courseId, session.id, stripeCustomerId, orderBumpIncluded, expiresAt]
     );
 
     // 3. Utwórz kryptograficzne ciasteczko sesyjne HMAC
@@ -116,12 +117,14 @@ export async function GET(req: NextRequest) {
       success: true,
       paid: true,
       email: customerEmail,
+      orderBumpIncluded: Boolean(orderBumpIncluded),
       expiresInDays: ACCESS_DURATION_DAYS,
       user: {
         id: userId,
         email: customerEmail,
         role: 'student',
         hasActiveCourse: true,
+        orderBumpIncluded: Boolean(orderBumpIncluded),
       },
     });
 

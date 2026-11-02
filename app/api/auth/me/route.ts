@@ -51,10 +51,19 @@ export async function GET() {
     status: string;
     granted_at: string;
     expires_at: string;
+    order_bump_included: number;
     first_content_accessed_at: string | null;
   }>(
-    'SELECT status, granted_at, expires_at, first_content_accessed_at FROM enrollments WHERE user_id = ? AND status = ? LIMIT 1',
+    'SELECT status, granted_at, expires_at, order_bump_included, first_content_accessed_at FROM enrollments WHERE user_id = ? AND status = ? ORDER BY created_at DESC LIMIT 1',
     [session.userId, 'active']
+  );
+
+  const latestOrder = await d1First<{
+    order_number: string;
+    order_bump_included: number;
+  }>(
+    'SELECT order_number, order_bump_included FROM orders WHERE user_id = ? OR customer_email = ? ORDER BY created_at DESC LIMIT 1',
+    [session.userId, session.email]
   );
 
   const defaultExpiresAt = new Date(Date.now() + ACCESS_DURATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
@@ -80,6 +89,8 @@ export async function GET() {
       avatarUrl: user?.avatar_url || '',
       role: user?.role || session.role || 'student',
       hasActiveCourse: (!!enrollment || session.role === 'student' || session.role === 'partner') && isNotExpired,
+      orderNumber: latestOrder?.order_number || null,
+      orderBumpIncluded: Boolean(enrollment?.order_bump_included || latestOrder?.order_bump_included),
       expiresAt: expiresAtIso,
       daysRemaining,
       firstContentAccessedAt: enrollment?.first_content_accessed_at || null,

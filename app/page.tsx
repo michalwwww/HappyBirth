@@ -598,10 +598,16 @@ export default function RootPage() {
       const currentPromo = (appliedPromo || promoCodeInput).trim().toUpperCase();
 
       if (is100PercentPromo(currentPromo)) {
-        activateStudentAccessLocally(currentPromo);
+        activateStudentAccessLocally(currentPromo, includeOrderBump);
         window.location.href = `/strefa?session_id=promo_test_100&payment=success&promo=${encodeURIComponent(currentPromo)}`;
         return;
       }
+
+      try {
+        if (includeOrderBump) {
+          localStorage.setItem('hb_order_bump_unlocked', 'true');
+        }
+      } catch (_) {}
 
       const utmParams: Record<string, string> = {};
       if (typeof window !== 'undefined') {
@@ -633,6 +639,7 @@ export default function RootPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           courseId: 'kurs-glowny-happybirth',
+          orderBumpEdition: smartOrderBump.editionKey,
           utm: {
             ...utmParams,
             order_bump_edition: smartOrderBump.editionKey,
@@ -1067,7 +1074,8 @@ export default function RootPage() {
                         { key: 'pl-de', label: '🇵🇱🇩🇪 Polki w DE/AT/CH (PL↔DE)' },
                         { key: 'pl-nl', label: '🇵🇱🇳🇱 Polki w NL (PL↔NL)' },
                         { key: 'en-us', label: '🇵🇱🇺🇸 USA / Kanada (L&D)' },
-                        { key: 'en-au-ae', label: '🇦🇺🇦🇪 Australia / Dubaj' },
+                        { key: 'en-au', label: '🇦🇺 Australia (Medicare)' },
+                        { key: 'en-ae', label: '🇦🇪 Dubaj / ZEA (Expat)' },
                         { key: 'es', label: '🇪🇸🇲🇽 Hiszpania / LatAm' },
                         { key: 'pt-br', label: '🇧🇷 Brazylia' },
                       ].map((item) => (

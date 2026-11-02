@@ -210,21 +210,24 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       params.append('line_items[0][quantity]', '1');
     }
 
-    // [B3] Pozycja 1: Jednoklikowy Order Bump (+49,00 zł brutto / £15 / €17 / $27)
+    // [B3] Pozycja 1: Jednoklikowy Order Bump (+49,00 zł brutto / £15 / €17 / $27) z edycją krajową
+    const requestedEditionKey = String(body.orderBumpEdition || utm?.order_bump_edition || 'pl')
+      .trim()
+      .toLowerCase();
     if (includeOrderBump) {
       params.append('line_items[1][price_data][currency]', activeCurrency);
       params.append('line_items[1][price_data][unit_amount]', activeBumpAmount);
       params.append(
         'line_items[1][price_data][product_data][name]',
         isPln
-          ? 'Pakiet Dokumentów Szpitalnych i Kreator Planu Porodu PDF + Checklista Wyprawkowa'
-          : 'Partner Labour Ward Action Cards & Hospital Bag Master Checklist (PDF Bundle)'
+          ? `Pakiet Kart Sytuacyjnych na Porodówkę dla Taty & Słownik Skurczowy PDF (Edycja: ${requestedEditionKey.toUpperCase()})`
+          : `Partner Labour Ward Action Cards, B.R.A.I.N. & Hospital Checklist PDF (${requestedEditionKey.toUpperCase()})`
       );
       params.append(
         'line_items[1][price_data][product_data][description]',
         isPln
-          ? 'Dodatek komplementarny (Order Bump): Rozszerzony pakiet dokumentów do szpitala, wzór planu porodu i lista zakupowa PDF.'
-          : 'Complementary Add-On (Order Bump): 4 step-by-step labour room partner cards, acupressure guide & 3-bag hospital checklist PDF.'
+          ? 'Dodatek komplementarny (Order Bump): 4 karty sytuacyjne na salę porodową, matryca B.R.A.I.N., protokół siary i dwujęzyczny słownik.'
+          : 'Complementary Add-On (Order Bump): 4 step-by-step labour room partner cards, B.R.A.I.N. matrix, colostrum log & hospital checklist PDF.'
       );
       params.append('line_items[1][price_data][product_data][tax_code]', 'txcd_10000000');
       params.append('line_items[1][price_data][tax_behavior]', 'inclusive');
@@ -241,6 +244,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('metadata[locale]', activeLocale);
     params.append('metadata[buyer_country]', buyerCountry);
     params.append('metadata[order_bump_included]', includeOrderBump ? 'true' : 'false');
+    params.append('metadata[order_bump_edition]', requestedEditionKey);
     params.append('metadata[promo_code]', has10Discount ? cleanPromo : '');
     params.append('metadata[affiliate_ref_cookie]', String(cookieRef).slice(0, 80));
     params.append('metadata[attribution_priority]', has10Discount ? 'promo_code' : cookieRef ? 'ref_cookie' : 'direct');

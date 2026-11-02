@@ -93,6 +93,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       .trim()
       .toLowerCase();
     const fullName = String(sessionData.customer_details?.name || 'Kursantka HappyBirth').trim();
+    const orderBumpIncluded = sessionData.metadata?.order_bump_included === 'true' ? 1 : 0;
     let userId = `usr_${sessionId.slice(-10)}`;
 
     if (env.DB && email) {
@@ -114,10 +115,10 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
 
         await env.DB.prepare(
           `INSERT OR IGNORE INTO enrollments (
-             id, user_id, course_id, stripe_session_id, status, granted_at, expires_at
-           ) VALUES (?, ?, 'kurs-glowny-happybirth', ?, 'active', datetime('now'), datetime('now', '+548 days'))`
+             id, user_id, course_id, stripe_session_id, status, order_bump_included, granted_at, expires_at
+           ) VALUES (?, ?, 'kurs-glowny-happybirth', ?, 'active', ?, datetime('now'), datetime('now', '+548 days'))`
         )
-          .bind(crypto.randomUUID(), userId, sessionId)
+          .bind(crypto.randomUUID(), userId, sessionId, orderBumpIncluded)
           .run();
       } catch (e) {
         console.error('Błąd zapisu verify-session w D1:', e);
@@ -134,6 +135,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         success: true,
         paid: true,
         email,
+        orderBumpIncluded: Boolean(orderBumpIncluded),
         expiresInDays: 548,
         message: 'Płatność zweryfikowana w Stripe. Dostęp na 18 miesięcy (548 dni) został aktywowany.',
       }),

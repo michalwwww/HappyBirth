@@ -6,6 +6,7 @@ import {
   BASE_COURSE_PRICE_GROSZE,
   ORDER_BUMP_PRICE_GROSZE,
   resolvePricingForCurrency,
+  ORDER_BUMP_GLOBAL_CATALOG,
 } from '@/lib/promo';
 import {
   CHECKBOX_2_ART38_WAIVER_TEXT,
@@ -140,18 +141,30 @@ export async function POST(req: NextRequest) {
 
     const lineItems: any[] = [mainCourseLineItem];
 
-    // 2. [B3] Jednoklikowy dodatek w koszyku (Order Bump +49,00 zł brutto / £15 / €17 / $27)
+    // 2. [B3] Jednoklikowy dodatek w koszyku (Order Bump +49,00 zł brutto / £15 / €17 / $27) z edycją krajową
+    const requestedEditionKey = String(body.orderBumpEdition || utm?.order_bump_edition || 'pl')
+      .trim()
+      .toLowerCase();
+    const matchedBumpEdition =
+      ORDER_BUMP_GLOBAL_CATALOG[requestedEditionKey] || ORDER_BUMP_GLOBAL_CATALOG.pl;
+
     if (includeOrderBump) {
       lineItems.push({
         price_data: {
           currency: pricing.currency,
           product_data: {
-            name: isPln
-              ? 'Pakiet Dokumentów Szpitalnych i Kreator Planu Porodu PDF + Checklista Wyprawkowa'
-              : 'Partner Labour Ward Action Cards & Hospital Bag Master Checklist (PDF Bundle)',
-            description: isPln
-              ? 'Dodatek komplementarny (Order Bump): Rozszerzony pakiet dokumentów do szpitala, wzór planu porodu i lista zakupowa PDF.'
-              : 'Complementary Add-On (Order Bump): 4 step-by-step labour room partner cards, acupressure guide & 3-bag hospital checklist PDF.',
+            name:
+              requestedEditionKey !== 'pl'
+                ? `${matchedBumpEdition.title} (${matchedBumpEdition.targetMarket})`
+                : isPln
+                  ? 'Pakiet Dokumentów Szpitalnych i Kart na Porodówkę dla Taty (Edycja Polska MZ 2026)'
+                  : matchedBumpEdition.title,
+            description:
+              requestedEditionKey !== 'pl'
+                ? matchedBumpEdition.description
+                : isPln
+                  ? 'Dodatek komplementarny (Order Bump): 4 karty dla Taty, matryca B.R.A.I.N., protokół siary (37 tyg.) i system 3 reklamówek PDF.'
+                  : matchedBumpEdition.description,
             tax_code: 'txcd_10000000',
           },
           unit_amount: activeOrderBumpMinorUnits,
@@ -173,6 +186,7 @@ export async function POST(req: NextRequest) {
       locale: activeLocale,
       buyer_country: buyerCountry,
       order_bump_included: includeOrderBump ? 'true' : 'false',
+      order_bump_edition: matchedBumpEdition.editionKey,
       promo_code: promoResult.valid ? promoResult.code : '',
       promo_source_type: promoResult.valid ? promoResult.sourceType : 'none',
       affiliate_ref_cookie: String(cookieRef).slice(0, 80),

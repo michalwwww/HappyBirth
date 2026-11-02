@@ -28,6 +28,7 @@ import {
   activateStudentAccessLocally,
   is100PercentPromo,
   detectClientOrderBumpEdition,
+  isOrderBumpUnlockedLocally,
 } from '@/lib/promo';
 import { Lesson, Stage } from '@/lib/types';
 import {
@@ -54,12 +55,14 @@ function StrefaDashboardContent() {
     email?: string;
     fullName?: string;
     orderNumber?: string | null;
+    orderBumpIncluded?: boolean;
     expiresAt?: string;
     daysRemaining?: number;
     referralCode?: string;
   } | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [hasOrderBump, setHasOrderBump] = useState<boolean>(false);
   const [smartOrderBump, setSmartOrderBump] = useState(() =>
     detectClientOrderBumpEdition({ countryCode: 'PL', uiLang: 'pl' })
   );
@@ -81,6 +84,9 @@ function StrefaDashboardContent() {
         manualEditionOverride: savedOverride,
       });
       setSmartOrderBump(detected);
+      if (isOrderBumpUnlockedLocally()) {
+        setHasOrderBump(true);
+      }
     }
 
     // Pobierz dane konta i profil ciąży z Cloudflare D1 (/api/auth/me)
@@ -92,10 +98,17 @@ function StrefaDashboardContent() {
             email: data.user.email,
             fullName: data.user.fullName,
             orderNumber: data.user.orderNumber,
+            orderBumpIncluded: Boolean(data.user.orderBumpIncluded),
             expiresAt: data.user.expiresAt,
             daysRemaining: data.user.daysRemaining,
             referralCode: data.user.referralCode,
           });
+          if (data.user.orderBumpIncluded) {
+            setHasOrderBump(true);
+            try {
+              localStorage.setItem('hb_order_bump_unlocked', 'true');
+            } catch (_) {}
+          }
           if (data.user.pregnancy?.dueDate && !localProfile?.dueDate) {
             setPregnancyProfile(data.user.pregnancy);
             savePregnancyProfile(data.user.pregnancy);
@@ -130,7 +143,9 @@ function StrefaDashboardContent() {
           .then((res) => res.json())
           .then((data) => {
             if (data.success) {
-              activateStudentAccessLocally(promo || 'TEST100');
+              const bumpUnlocked = Boolean(data.orderBumpIncluded || data.user?.orderBumpIncluded);
+              activateStudentAccessLocally(promo || 'TEST100', bumpUnlocked);
+              if (bumpUnlocked) setHasOrderBump(true);
               changeRole('student');
               setPaymentSuccess(true);
               window.dispatchEvent(new Event('hb_progress_updated'));
@@ -841,9 +856,20 @@ function StrefaDashboardContent() {
 
           <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#7FB3CC] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#7FB3CC] uppercase tracking-wider">
-                ✨ {smartOrderBump.autoDetectedBadge}
-              </span>
+              <div className="flex flex-wrap items-center justify-between gap-1">
+                <span className="text-[10px] font-bold text-[#7FB3CC] uppercase tracking-wider">
+                  ✨ {smartOrderBump.autoDetectedBadge}
+                </span>
+                {hasOrderBump ? (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                    ✓ Pakiet odblokowany
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#DA0271]/15 text-[#DA0271] dark:text-[#FF7AC3]">
+                    🔒 Dodatek Order Bump (+49 zł)
+                  </span>
+                )}
+              </div>
               <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">
                 {smartOrderBump.checkoutTitlePl}
               </h4>
@@ -851,41 +877,62 @@ function StrefaDashboardContent() {
                 {smartOrderBump.checkoutDescPl}
               </p>
             </div>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <a
-                href={smartOrderBump.editionConfig.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#7FB3CC] hover:underline"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Otwórz dopasowany pakiet PDF ({smartOrderBump.editionConfig.languageLabel})</span>
-              </a>
-              <a
-                href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-uk"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
-              >
-                🇵🇱🇬🇧 UK/IE
-              </a>
-              <a
-                href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-de"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
-              >
-                🇵🇱🇩🇪 DACH
-              </a>
-              <a
-                href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-nl"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
-              >
-                🇵🇱🇳🇱 NL
-              </a>
-            </div>
+            {hasOrderBump ? (
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <a
+                  href={`${smartOrderBump.editionConfig.url}&unlocked=1`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#7FB3CC] hover:underline"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Otwórz pełny pakiet PDF ({smartOrderBump.editionConfig.languageLabel})</span>
+                </a>
+                <a
+                  href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-uk&unlocked=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+                >
+                  🇵🇱🇬🇧 UK/IE
+                </a>
+                <a
+                  href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-de&unlocked=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+                >
+                  🇵🇱🇩🇪 DACH
+                </a>
+                <a
+                  href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-nl&unlocked=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+                >
+                  🇵🇱🇳🇱 NL
+                </a>
+              </div>
+            ) : (
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                <a
+                  href={`${smartOrderBump.editionConfig.url}&preview=1`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#7FB3CC] hover:underline"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Podgląd Karty #1 (Demo)</span>
+                </a>
+                <Link
+                  href="/#cena"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#DA0271] text-white text-[11px] font-bold hover:bg-[#B8005E]"
+                >
+                  <span>Dokup pełny pakiet (+49 zł)</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </section>
