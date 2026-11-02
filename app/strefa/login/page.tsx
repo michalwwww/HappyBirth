@@ -31,6 +31,34 @@ export default function StrefaLoginPage() {
     if (err) {
       setErrorMessage(decodeURIComponent(err));
     }
+
+    const token = params.get('token');
+    const emailParam = params.get('email') || '';
+    if (token) {
+      setLoadingProvider('email');
+      fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, email: emailParam }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            changeRole('student');
+            try {
+              localStorage.setItem('hb_unlocked', 'true');
+            } catch {}
+            router.push('/strefa?payment=success');
+          } else {
+            setErrorMessage(data.error || 'Link logowania wygasł lub został już wykorzystany.');
+            setLoadingProvider(null);
+          }
+        })
+        .catch(() => {
+          setErrorMessage('Wystąpił błąd podczas weryfikacji linku logowania.');
+          setLoadingProvider(null);
+        });
+    }
   }, []);
 
   const handleMagicLink = async (e: React.FormEvent) => {

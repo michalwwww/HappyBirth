@@ -13,7 +13,12 @@ import {
 } from '@/lib/course-data';
 import { useCourseProgress } from '@/lib/progress';
 import { StageIcon } from '@/components/stage-icons';
-import { PregnancyProfile, getSavedPregnancyProfile } from '@/lib/pregnancy';
+import {
+  PregnancyProfile,
+  getSavedPregnancyProfile,
+  savePregnancyProfile,
+  calculatePregnancyState,
+} from '@/lib/pregnancy';
 import { OnboardingWizard } from '@/components/onboarding-wizard';
 import { CloudflarePlayer } from '@/components/cloudflare-player';
 import { StudentReferralBox } from '@/components/student-referral-box';
@@ -41,6 +46,14 @@ import {
 function StrefaDashboardContent() {
   const { role, changeRole, completedLessons, percentCompleted, toggleLessonCompletion } = useCourseProgress();
   const [pregnancyProfile, setPregnancyProfile] = useState<PregnancyProfile | null>(null);
+  const [accountInfo, setAccountInfo] = useState<{
+    email?: string;
+    fullName?: string;
+    orderNumber?: string | null;
+    expiresAt?: string;
+    daysRemaining?: number;
+    referralCode?: string;
+  } | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
@@ -52,7 +65,29 @@ function StrefaDashboardContent() {
   const [shouldAutoplay, setShouldAutoplay] = useState(false);
 
   useEffect(() => {
-    setPregnancyProfile(getSavedPregnancyProfile());
+    const localProfile = getSavedPregnancyProfile();
+    setPregnancyProfile(localProfile);
+
+    // Pobierz dane konta i profil ciąży z Cloudflare D1 (/api/auth/me)
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.user) {
+          setAccountInfo({
+            email: data.user.email,
+            fullName: data.user.fullName,
+            orderNumber: data.user.orderNumber,
+            expiresAt: data.user.expiresAt,
+            daysRemaining: data.user.daysRemaining,
+            referralCode: data.user.referralCode,
+          });
+          if (data.user.pregnancy?.dueDate && !localProfile?.dueDate) {
+            setPregnancyProfile(data.user.pregnancy);
+            savePregnancyProfile(data.user.pregnancy);
+          }
+        }
+      })
+      .catch(() => {});
 
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -155,6 +190,14 @@ function StrefaDashboardContent() {
     }
   };
 
+  const pregnancyState = pregnancyProfile?.dueDate
+    ? calculatePregnancyState(pregnancyProfile.dueDate)
+    : null;
+
+  const formattedExpiresDate = accountInfo?.expiresAt
+    ? new Date(accountInfo.expiresAt).toLocaleDateString('pl-PL')
+    : null;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
       {/* 1. BANER STATUSU DOSTĘPU 18 MIESIĘCY (548 DNI) DLA DWOJGA ([C1]) */}
@@ -164,16 +207,28 @@ function StrefaDashboardContent() {
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xs font-bold text-[#FF4BA8] uppercase tracking-wide flex items-center gap-1.5">
-              Aktywny Pakiet · Dostęp ważny przez 18 miesięcy (548 dni) od zakupu
+            <div className="text-xs font-bold text-[#FF4BA8] uppercase tracking-wide flex flex-wrap items-center gap-1.5">
+              <span>Aktywny Pakiet · Dostęp ważny przez 18 miesięcy (548 dni) od zakupu</span>
+              {accountInfo?.email && (
+                <span className="text-white/80 font-mono text-[11px] bg-white/10 px-2 py-0.5 rounded-full">
+                  {accountInfo.email}
+                </span>
+              )}
+              {accountInfo?.orderNumber && (
+                <span className="text-emerald-300 font-mono text-[11px] bg-emerald-500/15 px-2 py-0.5 rounded-full">
+                  Zamówienie: {accountInfo.orderNumber}
+                </span>
+              )}
             </div>
             <h3 className="font-brand-display font-bold text-base sm:text-lg text-white">
-              Pełny dostęp dla dwojga: 52 lekcje w jakości 4K, Notatnik Rodzica PDF oraz Strefa Taty.
+              {accountInfo?.fullName ? `Witaj, ${accountInfo.fullName}! ` : ''}Pełny dostęp dla dwojga: 52 lekcje w jakości 4K, Notatnik Rodzica PDF oraz Strefa Taty.
             </h3>
           </div>
         </div>
         <span className="inline-block self-start sm:self-auto text-xs bg-emerald-500/20 text-emerald-200 px-3.5 py-1.5 rounded-full border border-emerald-500/40 font-semibold whitespace-nowrap">
-          Dostęp aktywny (548 dni)
+          {formattedExpiresDate
+            ? `Ważny do ${formattedExpiresDate} (${accountInfo?.daysRemaining ?? 548} dni)`
+            : 'Dostęp aktywny (548 dni)'}
         </span>
       </div>
 
@@ -430,41 +485,75 @@ function StrefaDashboardContent() {
         </div>
       </section>
 
-      {/* 3. KOMPAKTOWY PASEK STATUSU KURSANTKI */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#20071E] dark:bg-[#250A24] text-[#FCD705] flex items-center justify-center shrink-0">
-            {role === 'partner' ? <User className="w-5 h-5 text-[#7FB3CC]" /> : <Heart className="w-5 h-5 text-[#DA0271]" />}
+      {/* 3. KOMPAKTOWY PASEK STATUSU KURSANTKI I PROFILU CIĄŻY */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] shadow-xs space-y-3.5">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#20071E] dark:bg-[#250A24] text-[#FCD705] flex items-center justify-center shrink-0">
+              {role === 'partner' ? <User className="w-5 h-5 text-[#7FB3CC]" /> : <Heart className="w-5 h-5 text-[#DA0271]" />}
+            </div>
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0]">
+                Profil Kursantki i Status Konta {accountInfo?.email ? `(${accountInfo.email})` : ''}
+              </div>
+              <div className="font-brand-display font-semibold text-sm sm:text-base text-[#250A24] dark:text-[#FBF8F4]">
+                {role === 'partner' ? 'Strefa dla Partnera / Taty aktywna' : 'Strefa dla Mamy aktywna'} · Dostęp ważny 18 miesięcy (548 dni) dla dwojga
+              </div>
+            </div>
           </div>
-          <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0]">
-              Status Twojego Konta
+
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs">
+            <div className="flex items-center gap-1.5 text-[#544A44] dark:text-[#D7CCC3]">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span><strong>{completedLessons.length}</strong> z 52 lekcji ukończonych ({percentCompleted}%)</span>
             </div>
-            <div className="font-brand-display font-semibold text-sm sm:text-base text-[#250A24] dark:text-[#FBF8F4]">
-              {role === 'partner' ? 'Strefa dla Partnera / Taty aktywna' : 'Strefa dla Mamy aktywna'} · Dostęp ważny 18 miesięcy (548 dni) od zakupu dla dwojga
+
+            <div className="flex items-center gap-1.5 text-[#544A44] dark:text-[#D7CCC3]">
+              <Clock className="w-4 h-4 text-[#DA0271]" />
+              <span>Pozostało: <strong>{remainingHours}h {remainingMins}min</strong></span>
             </div>
+
+            <button
+              onClick={() => setWizardOpen(true)}
+              className="text-xs font-semibold text-[#DA0271] hover:underline cursor-pointer flex items-center gap-1 border-l border-[#EAE3DB] dark:border-[#3D0E39] pl-3"
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>{pregnancyProfile?.dueDate ? 'Edytuj dane i termin porodu' : 'Ustaw termin porodu i dane'}</span>
+            </button>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs">
-          <div className="flex items-center gap-1.5 text-[#544A44] dark:text-[#D7CCC3]">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span><strong>{completedLessons.length}</strong> z 52 lekcji ukończonych ({percentCompleted}%)</span>
+        {/* Podsumowanie zapisanych danych ciążowych kursantki i partnera */}
+        {pregnancyProfile?.dueDate && pregnancyState && (
+          <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] flex flex-wrap items-center justify-between gap-2 text-xs text-[#544A44] dark:text-[#D7CCC3]">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2.5 py-1 rounded-full bg-[#FAE3EB] dark:bg-[#3B0D36] text-[#DA0271] dark:text-[#FF4BA8] font-bold">
+                {pregnancyState.formattedWeek} · {pregnancyState.trimesterLabel}
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+                Termin porodu: <strong>{pregnancyProfile.dueDate}</strong> ({pregnancyState.daysUntilDue >= 0 ? `za ${pregnancyState.daysUntilDue} dni` : 'po terminie'})
+              </span>
+              {pregnancyProfile.babyName && (
+                <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+                  Maluszek: <strong>{pregnancyProfile.babyName}</strong>
+                </span>
+              )}
+              {pregnancyProfile.partnerName && (
+                <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+                  Partner / Tata: <strong>{pregnancyProfile.partnerName}</strong>
+                </span>
+              )}
+              {pregnancyProfile.city && (
+                <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+                  Szpital / Miasto: <strong>{pregnancyProfile.city}</strong>
+                </span>
+              )}
+            </div>
+            <span className="text-[11px] text-[#867A72] dark:text-[#C4ADC0]">
+              Wielkość maluszka: <strong>{pregnancyState.babyComparison.fruit}</strong> ({pregnancyState.babyComparison.weight})
+            </span>
           </div>
-
-          <div className="flex items-center gap-1.5 text-[#544A44] dark:text-[#D7CCC3]">
-            <Clock className="w-4 h-4 text-[#DA0271]" />
-            <span>Pozostało: <strong>{remainingHours}h {remainingMins}min</strong></span>
-          </div>
-
-          <button
-            onClick={() => setWizardOpen(true)}
-            className="text-xs font-semibold text-[#DA0271] hover:underline cursor-pointer flex items-center gap-1 border-l border-[#EAE3DB] dark:border-[#3D0E39] pl-3"
-          >
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{pregnancyProfile?.dueDate ? 'Edytuj termin porodu' : 'Ustaw termin porodu'}</span>
-          </button>
-        </div>
+        )}
       </div>
 
       {/* 4. SZYBKIE NARZĘDZIA SOS (3 najważniejsze kafelki dla rodziców) */}
