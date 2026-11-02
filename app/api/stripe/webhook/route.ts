@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
     const customerName = session.customer_details?.name || 'Mama HappyBirth';
     const courseId = session.metadata?.courseId || 'kurs-glowny-happybirth';
     const orderBumpIncluded = session.metadata?.order_bump_included === 'true';
+    const isOnlyOrderBump = session.metadata?.only_order_bump === 'true';
     const promoCode = (session.metadata?.promo_code || '').trim().toUpperCase();
     const refCookie = (session.metadata?.affiliate_ref_cookie || session.metadata?.ref || '').trim();
     const waiverTimestamp = session.metadata?.waiver_art38_timestamp || new Date().toISOString();
@@ -89,9 +90,13 @@ export async function POST(req: NextRequest) {
         await d1Run(
           `INSERT INTO enrollments (id, user_id, course_id, stripe_session_id, stripe_customer_id, status, order_bump_included, granted_at, expires_at)
            VALUES (?, ?, ?, ?, ?, 'active', ?, datetime('now'), ?)
-           ON CONFLICT(stripe_session_id) DO UPDATE SET status = 'active', expires_at = excluded.expires_at`,
+           ON CONFLICT(stripe_session_id) DO UPDATE SET status = 'active', order_bump_included = excluded.order_bump_included, expires_at = excluded.expires_at`,
           [enrollmentId, userId, courseId, session.id, stripeCustomerId, orderBumpIncluded ? 1 : 0, expiresAt]
         );
+
+        if (orderBumpIncluded) {
+          await d1Run('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?', [userId]);
+        }
 
         // 3. [E1] Zapisz pełny rejestr dowodowy w tabeli orders (Art. 38 ust. 1 pkt 13 u.p.k. + SHA-256 regulaminu)
         const orderId = crypto.randomUUID();
@@ -140,8 +145,8 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        // 5. [D1b] + [D2] + [D2a] Atrybucja Afiliacyjna 2-Tier Capped CPA (nadrzędność kodu nad ?ref=)
-        if (!promoCode.startsWith('MAMA-') && (promoCode || refCookie)) {
+        // 5. [D1b] + [D2] + [D2a] Atrybucja Afiliacyjna 2-Tier Capped CPA (nadrzędność kodu nad ?ref=, pomijana przy samym Order Bumpie)
+        if (!isOnlyOrderBump && !promoCode.startsWith('MAMA-') && (promoCode || refCookie)) {
           const partnerByPromo = promoCode
             ? await d1First<any>('SELECT * FROM affiliates WHERE promo_code = ? AND status = ?', [promoCode, 'active'])
             : null;

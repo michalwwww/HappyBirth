@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
       utm = {},
       promoCode,
       includeOrderBump = false,
+      onlyOrderBump = false,
       termsAccepted = true,
       waiverArt38Accepted = true,
       currency = 'pln',
@@ -139,16 +140,18 @@ export async function POST(req: NextRequest) {
             quantity: 1,
           };
 
-    const lineItems: any[] = [mainCourseLineItem];
+    const isStandaloneOrderBump = Boolean(onlyOrderBump);
+    const shouldIncludeBumpItem = Boolean(includeOrderBump || isStandaloneOrderBump);
+    const lineItems: any[] = isStandaloneOrderBump ? [] : [mainCourseLineItem];
 
-    // 2. [B3] Jednoklikowy dodatek w koszyku (Order Bump +49,00 zł brutto / £15 / €17 / $27) z edycją krajową
+    // 2. [B3] Jednoklikowy dodatek w koszyku lub samodzielny Post-Purchase Upsell w Strefie (Order Bump +49,00 zł brutto / £15 / €17 / $27) z edycją krajową
     const requestedEditionKey = String(body.orderBumpEdition || utm?.order_bump_edition || 'pl')
       .trim()
       .toLowerCase();
     const matchedBumpEdition =
       ORDER_BUMP_GLOBAL_CATALOG[requestedEditionKey] || ORDER_BUMP_GLOBAL_CATALOG.pl;
 
-    if (includeOrderBump) {
+    if (shouldIncludeBumpItem) {
       lineItems.push({
         price_data: {
           currency: pricing.currency,
@@ -185,12 +188,19 @@ export async function POST(req: NextRequest) {
       currency: pricing.currency.toUpperCase(),
       locale: activeLocale,
       buyer_country: buyerCountry,
-      order_bump_included: includeOrderBump ? 'true' : 'false',
+      order_bump_included: shouldIncludeBumpItem ? 'true' : 'false',
+      only_order_bump: isStandaloneOrderBump ? 'true' : 'false',
       order_bump_edition: matchedBumpEdition.editionKey,
-      promo_code: promoResult.valid ? promoResult.code : '',
-      promo_source_type: promoResult.valid ? promoResult.sourceType : 'none',
-      affiliate_ref_cookie: String(cookieRef).slice(0, 80),
-      attribution_priority: promoResult.valid ? 'promo_code' : cookieRef ? 'ref_cookie' : 'direct',
+      promo_code: promoResult.valid && !isStandaloneOrderBump ? promoResult.code : '',
+      promo_source_type: promoResult.valid && !isStandaloneOrderBump ? promoResult.sourceType : 'none',
+      affiliate_ref_cookie: isStandaloneOrderBump ? '' : String(cookieRef).slice(0, 80),
+      attribution_priority: isStandaloneOrderBump
+        ? 'post_purchase_upsell'
+        : promoResult.valid
+          ? 'promo_code'
+          : cookieRef
+            ? 'ref_cookie'
+            : 'direct',
       waiver_art38_accepted: 'true',
       waiver_art38_timestamp: waiverTimestamp,
       buyer_ip: String(buyerIp).slice(0, 64),
@@ -211,13 +221,13 @@ export async function POST(req: NextRequest) {
     const sessionParams: any = {
       mode: 'payment',
       line_items: lineItems,
-      allow_promotion_codes: !promoResult.valid,
+      allow_promotion_codes: !promoResult.valid && !isStandaloneOrderBump,
       invoice_creation: { enabled: true },
       tax_id_collection: { enabled: true },
       metadata,
       locale: activeLocale,
       success_url: `${origin}/strefa?session_id={CHECKOUT_SESSION_ID}&payment=success`,
-      cancel_url: `${origin}/#cena`,
+      cancel_url: isStandaloneOrderBump ? `${origin}/strefa` : `${origin}/#cena`,
     };
 
     if (email && typeof email === 'string' && email.includes('@')) {
@@ -230,7 +240,9 @@ export async function POST(req: NextRequest) {
       url: session.url,
       sessionId: session.id,
       currency: pricing.currency.toUpperCase(),
-      amountGrossGrosze: activeCourseAmountGrosze + (includeOrderBump ? activeOrderBumpMinorUnits : 0),
+      amountGrossGrosze: isStandaloneOrderBump
+        ? activeOrderBumpMinorUnits
+        : activeCourseAmountGrosze + (shouldIncludeBumpItem ? activeOrderBumpMinorUnits : 0),
     });
   } catch (error: any) {
     console.error('Błąd podczas tworzenia sesji Stripe Checkout:', error);

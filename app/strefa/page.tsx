@@ -63,9 +63,41 @@ function StrefaDashboardContent() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [hasOrderBump, setHasOrderBump] = useState<boolean>(false);
+  const [buyingOrderBump, setBuyingOrderBump] = useState<boolean>(false);
   const [smartOrderBump, setSmartOrderBump] = useState(() =>
     detectClientOrderBumpEdition({ countryCode: 'PL', uiLang: 'pl' })
   );
+
+  const handleBuyStandaloneOrderBump = async () => {
+    try {
+      setBuyingOrderBump(true);
+      try {
+        localStorage.setItem('hb_order_bump_unlocked', 'true');
+      } catch (_) {}
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          onlyOrderBump: true,
+          includeOrderBump: true,
+          orderBumpEdition: smartOrderBump.editionKey,
+          email: accountInfo?.email || undefined,
+          termsAccepted: true,
+          waiverArt38Accepted: true,
+        }),
+      });
+      const data = await res.json();
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+      window.location.href = '/#cena';
+    } catch {
+      window.location.href = '/#cena';
+    } finally {
+      setBuyingOrderBump(false);
+    }
+  };
 
   // Referencja do odtwarzacza wideo (do centrowania ekranu po płatności)
   const playerSectionRef = useRef<HTMLElement>(null);
@@ -924,13 +956,19 @@ function StrefaDashboardContent() {
                   <Download className="w-3.5 h-3.5" />
                   <span>Podgląd Karty #1 (Demo)</span>
                 </a>
-                <Link
-                  href="/#cena"
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#DA0271] text-white text-[11px] font-bold hover:bg-[#B8005E]"
+                <button
+                  type="button"
+                  onClick={handleBuyStandaloneOrderBump}
+                  disabled={buyingOrderBump}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#DA0271] text-white text-[11px] font-bold hover:bg-[#B8005E] cursor-pointer disabled:opacity-60"
                 >
-                  <span>Dokup pełny pakiet (+49 zł)</span>
+                  <span>
+                    {buyingOrderBump
+                      ? 'Otwieranie Stripe...'
+                      : `Dokup pełny pakiet (${smartOrderBump.editionConfig.priceDisplay || '+49 zł'})`}
+                  </span>
                   <ArrowRight className="w-3 h-3" />
-                </Link>
+                </button>
               </div>
             )}
           </div>

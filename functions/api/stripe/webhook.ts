@@ -94,6 +94,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const metadata = session.metadata || {};
     const sessionCurrency = String(session.currency || metadata.currency || 'PLN').toUpperCase();
     const orderBumpIncluded = metadata.order_bump_included === 'true' ? 1 : 0;
+    const isOnlyOrderBump = metadata.only_order_bump === 'true';
     const promoCode = String(metadata.promo_code || '').toUpperCase();
     const refCookie = String(metadata.affiliate_ref_cookie || '');
     const buyerIp = String(metadata.buyer_ip || '0.0.0.0');
@@ -143,6 +144,12 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           .bind(crypto.randomUUID(), userId, sessionId, orderBumpIncluded)
           .run();
 
+        if (orderBumpIncluded) {
+          await env.DB.prepare('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?')
+            .bind(userId)
+            .run();
+        }
+
         // 4. Dowodowy rejestr zamówienia i tarczy prawnej Art. 38 ust. 1 pkt 13 ([E1] & [TECH-03])
         const orderId = crypto.randomUUID();
         await env.DB.prepare(
@@ -191,7 +198,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
 
         // 6. [D1b] + [D2] Rozliczenie prowizji afiliacyjnej (Kod rabatowy nadrzędny wobec ?ref= cookie + blokada self-referral)
         const lookupKey = promoCode || refCookie;
-        if (lookupKey && !promoCode.startsWith('MAMA-')) {
+        if (!isOnlyOrderBump && lookupKey && !promoCode.startsWith('MAMA-')) {
           const affiliate = await env.DB.prepare(
             `SELECT id, email, promo_code, tier1_rate, referred_by_broker_id, tier2_override_rate
              FROM affiliates

@@ -29,6 +29,8 @@ import {
   ORDER_BUMP_DESC_PL,
   detectClientOrderBumpEdition,
   ORDER_BUMP_GLOBAL_CATALOG,
+  GLOBAL_PRICING_CONFIG,
+  SupportedCurrency,
 } from '@/lib/promo';
 import {
   CHECKBOX_2_ART38_WAIVER_TEXT,
@@ -505,6 +507,7 @@ export default function RootPage() {
   const [showPromoInput, setShowPromoInput] = useState(false);
 
   const [includeOrderBump, setIncludeOrderBump] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>('pln');
   const [orderBumpEditionOverride, setOrderBumpEditionOverride] = useState<string | null>(null);
   const [showEditionPicker, setShowEditionPicker] = useState(false);
   const [smartOrderBump, setSmartOrderBump] = useState(() =>
@@ -576,10 +579,34 @@ export default function RootPage() {
     );
   };
 
-  const baseCoursePln = appliedDiscountPercent === 100 ? 0 : appliedDiscountPercent === 10 ? 440.1 : 489.0;
-  const orderBumpPln = includeOrderBump && appliedDiscountPercent !== 100 ? 49.0 : 0;
-  const finalTotalPln = baseCoursePln + orderBumpPln;
-  const formattedFinalPrice = `${finalTotalPln.toFixed(2).replace('.', ',')} zł`;
+  const activeCurrencyConfig = GLOBAL_PRICING_CONFIG[selectedCurrency] || GLOBAL_PRICING_CONFIG.pln;
+  const baseCourseMajor =
+    appliedDiscountPercent === 100
+      ? 0
+      : appliedDiscountPercent === 10
+        ? activeCurrencyConfig.discounted10MinorUnits / 100
+        : activeCurrencyConfig.baseMinorUnits / 100;
+  const orderBumpMajor =
+    includeOrderBump && appliedDiscountPercent !== 100
+      ? activeCurrencyConfig.orderBumpMinorUnits / 100
+      : 0;
+  const finalTotalMajor = baseCourseMajor + orderBumpMajor;
+
+  const formatAmountForCurrency = (val: number, curr: SupportedCurrency): string => {
+    if (curr === 'pln') return `${val.toFixed(2).replace('.', ',')} zł`;
+    if (curr === 'gbp') return `£${val.toFixed(2)}`;
+    if (curr === 'eur') return `${val.toFixed(2).replace('.', ',')} €`;
+    if (curr === 'usd') return `$${val.toFixed(2)}`;
+    if (curr === 'aud') return `$${val.toFixed(2)} AUD`;
+    if (curr === 'aed') return `${val.toFixed(2)} AED`;
+    return `${val.toFixed(2).replace('.', ',')} zł`;
+  };
+
+  const formattedFinalPrice = formatAmountForCurrency(finalTotalMajor, selectedCurrency);
+  const formattedOrderBumpBadge =
+    selectedCurrency === 'pln'
+      ? '+49 zł'
+      : `+${activeCurrencyConfig.displayOrderBump}`;
 
   const handleCheckout = async (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
@@ -639,6 +666,7 @@ export default function RootPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           courseId: 'kurs-glowny-happybirth',
+          currency: selectedCurrency,
           orderBumpEdition: smartOrderBump.editionKey,
           utm: {
             ...utmParams,
@@ -749,6 +777,24 @@ export default function RootPage() {
                 <span className="kursywa">{t.hero.title2}</span>
               </h1>
               <p className="lead">{t.hero.lead}</p>
+              {smartOrderBump.isAbroad && (
+                <div className="mb-3 p-3 rounded-2xl bg-[#FDF7FA] dark:bg-[#2A0B28] border border-[#DA0271]/35 text-xs text-[#250A24] dark:text-[#FBF8F4] flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <span className="font-bold text-[#DA0271] dark:text-[#FF7AC3]">
+                      ✨ {smartOrderBump.autoDetectedBadge}:
+                    </span>{' '}
+                    <span>
+                      Uczysz się po polsku z naszymi położnymi, a na salę porodową otrzymujesz dwujęzyczny pakiet szpitalny ({smartOrderBump.editionConfig.languageLabel}) ze słownikiem skurczowym audio!
+                    </span>
+                  </div>
+                  <a
+                    href="#cena"
+                    className="font-bold text-[#DA0271] dark:text-[#FF7AC3] underline whitespace-nowrap"
+                  >
+                    Zobacz swój pakiet &rarr;
+                  </a>
+                </div>
+              )}
               <div className="ctas">
                 <a className="btn zolty" href="#bezplatna-lekcja">
                   <span aria-hidden="true" className="graj" />
@@ -1018,6 +1064,34 @@ export default function RootPage() {
             <div className="cena dalej">
               <div className="oferta">
                 <div className="space-y-1">
+                  {/* Przełącznik waluty rozliczeniowej dla Polek za granicą i rynków międzynarodowych */}
+                  <div className="flex flex-wrap items-center gap-1 pb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0] mr-1">
+                      Waluta płatności:
+                    </span>
+                    {(
+                      [
+                        { code: 'pln' as SupportedCurrency, label: '🇵🇱 PLN (BLIK / Karta)' },
+                        { code: 'gbp' as SupportedCurrency, label: '🇬🇧 GBP (£119)' },
+                        { code: 'eur' as SupportedCurrency, label: '🇪🇺 EUR (139 € · Klarna)' },
+                        { code: 'usd' as SupportedCurrency, label: '🇺🇸 USD ($179)' },
+                      ] as const
+                    ).map((currOpt) => (
+                      <button
+                        key={currOpt.code}
+                        type="button"
+                        onClick={() => setSelectedCurrency(currOpt.code)}
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${
+                          selectedCurrency === currOpt.code
+                            ? 'bg-[#250A24] dark:bg-[#DA0271] text-white'
+                            : 'bg-[#FBF8F4] dark:bg-[#2A0B28] text-[#544A44] dark:text-[#D7CCC3] border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271]'
+                        }`}
+                      >
+                        {currOpt.label}
+                      </button>
+                    ))}
+                  </div>
+
                   <p className="kwota">
                     {formattedFinalPrice}
                     <small>
@@ -1032,10 +1106,10 @@ export default function RootPage() {
                   {appliedDiscountPercent === 10 && (
                     <div className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold space-y-0.5 pt-1">
                       <div>
-                        Cena regularna: <span className="line-through opacity-75">489,00 zł</span> · Z kodem <strong>{appliedPromo}</strong>: <strong>440,10 zł</strong>
+                        Cena regularna: <span className="line-through opacity-75">{activeCurrencyConfig.displayBase}</span> · Z kodem <strong>{appliedPromo}</strong>: <strong>{activeCurrencyConfig.displayDiscounted}</strong>
                       </div>
                       <div className="text-[11px] text-[#867A72] dark:text-[#C4ADC0] font-normal">
-                        {OMNIBUS_LOWEST_30D_NOTICE_PL}
+                        {selectedCurrency === 'pln' ? OMNIBUS_LOWEST_30D_NOTICE_PL : activeCurrencyConfig.omnibusText}
                       </div>
                     </div>
                   )}
@@ -1114,7 +1188,7 @@ export default function RootPage() {
                         <Gift className="w-3.5 h-3.5 text-[#DA0271] shrink-0" />
                         <span>Dodaj: {smartOrderBump.checkoutTitlePl}</span>
                         <span className="px-2 py-0.5 rounded-full bg-[#DA0271] text-white text-[10px] font-bold">
-                          +49 zł
+                          {formattedOrderBumpBadge}
                         </span>
                       </div>
                       <p className="text-[11px] text-[#544A44] dark:text-[#D7CCC3]">

@@ -104,6 +104,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       utm = {},
       promoCode,
       includeOrderBump = false,
+      onlyOrderBump = false,
       termsAccepted = true,
       waiverArt38Accepted = true,
       currency = 'pln',
@@ -170,68 +171,76 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const cookieRef = parseCookie(request.headers.get('cookie'), 'hb_aff_ref') || utm?.ref || '';
     const waiverTimestamp = new Date().toISOString();
 
+    const isStandaloneOrderBump = Boolean(onlyOrderBump);
+    const shouldIncludeBumpItem = Boolean(includeOrderBump || isStandaloneOrderBump);
+
     const params = new URLSearchParams();
     params.append('mode', 'payment');
     params.append('locale', activeLocale);
-    params.append('allow_promotion_codes', has10Discount ? 'false' : 'true');
+    params.append('allow_promotion_codes', has10Discount || isStandaloneOrderBump ? 'false' : 'true');
     params.append('invoice_creation[enabled]', 'true');
     params.append('tax_id_collection[enabled]', 'true');
     params.append(
       'success_url',
       'https://strefa.happybirth.pl/?session_id={CHECKOUT_SESSION_ID}&payment=success'
     );
-    params.append('cancel_url', `${origin}/#cena`);
+    params.append('cancel_url', isStandaloneOrderBump ? `${origin}/strefa` : `${origin}/#cena`);
 
     const priceId = env.NEXT_PUBLIC_STRIPE_PRICE_ID;
-    if (priceId && !has10Discount && isPln) {
-      params.append('line_items[0][price]', priceId);
-      params.append('line_items[0][quantity]', '1');
-    } else {
-      params.append('line_items[0][price_data][currency]', activeCurrency);
-      params.append('line_items[0][price_data][unit_amount]', activeCourseAmount);
-      params.append(
-        'line_items[0][price_data][product_data][name]',
-        isPln
-          ? has10Discount
-            ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${cleanPromo})`
-            : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)'
-          : has10Discount
-            ? `HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons · -10%: ${cleanPromo})`
-            : 'HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons for Two)'
-      );
-      params.append(
-        'line_items[0][price_data][product_data][description]',
-        isPln
-          ? 'Dostęp na 18 miesięcy (548 dni) od momentu zakupu dla dwojga: 52 lekcje 4K w 8 modułach (288 min), Notatnik Rodzica PDF i checklisty.'
-          : '18-month (548 days) full access for both parents: 52 4K VOD lessons (288 min), Interactive Birth Plan, Contraction Timer & Partner Toolkit PDF.'
-      );
-      params.append('line_items[0][price_data][product_data][tax_code]', 'txcd_10000000');
-      params.append('line_items[0][price_data][tax_behavior]', 'inclusive');
-      params.append('line_items[0][quantity]', '1');
+    let lineItemIndex = 0;
+
+    if (!isStandaloneOrderBump) {
+      if (priceId && !has10Discount && isPln) {
+        params.append(`line_items[${lineItemIndex}][price]`, priceId);
+        params.append(`line_items[${lineItemIndex}][quantity]`, '1');
+      } else {
+        params.append(`line_items[${lineItemIndex}][price_data][currency]`, activeCurrency);
+        params.append(`line_items[${lineItemIndex}][price_data][unit_amount]`, activeCourseAmount);
+        params.append(
+          `line_items[${lineItemIndex}][price_data][product_data][name]`,
+          isPln
+            ? has10Discount
+              ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${cleanPromo})`
+              : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)'
+            : has10Discount
+              ? `HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons · -10%: ${cleanPromo})`
+              : 'HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons for Two)'
+        );
+        params.append(
+          `line_items[${lineItemIndex}][price_data][product_data][description]`,
+          isPln
+            ? 'Dostęp na 18 miesięcy (548 dni) od momentu zakupu dla dwojga: 52 lekcje 4K w 8 modułach (288 min), Notatnik Rodzica PDF i checklisty.'
+            : '18-month (548 days) full access for both parents: 52 4K VOD lessons (288 min), Interactive Birth Plan, Contraction Timer & Partner Toolkit PDF.'
+        );
+        params.append(`line_items[${lineItemIndex}][price_data][product_data][tax_code]`, 'txcd_10000000');
+        params.append(`line_items[${lineItemIndex}][price_data][tax_behavior]`, 'inclusive');
+        params.append(`line_items[${lineItemIndex}][quantity]`, '1');
+      }
+      lineItemIndex++;
     }
 
-    // [B3] Pozycja 1: Jednoklikowy Order Bump (+49,00 zł brutto / £15 / €17 / $27) z edycją krajową
+    // [B3] Pozycja Order Bump (+49,00 zł brutto / £15 / €17 / $27) z edycją krajową
     const requestedEditionKey = String(body.orderBumpEdition || utm?.order_bump_edition || 'pl')
       .trim()
       .toLowerCase();
-    if (includeOrderBump) {
-      params.append('line_items[1][price_data][currency]', activeCurrency);
-      params.append('line_items[1][price_data][unit_amount]', activeBumpAmount);
+    if (shouldIncludeBumpItem) {
+      params.append(`line_items[${lineItemIndex}][price_data][currency]`, activeCurrency);
+      params.append(`line_items[${lineItemIndex}][price_data][unit_amount]`, activeBumpAmount);
       params.append(
-        'line_items[1][price_data][product_data][name]',
+        `line_items[${lineItemIndex}][price_data][product_data][name]`,
         isPln
           ? `Pakiet Kart Sytuacyjnych na Porodówkę dla Taty & Słownik Skurczowy PDF (Edycja: ${requestedEditionKey.toUpperCase()})`
           : `Partner Labour Ward Action Cards, B.R.A.I.N. & Hospital Checklist PDF (${requestedEditionKey.toUpperCase()})`
       );
       params.append(
-        'line_items[1][price_data][product_data][description]',
+        `line_items[${lineItemIndex}][price_data][product_data][description]`,
         isPln
           ? 'Dodatek komplementarny (Order Bump): 4 karty sytuacyjne na salę porodową, matryca B.R.A.I.N., protokół siary i dwujęzyczny słownik.'
           : 'Complementary Add-On (Order Bump): 4 step-by-step labour room partner cards, B.R.A.I.N. matrix, colostrum log & hospital checklist PDF.'
       );
-      params.append('line_items[1][price_data][product_data][tax_code]', 'txcd_10000000');
-      params.append('line_items[1][price_data][tax_behavior]', 'inclusive');
-      params.append('line_items[1][quantity]', '1');
+      params.append(`line_items[${lineItemIndex}][price_data][product_data][tax_code]`, 'txcd_10000000');
+      params.append(`line_items[${lineItemIndex}][price_data][tax_behavior]`, 'inclusive');
+      params.append(`line_items[${lineItemIndex}][quantity]`, '1');
     }
 
     params.append('metadata[courseId]', courseId);
@@ -243,11 +252,21 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('metadata[currency]', activeCurrency.toUpperCase());
     params.append('metadata[locale]', activeLocale);
     params.append('metadata[buyer_country]', buyerCountry);
-    params.append('metadata[order_bump_included]', includeOrderBump ? 'true' : 'false');
+    params.append('metadata[order_bump_included]', shouldIncludeBumpItem ? 'true' : 'false');
+    params.append('metadata[only_order_bump]', isStandaloneOrderBump ? 'true' : 'false');
     params.append('metadata[order_bump_edition]', requestedEditionKey);
-    params.append('metadata[promo_code]', has10Discount ? cleanPromo : '');
-    params.append('metadata[affiliate_ref_cookie]', String(cookieRef).slice(0, 80));
-    params.append('metadata[attribution_priority]', has10Discount ? 'promo_code' : cookieRef ? 'ref_cookie' : 'direct');
+    params.append('metadata[promo_code]', has10Discount && !isStandaloneOrderBump ? cleanPromo : '');
+    params.append('metadata[affiliate_ref_cookie]', isStandaloneOrderBump ? '' : String(cookieRef).slice(0, 80));
+    params.append(
+      'metadata[attribution_priority]',
+      isStandaloneOrderBump
+        ? 'post_purchase_upsell'
+        : has10Discount
+          ? 'promo_code'
+          : cookieRef
+            ? 'ref_cookie'
+            : 'direct'
+    );
     params.append('metadata[waiver_art38_accepted]', 'true');
     params.append('metadata[waiver_art38_timestamp]', waiverTimestamp);
     params.append('metadata[buyer_ip]', String(buyerIp).slice(0, 64));

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Lock, ArrowLeft, Mail } from 'lucide-react';
+import { ShieldCheck, Lock, ArrowLeft } from 'lucide-react';
 
 export default function PolitykaPrywatnosciPage() {
   return (
@@ -20,7 +20,7 @@ export default function PolitykaPrywatnosciPage() {
       <div className="space-y-4 border-b border-[#EAE3DB] pb-8">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#DFEED4] border border-[#C5E1B3] text-xs font-semibold text-[#347A22]">
           <Lock className="w-3.5 h-3.5" />
-          <span>Ochrona danych osobowych (RODO)</span>
+          <span>Ochrona danych osobowych (RODO / UK GDPR / CCPA)</span>
         </div>
         <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-[#1A1512] tracking-tight">
           Polityka Prywatności i Plików Cookies
@@ -62,7 +62,7 @@ export default function PolitykaPrywatnosciPage() {
               <strong>Realizacja zamówienia i dostęp do Strefy Kursantki</strong> (art. 6 ust. 1 lit. b RODO – niezbędność do wykonania umowy): przetwarzamy Twój adres e-mail, imię, dane transakcji oraz rejestr dowodowy zgód konsumenckich w celu udostępnienia kursu na okres <strong>18 miesięcy (548 dni) od momentu zakupu</strong>.
             </li>
             <li>
-              <strong>Wypełnienie obowiązków prawno-podatkowych</strong> (art. 6 ust. 1 lit. c RODO): wystawianie faktur, prowadzenie księgowości i archiwizacja dokumentów rozliczeniowych.
+              <strong>Wypełnienie obowiązków prawno-podatkowych (w tym VAT OSS / Stripe Tax)</strong> (art. 6 ust. 1 lit. c RODO): wystawianie faktur, prowadzenie księgowości i archiwizacja dokumentów rozliczeniowych.
             </li>
             <li>
               <strong>Obsługa zapytań i wsparcie techniczne</strong> (art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora): kontakt w sprawach związanych z obsługą konta lub zgłoszeniami reklamacyjnymi.
@@ -87,7 +87,7 @@ export default function PolitykaPrywatnosciPage() {
               Wiemy, jak intymnym okresem jest ciąża i narodziny dziecka. Dlatego wewnątrz Strefy Kursantki (<strong>strefa.happybirth.pl</strong>) obowiązuje całkowity zakaz stosowania pikseli śledzących podmiotów trzecich (takich jak Meta Pixel czy Google Ads Remarketing).
             </p>
             <p>
-              Twoje postępy w oglądaniu lekcji, korzystanie z licznika skurczów 5-1-1 czy przeglądanie apteczki nie są przekazywane żadnym sieciom reklamowym ani profilowane komercyjnie.
+              Twoje postępy w oglądaniu lekcji, wybrane preferencje w Planie Porodu czy przeglądanie apteczki nie są przekazywane żadnym sieciom reklamowym ani profilowane komercyjnie.
             </p>
           </div>
         </section>
@@ -100,22 +100,23 @@ export default function PolitykaPrywatnosciPage() {
           <p>Twoje dane mogą być powierzane zaufanym podmiotom technicznym:</p>
           <ul className="list-disc pl-5 space-y-1.5">
             <li><strong>Cloudflare Inc.</strong> (USA / UE) – bezpieczny hosting na serwerach Cloudflare Pages oraz streaming wideo Cloudflare Stream (z zachowaniem Standardowych Klauzul Umownych SCC);</li>
-            <li><strong>Operatorzy płatności elektronicznych</strong> (np. Stripe Payments Europe Ltd.) – w celu bezpiecznego procesowania transakcji BLIK i kart;</li>
+            <li><strong>Operatorzy płatności elektronicznych</strong> (Stripe Payments Europe Ltd.) – w celu bezpiecznego procesowania transakcji BLIK, kart płatniczych, Klarna, Apple Pay i Google Pay;</li>
             <li><strong>Biuro rachunkowo-księgowe</strong> – w celu obsługi faktur i rozliczeń podatkowych.</li>
           </ul>
         </section>
 
         {/* 5. Pliki Cookies i LocalStorage */}
-        <section className="space-y-3">
+        <section className="space-y-3" id="cookies">
           <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
             5. Pliki Cookies i Pamięć Lokalna (LocalStorage)
           </h2>
           <p>
-            1. Serwis wykorzystuje pamięć lokalną przeglądarki (<strong>localStorage</strong>) wyłącznie do celów funkcjonalnych:
+            1. Serwis wykorzystuje pamięć lokalną przeglądarki (<strong>localStorage</strong>) oraz techniczne pliki cookies wyłącznie do celów funkcjonalnych:
           </p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Zapamiętywanie oznaczonych jako ukończone lekcji;</li>
-            <li>Zapamiętanie wybranego trybu widoku (Dla Mamy / Dla Taty);</li>
+            <li>Zapamiętanie wybranego trybu widoku (Dla Mamy / Dla Taty) oraz wybranego wariantu językowo-krajowego Planu Porodu i Pakietu Kart Sytuacyjnych;</li>
+            <li>Techniczne dopasowanie waluty i edycji językowo-krajowej (ciasteczka funkcjonalne <code>hb_country</code>, <code>hb_geo_country</code> oraz <code>hb_locale</code> przechowujące wyłącznie 2-literowy kod kraju ISO bez gromadzenia dokładnej lokalizacji GPS);</li>
             <li>Zapisanie statusu zgody na baner cookies.</li>
           </ul>
           <p>
@@ -140,6 +141,16 @@ export default function PolitykaPrywatnosciPage() {
           </ul>
           <p>
             W celu realizacji powyższych praw wystarczy wysłać wiadomość e-mail na adres: <strong>pomoc@happybirth.pl</strong>.
+          </p>
+        </section>
+
+        {/* 7. International Privacy Notice (UK GDPR, CCPA/CPRA, LGPD) */}
+        <section className="space-y-3 pt-4 border-t border-[#EAE3DB]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+            7. International Privacy & Health Data Protection Notice (UK GDPR / US CCPA / Brazil LGPD)
+          </h2>
+          <p className="text-xs sm:text-sm text-[#544A44]">
+            For users accessing HappyBirth from the United Kingdom (UK GDPR & Data Protection Act 2018), the United States (including California CCPA/CPRA), Australia (Privacy Act 1988), and Brazil (LGPD Lei nº 13.709/2018): <strong>KLARSOLUTIONS Sp. z o.o. does NOT sell, rent, or share sensitive pregnancy or health-related data with any third-party advertising networks (such as Meta, TikTok, or Google Ads).</strong> All interactive birth plan preferences and checklists are stored locally in your browser (<code>localStorage</code>), and the Student Zone (<code>/strefa/*</code>) operates under a strict zero-advertising-pixel policy.
           </p>
         </section>
       </div>

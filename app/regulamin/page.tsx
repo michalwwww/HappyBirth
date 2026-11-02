@@ -143,8 +143,18 @@ export default function RegulaminPage() {
             2. W przypadku zastosowania autoryzowanego kodu rabatowego (np. <strong>-10%</strong> od położnej, partnera lub koleżanki, obniżającego cenę kursu do <strong>440,10 zł brutto</strong>), obok ceny promocyjnej zawsze prezentowana jest informacja o najniższej cenie z 30 dni przed obniżką zgodnie z Dyrektywą Omnibus.
           </p>
           <p>
-            3. Płatności realizowane są za pośrednictwem operatora Stripe (BLIK, karty płatnicze, szybkie przelewy, Apple Pay, Google Pay). Po opłaceniu zamówienia Klient otrzymuje potwierdzenie zawarcia umowy na trwałym nośniku (wiadomość e-mail) wraz z fakturą VAT 23%.
+            3. Płatności realizowane są za pośrednictwem operatora Stripe (BLIK, karty płatnicze, szybkie przelewy, Klarna, Apple Pay, Google Pay). Po opłaceniu zamówienia Klient otrzymuje potwierdzenie zawarcia umowy na trwałym nośniku (wiadomość e-mail) wraz z fakturą VAT.
           </p>
+          <p>
+            4. <strong>Sprzedaż międzynarodowa, cennik wielowalutowy i rozliczenia podatkowe (VAT OSS / Stripe Tax):</strong> Dla Klientek przebywających poza terytorium Rzeczypospolitej Polskiej Platforma umożliwia rozliczenie w walucie lokalnej za pośrednictwem Stripe Checkout (ceny brutto zawierające właściwy podatek pośredni VAT / GST zgodnie z krajem zamieszkania Konsumenta w procedurze unijnej <strong>VAT OSS</strong> lub eksporcie usług cyfrowych B2C):
+          </p>
+          <ul className="list-disc pl-5 space-y-1 text-sm">
+            <li><strong>Polska (PLN):</strong> Kurs główny <strong>489,00 zł brutto</strong> (z kodem -10%: <strong>440,10 zł</strong>) · Dodatek Order Bump: <strong>+49,00 zł brutto</strong> (w tym 23% VAT PL);</li>
+            <li><strong>Wielka Brytania (GBP):</strong> Kurs główny <strong>£119.00 GBP</strong> (z kodem -10%: <strong>£107.10 GBP</strong>) · Dodatek Order Bump: <strong>+£15.00 GBP</strong>;</li>
+            <li><strong>Strefa Euro / UE (EUR):</strong> Kurs główny <strong>139,00 € EUR</strong> (z kodem -10%: <strong>125,10 € EUR</strong>) · Dodatek Order Bump: <strong>+17,00 € EUR</strong> (rozliczane w procedurze VAT OSS z właściwą stawką kraju Konsumenta, np. 19% DE, 21% NL/ES, 23% IE);</li>
+            <li><strong>USA i Kanada (USD):</strong> Kurs główny <strong>$179.00 USD</strong> (z kodem -10%: <strong>$161.10 USD</strong>) · Dodatek Order Bump: <strong>+$27.00 USD</strong>;</li>
+            <li><strong>Australia (AUD) i ZEA / Dubaj (AED):</strong> Kurs główny <strong>$219.00 AUD / 649.00 AED</strong> · Dodatek Order Bump: <strong>+$29.00 AUD / +89.00 AED</strong>.</li>
+          </ul>
         </section>
 
         {/* § 6 */}
@@ -183,6 +193,27 @@ export default function RegulaminPage() {
           <p>
             1. Reklamacje dotyczące działania Platformy należy kierować na adres e-mail: <strong>pomoc@happybirth.pl</strong>. Usługodawca rozpatruje reklamację w terminie do 14 dni kalendarzowych.
           </p>
+        </section>
+
+        {/* § 8 */}
+        <section className="space-y-3 pt-4 border-t border-[#EAE3DB]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+            § 8. International Consumer Terms & Medical Disclaimer (English Summary for UK / US / EU / AU / UAE Customers)
+          </h2>
+          <div className="p-5 rounded-2xl bg-white border border-[#EAE3DB] space-y-2.5 text-xs sm:text-sm text-[#544A44]">
+            <p>
+              <strong>1. Service Provider & Merchant of Record:</strong> HappyBirth is operated by <strong>KLARSOLUTIONS Sp. z o.o.</strong>, registered in Poland (ul. Śląska 14, 60-614 Poznań, KRS: 0001268396, EU VAT ID: PL7812118273, e-mail: <strong>kontakt@happybirth.pl</strong>).
+            </p>
+            <p>
+              <strong>2. Educational Purpose Only (Global Medical Disclaimer):</strong> All 52 4K video lessons, partner action cards, B.R.A.I.N. decision matrices, colostrum harvesting logs, and birth plan generators provided on HappyBirth are strictly for <strong>general educational and informational purposes</strong>. They do not constitute medical advice, clinical diagnosis, or midwifery/obstetric treatment, nor do they establish a physician-patient or midwife-patient relationship. Always consult your licensed OB-GYN, NHS/HSE Midwife, Hebamme, or healthcare provider regarding any medical condition or pregnancy decision. In case of a medical emergency, call 999 (UK), 911 (US/CA), 112 (EU), or 000 (AU) immediately.
+            </p>
+            <p>
+              <strong>3. Digital Content Right of Withdrawal (UK & EU Consumers):</strong> Under Article 38(1)(13) of the Polish Consumer Rights Act, Directive 2011/83/EU, and Regulation 37 of the UK Consumer Contracts Regulations 2013, by consenting at checkout to immediate delivery of digital content before the expiry of the 14-day cooling-off period, you acknowledge that your statutory 14-day right to cancel is waived once streaming or downloading of the course content begins.
+            </p>
+            <p>
+              <strong>4. Governing Law:</strong> These Terms are governed by the laws of Poland and the European Union, without prejudice to mandatory consumer protection provisions applicable in the country of habitual residence of the Consumer.
+            </p>
+          </div>
         </section>
       </div>
     </div>

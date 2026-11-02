@@ -106,6 +106,10 @@ export async function GET(req: NextRequest) {
       [enrollmentId, userId, courseId, session.id, stripeCustomerId, orderBumpIncluded, expiresAt]
     );
 
+    if (orderBumpIncluded) {
+      await d1Run('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?', [userId]);
+    }
+
     // 3. Utwórz kryptograficzne ciasteczko sesyjne HMAC
     const sessionToken = signSession({
       userId,

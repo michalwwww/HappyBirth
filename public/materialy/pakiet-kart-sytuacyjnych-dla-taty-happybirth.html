@@ -419,7 +419,7 @@
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#FCD705;margin-bottom:4px;">🔒 Tryb Podglądu Demo (Karta #1 + Mapa Anatomiczna SVG)</div>
       <div style="font-size:16px;font-weight:700;margin-bottom:6px;">Odblokuj pełny pakiet wszystkich 4 Kart Sytuacyjnych, Matrycę B.R.A.I.N., Słownik Skurczowy z Wymową Audio i 11 Edycji Krajowych</div>
       <p style="font-size:12.5px;color:#EAD5E5;margin:0 0 12px 0;">Dodatek komplementarny Order Bump (+49,00 zł brutto) daje natychmiastowy dostęp do druku A4 oraz Trybu Nocnego na Salę Porodową.</p>
-      <a href="/#cena" style="display:inline-block;background:#DA0271;color:#FFFFFF;text-decoration:none;font-weight:700;font-size:13px;padding:10px 22px;border-radius:999px;box-shadow:0 4px 14px rgba(218,2,113,0.4);">Odblokuj pełny pakiet Order Bump (+49 zł) &rarr;</a>
+      <button type="button" onclick="buyStandaloneOrderBump(this)" style="cursor:pointer;border:none;display:inline-block;background:#DA0271;color:#FFFFFF;text-decoration:none;font-weight:700;font-size:13px;padding:10px 22px;border-radius:999px;box-shadow:0 4px 14px rgba(218,2,113,0.4);">Odblokuj pełny pakiet Order Bump (+49 zł) &rarr;</button>
     </div>
 
     <!-- ========================================================================= -->
@@ -1563,6 +1563,39 @@
       if (country === 'ES' || country === 'MX' || country === 'AR' || country === 'CO' || country === 'CL') return 'es';
       if (country === 'BR' || country === 'PT') return 'pt-br';
       return speaksPolish ? 'pl-uk' : 'en-uk';
+    }
+
+    function buyStandaloneOrderBump(btnEl) {
+      try {
+        if (btnEl) btnEl.textContent = 'Otwieranie bezpiecznej płatności Stripe...';
+        var activeSec = document.querySelector('.edition-section.active');
+        var edKey = activeSec ? activeSec.id.replace('edition-', '') : 'pl';
+        localStorage.setItem('hb_order_bump_unlocked', 'true');
+        fetch('/api/stripe/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            onlyOrderBump: true,
+            includeOrderBump: true,
+            orderBumpEdition: edKey,
+            termsAccepted: true,
+            waiverArt38Accepted: true
+          })
+        })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data && data.url) {
+              window.location.href = data.url;
+            } else {
+              window.location.href = '/#cena';
+            }
+          })
+          .catch(function() {
+            window.location.href = '/#cena';
+          });
+      } catch (e) {
+        window.location.href = '/#cena';
+      }
     }
 
     (function initSmartToolkit() {

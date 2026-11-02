@@ -120,6 +120,12 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         )
           .bind(crypto.randomUUID(), userId, sessionId, orderBumpIncluded)
           .run();
+
+        if (orderBumpIncluded) {
+          await env.DB.prepare('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?')
+            .bind(userId)
+            .run();
+        }
       } catch (e) {
         console.error('Błąd zapisu verify-session w D1:', e);
       }
