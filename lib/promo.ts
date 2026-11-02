@@ -241,6 +241,255 @@ export const ORDER_BUMP_GLOBAL_CATALOG: Record<string, OrderBumpEditionConfig> =
   },
 };
 
+export interface SmartGeoOrderBumpResult {
+  editionKey: string;
+  countryCode: string;
+  isAbroad: boolean;
+  isPolishDiaspora: boolean;
+  autoDetectedBadge: string;
+  checkoutTitlePl: string;
+  checkoutDescPl: string;
+  editionConfig: OrderBumpEditionConfig;
+}
+
+export function inferCountryFromTimeZone(tz?: string | null): string {
+  const cleanTz = (tz || '').trim();
+  if (!cleanTz) return 'PL';
+  if (cleanTz === 'Europe/Warsaw') return 'PL';
+  if (cleanTz === 'Europe/London' || cleanTz === 'Europe/Belfast' || cleanTz === 'Europe/Jersey') return 'GB';
+  if (cleanTz === 'Europe/Dublin') return 'IE';
+  if (cleanTz === 'Europe/Berlin' || cleanTz === 'Europe/Busingen') return 'DE';
+  if (cleanTz === 'Europe/Vienna') return 'AT';
+  if (cleanTz === 'Europe/Zurich') return 'CH';
+  if (cleanTz === 'Europe/Amsterdam') return 'NL';
+  if (cleanTz === 'Europe/Brussels') return 'BE';
+  if (cleanTz === 'Europe/Madrid' || cleanTz === 'Atlantic/Canary') return 'ES';
+  if (cleanTz.startsWith('America/Mexico') || cleanTz === 'America/Monterrey' || cleanTz === 'America/Cancun') return 'MX';
+  if (
+    cleanTz === 'America/Sao_Paulo' ||
+    cleanTz === 'America/Fortaleza' ||
+    cleanTz === 'America/Recife' ||
+    cleanTz === 'America/Bahia' ||
+    cleanTz === 'America/Manaus'
+  ) {
+    return 'BR';
+  }
+  if (cleanTz.startsWith('Australia/')) return 'AU';
+  if (cleanTz === 'Asia/Dubai' || cleanTz === 'Asia/Muscat' || cleanTz === 'Asia/Qatar') return 'AE';
+  if (
+    cleanTz === 'America/Toronto' ||
+    cleanTz === 'America/Vancouver' ||
+    cleanTz === 'America/Montreal' ||
+    cleanTz === 'America/Edmonton' ||
+    cleanTz === 'America/Winnipeg' ||
+    cleanTz === 'America/Halifax'
+  ) {
+    return 'CA';
+  }
+  if (cleanTz.startsWith('America/')) return 'US';
+  return 'PL';
+}
+
+export function readGeoCountryCookie(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)hb_geo_country=([A-Z]{2})/i);
+  return match ? match[1].toUpperCase() : null;
+}
+
+/**
+ * Inteligentne dopasowanie pakietu Order Bump do miejsca pobytu i języka klientki:
+ * 1) Sprawdza ręczny wybór użytkowniczki (manualOverride / localStorage)
+ * 2) Sprawdza nagłówek/ciasteczko geolokalizacji Cloudflare (`hb_geo_country` z `cf-ipcountry`)
+ * 3) Sprawdza strefę czasową przeglądarki (`Intl.DateTimeFormat().resolvedOptions().timeZone`) oraz języki (`navigator.languages`)
+ */
+export function detectClientOrderBumpEdition(options?: {
+  countryCode?: string | null;
+  timeZone?: string | null;
+  browserLangs?: readonly string[];
+  uiLang?: string;
+  manualEditionOverride?: string | null;
+}): SmartGeoOrderBumpResult {
+  // 1. Jeśli przekazano jawne nadpisanie edycji (np. z przełącznika lub localStorage)
+  const overrideKey = (options?.manualEditionOverride || '').trim().toLowerCase();
+  if (overrideKey && ORDER_BUMP_GLOBAL_CATALOG[overrideKey]) {
+    const cfg = ORDER_BUMP_GLOBAL_CATALOG[overrideKey];
+    const isPl = overrideKey === 'pl';
+    return {
+      editionKey: overrideKey,
+      countryCode: isPl ? 'PL' : overrideKey.toUpperCase(),
+      isAbroad: !isPl,
+      isPolishDiaspora: overrideKey.startsWith('pl-'),
+      autoDetectedBadge: isPl
+        ? '🇵🇱 Dopasowano: Polska (Standard MZ 2026)'
+        : `🌍 Wybrana edycja: ${cfg.targetMarket} (${cfg.languageLabel})`,
+      checkoutTitlePl: isPl ? ORDER_BUMP_TITLE_PL : cfg.title,
+      checkoutDescPl: isPl ? ORDER_BUMP_DESC_PL : cfg.description,
+      editionConfig: cfg,
+    };
+  }
+
+  // 2. Odczyt kraju z opcji, ciasteczka Cloudflare Edge lub strefy czasowej przeglądarki
+  const cookieCountry = readGeoCountryCookie();
+  const browserTz =
+    options?.timeZone ||
+    (typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Europe/Warsaw');
+  const country = (options?.countryCode || cookieCountry || inferCountryFromTimeZone(browserTz) || 'PL')
+    .trim()
+    .toUpperCase();
+
+  const langs =
+    options?.browserLangs ||
+    (typeof navigator !== 'undefined' && navigator.languages ? navigator.languages : ['pl-PL']);
+  const uiLang = (options?.uiLang || 'pl').toLowerCase();
+  const speaksPolish =
+    uiLang === 'pl' || langs.some((l) => l.toLowerCase().startsWith('pl'));
+
+  // Domyślnie Polska (PL) -> 100% zgodności z polskim koszykiem 489 zł + 49 zł
+  if (country === 'PL') {
+    const cfg = ORDER_BUMP_GLOBAL_CATALOG.pl;
+    return {
+      editionKey: 'pl',
+      countryCode: 'PL',
+      isAbroad: false,
+      isPolishDiaspora: false,
+      autoDetectedBadge: '🇵🇱 Polska (Standard MZ 2026)',
+      checkoutTitlePl: ORDER_BUMP_TITLE_PL,
+      checkoutDescPl: ORDER_BUMP_DESC_PL,
+      editionConfig: cfg,
+    };
+  }
+
+  // Polka za granicą (lub klientka zagraniczna): dobierz właściwą edycję krajową
+  if (country === 'GB' || country === 'UK' || country === 'IE') {
+    const key = speaksPolish ? 'pl-uk' : 'en-uk';
+    const cfg = ORDER_BUMP_GLOBAL_CATALOG[key];
+    return {
+      editionKey: key,
+      countryCode: country,
+      isAbroad: true,
+      isPolishDiaspora: speaksPolish,
+      autoDetectedBadge: speaksPolish
+        ? '🇵🇱🇬🇧 Automatycznie dopasowano do UK/Irlandii (Pakiet Dwujęzyczny PL↔EN NHS/HSE)'
+        : '🇬🇧🇮🇪 Auto-matched: UK & Ireland Edition (NHS / HSE)',
+      checkoutTitlePl: cfg.title,
+      checkoutDescPl: cfg.description,
+      editionConfig: cfg,
+    };
+  }
+
+  if (country === 'DE' || country === 'AT' || country === 'CH') {
+    const key = speaksPolish ? 'pl-de' : 'de';
+    const cfg = ORDER_BUMP_GLOBAL_CATALOG[key];
+    return {
+      editionKey: key,
+      countryCode: country,
+      isAbroad: true,
+      isPolishDiaspora: speaksPolish,
+      autoDetectedBadge: speaksPolish
+        ? '🇵🇱🇩🇪 Automatycznie dopasowano do DE/AT/CH (Pakiet Dwujęzyczny PL↔DE Kreißsaal)'
+        : '🇩🇪🇦🇹🇨🇭 Automatisch angepasst: DACH Kreißsaal-Edition',
+      checkoutTitlePl: cfg.title,
+      checkoutDescPl: cfg.description,
+      editionConfig: cfg,
+    };
+  }
+
+  if (country === 'NL' || country === 'BE') {
+    const cfg = ORDER_BUMP_GLOBAL_CATALOG['pl-nl'];
+    return {
+      editionKey: 'pl-nl',
+      countryCode: country,
+      isAbroad: true,
+      isPolishDiaspora: true,
+      autoDetectedBadge: '🇵🇱🇳🇱 Automatycznie dopasowano do Holandii (Pakiet Dwujęzyczny PL↔NL Kraamzorg)',
+      checkoutTitlePl: cfg.title,
+      checkoutDescPl: cfg.description,
+      editionConfig: cfg,
+    };
+  }
+
+  if (country === 'US' || country === 'CA') {
+    const cfg = ORDER_BUMP_GLOBAL_CATALOG['en-us'];
+    return {
+      editionKey: 'en-us',
+      countryCode: country,
+      isAbroad: true,
+      isPolishDiaspora: speaksPolish,
+      autoDetectedBadge: speaksPolish
+        ? '🇵🇱🇺🇸 Automatycznie dopasowano do USA/Kanady (Szpital L&D + Darmowy Laktator ACA)'
+        : '🇺🇸🇨🇦 Auto-matched: USA & Canada L&D Hospital Edition',
+      checkoutTitlePl: speaksPolish
+        ? 'Pakiet Porodowy USA/Kanada (L&D): Karty dla Taty, Matryca B.R.A.I.N., Darmowy Laktator ACA i Audyt Rachunku'
+        : cfg.title,
+      checkoutDescPl: speaksPolish
+        ? 'Reguła 5-1-1, pozycje z Peanut Ball, pytania B.R.A.I.N. przed Pitocinem, odbiór darmowego laktatora z polisy ACA i ochrona przed zawyżonym rachunkiem szpitalnym.'
+        : cfg.description,
+      editionConfig: cfg,
+    };
+  }
+
+  if (country === 'AU' || country === 'NZ' || country === 'AE') {
+    const cfg = ORDER_BUMP_GLOBAL_CATALOG['en-au-ae'];
+    return {
+      editionKey: 'en-au-ae',
+      countryCode: country,
+      isAbroad: true,
+      isPolishDiaspora: speaksPolish,
+      autoDetectedBadge:
+        country === 'AE'
+          ? '🇦🇪 Automatycznie dopasowano do ZEA/Dubaju (DHA GOP + Wiza 120 Dni)'
+          : '🇦🇺 Automatycznie dopasowano do Australii (Medicare FA081 + MGP)',
+      checkoutTitlePl: speaksPolish
+        ? 'Pakiet Porodowy Australia & Dubaj (Expat): Karty na Salę, Siara 36w+, Medicare FA081 i Wiza 120 Dni'
+        : cfg.title,
+      checkoutDescPl: cfg.description,
+      editionConfig: cfg,
+    };
+  }
+
+  if (country === 'ES' || country === 'MX' || country === 'AR' || country === 'CO' || country === 'CL') {
+    const cfg = ORDER_BUMP_GLOBAL_CATALOG.es;
+    return {
+      editionKey: 'es',
+      countryCode: country,
+      isAbroad: true,
+      isPolishDiaspora: speaksPolish,
+      autoDetectedBadge: '🇪🇸🇲🇽 Automatycznie dopasowano: Edycja Hiszpania / LatAm (Español)',
+      checkoutTitlePl: cfg.title,
+      checkoutDescPl: cfg.description,
+      editionConfig: cfg,
+    };
+  }
+
+  if (country === 'BR' || country === 'PT') {
+    const cfg = ORDER_BUMP_GLOBAL_CATALOG['pt-br'];
+    return {
+      editionKey: 'pt-br',
+      countryCode: country,
+      isAbroad: true,
+      isPolishDiaspora: speaksPolish,
+      autoDetectedBadge: '🇧🇷 Automatycznie dopasowano: Edycja Brazylia (Parto Humanizado & Lei 11.108)',
+      checkoutTitlePl: cfg.title,
+      checkoutDescPl: cfg.description,
+      editionConfig: cfg,
+    };
+  }
+
+  // Pozostałe kraje zagraniczne -> domyślnie pakiet dwujęzyczny PL↔EN (najbardziej uniwersalny dla Polek za granicą)
+  const fallbackKey = speaksPolish ? 'pl-uk' : 'en-uk';
+  const fallbackCfg = ORDER_BUMP_GLOBAL_CATALOG[fallbackKey];
+  return {
+    editionKey: fallbackKey,
+    countryCode: country,
+    isAbroad: true,
+    isPolishDiaspora: speaksPolish,
+    autoDetectedBadge: `🌍 Automatycznie dopasowano do pobytu za granicą (${country}): Pakiet Dwujęzyczny PL↔EN`,
+    checkoutTitlePl: fallbackCfg.title,
+    checkoutDescPl: fallbackCfg.description,
+    editionConfig: fallbackCfg,
+  };
+}
+
 export function is10PercentAffiliatePromo(code?: string | null): boolean {
   const res = validatePromoCode(code);
   return res.valid && res.discountPercent === 10;

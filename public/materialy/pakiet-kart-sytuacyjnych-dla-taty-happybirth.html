@@ -254,8 +254,8 @@
     <!-- INTERACTIVE GLOBAL & DIASPORA EDITION SWITCHER (NO-PRINT) -->
     <div class="market-switcher no-print">
       <div class="market-switcher-title">
-        <span>🌍 Wybierz edycję krajową / językową pakietu Order Bump (Druk A4 lub Smartfon):</span>
-        <span style="color:#EAD5E5;font-weight:500;">10 Edycji Rynkowych · Zero zapychaczy · Standard 2026</span>
+        <span>🌍 Inteligentny wybór edycji krajowej / językowej (Druk A4 lub Smartfon):</span>
+        <span id="auto-geo-status" style="color:#FCD705;font-weight:600;background:rgba(252,215,5,0.12);padding:3px 10px;border-radius:999px;border:1px solid rgba(252,215,5,0.3);">✨ Automatycznie dopasowano do Twojego miejsca pobytu</span>
       </div>
       <div class="market-tabs" role="tablist">
         <button class="market-btn active" onclick="selectEdition('pl')">🇵🇱 Polska (PL · Standard MZ 2026)</button>
@@ -1069,7 +1069,20 @@
   </div>
 
   <script>
-    function selectEdition(editionKey) {
+    var EDITION_LABELS = {
+      'pl': '🇵🇱 Polska (Standard MZ 2026)',
+      'pl-uk': '🇵🇱🇬🇧 Polki w UK i Irlandii (NHS / HSE · PL↔EN)',
+      'pl-de': '🇵🇱🇩🇪 Polki w DE / AT / CH (Kreißsaal · PL↔DE)',
+      'pl-nl': '🇵🇱🇳🇱 Polki w Holandii (Kraamzorg · PL↔NL)',
+      'en-uk': '🇬🇧🇮🇪 UK & Ireland Native (NHS / HSE)',
+      'en-us': '🇺🇸🇨🇦 USA & Canada (L&D Hospital)',
+      'en-au-ae': '🇦🇺🇦🇪 Australia & Dubai Expat Edition',
+      'de': '🇩🇪🇦🇹🇨🇭 DACH Native (Deutsch)',
+      'es': '🇪🇸🇲🇽 Español (España, México & LatAm)',
+      'pt-br': '🇧🇷 Brasil (Português · Parto Humanizado)'
+    };
+
+    function selectEdition(editionKey, isAutoDetected) {
       var panels = document.querySelectorAll('.edition-panel');
       for (var i = 0; i < panels.length; i++) {
         panels[i].classList.remove('active');
@@ -1085,17 +1098,80 @@
           btns[j].classList.add('active');
         }
       }
+      try {
+        localStorage.setItem('hb_detected_edition', editionKey);
+      } catch (e) {}
+      var statusEl = document.getElementById('auto-geo-status');
+      if (statusEl && EDITION_LABELS[editionKey]) {
+        statusEl.textContent = (isAutoDetected ? '✨ Automatycznie dopasowano: ' : '✓ Aktywna edycja: ') + EDITION_LABELS[editionKey];
+      }
       if (window.history && window.history.replaceState) {
         window.history.replaceState(null, '', '?edition=' + encodeURIComponent(editionKey));
       }
     }
 
-    (function initFromQuery() {
+    function inferCountryFromTz(tz) {
+      if (!tz) return 'PL';
+      if (tz === 'Europe/Warsaw') return 'PL';
+      if (tz === 'Europe/London' || tz === 'Europe/Belfast' || tz === 'Europe/Jersey') return 'GB';
+      if (tz === 'Europe/Dublin') return 'IE';
+      if (tz === 'Europe/Berlin' || tz === 'Europe/Busingen') return 'DE';
+      if (tz === 'Europe/Vienna') return 'AT';
+      if (tz === 'Europe/Zurich') return 'CH';
+      if (tz === 'Europe/Amsterdam') return 'NL';
+      if (tz === 'Europe/Brussels') return 'BE';
+      if (tz === 'Europe/Madrid' || tz === 'Atlantic/Canary') return 'ES';
+      if (tz.indexOf('America/Mexico') === 0 || tz === 'America/Monterrey' || tz === 'America/Cancun') return 'MX';
+      if (tz === 'America/Sao_Paulo' || tz === 'America/Fortaleza' || tz === 'America/Recife' || tz === 'America/Bahia') return 'BR';
+      if (tz.indexOf('Australia/') === 0) return 'AU';
+      if (tz === 'Asia/Dubai' || tz === 'Asia/Muscat' || tz === 'Asia/Qatar') return 'AE';
+      if (tz === 'America/Toronto' || tz === 'America/Vancouver' || tz === 'America/Montreal') return 'CA';
+      if (tz.indexOf('America/') === 0) return 'US';
+      return 'PL';
+    }
+
+    function autoDetectSmartEdition() {
+      var cookieMatch = document.cookie.match(/(?:^|;\s*)hb_geo_country=([A-Z]{2})/i);
+      var cookieCountry = cookieMatch ? cookieMatch[1].toUpperCase() : '';
+      var tz = '';
+      try {
+        tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      } catch (e) {}
+      var country = cookieCountry || inferCountryFromTz(tz) || 'PL';
+      var savedLang = '';
+      try {
+        savedLang = (localStorage.getItem('hb_lang') || '').toLowerCase();
+      } catch (e) {}
+      var navLangs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'pl'];
+      var speaksPolish = savedLang === 'pl' || navLangs.some(function(l) { return String(l).toLowerCase().indexOf('pl') === 0; });
+
+      if (country === 'PL') return 'pl';
+      if (country === 'GB' || country === 'UK' || country === 'IE') return speaksPolish ? 'pl-uk' : 'en-uk';
+      if (country === 'DE' || country === 'AT' || country === 'CH') return speaksPolish ? 'pl-de' : 'de';
+      if (country === 'NL' || country === 'BE') return 'pl-nl';
+      if (country === 'US' || country === 'CA') return 'en-us';
+      if (country === 'AU' || country === 'NZ' || country === 'AE') return 'en-au-ae';
+      if (country === 'ES' || country === 'MX' || country === 'AR' || country === 'CO' || country === 'CL') return 'es';
+      if (country === 'BR' || country === 'PT') return 'pt-br';
+      return speaksPolish ? 'pl-uk' : 'en-uk';
+    }
+
+    (function initSmartEdition() {
       try {
         var params = new URLSearchParams(window.location.search);
         var ed = params.get('edition');
         if (ed && document.getElementById('edition-' + ed)) {
-          selectEdition(ed);
+          selectEdition(ed, false);
+          return;
+        }
+        var savedOverride = localStorage.getItem('hb_order_bump_edition_override');
+        if (savedOverride && document.getElementById('edition-' + savedOverride)) {
+          selectEdition(savedOverride, false);
+          return;
+        }
+        var detected = autoDetectSmartEdition();
+        if (detected && document.getElementById('edition-' + detected)) {
+          selectEdition(detected, true);
         }
       } catch (e) {}
     })();

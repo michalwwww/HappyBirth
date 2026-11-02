@@ -27,6 +27,8 @@ import {
   OMNIBUS_LOWEST_30D_NOTICE_PL,
   ORDER_BUMP_TITLE_PL,
   ORDER_BUMP_DESC_PL,
+  detectClientOrderBumpEdition,
+  ORDER_BUMP_GLOBAL_CATALOG,
 } from '@/lib/promo';
 import {
   CHECKBOX_2_ART38_WAIVER_TEXT,
@@ -503,9 +505,27 @@ export default function RootPage() {
   const [showPromoInput, setShowPromoInput] = useState(false);
 
   const [includeOrderBump, setIncludeOrderBump] = useState(false);
+  const [orderBumpEditionOverride, setOrderBumpEditionOverride] = useState<string | null>(null);
+  const [showEditionPicker, setShowEditionPicker] = useState(false);
+  const [smartOrderBump, setSmartOrderBump] = useState(() =>
+    detectClientOrderBumpEdition({ countryCode: 'PL', uiLang: 'pl' })
+  );
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [waiverArt38Accepted, setWaiverArt38Accepted] = useState(false);
   const [checkboxError, setCheckboxError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const savedOverride = localStorage.getItem('hb_order_bump_edition_override');
+    const detected = detectClientOrderBumpEdition({
+      uiLang: lang,
+      manualEditionOverride: orderBumpEditionOverride || savedOverride,
+    });
+    setSmartOrderBump(detected);
+    try {
+      localStorage.setItem('hb_detected_edition', detected.editionKey);
+    } catch (_) {}
+  }, [lang, orderBumpEditionOverride]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -613,7 +633,10 @@ export default function RootPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           courseId: 'kurs-glowny-happybirth',
-          utm: utmParams,
+          utm: {
+            ...utmParams,
+            order_bump_edition: smartOrderBump.editionKey,
+          },
           promoCode: currentPromo || undefined,
           includeOrderBump,
           termsAccepted: true,
@@ -1017,8 +1040,60 @@ export default function RootPage() {
                   ))}
                 </ul>
 
-                {/* [B3] Kompaktowy Order Bump (+49,00 zł) */}
-                <div className="mt-4 p-3.5 rounded-2xl border border-[#DA0271]/40 bg-[#FDF7FA] dark:bg-[#2A0B28] text-left">
+                {/* [B3] Kompaktowy Order Bump (+49,00 zł) z inteligentną detekcją miejsca pobytu */}
+                <div className="mt-4 p-3.5 rounded-2xl border border-[#DA0271]/40 bg-[#FDF7FA] dark:bg-[#2A0B28] text-left space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-1.5 text-[10px]">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DA0271]/10 text-[#DA0271] dark:text-[#FF7AC3] font-bold">
+                      ✨ {smartOrderBump.autoDetectedBadge}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowEditionPicker((prev) => !prev)}
+                      className="text-[10px] font-semibold text-[#544A44] dark:text-[#D7CCC3] hover:text-[#DA0271] underline cursor-pointer"
+                    >
+                      {showEditionPicker
+                        ? 'Ukryj wybór kraju'
+                        : smartOrderBump.isAbroad
+                        ? 'Zmień kraj porodu'
+                        : 'Rodzisz za granicą? Dopasuj pakiet (UK/DE/NL/USA)'}
+                    </button>
+                  </div>
+
+                  {showEditionPicker && (
+                    <div className="p-2 rounded-xl bg-white/80 dark:bg-[#1B061A] border border-[#EAE3DB] dark:border-[#3D0E39] flex flex-wrap gap-1">
+                      {[
+                        { key: 'pl', label: '🇵🇱 Polska (MZ 2026)' },
+                        { key: 'pl-uk', label: '🇵🇱🇬🇧 Polki w UK/IE (PL↔EN)' },
+                        { key: 'pl-de', label: '🇵🇱🇩🇪 Polki w DE/AT/CH (PL↔DE)' },
+                        { key: 'pl-nl', label: '🇵🇱🇳🇱 Polki w NL (PL↔NL)' },
+                        { key: 'en-us', label: '🇵🇱🇺🇸 USA / Kanada (L&D)' },
+                        { key: 'en-au-ae', label: '🇦🇺🇦🇪 Australia / Dubaj' },
+                        { key: 'es', label: '🇪🇸🇲🇽 Hiszpania / LatAm' },
+                        { key: 'pt-br', label: '🇧🇷 Brazylia' },
+                      ].map((item) => (
+                        <button
+                          key={item.key}
+                          type="button"
+                          onClick={() => {
+                            setOrderBumpEditionOverride(item.key);
+                            try {
+                              localStorage.setItem('hb_order_bump_edition_override', item.key);
+                              localStorage.setItem('hb_detected_edition', item.key);
+                            } catch (_) {}
+                            setShowEditionPicker(false);
+                          }}
+                          className={`px-2 py-1 rounded-full text-[10px] font-semibold transition-colors cursor-pointer ${
+                            smartOrderBump.editionKey === item.key
+                              ? 'bg-[#DA0271] text-white'
+                              : 'bg-[#FBF8F4] dark:bg-[#2A0B28] text-[#250A24] dark:text-[#EAD5E5] hover:bg-[#DA0271]/15'
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   <label className="flex items-start gap-2.5 cursor-pointer">
                     <input
                       type="checkbox"
@@ -1029,13 +1104,13 @@ export default function RootPage() {
                     <div className="space-y-0.5 text-xs">
                       <div className="flex flex-wrap items-center gap-1.5 font-bold text-[#250A24] dark:text-white">
                         <Gift className="w-3.5 h-3.5 text-[#DA0271] shrink-0" />
-                        <span>Dodaj: {ORDER_BUMP_TITLE_PL}</span>
+                        <span>Dodaj: {smartOrderBump.checkoutTitlePl}</span>
                         <span className="px-2 py-0.5 rounded-full bg-[#DA0271] text-white text-[10px] font-bold">
                           +49 zł
                         </span>
                       </div>
                       <p className="text-[11px] text-[#544A44] dark:text-[#D7CCC3]">
-                        {ORDER_BUMP_DESC_PL}
+                        {smartOrderBump.checkoutDescPl}
                       </p>
                     </div>
                   </label>

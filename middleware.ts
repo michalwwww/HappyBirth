@@ -30,6 +30,24 @@ export function middleware(request: NextRequest) {
         path: '/',
       });
     }
+
+    // [TECH-06] Automatyczna detekcja kraju klientki z nagłówków Edge (Cloudflare cf-ipcountry / x-vercel-ip-country)
+    const ipCountry = (
+      request.headers.get('cf-ipcountry') ||
+      request.headers.get('x-vercel-ip-country') ||
+      ''
+    )
+      .trim()
+      .toUpperCase();
+    if (/^[A-Z]{2}$/.test(ipCountry) && ipCountry !== 'XX') {
+      res.cookies.set('hb_geo_country', ipCountry, {
+        httpOnly: false, // czytelne dla UI oraz /materialy/* (0ms latencji)
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60,
+        path: '/',
+      });
+    }
     return res;
   };
 

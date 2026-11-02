@@ -24,7 +24,11 @@ import { CloudflarePlayer } from '@/components/cloudflare-player';
 import { StudentReferralBox } from '@/components/student-referral-box';
 import { FinalQuizAndCertificate } from '@/components/final-quiz-certificate';
 import { openPrintableLessonWorksheet } from '@/lib/printable-worksheets';
-import { activateStudentAccessLocally, is100PercentPromo } from '@/lib/promo';
+import {
+  activateStudentAccessLocally,
+  is100PercentPromo,
+  detectClientOrderBumpEdition,
+} from '@/lib/promo';
 import { Lesson, Stage } from '@/lib/types';
 import {
   Play,
@@ -56,6 +60,9 @@ function StrefaDashboardContent() {
   } | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [smartOrderBump, setSmartOrderBump] = useState(() =>
+    detectClientOrderBumpEdition({ countryCode: 'PL', uiLang: 'pl' })
+  );
 
   // Referencja do odtwarzacza wideo (do centrowania ekranu po płatności)
   const playerSectionRef = useRef<HTMLElement>(null);
@@ -67,6 +74,14 @@ function StrefaDashboardContent() {
   useEffect(() => {
     const localProfile = getSavedPregnancyProfile();
     setPregnancyProfile(localProfile);
+
+    if (typeof window !== 'undefined') {
+      const savedOverride = localStorage.getItem('hb_order_bump_edition_override');
+      const detected = detectClientOrderBumpEdition({
+        manualEditionOverride: savedOverride,
+      });
+      setSmartOrderBump(detected);
+    }
 
     // Pobierz dane konta i profil ciąży z Cloudflare D1 (/api/auth/me)
     fetch('/api/auth/me')
@@ -827,22 +842,24 @@ function StrefaDashboardContent() {
           <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#7FB3CC] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-[#7FB3CC] uppercase tracking-wider">
-                PDF · Order Bump (PL + Zagranica)
+                ✨ {smartOrderBump.autoDetectedBadge}
               </span>
-              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">Pakiet Kart dla Taty &amp; Polki za Granicą</h4>
+              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">
+                {smartOrderBump.checkoutTitlePl}
+              </h4>
               <p className="text-xs text-[#544A44] dark:text-[#D7CCC3]">
-                4 karty na porodówkę, matryca B.R.A.I.N., protokół siary (37 tyg.) oraz dwujęzyczne słowniki skurczowe (UK/IE, DE/AT/CH, NL, USA, ES, BR).
+                {smartOrderBump.checkoutDescPl}
               </p>
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <a
-                href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html"
+                href={smartOrderBump.editionConfig.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#7FB3CC] hover:underline"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Otwórz pakiet PDF (PL + 10 edycji)</span>
+                <span>Otwórz dopasowany pakiet PDF ({smartOrderBump.editionConfig.languageLabel})</span>
               </a>
               <a
                 href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-uk"
