@@ -187,18 +187,26 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           }
         }
 
-        // 6. [D1b] + [D2] Rozliczenie prowizji afiliacyjnej (Kod rabatowy nadrzędny wobec ?ref= cookie)
+        // 6. [D1b] + [D2] Rozliczenie prowizji afiliacyjnej (Kod rabatowy nadrzędny wobec ?ref= cookie + blokada self-referral)
         const lookupKey = promoCode || refCookie;
-        if (lookupKey) {
+        if (lookupKey && !promoCode.startsWith('MAMA-')) {
           const affiliate = await env.DB.prepare(
-            `SELECT id, tier1_rate, referred_by_broker_id, tier2_override_rate
+            `SELECT id, email, promo_code, tier1_rate, referred_by_broker_id, tier2_override_rate
              FROM affiliates
-             WHERE (promo_code = ? OR ref_slug = ?) AND status = 'active'`
+             WHERE (promo_code = ? OR ref_slug = ?) AND status = 'active'
+             ORDER BY CASE WHEN promo_code = ? THEN 0 ELSE 1 END
+             LIMIT 1`
           )
-            .bind(promoCode || '__NONE__', refCookie || '__NONE__')
+            .bind(promoCode || '__NONE__', refCookie || '__NONE__', promoCode || '__NONE__')
             .first();
 
-          if (affiliate?.id) {
+          if (
+            affiliate?.id &&
+            String(affiliate.email || '').trim().toLowerCase() !== customerEmail
+          ) {
+            const matchedByPromo =
+              Boolean(promoCode) &&
+              String(affiliate.promo_code || '').toUpperCase() === promoCode;
             const courseNetBase = promoCode ? 44010 : 48900;
             const tier1Rate = Number(affiliate.tier1_rate || 0.2);
             const tier1Comm = Math.round(courseNetBase * tier1Rate);
@@ -219,7 +227,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
                 sessionId,
                 affiliate.id,
                 affiliate.referred_by_broker_id || null,
-                promoCode ? 'promo_code' : 'ref_cookie',
+                matchedByPromo ? 'promo_code' : 'ref_cookie',
                 courseNetBase,
                 tier1Rate,
                 tier1Comm,
@@ -273,6 +281,44 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         }
       } catch (dbErr) {
         console.error('Błąd zapisu webhooka Stripe w D1:', dbErr);
+      }
+    }
+  }
+
+  // [A7] + [D2] Obsługa zwrotów (charge.refunded) — wycofanie dostępu i anulowanie prowizji afiliacyjnych
+  if (event.type === 'charge.refunded') {
+    const charge = event.data?.object || {};
+    const customerEmail = String(
+      charge.billing_details?.email || charge.receipt_email || ''
+    )
+      .trim()
+      .toLowerCase();
+
+    if (env.DB) {
+      try {
+        if (customerEmail) {
+          const userRow = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
+            .bind(customerEmail)
+            .first();
+          if (userRow?.id) {
+            await env.DB.prepare("UPDATE enrollments SET status = 'refunded' WHERE user_id = ?")
+              .bind(userRow.id)
+              .run();
+            await env.DB.prepare("UPDATE orders SET status = 'refunded' WHERE user_id = ? OR customer_email = ?")
+              .bind(userRow.id, customerEmail)
+              .run();
+          } else {
+            await env.DB.prepare("UPDATE orders SET status = 'refunded' WHERE customer_email = ?")
+              .bind(customerEmail)
+              .run();
+          }
+        }
+        await env.DB.prepare(
+          `UPDATE affiliate_commissions SET status = 'CANCELLED'
+           WHERE order_id IN (SELECT id FROM orders WHERE status = 'refunded')`
+        ).run();
+      } catch (refundErr) {
+        console.error('Błąd aktualizacji statusu zwrotu w D1:', refundErr);
       }
     }
   }

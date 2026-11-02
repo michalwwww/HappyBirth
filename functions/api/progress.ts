@@ -13,6 +13,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
     return new Response(
       JSON.stringify({
         completedLessons: [],
+        positions: {},
         lessonPositions: {},
         pregnancyProfile: null,
       }),
@@ -34,6 +35,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
           expired: true,
           error: 'Twój 18-miesięczny dostęp do kursu wygasł.',
           completedLessons: [],
+          positions: {},
           lessonPositions: {},
         }),
         { status: 403, headers: { 'Content-Type': 'application/json' } }
@@ -66,6 +68,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
     return new Response(
       JSON.stringify({
         completedLessons,
+        positions: lessonPositions,
         lessonPositions,
         pregnancyProfile: userRow || null,
         expiresAt: enrollment?.expires_at || null,
@@ -76,6 +79,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
     return new Response(
       JSON.stringify({
         completedLessons: [],
+        positions: {},
         lessonPositions: {},
         pregnancyProfile: null,
       }),
@@ -89,17 +93,18 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const { request, env } = context;
     const session = await getEdgeSession(request, env);
     const body: any = await request.json().catch(() => ({}));
-    const { lessonId, completed, positionSeconds } = body;
+    const { lessonId, completed, positionSeconds, lastPositionSeconds } = body;
 
     if (!session || !env.DB || !lessonId) {
-      return new Response(JSON.stringify({ success: true, mode: 'local_fallback' }), {
+      return new Response(JSON.stringify({ success: true, saved: true, mode: 'local_fallback' }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
     const isCompleted = completed ? 1 : 0;
-    const pos = typeof positionSeconds === 'number' ? Math.max(0, Math.floor(positionSeconds)) : 0;
+    const rawPos = typeof lastPositionSeconds === 'number' ? lastPositionSeconds : positionSeconds;
+    const pos = typeof rawPos === 'number' ? Math.max(0, Math.floor(rawPos)) : 0;
 
     await env.DB.prepare(
       `INSERT INTO lesson_progress (id, user_id, lesson_id, completed, last_position_seconds, updated_at)

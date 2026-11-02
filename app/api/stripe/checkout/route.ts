@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
     // [A4] Bezwzględna blokada publicznego kodu TEST (100%) na produkcji
-    if (cleanPromo === 'TEST' || cleanPromo === 'TEST100' || cleanPromo === 'FREE') {
+    if (cleanPromo === 'TEST' || cleanPromo === 'TEST100' || cleanPromo === 'FREE' || cleanPromo === '100%') {
       return NextResponse.json(
         {
           error:
@@ -62,6 +62,16 @@ export async function POST(req: NextRequest) {
     }
 
     const promoResult = validatePromoCode(cleanPromo);
+    if (cleanPromo && !promoResult.valid) {
+      return NextResponse.json(
+        {
+          error:
+            promoResult.errorMessage ||
+            'Podany kod rabatowy jest nieaktywny lub nieprawidłowy. Sprawdź pisownię kodu.',
+        },
+        { status: 400 }
+      );
+    }
     const activeCourseAmountGrosze = promoResult.valid ? 44010 : BASE_COURSE_PRICE_GROSZE; // 440,10 zł lub 489,00 zł brutto
 
     // Pobierz adres IP kupującego oraz ciasteczko afiliacyjne hb_aff_ref ([D2] & [E1])

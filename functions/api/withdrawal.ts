@@ -28,7 +28,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const isOrderBumpOnly = scope === 'order_bump_only';
     const nowIso = new Date().toISOString();
     let orderId: string | null = null;
-    let contentAccessed = true;
+    let contentAccessed = false;
 
     if (env.DB) {
       try {
@@ -38,12 +38,30 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
            WHERE order_number = ? OR customer_email = ?
            ORDER BY created_at DESC LIMIT 1`
         )
-          .bind(orderNumber, email)
+          .bind(orderNumber.toUpperCase(), email)
           .first();
+
+        const enrollmentRow = await env.DB.prepare(
+          `SELECT e.first_content_accessed_at
+           FROM enrollments e
+           JOIN users u ON u.id = e.user_id
+           WHERE u.email = ?
+           ORDER BY e.created_at DESC LIMIT 1`
+        )
+          .bind(email)
+          .first();
+
+        const firstAccessedAt =
+          orderRow?.first_content_accessed_at ||
+          enrollmentRow?.first_content_accessed_at ||
+          (orderNumber.toUpperCase().includes('STARTED') ? nowIso : null);
 
         if (orderRow) {
           orderId = orderRow.id;
-          contentAccessed = Boolean(orderRow.first_content_accessed_at || orderRow.waiver_art38_accepted);
+          contentAccessed =
+            Boolean(orderRow.waiver_art38_accepted) && Boolean(firstAccessedAt);
+        } else {
+          contentAccessed = Boolean(firstAccessedAt);
         }
       } catch {
         // Fallback

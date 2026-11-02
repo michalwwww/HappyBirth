@@ -33,10 +33,11 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       });
     }
 
-    // [A4] Blokada publicznych kodów testowych 100% na produkcji
+    // [A4] Blokada fałszywych identyfikatorów spoza Stripe (prawdziwe sesje Stripe Test i Live zaczynają się od cs_test_ lub cs_live_)
     const lowerId = sessionId.toLowerCase();
     if (
-      lowerId.includes('test') ||
+      lowerId === 'test' ||
+      lowerId === 'test100' ||
       lowerId.startsWith('promo_') ||
       lowerId.startsWith('demo_') ||
       !sessionId.startsWith('cs_')
@@ -44,7 +45,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Publiczne sesje testowe są wyłączone. Wymagana jest opłacona sesja Stripe Checkout.',
+          error: 'Publiczne sesje bezpłatne są wyłączone. Wymagana jest opłacona sesja Stripe Checkout (cs_test_ / cs_live_).',
         }),
         { status: 403, headers: { 'Content-Type': 'application/json' } }
       );

@@ -32,9 +32,9 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_google ON users(google_id);
-CREATE INDEX IF NOT EXISTS idx_users_apple ON users(apple_id);
-CREATE INDEX IF NOT EXISTS idx_users_referral_code ON users(referral_code);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_google ON users(google_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_apple ON users(apple_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_referral_code ON users(referral_code);
 
 -- 2. TABELA DOSTĘPÓW / ENROLLMENTS ([C1] 18-Month Access Guard / 548 dni od zakupu)
 CREATE TABLE IF NOT EXISTS enrollments (
@@ -231,3 +231,19 @@ CREATE TABLE IF NOT EXISTS contraction_sessions (
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
+
+-- 13. BAZA LEADÓW EDUKACYJNYCH ([F3] Plan Porodu PDF & Kalkulator Wyprawki PDF)
+CREATE TABLE IF NOT EXISTS leads (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    first_name TEXT,
+    due_date TEXT,
+    pregnancy_week INTEGER,
+    hospital_city TEXT,
+    source TEXT DEFAULT 'plan_porodu',
+    rodo_consent INTEGER DEFAULT 1,
+    marketing_consent INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_leads_email ON leads(email);
