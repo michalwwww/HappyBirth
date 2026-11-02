@@ -3,182 +3,1102 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pakiet Kart Sytuacyjnych na Porodówkę dla Taty + Checklisty Szpitalne · HappyBirth.pl</title>
+  <title>Global & Diaspora Order Bump Toolkit · Karty na Porodówkę, B.R.A.I.N., Słownik Skurczowy i Plan Porodu · HappyBirth</title>
   <style>
-    @page { size: A4; margin: 12mm; }
+    @page { size: A4; margin: 10mm; }
+    * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
       color: #1A1512;
       background: #FBF8F4;
       margin: 0;
-      padding: 20px;
-      line-height: 1.5;
+      padding: 18px;
+      line-height: 1.48;
     }
     .container {
-      max-width: 840px;
+      max-width: 920px;
       margin: 0 auto;
       background: #FFFFFF;
       border: 1px solid #EAE3DB;
       border-radius: 20px;
-      padding: 28px 34px;
-      box-shadow: 0 10px 30px rgba(37, 10, 36, 0.06);
+      padding: 26px 32px;
+      box-shadow: 0 12px 34px rgba(37, 10, 36, 0.07);
+    }
+    .market-switcher {
+      background: #250A24;
+      color: #FBF8F4;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+    .market-switcher-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #FCD705;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .market-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .market-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: #EAD5E5;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .market-btn:hover {
+      background: rgba(218, 2, 113, 0.35);
+      color: #FFFFFF;
+    }
+    .market-btn.active {
+      background: #DA0271;
+      color: #FFFFFF;
+      border-color: #FF5CAD;
+      box-shadow: 0 2px 10px rgba(218, 2, 113, 0.4);
     }
     .top-bar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       border-bottom: 2px solid #250A24;
       padding-bottom: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      gap: 16px;
+      flex-wrap: wrap;
     }
     .badge {
       display: inline-block;
-      background: #E0F2FE;
-      color: #0369A1;
-      font-size: 11px;
+      background: #FCE7F3;
+      color: #9D174D;
+      font-size: 10.5px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       padding: 4px 12px;
       border-radius: 999px;
+      margin-bottom: 4px;
     }
-    h1 { font-size: 22px; color: #250A24; margin: 6px 0; }
-    h2 { font-size: 16px; color: #DA0271; margin: 18px 0 8px 0; border-bottom: 1px solid #EAE3DB; padding-bottom: 4px; }
+    .badge-diaspora {
+      background: #E0F2FE;
+      color: #0369A1;
+    }
+    h1 { font-size: 21px; color: #250A24; margin: 4px 0; line-height: 1.25; }
+    .subtitle { font-size: 12.5px; color: #544A44; margin: 2px 0 0 0; }
+    h2 {
+      font-size: 15px;
+      color: #DA0271;
+      margin: 20px 0 8px 0;
+      border-bottom: 1px solid #EAE3DB;
+      padding-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
     .cards-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 12px;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .cards-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
     }
     .card {
       border: 1px solid #EAE3DB;
-      border-radius: 14px;
-      padding: 14px 16px;
+      border-radius: 13px;
+      padding: 12px 14px;
       background: #FDFAF6;
       page-break-inside: avoid;
     }
+    .card-highlight {
+      border: 1.5px solid #DA0271;
+      background: #FFF9FC;
+    }
+    .card-blue {
+      border: 1.5px solid #0284C7;
+      background: #F0F9FF;
+    }
     .card h3 {
       margin: 0 0 6px 0;
-      font-size: 14px;
+      font-size: 13px;
       color: #250A24;
     }
     .card ul {
       margin: 0;
       padding-left: 16px;
-      font-size: 12px;
+      font-size: 11.8px;
       color: #3A322D;
     }
     .card li { margin-bottom: 4px; }
+    .dict-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      margin-top: 8px;
+      page-break-inside: avoid;
+    }
+    .dict-table th {
+      background: #250A24;
+      color: #FFFFFF;
+      text-align: left;
+      padding: 7px 10px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .dict-table td {
+      border-bottom: 1px solid #EAE3DB;
+      padding: 6px 10px;
+      vertical-align: top;
+    }
+    .dict-table tr:nth-child(even) td {
+      background: #FDFAF6;
+    }
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 11.5px;
+      margin-top: 8px;
+    }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      background: #FDFAF6;
+      border: 1px solid #EAE3DB;
+      padding: 7px 10px;
+      border-radius: 9px;
+      page-break-inside: avoid;
+    }
+    .check-box {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid #250A24;
+      border-radius: 3px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
     .print-btn {
       background: #DA0271;
       color: #fff;
       border: none;
-      padding: 10px 20px;
+      padding: 10px 18px;
       border-radius: 999px;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12.5px;
       cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(218, 2, 113, 0.25);
+    }
+    .print-btn:hover { background: #B8005E; }
+    .edition-panel { display: none; }
+    .edition-panel.active { display: block; }
+    .pill-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: #F3E8FF;
+      color: #6B21A8;
+      margin-left: 6px;
+    }
+    .door-sign {
+      border: 2px dashed #250A24;
+      border-radius: 16px;
+      padding: 14px 18px;
+      text-align: center;
+      background: #FFFDF9;
+      margin-top: 12px;
+      page-break-inside: avoid;
     }
     .footer {
       margin-top: 22px;
       padding-top: 12px;
       border-top: 1px solid #EAE3DB;
-      font-size: 11px;
+      font-size: 10.5px;
       color: #867A72;
       text-align: center;
     }
-    @media (max-width: 640px) {
-      .cards-grid { grid-template-columns: 1fr; }
+    @media (max-width: 680px) {
+      .cards-grid, .cards-grid-3, .checklist-grid { grid-template-columns: 1fr; }
+      .container { padding: 16px; }
     }
     @media print {
       body { background: #fff; padding: 0; }
-      .container { border: none; box-shadow: none; padding: 0; }
+      .container { border: none; box-shadow: none; padding: 0; max-width: 100%; }
       .no-print { display: none !important; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="top-bar">
-      <div>
-        <span class="badge">Pakiet na Porodówkę dla Taty i Osoby Towarzyszącej (A4 + Smartfon)</span>
-        <h1>4 Karty Sytuacyjne na Salę Porodową + Ściąga Masażu i Torby</h1>
+    <!-- INTERACTIVE GLOBAL & DIASPORA EDITION SWITCHER (NO-PRINT) -->
+    <div class="market-switcher no-print">
+      <div class="market-switcher-title">
+        <span>🌍 Wybierz edycję krajową / językową pakietu Order Bump (Druk A4 lub Smartfon):</span>
+        <span style="color:#EAD5E5;font-weight:500;">10 Edycji Rynkowych · Zero zapychaczy · Standard 2026</span>
       </div>
-      <button class="print-btn no-print" onclick="window.print()">Drukuj / Zapisz PDF (A4)</button>
-    </div>
-
-    <h2>Część 1: Cztery Karty Sytuacyjne dla Taty (krok po kroku na sali porodowej)</h2>
-    <div class="cards-grid">
-      <div class="card">
-        <h3>KARTA 1: Izba Przyjęć i Formalności (Pierwsze 30 minut)</h3>
-        <ul>
-          <li><strong>Twoje zadanie nr 1:</strong> Ty przejmujesz teczkę z dokumentami (Karta Ciąży, oryginał grupy krwi, wynik GBS, ostatnie USG, Plan Porodu, dowód osobisty).</li>
-          <li><strong>Podczas skurczu na izbie:</strong> Gdy położna zadaje pytanie w trakcie skurczu, powiedz spokojnie: <em>„Poczekajmy 40 sekund aż minie skurcz, żona zaraz odpowie”</em>.</li>
-          <li><strong>Przebranie:</strong> Pomóż zmienić obuwie, przekaż położnej <strong>Reklamówkę nr 1 (Na salę porodową)</strong>, a walizkę poporodową zostaw zamkniętą lub w szafce.</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>KARTA 2: I Okres Porodu (Rozwieranie 1–7 cm · Oddech i Ruch)</h3>
-        <ul>
-          <li><strong>Rytm oddechu:</strong> Oddychaj razem z nią powoli: wdech nosem (4 sekundy) i długi, miękki wydech luźnymi ustami (6–8 sekund). Rozluźniaj jej barki i szczękę.</li>
-          <li><strong>Nawodnienie co 20 minut:</strong> Po każdym 2–3 skurczu podaj jej bidon z wodą lub izotonikiem pod same usta (bez pytania „czy chcesz pić?”).</li>
-          <li><strong>Zmiana pozycji co 30 min:</strong> Proponuj piłkę, krążenie biodrami, oparcie o Ciebie w pozycji stojącej lub ciepły prysznic na dół pleców i brzuch.</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>KARTA 3: Kryzys 7–8 cm (Transformacja · Gdy mówi „Nie dam rady”)</h3>
-        <ul>
-          <li><strong>Co to oznacza fizjologicznie:</strong> To najkrótsza, ale najbardziej intensywna faza tuż przed pełnym rozwarciem (10 cm). To znak, że spotkanie z dzieckiem jest już bardzo blisko!</li>
-          <li><strong>Czego NIE mówić:</strong> Nie mów „uspokój się” ani „przecież nie boli aż tak”.</li>
-          <li><strong>Co mówić (1 zdanie na skurcz):</strong> <em>„Jesteś bezpieczna, jestem tu przy Tobie, ten skurcz już schodzi, puść luźno ramiona”</em>.</li>
-          <li><strong>Zimny kompres:</strong> Przykładaj chłodny, wilgotny ręcznik do czoła i karku między skurczami.</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>KARTA 4: II/III Okres Porodu i Złota Godzina (Kontakt Skóra do Skóry)</h3>
-        <ul>
-          <li><strong>Faza parcia:</strong> Podtrzymuj plecy i barki w wybranej pozycji wertykalnej. Przypominaj o rozluźnieniu dna miednicy między skurczami.</li>
-          <li><strong>Nieprzerwane 2 godziny „Skóra do Skóry”:</strong> Dopilnuj, aby zdrowy noworodek pozostał na nagiej piersi mamy przez pełne 120 minut i był okryty ciepłym, suchym ręcznikiem/pieluszką.</li>
-          <li><strong>W razie cięcia cesarskiego (Plan B):</strong> Zgłoś położnej gotowość do <strong>kangurowania noworodka na Twojej nagiej klatce piersiowej</strong> od pierwszych minut!</li>
-        </ul>
+      <div class="market-tabs" role="tablist">
+        <button class="market-btn active" onclick="selectEdition('pl')">🇵🇱 Polska (PL · Standard MZ 2026)</button>
+        <button class="market-btn" onclick="selectEdition('pl-uk')">🇵🇱🇬🇧 Polki w UK i Irlandii (PL↔EN NHS/HSE)</button>
+        <button class="market-btn" onclick="selectEdition('pl-de')">🇵🇱🇩🇪 Polki w DE / AT / CH (PL↔DE Kreißsaal)</button>
+        <button class="market-btn" onclick="selectEdition('pl-nl')">🇵🇱🇳🇱 Polki w Holandii (PL↔NL Kraamzorg)</button>
+        <button class="market-btn" onclick="selectEdition('en-uk')">🇬🇧🇮🇪 UK & Ireland (NHS / HSE Edition)</button>
+        <button class="market-btn" onclick="selectEdition('en-us')">🇺🇸🇨🇦 USA & Canada (L&D Hospital Edition)</button>
+        <button class="market-btn" onclick="selectEdition('en-au-ae')">🇦🇺🇦🇪 Australia & Dubai Expat Edition</button>
+        <button class="market-btn" onclick="selectEdition('de')">🇩🇪🇦🇹🇨🇭 DACH (Deutsch · Kreißsaal-Spickzettel)</button>
+        <button class="market-btn" onclick="selectEdition('es')">🇪🇸🇲🇽 Español (España, México & US LatAm)</button>
+        <button class="market-btn" onclick="selectEdition('pt-br')">🇧🇷 Brasil (Português · Parto Humanizado)</button>
       </div>
     </div>
 
-    <h2>Część 2: Instrukcja Ucisku Krzyżowego (Counter-Pressure na bóle z krzyża)</h2>
-    <div class="card" style="margin-top: 8px;">
-      <ul>
-        <li><strong>Kiedy stosować:</strong> Wyłącznie <strong>w trakcie trwania skurczu</strong> (od pierwszej do ostatniej sekundy fali skurczowej), gdy partnerka odczuwa promieniowanie w dole pleców.</li>
-        <li><strong>Technika:</strong> Ułóż nasadę swojej dłoni płasko na kości krzyżowej (płaska trójkątna kość tuż nad pośladkami, poniżej talii). Drugą dłonią podeprzyj jej biodro z przodu, aby nie popychać jej do przodu.</li>
-        <li><strong>Siła nacisku:</strong> Stały, głęboki docisk do wewnątrz i lekko w dół (bez pocierania skóry na sucho). Po zakończeniu skurczu wykonaj łagodne głaskanie rozluźniające boki bioder.</li>
-      </ul>
+    <!-- ========================================================================= -->
+    <!-- 1. EDYCJA POLSKA (PL - STANDARD MZ 2026)                                  -->
+    <!-- ========================================================================= -->
+    <div id="edition-pl" class="edition-panel active">
+      <div class="top-bar">
+        <div>
+          <span class="badge">Edycja Polska · Zgodna ze Standardem Opieki Okołoporodowej MZ (Dz.U. 2025 poz. 1525)</span>
+          <h1>Pakiet Kart Sytuacyjnych dla Taty + Matryca B.R.A.I.N., Siara (37 tyg.) i System 3 Reklamówek</h1>
+          <p class="subtitle">Niezbędnik na salę porodową i pierwsze 72h połogu · Gotowy do wydruku A4 lub zapisania w telefonie</p>
+        </div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ Drukuj / Zapisz PDF (A4)</button>
+      </div>
+
+      <h2>1. Cztery Karty Sytuacyjne dla Taty i Osoby Towarzyszącej (Sala Porodowa)</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>KARTA 1: Izba Przyjęć i Reguła 5-1-1 (Kiedy jechać?)</h3>
+          <ul>
+            <li><strong>Reguła 5-1-1 (pierwszy poród):</strong> Jedziemy do szpitala, gdy skurcze są co <strong>5 minut</strong>, trwają pełną <strong>1 minutę</strong> i utrzymują się od <strong>1 godziny</strong> (lub natychmiast przy zielonych/krwistych wodach płodowych).</li>
+            <li><strong>Twoja rola na Izbie Przyjęć:</strong> Ty trzymasz teczkę z dokumentami (Karta Ciąży, oryginał grupy krwi i Rh, GBS, ostatnie USG, Plan Porodu).</li>
+            <li><strong>Ochrona w trakcie skurczu:</strong> Gdy personel zadaje pytanie podczas skurczu, powiedz spokojnie: <em>„Poczekajmy 45 sekund aż minie skurcz, żona zaraz odpowie”</em>.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>KARTA 2: Aktywna Faza (1–7 cm) i Ucisk Krzyżowy</h3>
+          <ul>
+            <li><strong>Oddech 4–7:</strong> Oddychaj razem z nią: wdech nosem (4 s) i długi, luźny wydech ustami (6–8 s). Przypominaj: <em>„Luźna szczęka i usta = luźne dno miednicy”</em>.</li>
+            <li><strong>Nawodnienie bez pytań Tak/Nie:</strong> Co 20 minut (po co 3. skurczu) podaj bidon ze słomką bezpośrednio do ust.</li>
+            <li><strong>Ucisk krzyżowy (Counter-Pressure):</strong> Przy bólach z krzyża uciskaj nasadą dłoni płaską kość krzyżową przez cały skurcz, a drugą ręką stabilizuj przód biodra.</li>
+          </ul>
+        </div>
+
+        <div class="card card-highlight">
+          <h3>KARTA 3: Kryzys 7–8 cm (Gdy mówi „Już nie dam rady!”)</h3>
+          <ul>
+            <li><strong>Co się dzieje:</strong> Wyrzut adrenaliny tuż przed pełnym rozwarciem (10 cm). To najkrótsza faza porodu — znak, że dziecko zaraz będzie z Wami!</li>
+            <li><strong>ZAKAZANE zdania:</strong> Nigdy nie mów <em>„Uspokój się”</em>, <em>„Nie krzycz”</em> ani <em>„Inne kobiety dały radę”</em>.</li>
+            <li><strong>Złote zdania (1 na skurcz):</strong> <em>„Jesteś bezpieczna, jestem tu przy Tobie, ten skurcz już mija, robisz to wspaniale”</em> + chłodny kompres na kark.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>KARTA 4: Parcie, Złota Godzina (120 min) i Plan B (Cesarka)</h3>
+          <ul>
+            <li><strong>Kontakt Skóra do Skóry (2h):</strong> Zgodnie ze Standardem MZ zdrowy noworodek leży na nagiej piersi mamy przez <strong>minimum 2 godziny</strong> bez przerywania na ważenie i mierzenie.</li>
+            <li><strong>Późne odpępnienie:</strong> Odczekanie min. 1–3 minut aż pępowina przestanie tętnić (+30% zapasu żelaza dla dziecka).</li>
+            <li><strong>Plan B (Cięcie Cesarskie):</strong> Zgłoś położnej gotowość do <strong>kangurowania dziecka na swojej nagiej klatce piersiowej</strong> od pierwszych minut po wyjęciu z sali operacyjnej!</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>2. Matryca Decyzyjna B.R.A.I.N. (Gdy lekarz proponuje nagłą interwencję)</h2>
+      <div class="card card-blue">
+        <p style="margin:0 0 6px 0;font-size:12px;">Gdy sytuacja NIE zagraża życiu (zielony zapis KTG), a personel proponuje przebicie pęcherza, oksytocynę lub nacięcie, Tata zadaje 5 spokojnych pytań <strong>B.R.A.I.N.</strong>:</p>
+        <div class="cards-grid-3">
+          <div><strong>B – Benefits (Korzyści):</strong><br/><span style="font-size:11.5px;">Jakie są konkretne korzyści tej procedury w tym momencie?</span></div>
+          <div><strong>R – Risks (Ryzyko):</strong><br/><span style="font-size:11.5px;">Jakie jest ryzyko lub skutki uboczne dla mamy i dziecka?</span></div>
+          <div><strong>A – Alternatives (Alternatywy):</strong><br/><span style="font-size:11.5px;">Czy możemy spróbować najpierw zmiany pozycji lub ruchu?</span></div>
+          <div><strong>I – Intuition (Odczucie):</strong><br/><span style="font-size:11.5px;">Jak czuje się z tym rodząca mama?</span></div>
+          <div><strong>N – Nothing / Not Now (Czas):</strong><br/><span style="font-size:11.5px;">Co się stanie, jeśli poczekamy spokojnie 30–60 minut?</span></div>
+          <div><strong>Prawo Pacjentki:</strong><br/><span style="font-size:11.5px;">Każda procedura (w tym badanie wewnętrzne i nacięcie krocza) wymaga świadomej zgody.</span></div>
+        </div>
+      </div>
+
+      <h2>3. Protokół Przedporodowego Odciągania Siary (od 37+0 tyg.) + System 3 Reklamówek</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>🍼 Odciąganie Siary przed porodem (Hit laktacyjny 2026)</h3>
+          <ul>
+            <li><strong>Kiedy zacząć:</strong> Po ukończeniu <strong>37. tygodnia ciąży</strong> (po zielonym świetle od lekarza/położnej) – ręcznie po ciepłym prysznicu 2x dziennie po 5 minut.</li>
+            <li><strong>Jak zbierać:</strong> Do sterylnych strzykawek 1 ml (z zatyczką). Podpisz strzykawkę: Imię i nazwisko, data, godzina.</li>
+            <li><strong>Po co:</strong> Zamrożone 3–5 strzykawek zabrane w małej termos-saszetce do szpitala chroni noworodka przed dokarmianiem sztucznym mlekiem przy spadku cukru lub po cesarce!</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🎒 System 3 Podpisanych Reklamówek w Walizce</h3>
+          <ul>
+            <li><strong>Reklamówka #1 (Sala Porodowa – na samym wierzchu):</strong> Teczka badań, koszula do porodu, klapki, 2 bidony z dziubkiem, daktyle/batony, pomadka, długi kabel 2 m, grzebyk porodowy (Birth Comb do akupresury dłoni).</li>
+            <li><strong>Reklamówka #2 (Pierwsze ubranko dla Położnej):</strong> W woreczku strunowym: pieluszka 1, body kopertowe r. 56, pajacyk rozpinany r. 56, czapeczka, pieluszka muślinowa.</li>
+            <li><strong>Reklamówka #3 (Oddział Położniczy po 2h):</strong> Koszule do karmienia, podkłady poporodowe, majtki siateczkowe, butelka-bidet (Peri Bottle) do przemywania krocza wodą.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="door-sign">
+        <strong>🚪 Zawieszka na drzwi pokoju / mieszkania (Ochrona 4. Trymestru):</strong><br/>
+        <span style="font-size:12px;">„Maluszek uczy się ssać, a Mama odpoczywa po porodzie. Dziękujemy za krótkie odwiedziny po wcześniejszym SMS-ie, dokładne umycie rąk, niecałowanie noworodka w rączki i buzię oraz pomoc w jednym domowym drobiazgu z listy na lodówce ❤️”</span>
+      </div>
     </div>
 
-    <h2>Część 3: Szybka Checklista 3 Reklamówek w Torbie (Dla Taty — gdzie co leży)</h2>
-    <div class="cards-grid">
-      <div class="card">
-        <h3>Reklamówka #1 (Na wierzchu — Sala Porodowa)</h3>
-        <ul>
-          <li>Teczka z dokumentami + Plan Porodu (2 egz.)</li>
-          <li>Koszula do porodu + klapki pod prysznic</li>
-          <li>2 butelki wody z dziubkiem + przekąski dla dwojga</li>
-          <li>Pomadka do ust, gumka do włosów, długi kabel do telefonu</li>
-        </ul>
+    <!-- ========================================================================= -->
+    <!-- 2. POLKI W WIELKIEJ BRYTANII I IRLANDII (PL <-> EN NHS & HSE)             -->
+    <!-- ========================================================================= -->
+    <div id="edition-pl-uk" class="edition-panel">
+      <div class="top-bar">
+        <div>
+          <span class="badge badge-diaspora">Edycja Dwujęzyczna PL ↔ EN · Wielka Brytania (NHS) i Irlandia (HSE)</span>
+          <h1>Niezbędnik Porodowy dla Polek w UK i Irlandii: Słownik Skurczowy PL↔EN + Dwujęzyczny Plan Porodu</h1>
+          <p class="subtitle">Stworzony, aby w stresie skurczowym na angielskiej lub irlandzkiej porodówce nigdy nie zabrakło Wam słów</p>
+        </div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ Drukuj / Zapisz PDF (A4)</button>
       </div>
-      <div class="card">
-        <h3>Reklamówka #2 i #3 (Po narodzinach — Pierwsze ubranko i Oddział)</h3>
-        <ul>
-          <li><strong>Pierwszy zestaw dla maluszka (w osobnej podpisanej torebce strunowej):</strong> pieluszka 1 (2–5 kg), body kopertowe r. 56, pajacyk rozpinany r. 56, czapeczka, pieluszka tetrowa/muślinowa.</li>
-          <li><strong>Dla mamy po 2h:</strong> czysta koszula do karmienia, podkłady poporodowe i majtki siateczkowe.</li>
-        </ul>
+
+      <h2>1. Słownik Skurczowy na Porodówkę NHS / HSE (Co mówi położna i jak odpowiedzieć)</h2>
+      <table class="dict-table">
+        <thead>
+          <tr>
+            <th>Po polsku (Co się dzieje)</th>
+            <th>Termin medyczny w UK / IE</th>
+            <th>Gotowe zdanie dla Taty / Mamy do położnej (Midwife)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Triaż telefoniczny (kiedy dzwonić)</strong></td>
+            <td><strong>Maternity Triage / Assessment Unit (MAU)</strong></td>
+            <td><em>"My partner is at [39] weeks, contractions are every 4 minutes lasting 60 seconds, waters have / haven't broken."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Karta ciąży (papierowa / aplikacja)</strong></td>
+            <td><strong>Maternity Notes / BadgerNotes App</strong></td>
+            <td><em>"Here are her maternity notes and our printed Birth Preferences."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Gaz rozweselający (tlenek azotu z tlenem)</strong></td>
+            <td><strong>Gas and Air (Entonox)</strong></td>
+            <td><em>"Could we please try Gas and Air (Entonox) for the contractions now?"</em></td>
+          </tr>
+          <tr>
+            <td><strong>Znieczulenie zewnątrzoponowe</strong></td>
+            <td><strong>Epidural anaesthesia</strong></td>
+            <td><em>"She would like to request an epidural now. Could you please call the anaesthetist?"</em></td>
+          </tr>
+          <tr>
+            <td><strong>Masaż szyjki macicy (uwaga: wymaga zgody!)</strong></td>
+            <td><strong>Membrane Sweep (Stretch & Sweep)</strong></td>
+            <td><em>"Is this a vaginal exam only, or a membrane sweep? We decline a sweep today."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Przebicie pęcherza płodowego</strong></td>
+            <td><strong>ARM (Artificial Rupture of Membranes) / Breaking waters</strong></td>
+            <td><em>"What are the benefits and risks of breaking her waters right now? Can we wait 1 hour?"</em></td>
+          </tr>
+          <tr>
+            <td><strong>Nacięcie krocza / Ochrona krocza</strong></td>
+            <td><strong>Episiotomy / Warm perineal compresses</strong></td>
+            <td><em>"We prefer to avoid an episiotomy unless strictly necessary. Could we use warm compresses?"</em></td>
+          </tr>
+          <tr>
+            <td><strong>Opóźnione odpępnienie i Witamina K</strong></td>
+            <td><strong>Optimal / Delayed Cord Clamping & Vitamin K injection</strong></td>
+            <td><em>"We would like delayed cord clamping until the cord stops pulsing, and intramuscular Vitamin K."</em></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. Dwujęzyczny Wizualny Plan Porodu (Pokaż bezpośrednio położnej w szpitalu NHS / HSE)</h2>
+      <div class="checklist-grid">
+        <div class="check-item"><div class="check-box"></div><div><strong>English is our second language:</strong> Please speak slowly and wait until the contraction passes before asking for consent.<br/><em style="color:#544A44;">(Prosimy mówić wolniej i nie zadawać pytań w trakcie skurczu).</em></div></div>
+        <div class="check-item"><div class="check-box"></div><div><strong>Environment & Mobility:</strong> Dim lighting, freedom to move, upright positions, birth ball / birth pool if available.<br/><em style="color:#544A44;">(Przyciemnione światło, swoboda ruchu, piłka / basen porodowy).</em></div></div>
+        <div class="check-item"><div class="check-box"></div><div><strong>Pain Relief Ladder:</strong> Breathing, warm water & Tens machine first &rarr; Entonox (Gas & Air) &rarr; Epidural if requested (no Pethidine/Diamorphine without prior discussion).<br/><em style="color:#544A44;">(Drabina znieczulenia: woda/TENS &rarr; gaz &rarr; Epidural; bez opioidów bez rozmowy).</em></div></div>
+        <div class="check-item"><div class="check-box"></div><div><strong>Perineal Protection:</strong> Hands-poised approach, warm compresses in 2nd stage, avoid routine episiotomy.<br/><em style="color:#544A44;">(Ochrona krocza, ciepłe okłady, unikanie rutynowego nacięcia).</em></div></div>
+        <div class="check-item"><div class="check-box"></div><div><strong>Golden Hour & Cord Clamping:</strong> Optimal cord clamping (min. 1–3 mins) & uninterrupted skin-to-skin for 1–2 hours.<br/><em style="color:#544A44;">(Późne odpępnienie i nieprzerwany kontakt skóra do skóry).</em></div></div>
+        <div class="check-item"><div class="check-box"></div><div><strong>Gentle Caesarean (If needed):</strong> Partner present in theatre, music if possible, immediate skin-to-skin with Mum or Partner.<br/><em style="color:#544A44;">(W razie CC: obecność partnera na sali i natychmiastowe kangurowanie).</em></div></div>
+      </div>
+
+      <h2>3. Różnice Systemowe PL vs UK/Irlandia + Zasiłki i Dokumenty po Porodzie</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>🏥 Co Cię zaskoczy w szpitalu NHS (UK) i HSE (IE)?</h3>
+          <ul>
+            <li><strong>Szybki wypis do domu:</strong> Po porodzie fizjologicznym bez powikłań w UK często wychodzi się do domu już po <strong>6–24 godzinach</strong>! Następnego dnia do domu przychodzi położna środowiskowa (<em>Community Midwife</em> w UK / <em>Public Health Nurse</em> w IE).</li>
+            <li><strong>Wypożyczenie TENS:</strong> W UK i IE absolutnym standardem na wczesne skurcze w domu (zanim pojedziesz na Maternity Triage przy 4–5 cm) jest elektrostymulator <em>Elle TENS</em>.</li>
+            <li><strong>Fotelik samochodowy:</strong> Szpital nie wypuści dziecka do auta bez zapięcia w foteliku (<em>Infant Car Seat</em>) jeszcze na oddziale.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>📋 Formalności, Zasiłki i Paszport RP (Checklista Taty)</h3>
+          <ul>
+            <li><strong>UK – Formularz MAT B1 i Maternity Exemption:</strong> Odbierz od położnej <em>MAT B1</em> (do pracodawcy pod SMP lub Maternity Allowance) oraz <em>FW8</em> (darmowe leki i dentysta NHS przez całą ciążę i 12 mies. po porodzie!).</li>
+            <li><strong>UK – Rejestracja urodzenia (42 dni):</strong> W Register Office w ciągu 42 dni (Anglia/Walia/NI) lub 21 dni (Szkocja) + wniosek o <em>Child Benefit (CH2)</em> online.</li>
+            <li><strong>Irlandia (HSE):</strong> Wniosek o <em>Maternity Benefit</em> na MyWelfare.ie (min. 6 tyg. przed urlopem) oraz automatyczny <em>Child Benefit (€140/mies.)</em> po rejestracji aktu urodzenia.</li>
+            <li><strong>Polski PESEL i paszport:</strong> Aby wyrobić dziecku polski paszport w Konsulacie RP (Londyn/Manchester/Edynburg/Belfast/Dublin), weź z Register Office <strong>Full Birth Certificate</strong> (z imionami obojga rodziców).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 3. POLKI W NIEMCZECH, AUSTRII I SZWAJCARII (PL <-> DE KREISSSAAL)         -->
+    <!-- ========================================================================= -->
+    <div id="edition-pl-de" class="edition-panel">
+      <div class="top-bar">
+        <div>
+          <span class="badge badge-diaspora">Edycja Dwujęzyczna PL ↔ DE · Niemcy, Austria i Szwajcaria (DACH)</span>
+          <h1>Niezbędnik na Kreißsaal (PL↔DE): Słownik Porodowy, Dekoder Mutterpass, Geburtsplan i Elterngeld</h1>
+          <p class="subtitle">Praktyczny przewodnik dla polskich par rodzących w niemieckim, austriackim lub szwajcarskim szpitalu</p>
+        </div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ Drukuj / Zapisz PDF (A4)</button>
+      </div>
+
+      <h2>1. Słownik Skurczowy na Kreißsaal + Dekoder Skrótów w Mutterpass</h2>
+      <table class="dict-table">
+        <thead>
+          <tr>
+            <th>Po polsku</th>
+            <th>Po niemiecku (w Kreißsaal / Mutterpass)</th>
+            <th>Gotowe zdanie dla Partnera do położnej (Hebamme)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Sala porodowa / Położna</strong></td>
+            <td><strong>Der Kreißsaal / Die Hebamme</strong></td>
+            <td><em>"Hallo, meine Frau ist in der [39.] SSW, die Wehen kommen alle [4] Minuten."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Odejście wód płodowych</strong></td>
+            <td><strong>Der Blasensprung (Fruchtwasser ist klar / grün)</strong></td>
+            <td><em>"Sie hatte einen Blasensprung um [Uhrzeit], das Fruchtwasser ist klar."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Rozwarcie szyjki macicy</strong></td>
+            <td><strong>Muttermundöffnung (MM w Mutterpass)</strong></td>
+            <td><em>"Bitte warten Sie kurz mit der Frage, bis diese Wehe vorbei ist."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Znieczulenie zewnątrzoponowe</strong></td>
+            <td><strong>Die PDA (Periduralanästhesie)</strong></td>
+            <td><em>"Meine Frau wünscht sich jetzt bitte eine PDA zur Schmerzlinderung."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Nacięcie krocza / Ochrona krocza</strong></td>
+            <td><strong>Der Dammschnitt / Der Dammschutz</strong></td>
+            <td><em>"Wir möchten einen routinemäßigen Dammschnitt nach Möglichkeit vermeiden."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Późne odpępnienie i Kangurowanie</strong></td>
+            <td><strong>Spätes Abnabeln (Auspulsieren) & Bonding (Haut-zu-Haut)</strong></td>
+            <td><em>"Wir wünschen uns spätes Abnabeln und direktes Haut-zu-Haut-Bonding."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Skróty w Mutterpass: SL / BEL / VW / HW</strong></td>
+            <td><strong>SL = Schädellage (główkowe), BEL = Beckenendlage (miednicowe), VW/HW = łożysko na przedniej/tylnej ścianie</strong></td>
+            <td><em>Warto wiedzieć przed wizytą kwalifikacyjną (Geburtsanmeldung ok. 34–36 SSW).</em></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. Dwujęzyczny Geburtsplan (Plan Porodu PL ↔ DE do wręczenia położnej)</h2>
+      <div class="checklist-grid">
+        <div class="check-item"><div class="check-box"></div><div><strong>Sprache & Kommunikation:</strong> Deutsch ist nicht unsere Muttersprache. Bitte sprechen Sie langsam und nicht während einer Wehe.<br/><em style="color:#544A44;">(Prosimy mówić wolniej i poza czasem trwania skurczu).</em></div></div>
+        <div class="check-item"><div class="check-box"></div><div><strong>Bewegungsfreiheit & Positionen:</strong> Gedämpftes Licht, freie Wahl der Gebärposition (Pezziball, Gebärhocker, Wanne).<br/><em style="color:#544A44;">(Swoboda pozycji, piłka, stołek porodowy, wanna).</em></div></div>
+        <div class="check-item"><div class="check-box"></div><div><strong>Schmerzlinderung:</strong> Zuerst natürliche Methoden (Wärme, Bewegung, Lachgas), bei Bedarf Wunsch nach einer PDA.<br/><em style="color:#544A44;">(Najpierw metody naturalne/gaz, w razie potrzeby PDA).</em></div></div>
+        <div class="check-item"><div class="check-box"></div><div><strong>Dammschutz & Interventionen:</strong> Bitte warme Kompressen für den Damm; kein Dammschnitt und kein Wehentropf ohne vorherige Absprache.<br/><em style="color:#544A44;">(Ciepłe okłady na krocze; brak nacięcia i oksytocyny bez konsultacji).</em></div></div>
+        <div class="check-item"><div class="check-box"></div><div><strong>Nach der Geburt (Goldene Stunde):</strong> Nabelschnur auspulsieren lassen, ungestörtes Bonding (Haut-zu-Haut) für mind. 1–2 Stunden.<br/><em style="color:#544A44;">(Wytętnienie pępowiny i nieprzerwane kangurowanie min. 1–2h).</em></div></div>
+        <div class="check-item"><div class="check-box"></div><div><strong>Falls Kaiserschnitt nötig:</strong> Partner im OP dabei, sofortiges Bonding bei der Mutter oder beim Vater.<br/><em style="color:#544A44;">(W razie CC: obecność partnera i kangurowanie przez tatę/mamę).</em></div></div>
+      </div>
+
+      <h2>3. Checklista Systemowa DE/AT/CH: Hebamme, Standesamt, Elterngeld i Kindergeld</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>👩‍⚕️ Wochenbett-Hebamme i Familienzimmer</h3>
+          <ul>
+            <li><strong>Położna środowiskowa (Nachsorgehebamme):</strong> W Niemczech i Austrii ubezpieczenie (<em>Krankenkasse</em>) opłaca wizyty domowe położnej przez pierwsze 12 tygodni po porodzie — zarezerwuj ją wcześniej!</li>
+            <li><strong>Familienzimmer:</strong> Zapytaj przy przyjęciu o pokój rodzinny, w którym tata może nocować z mamą i noworodkiem przez 2–3 doby pobytu.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>📄 Dokumenty do Kliniktasche (Bardzo ważne w DE!)</h3>
+          <ul>
+            <li><strong>Do rejestracji dziecka w szpitalu (Standesamt):</strong> W niemieckich szpitalach do wydania aktu urodzenia (<em>Geburtsurkunde</em>) musisz mieć w torbie oryginał aktu małżeństwa (lub akty urodzenia rodziców z tłumaczeniem przysięgłym / drukiem wielojęzycznym UE!).</li>
+            <li><strong>Świadczenia po porodzie:</strong> 1) Zaświadczenie o porodzie do <em>Krankenkasse</em> (wypłata 2. części <em>Mutterschaftsgeld</em>), 2) Wniosek o <em>Kindergeld (255 €/mies.)</em> w Familienkasse, 3) Wniosek o <em>Elterngeld</em>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 4. POLKI W HOLANDII (PL <-> NL VERLOSKUNDIGE & KRAAMZORG)                 -->
+    <!-- ========================================================================= -->
+    <div id="edition-pl-nl" class="edition-panel">
+      <div class="top-bar">
+        <div>
+          <span class="badge badge-diaspora">Edycja Dwujęzyczna PL ↔ NL/EN · Holandia (Verloskundige & Kraamzorg)</span>
+          <h1>Niezbędnik Porodowy dla Polek w Holandii: Słownik PL↔NL, Geboorteplan i Przewodnik Kraamzorg</h1>
+          <p class="subtitle">Jak spokojnie przejść przez holenderski system: poród polikliniczny/szpitalny, komunikacja z Verloskundige i opieka domowa</p>
+        </div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ Drukuj / Zapisz PDF (A4)</button>
+      </div>
+
+      <h2>1. Słownik Skurczowy PL ↔ Niderlandzki (Na rozmowę z Verloskundige i w szpitalu)</h2>
+      <table class="dict-table">
+        <thead>
+          <tr>
+            <th>Po polsku</th>
+            <th>Po niderlandzku (NL)</th>
+            <th>Co powiedzieć przez telefon / w szpitalu (NL / EN)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Położna / Karta ciąży</strong></td>
+            <td><strong>De verloskundige / Zwangerschapskaart</strong></td>
+            <td><em>"Mijn partner is [39] weken zwanger, de weeën komen elke [4] minuten."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Skurcze / Odejście wód</strong></td>
+            <td><strong>De weeën / Gebroken vliezen (helder vruchtwater)</strong></td>
+            <td><em>"Haar vliezen zijn gebroken, het vruchtwater is helder (czyste) / groen (zielone)."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Rozwarcie / Faza parcia</strong></td>
+            <td><strong>De ontsluiting / Het persen</strong></td>
+            <td><em>"Hoeveel centimeter ontsluiting heeft ze nu?" (Ile ma teraz centymetrów rozwarcia?)</em></td>
+          </tr>
+          <tr>
+            <td><strong>Znieczulenie zewnątrzoponowe / Pompka</strong></td>
+            <td><strong>De ruggenprik (Epiduraal) / Remifentanil-pompje</strong></td>
+            <td><em>"Ze wil graag pijnstilling bespreken: een ruggenprik (epidural) of pompje."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Poród w szpitalu bez wskazań vs medyczny</strong></td>
+            <td><strong>Poliklinische bevalling vs Medische indicatie</strong></td>
+            <td><em>Przy znieczuleniu (ruggenprik) poród automatycznie przechodzi pod opiekę szpitalną (medische indicatie).</em></td>
+          </tr>
+          <tr>
+            <td><strong>Pielęgniarka poporodowa w domu (8 dni)</strong></td>
+            <td><strong>De kraamzorg / De kraamverzorgende</strong></td>
+            <td><em>Dzwoń do biura Kraamzorg od razu po powrocie ze szpitala do domu!</em></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. Holenderska Specyfika: Co musisz wiedzieć, by nie dać się zaskoczyć?</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>🏠 Belinstructies (Kiedy dzwonić po Verloskundige?)</h3>
+          <ul>
+            <li>W Holandii przy pierwszym porodzie położna przyjeżdża najpierw <strong>do Twojego domu</strong>, gdy skurcze trwają po 60 sekund co 3–4 minuty przez pełną godzinę.</li>
+            <li>Dopiero po zbadaniu rozwarcia w domu (zwykle ok. 4–5 cm) jedziecie razem do szpitala na <em>Poliklinische bevalling</em> (chyba że masz już <em>medische indicatie</em> u ginekologa).</li>
+            <li><strong>Podwyższenie łóżka (Klossen):</strong> Od 37. tygodnia łóżko w sypialni musi być podniesione na wysokość 75–80 cm (darmowe podkładki z Medipoint) pod wizyty <em>Kraamzorg</em>!</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>📋 Rejestracja w Gemeente (Uwaga: tylko 3 dni robocze!)</h3>
+          <ul>
+            <li><strong>Geboorteaangifte (3 dni!):</strong> W Holandii tata ma <strong>tylko 3 dni robocze</strong> od dnia porodu na zgłoszenie urodzenia dziecka w urzędzie gminy (<em>Gemeente</em>) właściwym dla miejsca szpitala!</li>
+            <li><strong>Kraampakket:</strong> Upewnij się, że masz w domu pudełko <em>Kraampakket</em> z ubezpieczalni (podkłady, gaziki, zacisk do pępowiny, termometry cyfrowe – nie rtęciowe!).</li>
+            <li><strong>Kinderbijslag:</strong> Po rejestracji w Gemeente urząd SVB automatycznie prześle formularz o rodzinne (<em>Kinderbijslag</em>).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 5. UK & IRELAND NATIVE EDITION (EN-UK/IE - NHS & HSE)                     -->
+    <!-- ========================================================================= -->
+    <div id="edition-en-uk" class="edition-panel">
+      <div class="top-bar">
+        <div>
+          <span class="badge">UK & Ireland Native Edition · NHS NICE CG190 & HSE National Maternity Standards</span>
+          <h1>Birth Partner Labour Ward Action Cards, B.R.A.I.N. Advocacy & Colostrum Harvesting Toolkit</h1>
+          <p class="subtitle">Designed for Midwife-Led Units (MLU), Hospital Delivery Suites & Home Births · Print A4 or Save to Phone</p>
+        </div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save PDF (A4)</button>
+      </div>
+
+      <h2>1. Four Labour Ward Flashcards for the Birth Partner</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>CARD 1: Latent Phase at Home & Calling Maternity Triage</h3>
+          <ul>
+            <li><strong>The 4-1-1 / 3-1-1 Triage Rule:</strong> Call Maternity Assessment (MAU) when contractions are <strong>3–4 minutes apart</strong>, lasting <strong>60 seconds</strong> for at least <strong>1 hour</strong> (or immediately if waters break, reduced fetal movements, or bleeding).</li>
+            <li><strong>C.O.A.T. Waters Check:</strong> Note <strong>C</strong>olour (clear/pink vs green/brown meconium), <strong>O</strong>dour, <strong>A</strong>mount, and <strong>T</strong>ime.</li>
+            <li><strong>Your Job at Triage:</strong> Hand over <em>BadgerNotes / Handheld Notes</em> & printed Birth Preferences. Ask staff to pause questions during contractions.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>CARD 2: Active First Stage (4–8 cm) & Counter-Pressure</h3>
+          <ul>
+            <li><strong>Oxytocin Bubble Protection:</strong> Keep lights dim, curtains drawn, and voices low. Oxytocin needs privacy and safety to flow.</li>
+            <li><strong>Straw Hydration Every 20 Mins:</strong> Never ask yes/no questions during labour. Offer isotonic drink or water with a straw after every 3rd contraction.</li>
+            <li><strong>Double-Hip Squeeze & Sacral Press:</strong> Press the heel of your hand firmly onto her sacrum (flat bone above tailbone) from start to finish of each contraction.</li>
+          </ul>
+        </div>
+
+        <div class="card card-highlight">
+          <h3>CARD 3: Transition Crisis (8–10 cm · When She Says "I Can't!")</h3>
+          <ul>
+            <li><strong>What It Means Clinically:</strong> Transition is the shortest, most intense surge right before 10 cm full dilation. Self-doubt ("I want to go home / I can't do this") means baby is very close!</li>
+            <li><strong>1-Sentence Anchors:</strong> <em>"You are safe, baby is safe, this surge is already peaking, drop your shoulders and jaw."</em></li>
+            <li><strong>Cool Flannel:</strong> Place a cool damp cloth on the back of her neck between surges.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>CARD 4: Second Stage, Golden Hour & Gentle Caesarean (Plan B)</h3>
+          <ul>
+            <li><strong>Optimal Cord Clamping:</strong> Wait at least 1–3 minutes (until cord is white and flat) before clamping and cutting.</li>
+            <li><strong>Uninterrupted Golden Hour:</strong> Immediate skin-to-skin for at least 60–120 minutes until after the first breastfeed. Routine weighing can wait.</li>
+            <li><strong>Gentle C-Section Backup:</strong> Request partner presence in theatre, lowered screen at birth, and immediate skin-to-skin on Mum's or Partner's chest.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>2. The B.R.A.I.N. Informed Consent Card + Antenatal Colostrum Harvesting Log (36w+)</h2>
+      <div class="cards-grid">
+        <div class="card card-blue">
+          <h3>🛡️ The B.R.A.I.N. Framework for Hospital Shift Changes</h3>
+          <ul>
+            <li><strong>B – Benefits:</strong> <em>"What are the specific benefits of this intervention right now?"</em></li>
+            <li><strong>R – Risks:</strong> <em>"What are the risks or knock-on effects for Mum and baby?"</em></li>
+            <li><strong>A – Alternatives:</strong> <em>"Are there other options we can try first (e.g. position change, mobilisation)?"</em></li>
+            <li><strong>I – Instincts:</strong> <em>"How do we feel about this?"</em></li>
+            <li><strong>N – Nothing / Not Now:</strong> <em>"Since CTG monitoring is reassuring, what happens if we wait 1 hour and reassess?"</em></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🍼 Antenatal Colostrum Harvesting (From 36–37 Weeks)</h3>
+          <ul>
+            <li><strong>How to Express:</strong> With midwife clearance from 36+0/37+0 weeks, hand-express in a warm C-shape 2–3 times daily for 5 mins after a warm shower.</li>
+            <li><strong>Storage:</strong> Collect drops in sterile 1ml purple oral syringes. Label with Name, NHS/Hospital Number, Date & Time, and freeze immediately.</li>
+            <li><strong>Hospital Cool Bag:</strong> Bring 4–6 frozen syringes in a small zip bag with an ice pack labeled for the Maternity Ward freezer.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>3. 3-Cube Hospital Bag System + UK/Ireland Post-Birth Admin Fast-Track</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>🎒 The 3-Packing-Cube Hospital Bag</h3>
+          <ul>
+            <li><strong>Cube 1 (Labour Room – Top of Bag):</strong> Maternity notes, 2x printed Birth Preferences, TENS machine, birth comb, lip balm, 2m phone cable, straw bottle, electrolyte sachets, dark loose T-shirt, bikini top (for birth pool).</li>
+            <li><strong>Cube 2 (Baby's First Outfit – Ziplock):</strong> 2x vests & sleepsuits (Newborn + 0–3m), hat, cellular blanket (NHS hospitals require cellular blankets, not fleece!), size 1 nappies & water wipes.</li>
+            <li><strong>Cube 3 (Postnatal Ward):</strong> Front-opening nightdress, high-waisted dark cotton briefs, maternity pads, peri bottle, flip-flops.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>📋 UK & Ireland Postpartum Admin Checklist</h3>
+          <ul>
+            <li><strong>NHS Maternity Exemption Certificate (FW8):</strong> Free NHS prescriptions & NHS dental care until baby is 12 months old.</li>
+            <li><strong>Birth Registration:</strong> Book appointment at local Register Office within <strong>42 days</strong> (England/Wales/NI) or <strong>21 days</strong> (Scotland).</li>
+            <li><strong>Child Benefit & Childcare:</strong> Claim Child Benefit online via GOV.UK (or MyWelfare.ie in Ireland for the €140/mth benefit) as soon as birth is registered.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 6. USA & CANADA NATIVE EDITION (EN-US/CA - L&D HOSPITAL)                  -->
+    <!-- ========================================================================= -->
+    <div id="edition-en-us" class="edition-panel">
+      <div class="top-bar">
+        <div>
+          <span class="badge">USA & Canada Edition · ACOG / SOGC Evidence-Based Labor & Delivery Toolkit</span>
+          <h1>L&D Partner Coaching Flashcards, B.R.A.I.N. Advocacy, Visual Birth Plan & Hospital Bill Shield</h1>
+          <p class="subtitle">Built for US & Canadian Hospital Labor & Delivery Suites, Birth Centers & Postpartum Recovery</p>
+        </div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save PDF (A4 / Letter)</button>
+      </div>
+
+      <h2>1. Four Labor & Delivery (L&D) Partner Coaching Cards</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>CARD 1: The 5-1-1 Rule & L&D Triage Admission</h3>
+          <ul>
+            <li><strong>5-1-1 Rule (First Baby):</strong> Head to L&D when contractions are <strong>5 minutes apart</strong>, lasting <strong>1 full minute</strong>, for <strong>1 hour</strong> (or 4-1-1 if >30 mins from hospital).</li>
+            <li><strong>C.O.A.T. Bag of Waters Check:</strong> If water breaks, write down <strong>C</strong>olor, <strong>O</strong>dor, <strong>A</strong>mount, and <strong>T</strong>ime to tell the L&D nurse.</li>
+            <li><strong>Shift-Change Introduction:</strong> Hand 1 laminated/printed copy of your 1-Page Visual Birth Preferences to the day-shift AND night-shift L&D nurse.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>CARD 2: Active Labor Positions (Peanut Ball & Counter-Pressure)</h3>
+          <ul>
+            <li><strong>Change Positions Every 30 Mins:</strong> Even with an epidural, ask the L&D nurse for a <strong>Peanut Ball</strong> between the knees (side-lying alternation every 30–45 mins opens the pelvic outlet and lowers C-section risk!).</li>
+            <li><strong>Sacral Counter-Pressure & Hip Squeeze:</strong> Apply firm heel-of-hand pressure to the lower sacrum during back-labor surges.</li>
+            <li><strong>Jaw & Shoulder Check:</strong> Remind her: <em>"Unclench your jaw, drop your shoulders, low vocal tones."</em></li>
+          </ul>
+        </div>
+
+        <div class="card card-highlight">
+          <h3>CARD 3: Transition (7–10 cm) & Informed Advocacy (B.R.A.I.N.)</h3>
+          <ul>
+            <li><strong>Transition Signs:</strong> Shaking/tremors, nausea, hot/cold flashes, saying <em>"I can't do this anymore."</em> Reassure her: labour tremors are normal adrenaline/hormone shifts and mean 10 cm is right around the corner!</li>
+            <li><strong>B.R.A.I.N. Pause Before Pitocin / Amniotomy:</strong> Ask the OB/nurse: <em>"Since fetal heart tones (Category I strip) look great, what happens if we give her 45 more minutes to progress with position changes?"</em></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>CARD 4: Laboring Down, Golden Hour & Gentle C-Section</h3>
+          <ul>
+            <li><strong>Physiologic Pushing & Warm Compresses:</strong> Request warm washcloth compresses on the perineum during crowning to reduce tearing.</li>
+            <li><strong>Delayed Cord Clamping & Golden Hour:</strong> 1–3+ minutes delayed clamping & uninterrupted skin-to-skin before routine eye ointment/bath.</li>
+            <li><strong>Family-Centered C-Section (Plan B):</strong> Request clear drape option, arms unstrapped for OR skin-to-skin, or immediate partner skin-to-skin.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>2. US Insurance, Free ACA Breast Pump & Hospital Billing Audit Checklist (Saves $500–$2,500+)</h2>
+      <div class="cards-grid">
+        <div class="card card-blue">
+          <h3>💵 5 Financial & Insurance Moves Every US Parent Needs</h3>
+          <ul>
+            <li><strong>1. Add Baby to Health Insurance Within 30 Days:</strong> Birth is a Qualifying Life Event (QLE), but coverage is NOT automatic after day 30 — call HR/Insurer in week 1!</li>
+            <li><strong>2. Always Request an Itemized Bill (With CPT Codes):</strong> Never pay the first summary hospital bill. Request a line-by-line itemized statement to spot duplicate nursery/pharmacy charges.</li>
+            <li><strong>3. Claim Your $0 ACA Breast Pump + Replacement Parts:</strong> Under the Affordable Care Act, US plans must cover a hospital-grade electric pump (e.g. Spectra S1/S2) AND replacement tubing/flanges.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🎒 What the US Hospital Provides vs. What You Must Pack</h3>
+          <ul>
+            <li><strong>Take Home from L&D Room (Already Billed to Insurance!):</strong> Mesh underwear, peri bottle, dermoplast/witch hazel pads, newborn diapers, swaddle blankets, nasal bulb syringe.</li>
+            <li><strong>What YOU Pack:</strong> 10ft phone charger, portable stroller fan (postpartum hormone sweats!), nursing bra, going-home outfits (NB & 0–3M), rear-facing infant car seat installed & checked.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 7. AUSTRALIA & DUBAI / UAE EXPAT EDITION (EN-AU-AE)                       -->
+    <!-- ========================================================================= -->
+    <div id="edition-en-au-ae" class="edition-panel">
+      <div class="top-bar">
+        <div>
+          <span class="badge">Australia (Medicare / MGP) & UAE / Dubai Expat Edition (DHA Private Hospital)</span>
+          <h1>Partner Labour Ward Flashcards, Visual Birth Plan & Local Hospital/Visa Fast-Track</h1>
+          <p class="subtitle">Tailored for Australian Public/Private Maternity & Dubai/UAE Expat Private Hospitals (Mediclinic, Al Zahra, King's, Fakeeh)</p>
+        </div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save PDF (A4)</button>
+      </div>
+
+      <h2>1. Labour Ward Partner Cards + B.R.A.I.N. Decision Matrix</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>CARD 1: Triage, Water Immersion & Active Labour</h3>
+          <ul>
+            <li><strong>4-1-1 Contraction Rule:</strong> Contractions every 4 mins, lasting 1 min, for 1 hour.</li>
+            <li><strong>Active Support:</strong> Sacral counter-pressure during back contractions, cool cloth on forehead, straw sips of coconut water / electrolytes after every 3rd wave.</li>
+            <li><strong>B.R.A.I.N. Advocacy:</strong> Benefits, Risks, Alternatives, Intuition, Nothing/Wait 1 hour.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>CARD 2: Golden Hour, Delayed Clamping & Colostrum</h3>
+          <ul>
+            <li><strong>Delayed Cord Clamping:</strong> Wait 1–3+ minutes until cord stops pulsing.</li>
+            <li><strong>Colostrum Syringes (36w+):</strong> Bring labelled 1ml colostrum syringes in a cool pouch for the maternity unit freezer.</li>
+            <li><strong>Gentle Caesarean Backup:</strong> Immediate skin-to-skin in theatre or with partner in recovery.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>2. Regional Insider Checklists: Australia (Medicare) vs. Dubai / UAE (Expat Legal Rules)</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>🇦🇺 Australia: Medicare, Centrelink & Car Capsule</h3>
+          <ul>
+            <li><strong>Newborn Child Declaration Form (FA081):</strong> Signed by the midwife at the hospital — upload a photo directly to your MyGov / Centrelink app to enrol baby in <strong>Medicare</strong>, register for My Health Record, and claim <strong>Paid Parental Leave / Family Tax Benefit</strong>!</li>
+            <li><strong>Maternal & Child Health Record:</strong> Keep your state's Blue/Green/Red Book in the nappy bag for the 1–2 week home visit.</li>
+            <li><strong>ISOFIX / Top-Tether Car Capsule:</strong> Australian hospitals check for a properly fitted AS/NZS 1754 compliant capsule before discharge.</li>
+          </ul>
+        </div>
+        <div class="card card-highlight">
+          <h3>🇦🇪 Dubai / UAE Expats: Crucial Hospital & 120-Day Visa Rules</h3>
+          <ul>
+            <li><strong>1. Mandatory Document Folder at Admission:</strong> Original Passports + Emirates IDs of BOTH parents + <strong>MOFA-Attested Marriage Certificate (translated into Arabic/English)</strong> + Insurance <strong>Guarantee of Payment (GOP)</strong> pre-approval letter.</li>
+            <li><strong>2. The 120-Day Newborn Visa Rule:</strong> From the moment of birth in the UAE, you have strictly <strong>120 days</strong> to obtain the Arabic & English Birth Certificate (via DHA/MOHAP app), apply for your baby's home-country passport at your Embassy, and stamp the UAE Residence Visa & Emirates ID (otherwise a daily overstay fine applies!).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 8. DACH NATIVE EDITION (DEUTSCH - DE / AT / CH)                           -->
+    <!-- ========================================================================= -->
+    <div id="edition-de" class="edition-panel">
+      <div class="top-bar">
+        <div>
+          <span class="badge">DACH-Edition (Deutschland · Österreich · Schweiz) · S3-Leitlinie Vaginalgeburt</span>
+          <h1>Kreißsaal-Spickzettel für Partner, B.R.A.I.N.-Entscheidungshilfe, Kolostrum-Guide & Geburtsplan</h1>
+          <p class="subtitle">Kompakte Praxiskarten für Kreißsaal, Geburtshaus & Wochenbett · Sofort druckbereit (A4) oder fürs Smartphone</p>
+        </div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ Drucken / Als PDF speichern (A4)</button>
+      </div>
+
+      <h2>1. Vier Kreißsaal-Aktionskarten für den Geburtsbegleiter / Partner</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>KARTE 1: Wann losfahren in die Klinik? & Aufnahme</h3>
+          <ul>
+            <li><strong>Die 5-1-1-Regel (Erstgebärende):</strong> Wehen alle <strong>5 Minuten</strong>, Dauer <strong>1 volle Minute</strong>, seit mindestens <strong>1 Stunde</strong> (oder sofort bei Blasensprung mit grünlichem Fruchtwasser / Blutung).</li>
+            <li><strong>Deine Aufgabe bei der Aufnahme:</strong> Du hältst die Dokumentenmappe bereit (<em>Mutterpass, Versichertenkarte, Ausweise, 2x Geburtsplan</em>) und schützt deine Partnerin vor Fragen während einer Wehe.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>KARTE 2: Eröffnungsphase (1–7 cm) & Kreuzbein-Gegendruck</h3>
+          <ul>
+            <li><strong>Kiefer-Check & Atmung:</strong> Erinnere sie sanft: <em>„Kiefer und Lippen locker lassen, Schultern sinken lassen – weicher Mund = weicher Beckenboden.“</em></li>
+            <li><strong>Trinken ohne Ja/Nein-Fragen:</strong> Halte ihr nach jeder 3. Wehe die Trinkflasche mit Strohhalm direkt an den Mund.</li>
+            <li><strong>Kreuzbein-Gegendruck:</strong> Bei Rückenwehen während der gesamten Wehe mit dem Handballen kräftig auf das flache Kreuzbein drücken.</li>
+          </ul>
+        </div>
+
+        <div class="card card-highlight">
+          <h3>KARTE 3: Übergangsphase (7–10 cm · „Ich kann nicht mehr!“)</h3>
+          <ul>
+            <li><strong>Was im Körper passiert:</strong> Kurz vor der vollständigen Öffnung (10 cm) kommt der sogenannte Übergangskrise-Moment (Zittern, Hitze, Zweifel). Das ist das beste Zeichen: Das Baby ist gleich da!</li>
+            <li><strong>Was du sagst (1 Satz pro Wehe):</strong> <em>„Du bist sicher, unser Baby ist sicher, diese Welle klingt schon ab, du machst das großartig.“</em> + kühler Waschlappen in den Nacken.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>KARTE 4: Austrittsphase, Goldene Stunde & Kaisergeburt (Plan B)</h3>
+          <ul>
+            <li><strong>Dammschutz & Position:</strong> Aufrechte Positionen (Vierfüßler, Seitenlage mit Erdnussball, Gebärhocker) und warme Kompressen/Kaffee-Kompressen für den Damm.</li>
+            <li><strong>Spätes Abnabeln & Bonding:</strong> Nabelschnur 1–3+ Min. auspulsieren lassen und mind. 1–2 Stunden ungestörtes Haut-zu-Haut-Bonding.</li>
+            <li><strong>Plan B (Kaiserschnitt):</strong> Sofortiges Bonding auf der nackten Brust des Vaters, falls die Mutter im OP noch versorgt wird!</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>2. Die B.R.A.I.N.-Methode im Kreißsaal + Präpartale Kolostrum-Gewinnung (ab 37+0 SSW)</h2>
+      <div class="cards-grid">
+        <div class="card card-blue">
+          <h3>🛡️ Die B.R.A.I.N.-Fragen für informierte Entscheidungen</h3>
+          <ul>
+            <li><strong>B – Benefits (Vorteile):</strong> Welche konkreten Vorteile bringt dieser Eingriff jetzt?</li>
+            <li><strong>R – Risks (Risiken):</strong> Welche Risiken oder Nebenwirkungen hat das für Mutter und Kind?</li>
+            <li><strong>A – Alternatives (Alternativen):</strong> Können wir zuerst Positionswechsel oder Bewegung probieren?</li>
+            <li><strong>I – Intuition (Bauchgefühl):</strong> Wie fühlen wir uns damit?</li>
+            <li><strong>N – Nothing / Not Now (Abwarten):</strong> Da das CTG unauffällig ist: Was passiert, wenn wir noch 30–60 Minuten abwarten?</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🍼 Kolostrum vor der Geburt gewinnen + Behörden-Fahrplan</h3>
+          <ul>
+            <li><strong>Kolostrum-Spritzen (ab 37+0 SSW):</strong> Nach Rücksprache mit Hebamme/Gynäkologin täglich 2x 5 Min. per Hand ausstreichen, in 1-ml-Spritzen einfrieren und gekühlt mit in den Kreißsaal nehmen.</li>
+            <li><strong>Dokumente für die Kliniktasche (Standesamt):</strong> Mutterpass, Krankenkassenkarte, Ausweise + <strong>Eheurkunde / Stammbuch</strong> (oder Geburtsurkunden + Vaterschaftsanerkennung), damit die Klinik die Geburtsmeldung direkt ans Standesamt schicken kann.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 9. ESPAÑOL EDITION (ESPAÑA, MÉXICO & US HISPANIC)                         -->
+    <!-- ========================================================================= -->
+    <div id="edition-es" class="edition-panel">
+      <div class="top-bar">
+        <div>
+          <span class="badge">Edición en Español · España (Ministerio de Sanidad), México & US LatAm</span>
+          <h1>Tarjetas de Acción para el Acompañante en Paritorio, Método B.R.A.I.N. y Plan de Parto Visual</h1>
+          <p class="subtitle">Guía práctica paso a paso para la sala de dilatación, parto respetado y las primeras 72 horas con tu bebé</p>
+        </div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF (A4)</button>
+      </div>
+
+      <h2>1. Cuatro Tarjetas de Acción para el Acompañante en Sala de Partos</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>TARJETA 1: Regla 5-1-1 y Admisión en Urgencias de Maternidad</h3>
+          <ul>
+            <li><strong>Regla 5-1-1 (Primer parto):</strong> Acudir al hospital cuando las contracciones sean cada <strong>5 minutos</strong>, duren <strong>1 minuto entero</strong> y se mantengan durante <strong>1 hora</strong> (o de inmediato si se rompe la bolsa con líquido teñido/verdoso).</li>
+            <li><strong>Tu rol en Admisión:</strong> Tú entregas la carpeta de documentos (<em>Cartilla de Embarazo, analítica SGB/Estreptococo, DNI/Tarjeta Sanitaria y 2 copias del Plan de Parto</em>). Pide al personal esperar 45 segundos a que pase la contracción antes de hacer preguntas.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>TARJETA 2: Dilatación Activa (4–8 cm) y Presión Sacra</h3>
+          <ul>
+            <li><strong>Respiración y Mandíbula Suelta:</strong> Respira con ella (inhalar 4s por la nariz, exhalar largo 7s por la boca relajada). Recuérdale: <em>"Mandíbula y hombros sueltos = suelo pélvico relajado"</em>.</li>
+            <li><strong>Hidratación cada 20 min:</strong> Acerca la botella con pajita/popote a sus labios cada 3 contracciones sin hacer preguntas largas.</li>
+            <li><strong>Contrapresión en el Sacro:</strong> Durante la contracción, presiona firme con la base de tu palma sobre el hueso sacro y usa el peine de parto (<em>Birth Comb</em>) en su mano.</li>
+          </ul>
+        </div>
+
+        <div class="card card-highlight">
+          <h3>TARJETA 3: Fase de Transición (8–10 cm · "¡Ya no puedo más!")</h3>
+          <ul>
+            <li><strong>Qué significa fisiológicamente:</strong> Es la fase más corta e intensa justo antes de los 10 cm. Los temblores y el deseo de rendirse indican que el bebé está a punto de nacer.</li>
+            <li><strong>Frases Ancla (1 por contracción):</strong> <em>"Estás segura, nuestro bebé está bien, esta ola ya está bajando, lo estás haciendo increíble"</em> + paño fresco en la nuca.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>TARJETA 4: Expulsivo, Hora Sagrada y Cesárea Humanizada</h3>
+          <ul>
+            <li><strong>Protección Perineal:</strong> Posturas verticales o lateral con pelota cacahuete (<em>Peanut Ball</em>) y compresas tibias en el periné (evitar episiotomía rutinaria y maniobra de Kristeller).</li>
+            <li><strong>Pinzamiento Tardío y Piel con Piel:</strong> Esperar 1–3+ minutos a que el cordón deje de latir y <strong>Contacto Piel con Piel ininterrumpido</strong> durante las primeras 2 horas.</li>
+            <li><strong>Plan B (Cesárea):</strong> Solicitar acompañamiento en quirófano y piel con piel inmediato con la madre o con el padre.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>2. Matriz B.R.A.I.N. de Consentimiento Informado + Extracción Prenatal de Calostro (Sem 37+)</h2>
+      <div class="cards-grid">
+        <div class="card card-blue">
+          <h3>🛡️ Las 5 Preguntas B.R.A.I.N. ante Intervenciones no Urgentes</h3>
+          <ul>
+            <li><strong>B – Beneficios:</strong> ¿Cuál es el beneficio específico de hacer esta intervención ahora mismo?</li>
+            <li><strong>R – Riesgos:</strong> ¿Qué riesgos o efectos secundarios implica para la mamá y el bebé?</li>
+            <li><strong>A – Alternativas:</strong> ¿Podemos probar primero cambio de postura o movimiento?</li>
+            <li><strong>I – Intuición:</strong> ¿Cómo nos sentimos con esta opción?</li>
+            <li><strong>N – Nada / Esperar:</strong> Si el monitor fetal está bien, ¿qué pasa si esperamos 45–60 minutos?</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🍼 Banco Prenatal de Calostro + Trámites Postparto</h3>
+          <ul>
+            <li><strong>Calostro en Jeringas de 1 ml (desde semana 37):</strong> Con autorización de tu matrona/obstetra, extrae manualmente tras una ducha tibia, congela en jeringas etiquetadas y llévalas en bolsa térmica al hospital.</li>
+            <li><strong>España – Trámites clave:</strong> Inscripción en el Registro Civil directamente desde el hospital (en las primeras 72h), alta del bebé en la Seguridad Social y solicitud de la <em>Prestación por Nacimiento y Cuidado de Menor (16 semanas remuneradas al 100% para ambos progenitores)</em>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 10. BRASIL EDITION (PORTUGUÊS - PARTO HUMANIZADO & LEI 11.108/2005)       -->
+    <!-- ========================================================================= -->
+    <div id="edition-pt-br" class="edition-panel">
+      <div class="top-bar">
+        <div>
+          <span class="badge">Edição Brasil (PT-BR) · Diretrizes MS / ANS & Lei do Acompanhante nº 11.108/2005</span>
+          <h1>Cartões de Ação para o Acompanhante, Escudo Legal do Parto Humanizado e Mala em 6 Saquinhos</h1>
+          <p class="subtitle">Guia prático para Maternidades Privadas e SUS: proteção contra intervenções desnecessárias e apoio ativo</p>
+        </div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF (A4)</button>
+      </div>
+
+      <h2>1. Quatro Cartões de Bolso para o Acompanhante na Maternidade</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <h3>CARTÃO 1: Regra 5-1-1, Internação e Direito Legal (Lei 11.108)</h3>
+          <ul>
+            <li><strong>Quando ir para a Maternidade (5-1-1):</strong> Contrações a cada <strong>5 minutos</strong>, durando <strong>1 minuto completo</strong>, por pelo menos <strong>1 hora</strong> (Evite internar com 1–2 cm sem indicação médica para fugir da cascata de intervenções!).</li>
+            <li><strong>Escudo Legal (Lei Federal nº 11.108/2005 e RN 465 ANS):</strong> A gestante tem direito garantido por lei a <strong>1 acompanhante de sua livre escolha</strong> durante todo o pré-parto, parto normal OU <strong>sala de cirurgia na cesariana</strong> e pós-parto imediato (tanto no SUS quanto no Plano de Saúde!).</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>CARTÃO 2: Fase Ativa (4–8 cm), Chuveiro Quente e Massagem Sacral</h3>
+          <ul>
+            <li><strong>Ambiente de Ocitocina:</strong> Penumbra no quarto, silêncio e privacidade. Ofereça água de coco ou isotônico com canudo a cada 20 minutos.</li>
+            <li><strong>Contrapressão no Osso Sacro:</strong> Durante toda a contração, pressione com firmeza a base da mão na lombar baixa/sacro ou faça a pressão dupla nos quadris (<em>Double Hip Squeeze</em>).</li>
+            <li><strong>Bola Suíça e Banho Morno:</strong> Alterne posições verticais a cada 30 minutos para ajudar na descida e rotação do bebê.</li>
+          </ul>
+        </div>
+
+        <div class="card card-highlight">
+          <h3>CARTÃO 3: Fase de Transição (8–10 cm · "Não vou conseguir!")</h3>
+          <ul>
+            <li><strong>O que está acontecendo:</strong> Tremores nas pernas, calor e vontade de desistir são o sinal clássico da transição para os 10 cm! O encontro com o bebê está muito próximo.</li>
+            <li><strong>O que dizer (1 frase curta por onda):</strong> <em>"Você está segura, nosso bebê está ótimo, essa onda já está passando, solte os ombros e o maxilar."</em></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>CARTÃO 4: Expulsivo, Hora de Ouro e Cesárea Humanizada (Plano B)</h3>
+          <ul>
+            <li><strong>Proteção do Períneo e Direitos:</strong> Posição vertical/quatro apoios/lateral, compressas mornas no períneo. <strong>Não autorizamos</strong> Manobra de Kristeller (empurrar a barriga) nem episiotomia de rotina.</li>
+            <li><strong>Clampeamento Tardio e Hora de Ouro:</strong> Aguardar 1 a 3+ minutos até o cordão parar de pulsar e manter <strong>contato pele a pele ininterrupto</strong> na 1ª hora de vida.</li>
+            <li><strong>Cesárea Humanizada (Se necessária):</strong> Acompanhante presente na sala cirúrgica, campo cirúrgico abaixado no nascimento e pele a pele imediato no peito da mãe ou do pai.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>2. Método B.R.A.I.N. no Plantão Médico + Organização da Mala em 6 Saquinhos (Padrão Maternidades BR)</h2>
+      <div class="cards-grid">
+        <div class="card card-blue">
+          <h3>🛡️ Perguntas B.R.A.I.N. (Antes de Ocitocina Sintética ou Cesárea Sem Urgência)</h3>
+          <ul>
+            <li><strong>B – Benefícios:</strong> Qual é o benefício real desta intervenção agora?</li>
+            <li><strong>R – Riscos:</strong> Quais são os riscos para a mãe e para o bebê?</li>
+            <li><strong>A – Alternativas:</strong> Podemos tentar mudança de posição, banho morno ou bola de amendoim primeiro?</li>
+            <li><strong>I – Intuição:</strong> Como nos sentimos com isso?</li>
+            <li><strong>N – Nada / Esperar:</strong> Como os batimentos cardíacos do bebê (BCF/Cardiotoco) estão ótimos, podemos aguardar mais 1 hora e reavaliar?</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🎒 Mala da Maternidade Brasileira (Sistema de 6 Saquinhos + Documentos)</h3>
+          <ul>
+            <li><strong>Pasta de Documentos (No topo):</strong> Cartão de Pré-Natal completo, exames do 3º trimestre (Swab Estreptococo B, tipagem sanguínea), RG/CPF, Carteirinha do Plano/SUS e <strong>3 vias impressas do Plano de Parto</strong> (1 para o prontuário, 1 para a enfermagem, 1 no quarto).</li>
+            <li><strong>Saquinho #1 (Sala de Parto / Centro Obstétrico):</strong> Fralda RN, body, mijão/culote, macacão RN, touca, manta de algodão e fralda de boca (etiquetado com nome do bebê e da mãe!).</li>
+            <li><strong>Saquinhos #2 a #6 (Alojamento Conjunto e Alta):</strong> 1 troca completa por saquinho + pacote de fraldas RN + camisolas com abertura frontal, sutiã de amamentação, calcinhas altas e garrafinha perineal (<em>Peri Bottle</em>).</li>
+          </ul>
+        </div>
       </div>
     </div>
 
     <div class="footer">
-      Opracowano z położnymi i fizjoterapeutkami ze szkoły rodzenia Mama Gaja · <strong>HappyBirth.pl</strong> · Wydawca: KLARSOLUTIONS Sp. z o.o. (KRS: 0001268396, NIP: 7812118273).
+      Opracowano przez zespół położnych, fizjoterapeutek uroginekologicznych i ekspertów międzynarodowych standardów okołoporodowych · <strong>HappyBirth.pl Global Edition</strong> · Wydawca: KLARSOLUTIONS Sp. z o.o. (ul. Śląska 14, 60-614 Poznań, KRS: 0001268396, NIP: 7812118273).
     </div>
   </div>
+
+  <script>
+    function selectEdition(editionKey) {
+      var panels = document.querySelectorAll('.edition-panel');
+      for (var i = 0; i < panels.length; i++) {
+        panels[i].classList.remove('active');
+      }
+      var target = document.getElementById('edition-' + editionKey);
+      if (target) {
+        target.classList.add('active');
+      }
+      var btns = document.querySelectorAll('.market-btn');
+      for (var j = 0; j < btns.length; j++) {
+        btns[j].classList.remove('active');
+        if (btns[j].getAttribute('onclick') === "selectEdition('" + editionKey + "')") {
+          btns[j].classList.add('active');
+        }
+      }
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', '?edition=' + encodeURIComponent(editionKey));
+      }
+    }
+
+    (function initFromQuery() {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var ed = params.get('edition');
+        if (ed && document.getElementById('edition-' + ed)) {
+          selectEdition(ed);
+        }
+      } catch (e) {}
+    })();
+  </script>
 </body>
 </html>

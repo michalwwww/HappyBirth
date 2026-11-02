@@ -827,22 +827,48 @@ function StrefaDashboardContent() {
           <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#7FB3CC] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-[#7FB3CC] uppercase tracking-wider">
-                PDF · 4 Karty Sytuacyjne
+                PDF · Order Bump (PL + Zagranica)
               </span>
-              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">Pakiet Kart dla Taty</h4>
+              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">Pakiet Kart dla Taty &amp; Polki za Granicą</h4>
               <p className="text-xs text-[#544A44] dark:text-[#D7CCC3]">
-                4 karty na salę porodową, punkty ucisku krzyżowego i lista 3 reklamówek.
+                4 karty na porodówkę, matryca B.R.A.I.N., protokół siary (37 tyg.) oraz dwujęzyczne słowniki skurczowe (UK/IE, DE/AT/CH, NL, USA, ES, BR).
               </p>
             </div>
-            <a
-              href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#7FB3CC] hover:underline"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Pobierz karty PDF (A4)</span>
-            </a>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <a
+                href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#7FB3CC] hover:underline"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Otwórz pakiet PDF (PL + 10 edycji)</span>
+              </a>
+              <a
+                href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-uk"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+              >
+                🇵🇱🇬🇧 UK/IE
+              </a>
+              <a
+                href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-de"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+              >
+                🇵🇱🇩🇪 DACH
+              </a>
+              <a
+                href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-nl"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+              >
+                🇵🇱🇳🇱 NL
+              </a>
+            </div>
           </div>
         </div>
       </section>

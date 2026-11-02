@@ -117,6 +117,130 @@ export function resolvePricingForCurrency(
   };
 }
 
+export interface OrderBumpEditionConfig {
+  editionKey: string;
+  targetMarket: string;
+  languageLabel: string;
+  currency: SupportedCurrency;
+  priceDisplay: string;
+  title: string;
+  description: string;
+  url: string;
+}
+
+export const ORDER_BUMP_GLOBAL_CATALOG: Record<string, OrderBumpEditionConfig> = {
+  pl: {
+    editionKey: 'pl',
+    targetMarket: 'Polska (Standard MZ 2026)',
+    languageLabel: 'Polski (PL)',
+    currency: 'pln',
+    priceDisplay: '49,00 zł',
+    title: 'Pakiet Kart Sytuacyjnych dla Taty + Matryca B.R.A.I.N., Siara (37 tyg.) i System 3 Reklamówek',
+    description:
+      '4 karty krok po kroku na salę porodową, ucisk krzyżowy, matryca decyzyjna B.R.A.I.N., protokół odciągania siary i zawieszka na drzwi.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl',
+  },
+  'pl-uk': {
+    editionKey: 'pl-uk',
+    targetMarket: 'Polki w Wielkiej Brytanii i Irlandii (NHS / HSE)',
+    languageLabel: 'Dwujęzyczny PL ↔ EN',
+    currency: 'gbp',
+    priceDisplay: '£15.00 / 17,00 €',
+    title: 'Dwujęzyczny Niezbędnik na Porodówkę NHS/HSE (PL↔EN): Słownik Skurczowy + Plan Porodu + MAT B1',
+    description:
+      'Słownik skurczowy PL↔EN z gotowymi zdaniami do położnej, dwujęzyczny Birth Plan, zasady TENS/Entonox oraz checklista MAT B1, Child Benefit i paszportu RP.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-uk',
+  },
+  'pl-de': {
+    editionKey: 'pl-de',
+    targetMarket: 'Polki w Niemczech, Austrii i Szwajcarii (Kreißsaal)',
+    languageLabel: 'Dwujęzyczny PL ↔ DE',
+    currency: 'eur',
+    priceDisplay: '17,00 €',
+    title: 'Dwujęzyczny Niezbędnik na Kreißsaal (PL↔DE): Słownik Porodowy, Dekoder Mutterpass i Elterngeld',
+    description:
+      'Słownik skurczowy PL↔DE, dekoder skrótów w Mutterpass (SL/BEL/MM), dwujęzyczny Geburtsplan oraz checklista Standesamt, Elterngeld i Kindergeld.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-de',
+  },
+  'pl-nl': {
+    editionKey: 'pl-nl',
+    targetMarket: 'Polki w Holandii (Verloskundige & Kraamzorg)',
+    languageLabel: 'Dwujęzyczny PL ↔ NL/EN',
+    currency: 'eur',
+    priceDisplay: '17,00 €',
+    title: 'Dwujęzyczny Niezbędnik Porodowy Holandia (PL↔NL): Słownik Verloskundige, Geboorteplan i Kraamzorg',
+    description:
+      'Słownik PL↔NL na telefon do położnej, różnice poród polikliniczny vs medische indicatie, lista Kraampakket i rejestracja w Gemeente (w 3 dni!).',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-nl',
+  },
+  'en-uk': {
+    editionKey: 'en-uk',
+    targetMarket: 'United Kingdom & Ireland (NHS & HSE)',
+    languageLabel: 'English (UK/IE)',
+    currency: 'gbp',
+    priceDisplay: '£15.00',
+    title: 'Birth Partner Labour Ward Flashcards, B.R.A.I.N. Advocacy & Colostrum Harvesting Toolkit',
+    description:
+      '4 pocket labour cards, sacral counter-pressure guide, B.R.A.I.N. shift-change matrix, 36w+ colostrum harvesting log & 3-cube NHS hospital bag checklist.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=en-uk',
+  },
+  'en-us': {
+    editionKey: 'en-us',
+    targetMarket: 'United States & Canada (L&D Hospital)',
+    languageLabel: 'English (US/CA)',
+    currency: 'usd',
+    priceDisplay: '$27.00',
+    title: 'L&D Partner Coaching Flashcards, B.R.A.I.N. Advocacy, Visual Birth Plan & Hospital Bill Shield',
+    description:
+      '5-1-1 triage rule, peanut ball & counter-pressure cards, B.R.A.I.N. informed consent guide, $0 ACA breast pump checklist & itemized hospital bill audit.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=en-us',
+  },
+  'en-au-ae': {
+    editionKey: 'en-au-ae',
+    targetMarket: 'Australia (Medicare) & UAE / Dubai Expats',
+    languageLabel: 'English (AU / UAE)',
+    currency: 'aud',
+    priceDisplay: '$29.00 AUD / 89 AED',
+    title: 'Partner Labour Ward Flashcards, Visual Birth Plan & Medicare / UAE 120-Day Expat Visa Checklist',
+    description:
+      'Partner labour action cards, colostrum syringe log, Australian Medicare FA081 guide & Dubai DHA Guarantee of Payment (GOP) + 120-day newborn visa tracker.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=en-au-ae',
+  },
+  de: {
+    editionKey: 'de',
+    targetMarket: 'DACH (Deutschland, Österreich, Schweiz)',
+    languageLabel: 'Deutsch (DE/AT/CH)',
+    currency: 'eur',
+    priceDisplay: '17,00 €',
+    title: 'Kreißsaal-Spickzettel für Partner, B.R.A.I.N.-Entscheidungshilfe, Kolostrum-Guide & Geburtsplan',
+    description:
+      '4 Praxiskarten für den Kreißsaal, Kreuzbein-Gegendruck, B.R.A.I.N.-Fragen beim Schichtwechsel, Kolostrum-Gewinnung ab 37+0 SSW & Kliniktaschen-Checkliste.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=de',
+  },
+  es: {
+    editionKey: 'es',
+    targetMarket: 'España, México & US Hispanic',
+    languageLabel: 'Español (ES/LATAM)',
+    currency: 'eur',
+    priceDisplay: '17,00 € / $19.00',
+    title: 'Tarjetas de Acción para el Acompañante en Paritorio, Método B.R.A.I.N. y Plan de Parto Visual',
+    description:
+      '4 tarjetas paso a paso para dilatación y expulsivo, contrapresión sacra, matriz B.R.A.I.N., extracción prenatal de calostro y trámites postparto.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=es',
+  },
+  'pt-br': {
+    editionKey: 'pt-br',
+    targetMarket: 'Brasil (Rede Privada & SUS)',
+    languageLabel: 'Português (PT-BR)',
+    currency: 'usd',
+    priceDisplay: 'R$ 47,00 / $15.00',
+    title: 'Cartões de Ação para o Acompanhante, Escudo Lei 11.108/2005, Plano de Parto e Mala em 6 Saquinhos',
+    description:
+      '4 cartões práticos de sala de parto, proteção legal Lei do Acompanhante (inclusive na cesárea), método B.R.A.I.N. e checklist dos 6 saquinhos da maternidade.',
+    url: '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pt-br',
+  },
+};
+
 export function is10PercentAffiliatePromo(code?: string | null): boolean {
   const res = validatePromoCode(code);
   return res.valid && res.discountPercent === 10;
