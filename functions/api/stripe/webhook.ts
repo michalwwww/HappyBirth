@@ -92,6 +92,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const customerName = String(session.customer_details?.name || 'Kursantka HappyBirth').trim();
     const amountTotal = Number(session.amount_total || 48900);
     const metadata = session.metadata || {};
+    const sessionCurrency = String(session.currency || metadata.currency || 'PLN').toUpperCase();
     const orderBumpIncluded = metadata.order_bump_included === 'true' ? 1 : 0;
     const promoCode = String(metadata.promo_code || '').toUpperCase();
     const refCookie = String(metadata.affiliate_ref_cookie || '');
@@ -142,7 +143,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           .bind(crypto.randomUUID(), userId, sessionId, orderBumpIncluded)
           .run();
 
-        // 4. Dowodowy rejestr zamówienia i tarczy prawnej Art. 38 ust. 1 pkt 13 ([E1])
+        // 4. Dowodowy rejestr zamówienia i tarczy prawnej Art. 38 ust. 1 pkt 13 ([E1] & [TECH-03])
         const orderId = crypto.randomUUID();
         await env.DB.prepare(
           `INSERT INTO orders (
@@ -150,7 +151,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
              amount_total, currency, order_bump_included, promo_code,
              waiver_art38_accepted, waiver_art38_timestamp, buyer_ip,
              waiver_checkbox_text, terms_sha256, durable_medium_sent_at, status
-           ) VALUES (?, ?, ?, ?, ?, ?, ?, 'PLN', ?, ?, 1, ?, ?, ?, ?, datetime('now'), 'paid')`
+           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, datetime('now'), 'paid')`
         )
           .bind(
             orderId,
@@ -160,6 +161,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             customerEmail,
             customerName,
             amountTotal,
+            sessionCurrency,
             orderBumpIncluded,
             promoCode || null,
             waiverTimestamp,

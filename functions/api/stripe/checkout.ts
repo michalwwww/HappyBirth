@@ -10,6 +10,20 @@ const CHECKBOX_2_ART38_WAIVER_TEXT =
 
 const TERMS_VERSION_SHA256 = 'a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447';
 
+type EdgeCurrency = 'pln' | 'gbp' | 'eur' | 'usd' | 'aud' | 'aed';
+
+const EDGE_PRICING_TABLE: Record<
+  EdgeCurrency,
+  { base: string; discounted10: string; bump: string; locale: string }
+> = {
+  pln: { base: '48900', discounted10: '44010', bump: '4900', locale: 'pl' },
+  gbp: { base: '11900', discounted10: '10710', bump: '1500', locale: 'en-GB' },
+  eur: { base: '13900', discounted10: '12510', bump: '1700', locale: 'en' },
+  usd: { base: '17900', discounted10: '16110', bump: '2700', locale: 'en' },
+  aud: { base: '21900', discounted10: '19710', bump: '2900', locale: 'en' },
+  aed: { base: '64900', discounted10: '58410', bump: '8900', locale: 'en' },
+};
+
 const OFFICIAL_PROMO_ALLOWLIST = new Set([
   'MAMAGAJA10',
   'MAMAGAJA',
@@ -92,6 +106,8 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       includeOrderBump = false,
       termsAccepted = true,
       waiverArt38Accepted = true,
+      currency = 'pln',
+      locale,
     } = body;
 
     // [E1] Walidacja zgód konsumenckich
@@ -138,17 +154,25 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       });
     }
 
-    const activeCourseAmount = has10Discount ? '44010' : '48900'; // 440,10 zł lub 489,00 zł brutto
+    const normCurrency = (String(currency || 'pln').trim().toLowerCase() as EdgeCurrency);
+    const activePricing = EDGE_PRICING_TABLE[normCurrency] || EDGE_PRICING_TABLE.pln;
+    const activeCurrency: EdgeCurrency = EDGE_PRICING_TABLE[normCurrency] ? normCurrency : 'pln';
+    const isPln = activeCurrency === 'pln';
+    const activeLocale = String(locale || activePricing.locale || 'pl');
+    const activeCourseAmount = has10Discount ? activePricing.discounted10 : activePricing.base; // Domyślnie PLN: 44010 lub 48900 (440,10 zł lub 489,00 zł brutto)
+    const activeBumpAmount = activePricing.bump; // Domyślnie PLN: 4900 (49,00 zł brutto)
+
     const buyerIp =
       request.headers.get('cf-connecting-ip') ||
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       '0.0.0.0';
+    const buyerCountry = (request.headers.get('cf-ipcountry') || 'PL').toUpperCase();
     const cookieRef = parseCookie(request.headers.get('cookie'), 'hb_aff_ref') || utm?.ref || '';
     const waiverTimestamp = new Date().toISOString();
 
     const params = new URLSearchParams();
     params.append('mode', 'payment');
-    params.append('locale', 'pl');
+    params.append('locale', activeLocale);
     params.append('allow_promotion_codes', has10Discount ? 'false' : 'true');
     params.append('invoice_creation[enabled]', 'true');
     params.append('tax_id_collection[enabled]', 'true');
@@ -159,38 +183,48 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('cancel_url', `${origin}/#cena`);
 
     const priceId = env.NEXT_PUBLIC_STRIPE_PRICE_ID;
-    if (priceId && !has10Discount) {
+    if (priceId && !has10Discount && isPln) {
       params.append('line_items[0][price]', priceId);
       params.append('line_items[0][quantity]', '1');
     } else {
-      params.append('line_items[0][price_data][currency]', 'pln');
+      params.append('line_items[0][price_data][currency]', activeCurrency);
       params.append('line_items[0][price_data][unit_amount]', activeCourseAmount);
       params.append(
         'line_items[0][price_data][product_data][name]',
-        has10Discount
-          ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${cleanPromo})`
-          : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)'
+        isPln
+          ? has10Discount
+            ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${cleanPromo})`
+            : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)'
+          : has10Discount
+            ? `HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons · -10%: ${cleanPromo})`
+            : 'HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons for Two)'
       );
       params.append(
         'line_items[0][price_data][product_data][description]',
-        'Dostęp na 18 miesięcy (548 dni) od momentu zakupu dla dwojga: 52 lekcje 4K w 8 modułach (288 min), Notatnik Rodzica PDF i checklisty.'
+        isPln
+          ? 'Dostęp na 18 miesięcy (548 dni) od momentu zakupu dla dwojga: 52 lekcje 4K w 8 modułach (288 min), Notatnik Rodzica PDF i checklisty.'
+          : '18-month (548 days) full access for both parents: 52 4K VOD lessons (288 min), Interactive Birth Plan, Contraction Timer & Partner Toolkit PDF.'
       );
       params.append('line_items[0][price_data][product_data][tax_code]', 'txcd_10000000');
       params.append('line_items[0][price_data][tax_behavior]', 'inclusive');
       params.append('line_items[0][quantity]', '1');
     }
 
-    // [B3] Pozycja 1: Jednoklikowy Order Bump (+49,00 zł brutto)
+    // [B3] Pozycja 1: Jednoklikowy Order Bump (+49,00 zł brutto / £15 / €17 / $27)
     if (includeOrderBump) {
-      params.append('line_items[1][price_data][currency]', 'pln');
-      params.append('line_items[1][price_data][unit_amount]', '4900');
+      params.append('line_items[1][price_data][currency]', activeCurrency);
+      params.append('line_items[1][price_data][unit_amount]', activeBumpAmount);
       params.append(
         'line_items[1][price_data][product_data][name]',
-        'Pakiet Dokumentów Szpitalnych i Kreator Planu Porodu PDF + Checklista Wyprawkowa'
+        isPln
+          ? 'Pakiet Dokumentów Szpitalnych i Kreator Planu Porodu PDF + Checklista Wyprawkowa'
+          : 'Partner Labour Ward Action Cards & Hospital Bag Master Checklist (PDF Bundle)'
       );
       params.append(
         'line_items[1][price_data][product_data][description]',
-        'Dodatek komplementarny (Order Bump): Rozszerzony pakiet dokumentów do szpitala, wzór planu porodu i lista zakupowa PDF.'
+        isPln
+          ? 'Dodatek komplementarny (Order Bump): Rozszerzony pakiet dokumentów do szpitala, wzór planu porodu i lista zakupowa PDF.'
+          : 'Complementary Add-On (Order Bump): 4 step-by-step labour room partner cards, acupressure guide & 3-bag hospital checklist PDF.'
       );
       params.append('line_items[1][price_data][product_data][tax_code]', 'txcd_10000000');
       params.append('line_items[1][price_data][tax_behavior]', 'inclusive');
@@ -203,6 +237,9 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('metadata[mcc]', '8299');
     params.append('metadata[access_duration_days]', '548');
     params.append('metadata[access_duration_months]', '18');
+    params.append('metadata[currency]', activeCurrency.toUpperCase());
+    params.append('metadata[locale]', activeLocale);
+    params.append('metadata[buyer_country]', buyerCountry);
     params.append('metadata[order_bump_included]', includeOrderBump ? 'true' : 'false');
     params.append('metadata[promo_code]', has10Discount ? cleanPromo : '');
     params.append('metadata[affiliate_ref_cookie]', String(cookieRef).slice(0, 80));

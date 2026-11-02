@@ -22,6 +22,101 @@ export const ORDER_BUMP_TITLE_PL =
 export const ORDER_BUMP_DESC_PL =
   '4 karty krok po kroku na salę porodową, punkty ucisku i lista 3 reklamówek do szpitala.';
 
+export type SupportedCurrency = 'pln' | 'gbp' | 'eur' | 'usd' | 'aud' | 'aed';
+
+export interface CurrencyPricingConfig {
+  currency: SupportedCurrency;
+  baseMinorUnits: number; // np. 48900 gr (489,00 PLN), 11900 p (£119.00 GBP), 13900 c (139,00 EUR), 17900 c ($179.00 USD)
+  discounted10MinorUnits: number; // cena po kodzie -10% (44010 gr / 10710 p / 12510 c / 16110 c)
+  orderBumpMinorUnits: number; // np. 4900 gr (49,00 PLN), 1500 p (£15.00 GBP), 1700 c (17,00 EUR), 2700 c ($27.00 USD)
+  stripeLocale: 'pl' | 'en-GB' | 'en' | 'de';
+  displayBase: string;
+  displayDiscounted: string;
+  displayOrderBump: string;
+  omnibusText: string;
+}
+
+export const GLOBAL_PRICING_CONFIG: Record<SupportedCurrency, CurrencyPricingConfig> = {
+  pln: {
+    currency: 'pln',
+    baseMinorUnits: BASE_COURSE_PRICE_GROSZE, // 48900 (489,00 zł brutto)
+    discounted10MinorUnits: 44010, // 440,10 zł brutto
+    orderBumpMinorUnits: ORDER_BUMP_PRICE_GROSZE, // 4900 (49,00 zł brutto)
+    stripeLocale: 'pl',
+    displayBase: '489,00 zł',
+    displayDiscounted: '440,10 zł',
+    displayOrderBump: '49,00 zł',
+    omnibusText: OMNIBUS_LOWEST_30_DAYS_TEXT,
+  },
+  gbp: {
+    currency: 'gbp',
+    baseMinorUnits: 11900, // £119.00 GBP
+    discounted10MinorUnits: 10710, // £107.10 GBP
+    orderBumpMinorUnits: 1500, // £15.00 GBP
+    stripeLocale: 'en-GB',
+    displayBase: '£119.00',
+    displayDiscounted: '£107.10',
+    displayOrderBump: '£15.00',
+    omnibusText: 'Lowest price in the 30 days prior to discount: £119.00',
+  },
+  eur: {
+    currency: 'eur',
+    baseMinorUnits: 13900, // 139,00 EUR
+    discounted10MinorUnits: 12510, // 125,10 EUR
+    orderBumpMinorUnits: 1700, // 17,00 EUR
+    stripeLocale: 'en',
+    displayBase: '139,00 €',
+    displayDiscounted: '125,10 €',
+    displayOrderBump: '17,00 €',
+    omnibusText: 'Lowest price in the 30 days prior to discount: 139,00 €',
+  },
+  usd: {
+    currency: 'usd',
+    baseMinorUnits: 17900, // $179.00 USD
+    discounted10MinorUnits: 16110, // $161.10 USD
+    orderBumpMinorUnits: 2700, // $27.00 USD
+    stripeLocale: 'en',
+    displayBase: '$179.00',
+    displayDiscounted: '$161.10',
+    displayOrderBump: '$27.00',
+    omnibusText: 'Regular price: $179.00 USD',
+  },
+  aud: {
+    currency: 'aud',
+    baseMinorUnits: 21900, // $219.00 AUD
+    discounted10MinorUnits: 19710, // $197.10 AUD
+    orderBumpMinorUnits: 2900, // $29.00 AUD
+    stripeLocale: 'en',
+    displayBase: '$219.00 AUD',
+    displayDiscounted: '$197.10 AUD',
+    displayOrderBump: '$29.00 AUD',
+    omnibusText: 'Regular price: $219.00 AUD',
+  },
+  aed: {
+    currency: 'aed',
+    baseMinorUnits: 64900, // 649.00 AED
+    discounted10MinorUnits: 58410, // 584.10 AED
+    orderBumpMinorUnits: 8900, // 89.00 AED
+    stripeLocale: 'en',
+    displayBase: '649.00 AED',
+    displayDiscounted: '584.10 AED',
+    displayOrderBump: '89.00 AED',
+    omnibusText: 'Regular price: 649.00 AED',
+  },
+};
+
+export function resolvePricingForCurrency(
+  rawCurrency?: string | null,
+  has10Discount: boolean = false
+): CurrencyPricingConfig & { activeCourseMinorUnits: number } {
+  const normalized = (rawCurrency || 'pln').toString().trim().toLowerCase() as SupportedCurrency;
+  const cfg = GLOBAL_PRICING_CONFIG[normalized] || GLOBAL_PRICING_CONFIG.pln;
+  return {
+    ...cfg,
+    activeCourseMinorUnits: has10Discount ? cfg.discounted10MinorUnits : cfg.baseMinorUnits,
+  };
+}
+
 export function is10PercentAffiliatePromo(code?: string | null): boolean {
   const res = validatePromoCode(code);
   return res.valid && res.discountPercent === 10;

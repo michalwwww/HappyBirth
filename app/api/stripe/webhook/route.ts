@@ -48,8 +48,11 @@ export async function POST(req: NextRequest) {
     const termsSha256 = session.metadata?.terms_sha256 || getTermsSha256Hash();
     const waiverCheckboxText = session.metadata?.waiver_checkbox_text || CHECKBOX_2_ART38_WAIVER_TEXT;
     const amountTotalGrosze = session.amount_total || 48900;
+    const sessionCurrency = (session.currency || session.metadata?.currency || 'PLN').toUpperCase();
 
-    console.log(`✅ [Stripe Webhook] Otrzymano płatność! Sesja: ${session.id}, Email: ${customerEmail}`);
+    console.log(
+      `✅ [Stripe Webhook] Otrzymano płatność! Sesja: ${session.id}, Email: ${customerEmail}, Kwota: ${amountTotalGrosze} ${sessionCurrency}`
+    );
 
     if (customerEmail) {
       try {
@@ -100,7 +103,7 @@ export async function POST(req: NextRequest) {
              amount_total, currency, order_bump_included, promo_code,
              waiver_art38_accepted, waiver_art38_timestamp, buyer_ip,
              waiver_checkbox_text, terms_sha256, durable_medium_sent_at, status
-           ) VALUES (?, ?, ?, ?, ?, ?, ?, 'PLN', ?, ?, 1, ?, ?, ?, ?, datetime('now'), 'paid')
+           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, datetime('now'), 'paid')
            ON CONFLICT(stripe_session_id) DO NOTHING`,
           [
             orderId,
@@ -110,6 +113,7 @@ export async function POST(req: NextRequest) {
             customerEmail,
             customerName,
             amountTotalGrosze,
+            sessionCurrency,
             orderBumpIncluded ? 1 : 0,
             promoCode || null,
             waiverTimestamp,
@@ -265,7 +269,7 @@ export async function POST(req: NextRequest) {
                     ...(fbclid ? { fbc: `fb.1.${eventTime}.${fbclid}` } : {}),
                   },
                   custom_data: {
-                    currency: 'PLN',
+                    currency: sessionCurrency,
                     value: amountTotalPln,
                     content_name: 'HappyBirth - Edukacyjny Kurs Online VOD (18 mies.)',
                     content_type: 'product',

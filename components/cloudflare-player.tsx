@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { CLOUDFLARE_CUSTOMER_DOMAIN } from '@/lib/course-data';
 import { useCourseProgress } from '@/lib/progress';
+import { useI18n } from '@/lib/i18n';
 import { BuyCourseButton } from '@/components/buy-button';
 import { is100PercentPromo, activateStudentAccessLocally, isCourseUnlockedLocally } from '@/lib/promo';
 
@@ -43,6 +44,7 @@ export function CloudflarePlayer({
   const searchParams = useSearchParams();
   const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
   const { role, changeRole } = useCourseProgress();
+  const { lang } = useI18n();
   const [hasServerAccess, setHasServerAccess] = useState(Boolean(lesson.isFreePreview));
   const [loadingAccess, setLoadingAccess] = useState(!lesson.isFreePreview);
   const [playerPromoInput, setPlayerPromoInput] = useState('');
@@ -147,6 +149,7 @@ export function CloudflarePlayer({
         lessonId: lesson.id,
         videoUid: lesson.cloudflareUid,
         isFreePreview: Boolean(lesson.isFreePreview),
+        lang,
       }),
     })
       .then((res) => res.json())
@@ -165,7 +168,7 @@ export function CloudflarePlayer({
         body: JSON.stringify({ action: 'access', lessonId: lesson.id }),
       }).catch(() => {});
     }
-  }, [isUnlocked, lesson.id, lesson.cloudflareUid, lesson.isFreePreview]);
+  }, [isUnlocked, lesson.id, lesson.cloudflareUid, lesson.isFreePreview, lang]);
 
   // Dołącz skrypt Cloudflare Stream SDK do nasłuchiwania zdarzeń odtwarzacza
   useEffect(() => {
@@ -296,6 +299,9 @@ export function CloudflarePlayer({
   }
   if (savedPositionSeconds > 5) {
     streamParams.set('startTime', `${savedPositionSeconds}s`);
+  }
+  if (lang && lang !== 'pl') {
+    streamParams.set('defaultTextTrack', lang);
   }
 
   const activeStreamUid = signedTokenOrUid || lesson.cloudflareUid;

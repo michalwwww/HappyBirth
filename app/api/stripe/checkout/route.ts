@@ -5,6 +5,7 @@ import {
   is100PercentPromo,
   BASE_COURSE_PRICE_GROSZE,
   ORDER_BUMP_PRICE_GROSZE,
+  resolvePricingForCurrency,
 } from '@/lib/promo';
 import {
   CHECKBOX_2_ART38_WAIVER_TEXT,
@@ -25,6 +26,8 @@ export async function POST(req: NextRequest) {
       includeOrderBump = false,
       termsAccepted = true,
       waiverArt38Accepted = true,
+      currency = 'pln',
+      locale,
     } = body;
 
     // [E1] Serwerowa walidacja zgód konsumenckich (Regulamin + Art. 38 ust. 1 pkt 13 u.p.k.)
@@ -72,13 +75,24 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const activeCourseAmountGrosze = promoResult.valid ? 44010 : BASE_COURSE_PRICE_GROSZE; // 440,10 zł lub 489,00 zł brutto
+    const pricing = resolvePricingForCurrency(currency, promoResult.valid);
+    const isPln = pricing.currency === 'pln';
+    const activeLocale = (locale || pricing.stripeLocale || 'pl').toString();
+    const activeCourseAmountGrosze = isPln
+      ? promoResult.valid
+        ? 44010
+        : BASE_COURSE_PRICE_GROSZE // 440,10 zł lub 489,00 zł brutto
+      : pricing.activeCourseMinorUnits;
+    const activeOrderBumpMinorUnits = isPln
+      ? ORDER_BUMP_PRICE_GROSZE // 49,00 zł brutto
+      : pricing.orderBumpMinorUnits;
 
-    // Pobierz adres IP kupującego oraz ciasteczko afiliacyjne hb_aff_ref ([D2] & [E1])
+    // Pobierz adres IP kupującego, kraj (Cloudflare IP Country) oraz ciasteczko afiliacyjne hb_aff_ref ([D2] & [E1] & [TECH-03])
     const buyerIp =
       req.headers.get('cf-connecting-ip') ||
       req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       '0.0.0.0';
+    const buyerCountry = (req.headers.get('cf-ipcountry') || 'PL').toUpperCase();
     const cookieRef = req.cookies.get(AFFILIATE_COOKIE_NAME)?.value || utm?.ref || '';
     const waiverTimestamp = new Date().toISOString();
     const termsSha256 = getTermsSha256Hash();
@@ -98,19 +112,24 @@ export async function POST(req: NextRequest) {
 
     const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID;
 
-    // 1. Pozycja główna: Kurs HappyBirth 489,00 zł brutto (lub 440,10 zł z kodem -10%), 18 miesięcy (548 dni) od zakupu
+    // 1. Pozycja główna: Kurs HappyBirth 489,00 zł brutto (lub 440,10 zł z kodem -10%), 18 miesięcy (548 dni) od zakupu (lub waluta międzynarodowa GBP/EUR/USD/AUD/AED)
     const mainCourseLineItem =
-      priceId && !promoResult.valid
+      priceId && !promoResult.valid && isPln
         ? { price: priceId, quantity: 1 }
         : {
             price_data: {
-              currency: 'pln',
+              currency: pricing.currency,
               product_data: {
-                name: promoResult.valid
-                  ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${promoResult.code})`
-                  : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)',
-                description:
-                  'Dostęp na 18 miesięcy (548 dni) od momentu zakupu dla dwojga: 52 lekcje 4K w 8 modułach (288 min), Notatnik Rodzica PDF i checklisty.',
+                name: isPln
+                  ? promoResult.valid
+                    ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${promoResult.code})`
+                    : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)'
+                  : promoResult.valid
+                    ? `HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons · -10%: ${promoResult.code})`
+                    : 'HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons for Two)',
+                description: isPln
+                  ? 'Dostęp na 18 miesięcy (548 dni) od momentu zakupu dla dwojga: 52 lekcje 4K w 8 modułach (288 min), Notatnik Rodzica PDF i checklisty.'
+                  : '18-month (548 days) full access for both parents: 52 4K VOD lessons (288 min), Interactive Birth Plan, Contraction Timer & Partner Toolkit PDF.',
                 tax_code: 'txcd_10000000',
               },
               unit_amount: activeCourseAmountGrosze,
@@ -121,18 +140,21 @@ export async function POST(req: NextRequest) {
 
     const lineItems: any[] = [mainCourseLineItem];
 
-    // 2. [B3] Jednoklikowy dodatek w koszyku (Order Bump +49,00 zł brutto)
+    // 2. [B3] Jednoklikowy dodatek w koszyku (Order Bump +49,00 zł brutto / £15 / €17 / $27)
     if (includeOrderBump) {
       lineItems.push({
         price_data: {
-          currency: 'pln',
+          currency: pricing.currency,
           product_data: {
-            name: 'Pakiet Dokumentów Szpitalnych i Kreator Planu Porodu PDF + Checklista Wyprawkowa',
-            description:
-              'Dodatek komplementarny (Order Bump): Rozszerzony pakiet dokumentów do szpitala, wzór planu porodu i lista zakupowa PDF.',
+            name: isPln
+              ? 'Pakiet Dokumentów Szpitalnych i Kreator Planu Porodu PDF + Checklista Wyprawkowa'
+              : 'Partner Labour Ward Action Cards & Hospital Bag Master Checklist (PDF Bundle)',
+            description: isPln
+              ? 'Dodatek komplementarny (Order Bump): Rozszerzony pakiet dokumentów do szpitala, wzór planu porodu i lista zakupowa PDF.'
+              : 'Complementary Add-On (Order Bump): 4 step-by-step labour room partner cards, acupressure guide & 3-bag hospital checklist PDF.',
             tax_code: 'txcd_10000000',
           },
-          unit_amount: ORDER_BUMP_PRICE_GROSZE, // 49,00 PLN brutto (zawiera 23% VAT)
+          unit_amount: activeOrderBumpMinorUnits,
           tax_behavior: 'inclusive' as const,
         },
         quantity: 1,
@@ -147,6 +169,9 @@ export async function POST(req: NextRequest) {
       mcc: '8299',
       access_duration_days: '548',
       access_duration_months: '18',
+      currency: pricing.currency.toUpperCase(),
+      locale: activeLocale,
+      buyer_country: buyerCountry,
       order_bump_included: includeOrderBump ? 'true' : 'false',
       promo_code: promoResult.valid ? promoResult.code : '',
       promo_source_type: promoResult.valid ? promoResult.sourceType : 'none',
@@ -176,7 +201,7 @@ export async function POST(req: NextRequest) {
       invoice_creation: { enabled: true },
       tax_id_collection: { enabled: true },
       metadata,
-      locale: 'pl',
+      locale: activeLocale,
       success_url: `${origin}/strefa?session_id={CHECKOUT_SESSION_ID}&payment=success`,
       cancel_url: `${origin}/#cena`,
     };
@@ -190,7 +215,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       url: session.url,
       sessionId: session.id,
-      amountGrossGrosze: activeCourseAmountGrosze + (includeOrderBump ? ORDER_BUMP_PRICE_GROSZE : 0),
+      currency: pricing.currency.toUpperCase(),
+      amountGrossGrosze: activeCourseAmountGrosze + (includeOrderBump ? activeOrderBumpMinorUnits : 0),
     });
   } catch (error: any) {
     console.error('Błąd podczas tworzenia sesji Stripe Checkout:', error);

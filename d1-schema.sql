@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS users (
     referral_code TEXT UNIQUE, -- Indywidualny kod polecający kursantki np. MAMA-XXXX ([C4])
     rodo_consent INTEGER DEFAULT 1,
     marketing_consent INTEGER DEFAULT 0,
+    locale TEXT DEFAULT 'pl', -- 'pl', 'en', 'en-GB', 'de', 'es', 'pt-BR' ([TECH-06] Global Expansion)
+    country_code TEXT DEFAULT 'PL', -- ISO 3166-1 alpha-2 np. 'PL', 'GB', 'IE', 'US', 'DE', 'AU', 'AE'
     role TEXT DEFAULT 'student', -- 'student', 'partner', 'admin', 'lead'
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -63,8 +65,10 @@ CREATE TABLE IF NOT EXISTS orders (
     user_id TEXT,
     customer_email TEXT NOT NULL,
     customer_name TEXT,
-    amount_total INTEGER NOT NULL DEFAULT 48900, -- w groszach (domyślnie 48900 = 489,00 zł brutto)
-    currency TEXT NOT NULL DEFAULT 'PLN',
+    amount_total INTEGER NOT NULL DEFAULT 48900, -- w groszach/centach (domyślnie 48900 = 489,00 zł brutto)
+    currency TEXT NOT NULL DEFAULT 'PLN', -- 'PLN', 'GBP', 'EUR', 'USD', 'AUD', 'AED' ([TECH-03])
+    country_code TEXT DEFAULT 'PL', -- Kraj rozliczenia VAT OSS / Tax Nexus ([TECH-06])
+    locale TEXT DEFAULT 'pl', -- Język interfejsu przy zakupie
     order_bump_included INTEGER NOT NULL DEFAULT 0, -- 1 jeśli dokupiono pakiet +49,00 zł
     order_bump_refunded INTEGER NOT NULL DEFAULT 0,
     promo_code TEXT,
