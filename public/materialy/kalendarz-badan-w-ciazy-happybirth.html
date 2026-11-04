@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalendarz Badań Laboratoryjnych i USG w Ciąży (Standard MZ) · HappyBirth.pl</title>
+  <style>
+    @page { size: A4; margin: 14mm; }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #1A1512;
+      background: #FBF8F4;
+      margin: 0;
+      padding: 24px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 840px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border: 1px solid #EAE3DB;
+      border-radius: 20px;
+      padding: 32px 36px;
+      box-shadow: 0 10px 30px rgba(37, 10, 36, 0.06);
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #DA0271;
+      padding-bottom: 14px;
+      margin-bottom: 20px;
+    }
+    .badge {
+      display: inline-block;
+      background: #FAE3EB;
+      color: #DA0271;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+    h1 { font-size: 24px; color: #250A24; margin: 6px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 12.5px;
+    }
+    th, td {
+      border: 1px solid #EAE3DB;
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #250A24;
+      color: #FFFFFF;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+    tr:nth-child(even) td { background: #FDFAF6; }
+    .check { width: 28px; text-align: center; font-weight: bold; color: #DA0271; }
+    .print-btn {
+      background: #DA0271;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .footer {
+      margin-top: 24px;
+      padding-top: 14px;
+      border-top: 1px solid #EAE3DB;
+      font-size: 11px;
+      color: #867A72;
+      text-align: center;
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .container { border: none; box-shadow: none; padding: 0; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <div>
+        <span class="badge">Materiał Edukacyjny · Moduł 2 HappyBirth.pl</span>
+        <h1>Kalendarz Badań w Ciąży (Standard Opieki Okołoporodowej)</h1>
+      </div>
+      <button class="print-btn no-print" onclick="window.print()">Drukuj / Zapisz PDF (A4)</button>
+    </div>
+
+    <p style="font-size: 13px; color: #544A44;">
+      Zestawienie zalecanych badań diagnostycznych i ultrasonograficznych (USG) zgodnie z polskim Standardem Organizacyjnym Opieki Okołoporodowej (Rozporządzenie Ministra Zdrowia, Dz.U. 2025 poz. 1525). Wydrukuj i włóż do Karty Ciąży.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th class="check">✓</th>
+          <th style="width: 150px;">Tydzień ciąży</th>
+          <th>Zalecane badania laboratoryjne, konsultacje i USG</th>
+          <th style="width: 130px;">Twoja data / Notatka</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="check">☐</td>
+          <td><strong>Do 10. tygodnia</strong><br/><span style="font-size:11px;color:#867A72;">Pierwsza wizyta</span></td>
+          <td>Grupa krwi i Rh, przeciwciała odpornościowe, morfologia krwi, badanie ogólne moczu, glukoza na czczo, TSH, VDRL (kiła), HIV, HCV, toksoplazmoza (IgG, IgM), różyczka (IgG, IgM), cytologia, pomiar ciśnienia tętniczego i masy ciała, ocena ryzyka depresji.</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="check">☐</td>
+          <td><strong>11.–14. tydzień</strong><br/><span style="font-size:11px;color:#867A72;">I USG genetyczne</span></td>
+          <td><strong>Obowiązkowe USG I trymestru (11+0 do 13+6 tyg.):</strong> ocena przezierności karkowej (NT), kości nosowej (NB), czynności serca płodu (FHR) oraz test podwójny (PAPP-A + wolna podjednostka beta-hCG).</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="check">☐</td>
+          <td><strong>15.–20. tydzień</strong></td>
+          <td>Morfologia krwi, badanie ogólne moczu, pomiar ciśnienia i masy ciała.</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="check">☐</td>
+          <td><strong>18.–22. tydzień</strong><br/><span style="font-size:11px;color:#867A72;">USG połówkowe</span></td>
+          <td><strong>Obowiązkowe USG II trymestru (tzw. połówkowe):</strong> szczegółowa ocena anatomii płodu (serce, mózgowie, kręgosłup, nerki, kończyny), lokalizacja łożyska i ilość płynu owodniowego.</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="check">☐</td>
+          <td><strong>24.–26. tydzień</strong><br/><span style="font-size:11px;color:#867A72;">Krzywa cukrowa</span></td>
+          <td><strong>Doustny test obciążenia glukozą (OGTT 75 g — 3-punktowy: na czczo, po 1h i po 2h)</strong>, badanie ogólne moczu, przeciwciała anty-D u kobiet Rh(-), powtórne badanie toksoplazmozy (jeśli w I trymestrze wynik był ujemny).</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="check">☐</td>
+          <td><strong>28.–32. tydzień</strong><br/><span style="font-size:11px;color:#867A72;">USG III trymestru</span></td>
+          <td><strong>Obowiązkowe USG III trymestru:</strong> ocena wzrastania płodu (biometria, szacowana masa płodu EFW), przepływy naczyniowe i położenie płodu. Morfologia krwi, mocz, kwalifikacja do podania immunoglobuliny anty-D (28.–30. tydz. u mam Rh-). Ocena ryzyka depresji okołoporodowej.</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="check">☐</td>
+          <td><strong>33.–37. tydzień</strong><br/><span style="font-size:11px;color:#867A72;">Wymaz GBS</span></td>
+          <td><strong>Posiew z przedsionka pochwy i okolic odbytu w kierunku paciorkowców B-hemolizujących (GBS — w 35.–37. tyg.)</strong>, morfologia krwi, badanie ogólne moczu, antygen HBs (WZW typu B), HIV, VDRL/HCV (wg wskazań). Przygotowanie Planu Porodu z położną.</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="check">☐</td>
+          <td><strong>38.–39. tydzień</strong></td>
+          <td>Badanie ogólne moczu, morfologia krwi, ocena dobrostanu płodu, weryfikacja położenia płodu i gotowości do porodu.</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="check">☐</td>
+          <td><strong>Po 40. tygodniu</strong><br/><span style="font-size:11px;color:#867A72;">W terminie porodu</span></td>
+          <td>Badanie KTG (kardiotokografia) oraz USG z oceną objętości płynu owodniowego (AFI/MVP).</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer">
+      Opracowano z dyplomowanymi położnymi ze szkoły rodzenia Mama Gaja · <strong>HappyBirth.pl</strong> · Wydawca: KLARSOLUTIONS Sp. z o.o. (KRS: 0001268396, NIP: 7812118273). Materiał ma charakter edukacyjny i nie zastępuje indywidualnych zaleceń lekarza prowadzącego ciążę.
+    </div>
+  </div>
+</body>
+</html>

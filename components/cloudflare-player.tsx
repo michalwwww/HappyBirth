@@ -9,13 +9,16 @@ import {
   ArrowLeft,
   ArrowRight,
   Lock,
+  Clock,
 } from 'lucide-react';
 import { Lesson } from '@/lib/types';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { CLOUDFLARE_CUSTOMER_DOMAIN } from '@/lib/course-data';
 import { useCourseProgress } from '@/lib/progress';
+import { useI18n } from '@/lib/i18n';
 import { BuyCourseButton } from '@/components/buy-button';
+import { is100PercentPromo, activateStudentAccessLocally, isCourseUnlockedLocally } from '@/lib/promo';
 
 interface CloudflarePlayerProps {
   lesson: Lesson;
@@ -23,6 +26,8 @@ interface CloudflarePlayerProps {
   onToggleComplete: () => void;
   prevLesson?: Lesson;
   nextLesson?: Lesson;
+  autoplay?: boolean;
+  onSelectLesson?: (lesson: Lesson) => void;
 }
 
 export function CloudflarePlayer({
@@ -31,23 +36,68 @@ export function CloudflarePlayer({
   onToggleComplete,
   prevLesson,
   nextLesson,
+  autoplay,
+  onSelectLesson,
 }: CloudflarePlayerProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
-  const { role } = useCourseProgress();
-  const [hasServerAccess, setHasServerAccess] = useState(false);
+  const { role, changeRole } = useCourseProgress();
+  const { lang } = useI18n();
+  const [hasServerAccess, setHasServerAccess] = useState(Boolean(lesson.isFreePreview));
   const [loadingAccess, setLoadingAccess] = useState(!lesson.isFreePreview);
+  const [playerPromoInput, setPlayerPromoInput] = useState('');
+  const [playerPromoError, setPlayerPromoError] = useState<string | null>(null);
+  const [showPlayerPromo, setShowPlayerPromo] = useState(false);
+
+  // [C2] Auto-Resume state & Signed Token
+  const [savedPositionSeconds, setSavedPositionSeconds] = useState<number>(0);
+  const [signedTokenOrUid, setSignedTokenOrUid] = useState<string>(lesson.cloudflareUid || '');
+  const lastSavedSecRef = useRef<number>(0);
+
+  const isUnlockedLocally =
+    typeof window !== 'undefined' &&
+    (localStorage.getItem('hb_unlocked') === 'true' ||
+      localStorage.getItem('hb_current_role') === 'student' ||
+      localStorage.getItem('hb_current_role') === 'partner' ||
+      isCourseUnlockedLocally());
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
 
   // Czy film ma wystartować automatycznie
-  const shouldAutoplay = searchParams?.get('autoplay') === 'true';
+  const shouldAutoplay = autoplay ?? (searchParams?.get('autoplay') === 'true');
+
+  // Wczytaj zapisaną sekundę odtwarzania z localStorage oraz serwera ([C2] Auto-Resume)
+  useEffect(() => {
+    setSignedTokenOrUid(lesson.cloudflareUid || '');
+    if (typeof window === 'undefined') return;
+    const localPos = parseInt(localStorage.getItem(`hb_pos_${lesson.id}`) || '0', 10);
+    if (localPos > 5) {
+      setSavedPositionSeconds(localPos);
+      lastSavedSecRef.current = localPos;
+    } else {
+      setSavedPositionSeconds(0);
+      lastSavedSecRef.current = 0;
+    }
+
+    fetch('/api/progress')
+      .then((r) => r.json())
+      .then((data) => {
+        const srvPos = data?.lessonPositions?.[lesson.id];
+        if (typeof srvPos === 'number' && srvPos > Math.max(5, localPos)) {
+          setSavedPositionSeconds(srvPos);
+          lastSavedSecRef.current = srvPos;
+          localStorage.setItem(`hb_pos_${lesson.id}`, String(srvPos));
+        }
+      })
+      .catch(() => {});
+  }, [lesson.id, lesson.cloudflareUid]);
 
   useEffect(() => {
-    if (lesson.isFreePreview || role === 'student' || role === 'partner') {
+    if (lesson.isFreePreview || role === 'student' || role === 'partner' || isUnlockedLocally) {
+      setHasServerAccess(true);
       setLoadingAccess(false);
       return;
     }
@@ -82,14 +132,43 @@ export function CloudflarePlayer({
       })
       .catch(() => {})
       .finally(() => setLoadingAccess(false));
-  }, [lesson.isFreePreview, role, searchParams]);
+  }, [lesson.isFreePreview, role, searchParams, isUnlockedLocally]);
 
-  // Lekcja odblokowana jeśli:
-  // 1. Jest to bezpłatna lekcja 1 (isFreePreview)
-  // 2. Użytkownik ma aktywny zakup na serwerze Cloudflare D1 (hasServerAccess)
-  // 3. Użytkownik ma rolę 'student' lub 'partner'
-  const isUnlocked =
-    lesson.isFreePreview || hasServerAccess || role === 'student' || role === 'partner';
+  const isUnlocked = Boolean(
+    lesson.isFreePreview || hasServerAccess || role === 'student' || role === 'partner' || isUnlockedLocally
+  );
+
+  // [C2] Pobierz 120-minutowy Signed Token URL oraz zarejestruj first_content_accessed_at ([E1])
+  useEffect(() => {
+    if (!isUnlocked || !lesson.cloudflareUid) return;
+
+    fetch('/api/stream/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lessonId: lesson.id,
+        videoUid: lesson.cloudflareUid,
+        isFreePreview: Boolean(lesson.isFreePreview),
+        lang,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.token) {
+          setSignedTokenOrUid(data.token);
+        }
+      })
+      .catch(() => {});
+
+    // Zapisz znacznik pierwszego dostępu do treści cyfrowej (Art. 38 ust. 1 pkt 13 u.p.k.)
+    if (!lesson.isFreePreview) {
+      fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'access', lessonId: lesson.id }),
+      }).catch(() => {});
+    }
+  }, [isUnlocked, lesson.id, lesson.cloudflareUid, lesson.isFreePreview, lang]);
 
   // Dołącz skrypt Cloudflare Stream SDK do nasłuchiwania zdarzeń odtwarzacza
   useEffect(() => {
@@ -104,14 +183,42 @@ export function CloudflarePlayer({
     }
   }, []);
 
-  // Nasłuchiwanie zakończenia filmu ('ended')
+  // Nasłuchiwanie zakończenia filmu ('ended') oraz Auto-Resume co 15 sekund ('timeupdate')
   useEffect(() => {
     if (!isUnlocked || !lesson.cloudflareUid) return;
 
     let player: any = null;
     let isCancelled = false;
 
+    const saveCurrentPosition = (sec: number) => {
+      const rounded = Math.floor(sec);
+      if (rounded <= 0) return;
+      if (Math.abs(rounded - lastSavedSecRef.current) < 15) return;
+      lastSavedSecRef.current = rounded;
+      try {
+        localStorage.setItem(`hb_pos_${lesson.id}`, String(rounded));
+      } catch {}
+      fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'position',
+          lessonId: lesson.id,
+          lastPositionSeconds: rounded,
+        }),
+      }).catch(() => {});
+    };
+
+    const handleTimeUpdate = () => {
+      if (player && typeof player.currentTime === 'number') {
+        saveCurrentPosition(player.currentTime);
+      }
+    };
+
     const handleVideoEnded = () => {
+      try {
+        localStorage.removeItem(`hb_pos_${lesson.id}`);
+      } catch {}
       if (!isCompleted) {
         onToggleComplete();
       }
@@ -127,6 +234,12 @@ export function CloudflarePlayer({
         try {
           player = streamGlobal(iframeRef.current);
           player.addEventListener('ended', handleVideoEnded);
+          player.addEventListener('timeupdate', handleTimeUpdate);
+          if (savedPositionSeconds > 5) {
+            try {
+              player.currentTime = savedPositionSeconds;
+            } catch {}
+          }
         } catch {
           // Błąd inicjalizacji ignorowany
         }
@@ -146,10 +259,11 @@ export function CloudflarePlayer({
       if (player && typeof player.removeEventListener === 'function') {
         try {
           player.removeEventListener('ended', handleVideoEnded);
+          player.removeEventListener('timeupdate', handleTimeUpdate);
         } catch {}
       }
     };
-  }, [lesson.id, lesson.cloudflareUid, isUnlocked, isCompleted, nextLesson, onToggleComplete]);
+  }, [lesson.id, lesson.cloudflareUid, isUnlocked, isCompleted, nextLesson, onToggleComplete, savedPositionSeconds]);
 
   // Odliczanie do automatycznego przejścia do kolejnej lekcji
   useEffect(() => {
@@ -157,7 +271,11 @@ export function CloudflarePlayer({
 
     if (autoNextCountdown <= 0) {
       if (nextLesson) {
-        router.push(`${prefix}/lekcja/${nextLesson.id}?autoplay=true`);
+        if (onSelectLesson) {
+          onSelectLesson(nextLesson);
+        } else {
+          router.push(`${prefix}/lekcja/${nextLesson.id}?autoplay=true`);
+        }
       }
       setAutoNextCountdown(null);
       return;
@@ -168,9 +286,9 @@ export function CloudflarePlayer({
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [autoNextCountdown, nextLesson, prefix, router]);
+  }, [autoNextCountdown, nextLesson, prefix, router, onSelectLesson]);
 
-  // Budowa URL do iframe Cloudflare Stream z uwzględnieniem autoplay
+  // Budowa URL do iframe Cloudflare Stream z uwzględnieniem autoplay i Auto-Resume (startTime)
   const streamParams = new URLSearchParams({
     poster: `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${lesson.cloudflareUid}/thumbnails/thumbnail.jpg`,
     preload: shouldAutoplay ? 'auto' : 'metadata',
@@ -179,8 +297,21 @@ export function CloudflarePlayer({
   if (shouldAutoplay) {
     streamParams.set('autoplay', 'true');
   }
+  if (savedPositionSeconds > 5) {
+    streamParams.set('startTime', `${savedPositionSeconds}s`);
+  }
+  if (lang && lang !== 'pl') {
+    streamParams.set('defaultTextTrack', lang);
+  }
 
-  const streamUrl = `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${lesson.cloudflareUid}/iframe?${streamParams.toString()}`;
+  const activeStreamUid = signedTokenOrUid || lesson.cloudflareUid;
+  const streamUrl = `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${activeStreamUid}/iframe?${streamParams.toString()}`;
+
+  const formatMmSs = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  };
 
   return (
     <div className="w-full bg-[#20071F] rounded-[18px] overflow-hidden shadow-2xl border border-[#461643] text-white">
@@ -197,8 +328,14 @@ export function CloudflarePlayer({
         </div>
 
         <div className="flex items-center space-x-3 text-[#EAD5E5]/70">
+          {savedPositionSeconds > 5 && (
+            <span className="inline-flex items-center gap-1 text-[#FCD705] font-semibold">
+              <Clock className="w-3.5 h-3.5" />
+              Auto-Resume: {formatMmSs(savedPositionSeconds)}
+            </span>
+          )}
           <span className="flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#EC008C]" /> Jakość Full HD · HappyBirth VOD
+            <ShieldCheck className="w-3.5 h-3.5 text-[#EC008C]" /> Jakość 4K · HappyBirth VOD
           </span>
           <span>·</span>
           <span>Czas trwania: {lesson.durationFormatted} min</span>
@@ -281,14 +418,14 @@ export function CloudflarePlayer({
                   Ta lekcja jest dostępna w pełnym pakiecie
                 </h3>
                 <p className="text-xs sm:text-sm text-[#EAD5E5]/80 max-w-md mx-auto leading-relaxed">
-                  Lekcja {lesson.lessonNumber}: <strong>„{lesson.title}”</strong> oraz pozostałe 51 filmów VOD, apteczka i plan porodu są dostępne po wykupieniu dostępu do Szkoły Rodzenia HappyBirth.
+                  Lekcja {lesson.lessonNumber}: <strong>„{lesson.title}”</strong> oraz pozostałe 51 filmów VOD, apteczka i plan porodu są dostępne przez 18 miesięcy (548 dni) od zakupu w Szkole Rodzenia HappyBirth.
                 </p>
               </div>
 
               {/* Przycisk zakupu przez Stripe */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <BuyCourseButton className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white font-bold text-sm transition-all shadow-xl shadow-[#EC008C]/30 hover:scale-105 flex items-center justify-center gap-2 cursor-pointer">
-                  <span>Kup dostęp · 349 zł (BLIK / Karta)</span>
+                  <span>Kup dostęp · 489,00 zł (BLIK / Karta)</span>
                   <ArrowRight className="w-4 h-4" />
                 </BuyCourseButton>
 
@@ -301,7 +438,7 @@ export function CloudflarePlayer({
               </div>
 
               {/* Link do darmowej lekcji 1 */}
-              <div className="pt-2">
+              <div className="pt-1">
                 <Link
                   href={`${prefix}/lekcja/lekcja-01`}
                   className="inline-flex items-center gap-1.5 text-xs text-[#FCD705] hover:underline font-medium"

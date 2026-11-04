@@ -1,0 +1,922 @@
+import { Language } from './i18n';
+
+export interface PillarItem {
+  num: string;
+  title: string;
+  subtitle: string;
+  desc: string;
+  accent: string;
+  bg: string;
+}
+
+export interface StageItem {
+  num: string;
+  name: string;
+  desc: string;
+  color: string;
+}
+
+export interface ComparisonPoint {
+  bold: string;
+  text: string;
+}
+
+export interface ComparisonContent {
+  tag: string;
+  title1: string;
+  titlePink: string;
+  desc: string;
+  traditionalBadge: string;
+  traditionalTitle: string;
+  traditionalSubtitle: string;
+  traditionalPoints: ComparisonPoint[];
+  traditionalFoot1: string;
+  traditionalFoot2: string;
+  happybirthBadge: string;
+  happybirthTitle: string;
+  happybirthSubtitle: string;
+  happybirthPoints: ComparisonPoint[];
+  priceLabel: string;
+  priceSub: string;
+  cta: string;
+}
+
+export interface TestimonialItem {
+  quote: string;
+  author: string;
+  role: string;
+  city: string;
+  avatar: string;
+  rating: number;
+}
+
+export interface FaqItem {
+  q: string;
+  a: string;
+}
+
+export interface MarketingContent {
+  nav: {
+    ribbonTitle: string;
+    ribbonDesc: string;
+    a11yBtn: string;
+    haveAccount: string;
+    enterZone: string;
+    brandSubtitle1: string;
+    brandSubtitle2: string;
+    links: {
+      pillars: string;
+      stages: string;
+      tools: string;
+      reviews: string;
+      price: string;
+      faq: string;
+    };
+    zoneBtn: string;
+    joinBtn: string;
+    partnerB2B: string;
+  };
+  hero: {
+    badge: string;
+    title1: string;
+    titlePink1: string;
+    titlePink2: string;
+    title2: string;
+    desc: string;
+    ctaBuy: string;
+    ctaPreview: string;
+    bullets: string[];
+    stats: {
+      lessons: string;
+      hours: string;
+      modules: string;
+      rating: string;
+    };
+  };
+  pillars: {
+    tag: string;
+    title: string;
+    desc: string;
+    items: PillarItem[];
+  };
+  stages: {
+    tag: string;
+    title: string;
+    desc: string;
+    items: StageItem[];
+  };
+  tools: {
+    tag: string;
+    title: string;
+    desc: string;
+    tipBadge: string;
+    tipTitle: string;
+    tipDesc: string;
+    card1Title: string;
+    card1Desc: string;
+    card2Title: string;
+    card2Desc: string;
+    card3Title: string;
+    card3Desc: string;
+  };
+  comparison: ComparisonContent;
+  testimonials: {
+    tag: string;
+    title: string;
+    items: TestimonialItem[];
+  };
+  pricing: {
+    badge: string;
+    title: string;
+    price: string;
+    unit: string;
+    features: string[];
+    cta: string;
+    statusBadge: string;
+    statusText: string;
+    guarantee: string;
+  };
+  faq: {
+    tag: string;
+    title: string;
+    items: FaqItem[];
+  };
+  footer: {
+    tagline: string;
+    familyCount: string;
+    navTitle: string;
+    legalNote: string;
+    rightsReserved: string;
+  };
+}
+
+export const marketingTranslations: Record<Language, MarketingContent> = {
+  pl: {
+    nav: {
+      ribbonTitle: 'Platforma Edukacyjna dla Rodziców:',
+      ribbonDesc: '52 lekcje e-learning VOD · Dostęp dla dwojga na 18 miesięcy (548 dni) od zakupu',
+      a11yBtn: 'Udogodnienia UE',
+      haveAccount: 'Masz już konto?',
+      enterZone: 'Wejdź do Strefy',
+      brandSubtitle1: 'Szkoła Rodzenia · Edukacja VOD',
+      brandSubtitle2: 'kurs online dla dwojga',
+      links: {
+        pillars: '4 Filary Spokoju',
+        stages: '8 Modułów',
+        tools: 'Patenty & Narzędzia',
+        reviews: 'Opinie rodziców',
+        price: 'Cena 489 zł',
+        faq: 'FAQ',
+      },
+      zoneBtn: 'Strefa Rodziców',
+      joinBtn: 'Dołącz · 489 zł',
+      partnerB2B: 'Strefa Partnera B2B (Afiliacja)',
+    },
+    hero: {
+      badge: 'Program Edukacyjny Online dla Rodziców · 52 Lekcje VOD',
+      title1: 'Szkoła rodzenia,',
+      titlePink1: 'która daje',
+      titlePink2: 'spokój',
+      title2: 'i pewność siebie',
+      desc: 'Wszystko, co musisz wiedzieć o narodzinach, skurczach, opiece nad noworodkiem i pierwszych tygodniach w domu. Bez medycznego żargonu, w tempie Twojej rodziny.',
+      ctaBuy: 'Rozpocznij przygotowania · 489 zł',
+      ctaPreview: 'Zobacz bezpłatny zwiastun',
+      bullets: [
+        'Dostęp na 18 miesięcy (548 dni) od zakupu dla dwojga',
+        '52 filmowe lekcje w jakości 4K (ok. 5h / 288 min)',
+        'Notatnik rodzica i ściągi PDF',
+      ],
+      stats: {
+        lessons: '52 lekcje wideo',
+        hours: 'ok. 5h (288 min) esencji',
+        modules: '8 modułów tematycznych',
+        rating: 'Ocena 4.9/5 od rodziców',
+      },
+    },
+    pillars: {
+      tag: 'Program Szkoleniowy',
+      title: '4 Filary Edukacji i Spokoju HappyBirth',
+      desc: 'Praktyczna wiedza, która przygotuje Was na każdy etap nowej drogi.',
+      items: [
+        {
+          num: '01',
+          title: 'Poród & Oddech',
+          subtitle: 'Współpraca z ciałem i naturalny rytm',
+          desc: 'Świadomy oddech, wygodne pozycje wertykalne i spokój. Uczymy, jak zaufać ciału i zachować pewność siebie krok po kroku.',
+          accent: '#EC008C',
+          bg: '#FAE3EB',
+        },
+        {
+          num: '02',
+          title: 'Ciało & Spokojny Ruch',
+          subtitle: 'Komfort, mobilność i czuły powrót do sił',
+          desc: 'Praktyczne ćwiczenia rozluźniające, masaż dla taty oraz bezpieczna domowa regeneracja dla świeżo upieczonej mamy.',
+          accent: '#98269C',
+          bg: '#EAD5E5',
+        },
+        {
+          num: '03',
+          title: 'Czułe Karmienie & Więź',
+          subtitle: 'Bliskość bez presji i bez oceniania',
+          desc: 'Wygodne pozycje i spokojny start – zarówno przy karmieniu piersią, jak i butelką. Bezpiecznie i z pełnym zrozumieniem.',
+          accent: '#0088BC',
+          bg: '#D0EBF3',
+        },
+        {
+          num: '04',
+          title: 'Maluszek w Domu',
+          subtitle: 'Pewność siebie o 3:00 w nocy',
+          desc: 'Kąpiel bez stresu, bezpieczny sen, noszenie i uspokajanie maluszka. Praktyczny spokój w pierwszych tygodniach w domu.',
+          accent: '#347A22',
+          bg: '#DFEED4',
+        },
+      ],
+    },
+    stages: {
+      tag: 'Sylabus kursu',
+      title: '9 Modułów Edukacyjnych Twojej Podróży',
+      desc: 'Od pierwszych tygodni ciąży, przez poród, aż po pierwszy rok życia maluszka.',
+      items: [
+        { num: '01', name: 'Zanim', desc: 'Świadome przygotowanie i spokój w głowie', color: '#8F8D8D' },
+        { num: '02', name: 'Dwie kreski', desc: 'I Trymestr – emocje, ciało i pierwsze chwile', color: '#54BF39' },
+        { num: '03', name: 'Wreszcie lepiej', desc: 'II Trymestr – nowa energia, ruch i siła', color: '#FCD705' },
+        { num: '04', name: 'Torba spakowana', desc: 'III Trymestr – sprytna wyprawka i organizacja', color: '#F57B14' },
+        { num: '05', name: 'Wielki Dzień', desc: 'Ciało w ruchu, oddech i spokój we dwoje', color: '#ED1C24' },
+        { num: '06', name: 'Plan B bez stresu', desc: 'Świadome narodziny w każdym scenariuszu', color: '#952999' },
+        { num: '07', name: 'Pierwsza noc w domu', desc: 'Czuły połóg i regeneracja sił mamy', color: '#EC008C' },
+        { num: '08', name: 'Karmienie z miłością', desc: 'Pierś i butelka bez presji i poczucia winy', color: '#00ADEF' },
+        { num: '09', name: 'Razem przez 1. rok', desc: 'Sen, rozwój maluszka i bezpieczeństwo', color: '#3B46A4' },
+      ],
+    },
+    tools: {
+      tag: 'Patenty & Narzędzia',
+      title: 'Praktyczne narzędzia i codzienne patenty',
+      desc: 'Wszystko, co ułatwia codzienność przyszłej mamy i daje konkretne zadania tacie.',
+      tipBadge: 'Patent Dnia HappyBirth',
+      tipTitle: 'Codzienna dawka wiedzy',
+      tipDesc: 'Krótki, sprawdzony trik od położnych i rodziców prosto z naszych 52 lekcji.',
+      card1Title: 'Cyfrowy Notatnik Rodzica (PDF)',
+      card1Desc: 'Gotowy arkusz do wpięcia w kartę ciąży: preferencje kangurowania, muzyki, oświetlenia i wsparcia partnera.',
+      card2Title: 'Apteczka SOS & Wyprawka',
+      card2Desc: 'Sprytna, bezstresowa lista tylko tego, co naprawdę potrzebne. Bez wydawania fortuny na zbędne gadżety.',
+      card3Title: 'Ściągi wideo dla Taty',
+      card3Desc: 'Krótkie 2-minutowe instrukcje: jak masować lędźwie, jak podtrzymać żonę pod prysznicem i co zrobić po powrocie ze szpitala.',
+    },
+    comparison: {
+      tag: 'Nowoczesne przygotowanie dla dwojga',
+      title1: 'Szkoła rodzenia, która',
+      titlePink: 'dopasowuje się do Was.',
+      desc: 'Porównaj tradycyjne kursy stacjonarne z podejściem HappyBirth. Zobacz, dlaczego ponad 18 000 par wybrało spokój we własnym salonie.',
+      traditionalBadge: 'Tradycyjna szkoła stacjonarna',
+      traditionalTitle: 'Sztywny grafik i pośpiech w korkach',
+      traditionalSubtitle: 'Często kosztuje 600–900 zł, a po narodzinach dziecka zostajecie sami bez dostępu do wiedzy.',
+      traditionalPoints: [
+        {
+          bold: 'Wtorki o 18:00 na drugim końcu miasta',
+          text: 'Dojazdy w korkach po pracy, pośpiech i zmęczenie w zaawansowanej ciąży. Gdy nie dotrzesz – lekcja bezpowrotnie przepada.',
+        },
+        {
+          bold: 'Partner jako bierny widz z tyłu sali',
+          text: 'Siedzi skrępowany na niewygodnym krześle. Brak czasu na indywidualne przećwiczenie technik masażu i realnych chwytów.',
+        },
+        {
+          bold: 'Koniec kursu tuż przed porodem',
+          text: 'Zajęcia kończą się przed narodzinami. Po powrocie ze szpitala o 3:00 w nocy przy pierwszych wyzwaniach zostajecie zdani na fora internetowe.',
+        },
+        {
+          bold: 'Notatki w zeszycie, które gubią się w torbie',
+          text: 'Stosy kartek i kserówek, których nikt nie czyta w trakcie akcji porodowej ani w szpitalnej sali.',
+        },
+        {
+          bold: 'Sztywne dogmaty i presja',
+          text: 'Narzucanie jednego idealnego scenariusza, który budzi poczucie winy, gdy poród lub laktacja potoczą się inaczej.',
+        },
+      ],
+      traditionalFoot1: 'Brak powrotu do materiałów',
+      traditionalFoot2: 'Ograniczony czas',
+      happybirthBadge: 'HappyBirth Online · Dla Dwojga',
+      happybirthTitle: 'Spokój, czułość i pełna wolność',
+      happybirthSubtitle: '52 filmowe lekcje 4K, do których wracacie przez 18 miesięcy (548 dni) od zakupu – na Smart TV i telefonie.',
+      happybirthPoints: [
+        {
+          bold: 'Ciepła herbata, kanapa i własny salon',
+          text: 'Oglądacie we dwoje o dowolnej porze na Smart TV lub smartfonie. Pauzujecie, wracacie i rozmawiacie we własnym rytmie, bez stresu i dojazdów.',
+        },
+        {
+          bold: 'Dedykowana Strefa dla Taty',
+          text: 'Praktyczne wideo-instrukcje dla partnera: masaż relaksacyjny, wsparcie mamy, gotowe zadania i pewność na porodówce.',
+        },
+        {
+          bold: 'Dostęp przez 18 miesięcy (548 dni) od zakupu',
+          text: 'Obejmuje cały okres ciąży, porodu, połogu oraz pierwszy rok życia maluszka. Włączacie lekcje o laktacji, kąpieli i śnie wtedy, gdy ich potrzebujecie.',
+        },
+        {
+          bold: 'Narzędzia nocne w telefonie i ściągi',
+          text: 'Cyfrowy Notatnik Rodzica PDF, wideo-patenty oraz ściągi na wyciągnięcie ręki o każdej porze.',
+        },
+        {
+          bold: 'Ciepło, zero dogmatów i akceptacja',
+          text: 'Wspieramy każdą drogę rodzicielstwa: poród naturalny i cesarskie cięcie, karmienie piersią i butelką – bez poczucia winy, z pełnym zrozumieniem.',
+        },
+      ],
+      priceLabel: 'Płatność jednorazowa za dwoje:',
+      priceSub: 'pełny pakiet na 18 miesięcy',
+      cta: 'Wybierz HappyBirth · 489 zł',
+    },
+    testimonials: {
+      tag: 'Głosy rodziców',
+      title: 'Historie mam i ojców, którzy zaufali HappyBirth',
+      items: [
+        {
+          quote: 'Oglądaliśmy lekcje wieczorami na telewizorze. Dzięki technikom oddechowym poród minął w pełnym spokoju, a mąż dokładnie wiedział, jak masować lędźwie.',
+          author: 'Karolina i Piotr',
+          role: 'Rodzice Leona',
+          city: 'Warszawa',
+          avatar: 'KP',
+          rating: 5,
+        },
+        {
+          quote: 'Najbardziej doceniam moduł o pierwszych dobach w domu. Kąpiel noworodka bez łez i lęku, pozycje do odbijania – te wideo uratowały nam noce.',
+          author: 'Marta i Tomasz',
+          role: 'Rodzice Zosi',
+          city: 'Gdańsk',
+          avatar: 'MT',
+          rating: 5,
+        },
+        {
+          quote: 'Strefa dla taty to majstersztyk. Żadnego lania wody, konkretne patenty: co spakować, jak rozmawiać w szpitalu, jak odciążyć żonę w połogu.',
+          author: 'Jakub',
+          role: 'Tata Tymona',
+          city: 'Wrocław',
+          avatar: 'JK',
+          rating: 5,
+        },
+      ],
+    },
+    pricing: {
+      badge: 'Jednorazowa opłata · Dostęp dla dwojga',
+      title: 'Dostęp do pełnego programu edukacyjnego VOD',
+      price: '489 zł',
+      unit: 'jednorazowo',
+      features: [
+        '52 filmowe lekcje w jakości 4K (ok. 5h / 288 min esencji)',
+        'Dostęp dla dwojga na 18 miesięcy (548 dni) od momentu zakupu',
+        'Dedykowana Strefa dla Taty i wideo-ściągi',
+        'Cyfrowy Notatnik Rodzica i szablony PDF do druku',
+        'Aplikacja mobilna i odtwarzacz na Smart TV',
+        'Certyfikat ukończenia programu edukacyjnego',
+      ],
+      cta: 'Dołącz do kursu · 489 zł',
+      statusBadge: 'Status: Usługa Edukacyjno-Szkoleniowa (E-learning VOD)',
+      statusText: 'Natychmiastowy dostęp po płatności (Art. 38 ust. 1 pkt 13 u.p.k.)',
+      guarantee: 'Bezpłatnie przetestuj Lekcję 1 przed zakupem. Dostęp do pełnego pakietu aktywowany jest natychmiast po opłaceniu.',
+    },
+    faq: {
+      tag: 'Często zadawane pytania',
+      title: 'Wszystko, co warto wiedzieć przed dołączeniem',
+      items: [
+        {
+          q: 'Na jak długo otrzymujemy dostęp do kursu?',
+          a: 'Dostęp jest aktywny przez 18 miesięcy (548 dni) od momentu zakupu. Oznacza to, że kurs służy Wam przez całą ciążę, poród, połóg oraz pierwszy rok życia maluszka — bez pytania o prywatną datę porodu.',
+        },
+        {
+          q: 'Czy partner może korzystać z kursu na osobnym urządzeniu?',
+          a: 'Tak! Jedno konto pozwala na jednoczesne logowanie na telefonie mamy, taty, komputerze oraz na telewizorze Smart TV bez żadnych dopłat.',
+        },
+        {
+          q: 'Kiedy jest najlepszy moment na rozpoczęcie nauki?',
+          a: 'Polecamy dołączenie między 20. a 28. tygodniem ciąży, ale materiały są pomocne zarówno na samym początku (I trymestr), jak i w ostatnich tygodniach przed porodem.',
+        },
+        {
+          q: 'Czy kurs zastępuje wizytę u lekarza lub położnej?',
+          a: 'HappyBirth to program edukacyjny i szkoleniowy przygotowujący do roli rodzica. Uzupełnia standardową opiekę medyczną o praktyczną wiedzę, spokój i techniki domowe.',
+        },
+        {
+          q: 'Jak wygląda płatność i czy otrzymam fakturę?',
+          a: 'Płatność jest jednorazowa przez bezpieczne systemy Stripe, BLIK lub kartę. Natychmiast po opłaceniu otrzymujesz dostęp do platformy oraz automatyczną fakturę.',
+        },
+      ],
+    },
+    footer: {
+      tagline: 'Czuła szkoła rodzenia online dla naszych mam i ojców. 52 filmowe lekcje wideo, sprawdzone patenty i wsparcie przez cały pierwszy rok życia dziecka.',
+      familyCount: 'Ponad 18 000 przygotowanych rodzin',
+      navTitle: 'Odkryj HappyBirth',
+      legalNote: 'HappyBirth jest internetową platformą edukacyjną świadczącą usługi szkoleniowe w formule kursu wideo VOD. Wszystkie materiały mają wyłącznie charakter edukacyjny i przygotowawczy do roli rodzica. Usługa nie stanowi i nie zastępuje indywidualnych świadczeń zdrowotnych, diagnostyki ani porady lekarskiej.',
+      rightsReserved: 'Wszelkie prawa zastrzeżone.',
+    },
+  },
+
+  en: {
+    nav: {
+      ribbonTitle: 'Parent Educational Platform:',
+      ribbonDesc: '52 e-learning VOD lessons · 18 months (548 days) access from purchase for two',
+      a11yBtn: 'EU Accessibility',
+      haveAccount: 'Already have an account?',
+      enterZone: 'Enter Zone',
+      brandSubtitle1: 'Birthing School · VOD Education',
+      brandSubtitle2: 'online course for two',
+      links: {
+        pillars: '4 Pillars of Calm',
+        stages: '9 Stages',
+        tools: 'Tips & Tools',
+        reviews: "Parents' Reviews",
+        price: 'Price 489 PLN',
+        faq: 'FAQ',
+      },
+      zoneBtn: 'Parent Zone',
+      joinBtn: 'Enroll · 489 PLN',
+      partnerB2B: 'B2B Partner Zone (Affiliation)',
+    },
+    hero: {
+      badge: 'Online Educational Program for Parents · 52 VOD Lessons',
+      title1: 'Birthing school,',
+      titlePink1: 'that brings',
+      titlePink2: 'calm',
+      title2: 'and true confidence',
+      desc: 'Everything you need to know about birth, contractions, newborn care, and the first weeks at home. No clinical jargon, at your family’s own pace.',
+      ctaBuy: 'Start Preparing · 489 PLN',
+      ctaPreview: 'Watch Free Preview',
+      bullets: [
+        '18 months (548 days) access from purchase for two',
+        '52 cinema-grade 4K lessons',
+        'Parent notebook & PDF cheatsheets',
+      ],
+      stats: {
+        lessons: '52 video lessons',
+        hours: '15+ hours of insights',
+        modules: '9 thematic modules',
+        rating: '4.9/5 rating by parents',
+      },
+    },
+    pillars: {
+      tag: 'Curriculum',
+      title: '4 Pillars of HappyBirth Education & Calm',
+      desc: 'Practical knowledge preparing you for every step of your new journey.',
+      items: [
+        {
+          num: '01',
+          title: 'Birth & Breathing',
+          subtitle: 'Body harmony and natural flow',
+          desc: 'Mindful breathing, upright positions, and deep calm. Learn to trust your body and stay confident step by step.',
+          accent: '#EC008C',
+          bg: '#FAE3EB',
+        },
+        {
+          num: '02',
+          title: 'Body & Gentle Motion',
+          subtitle: 'Comfort, mobility, and tender recovery',
+          desc: 'Practical release exercises, partner massage techniques, and safe postpartum recovery at home.',
+          accent: '#98269C',
+          bg: '#EAD5E5',
+        },
+        {
+          num: '03',
+          title: 'Loving Feeding & Bonding',
+          subtitle: 'Closeness with zero guilt or pressure',
+          desc: 'Comfortable latches and calm beginnings – whether breastfeeding or bottle feeding. Safe and compassionate.',
+          accent: '#0088BC',
+          bg: '#D0EBF3',
+        },
+        {
+          num: '04',
+          title: 'Baby at Home',
+          subtitle: 'Confidence at 3:00 AM',
+          desc: 'Tear-free bath times, safe sleep, soothing, and babywearing. Practical serenity in the early weeks at home.',
+          accent: '#347A22',
+          bg: '#DFEED4',
+        },
+      ],
+    },
+    stages: {
+      tag: 'Course Syllabus',
+      title: '9 Educational Modules of Your Journey',
+      desc: 'From early pregnancy, through birth, to your baby’s entire first year.',
+      items: [
+        { num: '01', name: 'Before', desc: 'Mindful preparation and mental serenity', color: '#8F8D8D' },
+        { num: '02', name: 'Two Lines', desc: '1st Trimester – emotions, body, and first steps', color: '#54BF39' },
+        { num: '03', name: 'Feeling Better', desc: '2nd Trimester – renewed energy, mobility & strength', color: '#FCD705' },
+        { num: '04', name: 'Hospital Bag', desc: '3rd Trimester – smart layette & organization', color: '#F57B14' },
+        { num: '05', name: 'The Big Day', desc: 'Body in motion, steady breath & partner calm', color: '#ED1C24' },
+        { num: '06', name: 'Plan B Without Stress', desc: 'Empowered birth in every scenario', color: '#952999' },
+        { num: '07', name: 'First Night Home', desc: 'Tender postpartum recovery for mom', color: '#EC008C' },
+        { num: '08', name: 'Feeding with Love', desc: 'Breast & bottle without pressure or guilt', color: '#00ADEF' },
+        { num: '09', name: 'Together Year One', desc: 'Sleep, baby milestones, and family safety', color: '#3B46A4' },
+      ],
+    },
+    tools: {
+      tag: 'Tips & Tools',
+      title: 'Practical tools and daily pro-tips',
+      desc: 'Everything making daily life smoother for mom and giving clear, empowering tasks to dad.',
+      tipBadge: 'HappyBirth Daily Pro-Tip',
+      tipTitle: 'Daily bite of wisdom',
+      tipDesc: 'A short, proven tip from midwives and experienced parents straight from our 52 lessons.',
+      card1Title: 'Digital Parent Notebook (PDF)',
+      card1Desc: 'Printable chart to insert into your pregnancy folder: preferences for skin-to-skin, music, dim lighting, and partner roles.',
+      card2Title: 'SOS Cabinet & Layette Checklist',
+      card2Desc: 'Smart, stress-free essentials checklist. Zero fortune spent on unnecessary baby gadgets.',
+      card3Title: 'Video Cheatsheets for Dad',
+      card3Desc: 'Concise 2-minute guides: lower back sacrum massage, supporting in the shower, and home transition support.',
+    },
+    comparison: {
+      tag: 'Modern Preparation for Two',
+      title1: 'A birthing school that',
+      titlePink: 'adapts to your life.',
+      desc: 'Compare traditional classes with HappyBirth. See why over 18,000 couples chose serenity in their own living room.',
+      traditionalBadge: 'Traditional In-Person Class',
+      traditionalTitle: 'Rigid schedule and rushed commutes',
+      traditionalSubtitle: 'Often costs 600–900 PLN, and once baby is born, you are left completely on your own.',
+      traditionalPoints: [
+        {
+          bold: 'Tuesday evenings across town',
+          text: 'Commuting in rush-hour traffic after work while heavily pregnant. Miss a session and it’s lost forever.',
+        },
+        {
+          bold: 'Partner as a passive spectator',
+          text: 'Sitting awkwardly on an uncomfortable chair. Zero time for hands-on partner massage practice.',
+        },
+        {
+          bold: 'Class ends before labor',
+          text: 'Lessons stop before baby arrives. When you are home at 3:00 AM facing new challenges, you are left to Google forums.',
+        },
+        {
+          bold: 'Paper notes lost in bags',
+          text: 'Piles of photocopies that nobody ever reads during active labor or in the hospital.',
+        },
+        {
+          bold: 'Rigid dogmas and pressure',
+          text: 'Enforcing a single "ideal" birth path that fuels guilt when labor or feeding goes differently.',
+        },
+      ],
+      traditionalFoot1: 'No return to materials',
+      traditionalFoot2: 'Limited time',
+      happybirthBadge: 'HappyBirth Online · For Two',
+      happybirthTitle: 'Serenity, tenderness & complete freedom',
+      happybirthSubtitle: '52 cinema-grade 4K lessons you can rewatch for 18 months (548 days) from purchase – on Smart TV and smartphone.',
+      happybirthPoints: [
+        {
+          bold: 'Hot tea, your sofa, your living room',
+          text: 'Watch together whenever you want on Smart TV or smartphone. Pause, replay, and discuss at your own pace.',
+        },
+        {
+          bold: 'Dedicated Dad Zone',
+          text: 'Actionable video guides for partner: soothing massage techniques, shower support, and birth room confidence.',
+        },
+        {
+          bold: '18 months (548 days) access from purchase',
+          text: 'Most questions arise after coming home. Rewatch feeding, bath, sleep, and first-aid lessons when you actually need them.',
+        },
+        {
+          bold: 'Nighttime tools & mobile cheatsheets',
+          text: 'Digital Parent Notebook PDF, quick video hacks, and actionable guides at your fingertips.',
+        },
+        {
+          bold: 'Warmth, zero dogmas, total acceptance',
+          text: 'We embrace every birth and parenting journey: natural birth and C-section, breastfeeding and bottle – zero guilt.',
+        },
+      ],
+      priceLabel: 'One-time payment for two:',
+      priceSub: 'full 1-year package',
+      cta: 'Choose HappyBirth · 489 PLN',
+    },
+    testimonials: {
+      tag: "Parents' Voices",
+      title: 'Real stories of families who trusted HappyBirth',
+      items: [
+        {
+          quote: 'We watched the lessons together on our TV in the evenings. The breathing techniques kept labor calm, and my husband knew exactly how to relieve lower back pain.',
+          author: 'Caroline & Peter',
+          role: 'Parents of Leo',
+          city: 'Warsaw',
+          avatar: 'CP',
+          rating: 5,
+        },
+        {
+          quote: 'The early home postpartum module was priceless. Bathing newborn without tears or fear, burping holds – these videos literally saved our nights.',
+          author: 'Martha & Thomas',
+          role: 'Parents of Sophie',
+          city: 'Gdansk',
+          avatar: 'MT',
+          rating: 5,
+        },
+        {
+          quote: 'The Dad Zone is a masterpiece. No fluff, straight to the point: what to pack, how to communicate with hospital staff, and supporting recovery.',
+          author: 'James',
+          role: 'Father to Tim',
+          city: 'Wroclaw',
+          avatar: 'JM',
+          rating: 5,
+        },
+      ],
+    },
+    pricing: {
+      badge: 'One-time fee · Access for two',
+      title: 'Full Access to VOD Educational Program',
+      price: '489 PLN',
+      unit: 'one-time payment',
+      features: [
+        '52 cinema-grade 4K lessons (over 15 hours of video content)',
+        'Access for two for 18 months (548 days) from purchase',
+        'Dedicated Dad Zone & fast video cheatsheets',
+        'Digital Parent Notebook and printable PDF templates',
+        'Mobile web application and Smart TV player support',
+        'Official Certificate of educational program completion',
+      ],
+      cta: 'Enroll Now · 489 PLN',
+      statusBadge: 'Status: Educational Training Service (E-learning VOD)',
+      statusText: '14-day hassle-free money-back guarantee',
+      guarantee: '14-day satisfaction guarantee. If the course doesn’t meet your expectations, we refund 100% with no questions asked.',
+    },
+    faq: {
+      tag: 'Frequently Asked Questions',
+      title: 'Everything you should know before joining',
+      items: [
+        {
+          q: 'How long does our access last?',
+          a: 'Your access remains active for 18 months (548 days) from purchase. It supports you throughout pregnancy, birth, postpartum, and your baby’s entire first year.',
+        },
+        {
+          q: 'Can both partners log in on separate devices?',
+          a: 'Yes! A single subscription lets both parents log in concurrently on phones, tablets, laptops, and Smart TVs without extra charge.',
+        },
+        {
+          q: 'When is the ideal time to start the course?',
+          a: 'We recommend joining between weeks 20 and 28 of pregnancy, but the materials provide immense value from week 6 up to the final days before birth.',
+        },
+        {
+          q: 'Does this replace medical consultations?',
+          a: 'HappyBirth is an educational e-learning program preparing you for parenthood. It complements healthcare with practical skills and domestic calm.',
+        },
+        {
+          q: 'How does payment work and do I get an invoice?',
+          a: 'Payment is one-time via secure Stripe, Apple Pay, Google Pay, or card. You get immediate access to all modules and an automatic invoice.',
+        },
+      ],
+    },
+    footer: {
+      tagline: 'Loving online birthing school for moms and dads. 52 video lessons, proven tips, and support through baby’s entire first year.',
+      familyCount: 'Over 18,000 prepared families',
+      navTitle: 'Discover HappyBirth',
+      legalNote: 'HappyBirth is an online educational platform offering training courses in VOD video format. All materials are purely educational and preparatory for parenthood. The service does not constitute or replace individual medical care, diagnosis, or physician advice.',
+      rightsReserved: 'All rights reserved.',
+    },
+  },
+
+  ru: {
+    nav: {
+      ribbonTitle: 'Образовательная Платформа для Родителей:',
+      ribbonDesc: '52 видеоурока VOD · Доступ для двоих на 18 месяцев (548 дней)',
+      a11yBtn: 'Доступность ЕС',
+      haveAccount: 'Уже есть аккаунт?',
+      enterZone: 'Войти в Зону',
+      brandSubtitle1: 'Школа Родов · VOD Обучение',
+      brandSubtitle2: 'онлайн курс для двоих',
+      links: {
+        pillars: '4 Столпа Спокойствия',
+        stages: '9 Этапов',
+        tools: 'Лайфхаки и Инструменты',
+        reviews: 'Отзывы родителей',
+        price: 'Цена 489 zł',
+        faq: 'Частые вопросы',
+      },
+      zoneBtn: 'Зона Родителей',
+      joinBtn: 'Купить курс · 489 zł',
+      partnerB2B: 'Партнёрская Зона B2B (Аффилиация)',
+    },
+    hero: {
+      badge: 'Образовательная Онлайн-Программа для Родителей · 52 Видеоурока VOD',
+      title1: 'Школа родов,',
+      titlePink1: 'которая дарит',
+      titlePink2: 'спокойствие',
+      title2: 'и уверенность в себе',
+      desc: 'Всё, что вам нужно знать о родах, схватках, уходе за новорожденным и первых неделях дома. Без медицинского жаргона, в ритме вашей семьи.',
+      ctaBuy: 'Начать подготовку · 489 zł',
+      ctaPreview: 'Смотреть демо-урок',
+      bullets: [
+        'Доступ на 18 месяцев (548 дней) с момента покупки для двоих',
+        '52 кинематографичных урока 4K',
+        'Блокнот родителя и шпаргалки PDF',
+      ],
+      stats: {
+        lessons: '52 видеоурока',
+        hours: '15+ часов знаний',
+        modules: '9 тематических модулей',
+        rating: 'Оценка 4.9/5 от родителей',
+      },
+    },
+    pillars: {
+      tag: 'Учебный План',
+      title: '4 Столпа Обучения и Спокойствия HappyBirth',
+      desc: 'Практические знания, которые подготовят вас к каждому этапу нового пути.',
+      items: [
+        {
+          num: '01',
+          title: 'Роды и Дыхание',
+          subtitle: 'Сотрудничество с телом и естественный ритм',
+          desc: 'Осознанное дыхание, удобные вертикальные позы и спокойствие. Учимся доверять телу и сохранять уверенность шаг за шагом.',
+          accent: '#EC008C',
+          bg: '#FAE3EB',
+        },
+        {
+          num: '02',
+          title: 'Тело и Мягкое Движение',
+          subtitle: 'Комфорт, мобильность и бережное восстановление',
+          desc: 'Практические упражнения на расслабление, массаж от партнера и безопасная домашняя регенерация для мамы.',
+          accent: '#98269C',
+          bg: '#EAD5E5',
+        },
+        {
+          num: '03',
+          title: 'Заботливое Кормление и Связь',
+          subtitle: 'Близость без давления и чувства вины',
+          desc: 'Удобное прикладывание и спокойный старт – как при грудном вскармливании, так и при бутылочном. Безопасно и с пониманием.',
+          accent: '#0088BC',
+          bg: '#D0EBF3',
+        },
+        {
+          num: '04',
+          title: 'Малыш Дома',
+          subtitle: 'Уверенность в 3 часа ночи',
+          desc: 'Купание без слез, безопасный сон, ношение и успокоение малыша. Практическое спокойствие в первые недели дома.',
+          accent: '#347A22',
+          bg: '#DFEED4',
+        },
+      ],
+    },
+    stages: {
+      tag: 'Программа курса',
+      title: '9 Образовательных Модулей Вашего Пути',
+      desc: 'От первых недель беременности, через роды, до первого года жизни малыша.',
+      items: [
+        { num: '01', name: 'До начала', desc: 'Осознанная подготовка и спокойствие в мыслях', color: '#8F8D8D' },
+        { num: '02', name: 'Две полоски', desc: 'I Триместр – эмоции, тело и первые ощущения', color: '#54BF39' },
+        { num: '03', name: 'Наконец лучше', desc: 'II Триместр – новая энергия, движение и силы', color: '#FCD705' },
+        { num: '04', name: 'Сумка собрана', desc: 'III Триместр – умное приданое и сборы', color: '#F57B14' },
+        { num: '05', name: 'Главный День', desc: 'Тело в движении, дыхание и спокойствие вдвоем', color: '#ED1C24' },
+        { num: '06', name: 'План Б без паники', desc: 'Осознанное рождение в любом сценарии', color: '#952999' },
+        { num: '07', name: 'Первая ночь дома', desc: 'Бережный послеродовой период и отдых мамы', color: '#EC008C' },
+        { num: '08', name: 'Кормление с любовью', desc: 'Грудь и бутылочка без давления и вины', color: '#00ADEF' },
+        { num: '09', name: 'Вместе 1-й год', desc: 'Сон, развитие малыша и безопасность', color: '#3B46A4' },
+      ],
+    },
+    tools: {
+      tag: 'Лайфхаки и Инструменты',
+      title: 'Практические инструменты и ежедневные лайфхаки',
+      desc: 'Всё, что облегчает будни мамы и дает четкие, понятные задачи папе.',
+      tipBadge: 'Лайфхак Дня HappyBirth',
+      tipTitle: 'Ежедневная порция мудрости',
+      tipDesc: 'Короткий проверенный совет от акушерок и опытных родителей из наших 52 уроков.',
+      card1Title: 'Цифровой Блокнот Родителя (PDF)',
+      card1Desc: 'Готовый бланк для обменной карты: пожелания по контакту кожа-к-коже, музыке, свету и помощи партнера.',
+      card2Title: 'Аптечка SOS и Списки в роддом',
+      card2Desc: 'Умный список только самого необходимого. Без лишних трат на бесполезные гаджеты.',
+      card3Title: 'Видеошпаргалки для Папы',
+      card3Desc: 'Короткие 2-минутные инструкции: массаж крестца, поддержка в душе и первые шаги дома.',
+    },
+    comparison: {
+      tag: 'Современная подготовка для двоих',
+      title1: 'Школа родов, которая',
+      titlePink: 'подстраивается под вас.',
+      desc: 'Сравните традиционные очные курсы с подходом HappyBirth. Узнайте, почему более 18 000 пар выбрали спокойствие в собственной гостиной.',
+      traditionalBadge: 'Традиционная очная школа',
+      traditionalTitle: 'Жесткий график и пробки после работы',
+      traditionalSubtitle: 'Часто стоит 600–900 zł, а после родов вы остаетесь один на один с вопросами.',
+      traditionalPoints: [
+        {
+          bold: 'Вторник в 18:00 на другом конце города',
+          text: 'Поездки по пробкам после работы на поздних сроках беременности. Пропустили занятие – оно сгорело.',
+        },
+        {
+          bold: 'Партнер – пассивный зритель',
+          text: 'Неловко сидит сзади на стуле. Нет времени индивидуально отработать техники обезболивающего массажа.',
+        },
+        {
+          bold: 'Курс заканчивается до родов',
+          text: 'Занятия заканчиваются до появления малыша. Вернувшись домой в 3 часа ночи, вы ищете ответы на форумах.',
+        },
+        {
+          bold: 'Записи в блокноте, которые теряются',
+          text: 'Стопки бумажных конспектов, которые никто не читает в родзале.',
+        },
+        {
+          bold: 'Жесткие догмы и давление',
+          text: 'Навязывание единственного идеального сценария, вызывающее чувство вины при отклонениях.',
+        },
+      ],
+      traditionalFoot1: 'Нет доступа к материалам',
+      traditionalFoot2: 'Ограниченное время',
+      happybirthBadge: 'HappyBirth Online · Для двоих',
+      happybirthTitle: 'Спокойствие, забота и полная свобода',
+      happybirthSubtitle: '52 фильма 4K, к которым вы возвращаетесь в течение 18 месяцев (548 дней) с момента покупки – на Smart TV и телефоне.',
+      happybirthPoints: [
+        {
+          bold: 'Теплый чай, диван и своя гостиная',
+          text: 'Смотрите вдвоем в удобное время на Smart TV или смартфоне. Ставьте на паузу, повторяйте и обсуждайте в своем ритме.',
+        },
+        {
+          bold: 'Специальная Зона для Папы',
+          text: 'Практические видео-шпаргалки: расслабляющий массаж, поддержка в душе, четкие задачи и уверенность.',
+        },
+        {
+          bold: 'Доступ на 18 месяцев (548 дней) с момента покупки',
+          text: 'Больше всего вопросов возникает дома. Смотрите уроки по кормлению, купанию, сну и первой помощи, когда они нужны.',
+        },
+        {
+          bold: 'Ночные инструменты и шпаргалки в телефоне',
+          text: 'Цифровой блокнот родителя PDF, видео-лайфхаки и удобные памятки всегда под рукой.',
+        },
+        {
+          bold: 'Чуткость, отсутствие догм и поддержка',
+          text: 'Мы поддерживаем любой выбор: естественные роды и кесарево сечение, грудное и искусственное вскармливание.',
+        },
+      ],
+      priceLabel: 'Разовый платеж за двоих:',
+      priceSub: 'полный пакет на год',
+      cta: 'Выбрать HappyBirth · 489 zł',
+    },
+    testimonials: {
+      tag: 'Голоса родителей',
+      title: 'Истории семей, которые доверились HappyBirth',
+      items: [
+        {
+          quote: 'Смотрели уроки по вечерам на телевизоре. Благодаря дыхательным техникам роды прошли спокойно, а муж точно знал, как снимать боль в пояснице.',
+          author: 'Каролина и Петр',
+          role: 'Родители Леона',
+          city: 'Варшава',
+          avatar: 'КП',
+          rating: 5,
+        },
+        {
+          quote: 'Больше всего ценю модуль о первых днях дома. Купание без слез и страха, позы для срыгивания – эти видео просто спасли наши ночи.',
+          author: 'Марта и Томаш',
+          role: 'Родители Софии',
+          city: 'Гданьск',
+          avatar: 'МТ',
+          rating: 5,
+        },
+        {
+          quote: 'Зона для папы — это шедевр. Никакой воды, всё по делу: что собрать, как общаться в роддоме, как разгрузить жену после родов.',
+          author: 'Якуб',
+          role: 'Папа Тимона',
+          city: 'Вроцлав',
+          avatar: 'ЯК',
+          rating: 5,
+        },
+      ],
+    },
+    pricing: {
+      badge: 'Единоразовая оплата · Доступ для двоих',
+      title: 'Полный доступ к обучающей программе VOD',
+      price: '489 zł',
+      unit: 'единоразово',
+      features: [
+        '52 фильма в качестве 4K (более 15 часов материалов)',
+        'Доступ для двоих на 18 месяцев (548 дней) с момента покупки',
+        'Специальная Зона для Папы и видеошпаргалки',
+        'Цифровой Блокнот Родителя и шаблоны PDF для печати',
+        'Мобильное веб-приложение и поддержка Smart TV',
+        'Официальный сертификат об окончании программы',
+      ],
+      cta: 'Купить доступ · 489 zł',
+      statusBadge: 'Статус: Образовательно-обучающая услуга (E-learning VOD)',
+      statusText: '14 дней гарантии возврата без лишних вопросов',
+      guarantee: '14 дней гарантии удовлетворения. Если курс вам не подойдет, вернем 100% средств.',
+    },
+    faq: {
+      tag: 'Часто задаваемые вопросы',
+      title: 'Всё, что важно знать перед началом',
+      items: [
+        {
+          q: 'На какой срок мы получаем доступ к курсу?',
+          a: 'Доступ действует 18 месяцев (548 дней) с момента покупки. Это значит, что курс будет поддерживать вас всю беременность, роды, послеродовой период и весь первый год малыша.',
+        },
+        {
+          q: 'Может ли партнер смотреть курс с другого устройства?',
+          a: 'Да! Один аккаунт дает возможность параллельного входа на телефоне мамы, папы, планшете и на Smart TV без доплат.',
+        },
+        {
+          q: 'Когда лучше всего начинать обучение?',
+          a: 'Рекомендуем присоединяться между 20-й и 28-й неделей, но материалы принесут огромную пользу как на ранних сроках, так и прямо перед родами.',
+        },
+        {
+          q: 'Заменяет ли курс консультацию врача или акушерки?',
+          a: 'HappyBirth — это обучающая программа подготовки к родительству. Она дополняет медицинскую помощь практическими навыками и домашним спокойствием.',
+        },
+        {
+          q: 'Как проходит оплата и получу ли я чек/счет?',
+          a: 'Оплата единоразовая через Stripe, Apple Pay, Google Pay или карту. Доступ ко всем урокам открывается моментально, чек формируется автоматически.',
+        },
+      ],
+    },
+    footer: {
+      tagline: 'Заботливая онлайн школа родов для мам и пап. 52 видеоурока, проверенные лайфхаки и поддержка на протяжении всего первого года малыша.',
+      familyCount: 'Более 18 000 подготовленных семей',
+      navTitle: 'Узнайте о HappyBirth',
+      legalNote: 'HappyBirth — это онлайн-платформа, предоставляющая обучающие курсы в формате VOD-видео. Все материалы носят исключительно образовательный и подготовительный характер к родительству. Услуга не заменяет медицинской помощи, диагностики или консультации врача.',
+      rightsReserved: 'Все права защищены.',
+    },
+  },
+};
+
+export function getMarketingTranslations(lang: Language): MarketingContent {
+  return marketingTranslations[lang] || marketingTranslations.pl;
+}

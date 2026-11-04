@@ -1126,3 +1126,61 @@ export function getAdjacentLessons(lessonId: string): { prev?: Lesson; next?: Le
     next: idx < lessons.length - 1 ? lessons[idx + 1] : undefined,
   };
 }
+
+export function getStageDisplayTitle(stage?: Stage): string {
+  if (!stage) return 'Moduł edukacyjny';
+  switch (stage.num) {
+    case '01':
+      return 'Planowanie & Fundament ciąży';
+    case '02':
+      return 'I Trymestr · Tygodnie 1–14';
+    case '03':
+      return 'II & III Trymestr · Tygodnie 15–32';
+    case '04':
+      return 'Wyprawka & Torba do szpitala (30–37 tc)';
+    case '05':
+      return 'Poród naturalny & Oddech (38–42 tc)';
+    case '06':
+      return 'Cesarskie cięcie, znieczulenie ZZO & Plan B';
+    case '07':
+      return 'Połóg & Powrót do sił (1–6 tyg. po porodzie)';
+    case '08':
+      return 'Karmienie piersią & Laktacja bez presji';
+    case '09':
+      return 'Opieka nad noworodkiem & I Rok życia';
+    default:
+      return stage.subtitle || stage.title;
+  }
+}
+
+export function getStageShortBadge(stage?: Stage): string {
+  if (!stage) return 'Moduł';
+  switch (stage.num) {
+    case '01': return '1. Planowanie';
+    case '02': return '2. I Trymestr';
+    case '03': return '3. II–III Trymestr';
+    case '04': return '4. Wyprawka & Torba';
+    case '05': return '5. Poród naturalny';
+    case '06': return '6. Cesarka & ZZO';
+    case '07': return '7. Połóg';
+    case '08': return '8. Karmienie';
+    case '09': return '9. Noworodek';
+    default: return stage.title;
+  }
+}
+
+export function getStageFullDescription(stage?: Stage): string {
+  if (!stage) return '';
+  switch (stage.num) {
+    case '01': return 'Przygotowanie ciała i umysłu, badania wstępne, kalkulator porodu i pierwsze decyzje.';
+    case '02': return 'Jak liczyć wiek ciąży, radzenie sobie z mdłościami, badania I trymestru i wybór lekarza.';
+    case '03': return 'Ruchy dziecka, kalendarz badań USG, bezpieczny sen, dno miednicy i fizjoterapia kręgosłupa.';
+    case '04': return 'Wybór wózka i bezpiecznego fotelika, pakowanie 3 stref torby do szpitala i domowa apteczka.';
+    case '05': return 'Kiedy jechać do szpitala, pozycje wertykalne, oddech przeponowy, masaż krzyżowy z partnerem.';
+    case '06': return 'Wskazania i przebieg cięcia cesarskiego, znieczulenie zewnątrzoponowe (ZZO) i kryzys 7 cm.';
+    case '07': return 'Fizjologia połogu, czuła regeneracja krocza/blizny, Baby Blues i ćwiczenia dna miednicy.';
+    case '08': return 'Prawidłowy chwyt brodawki, nawał pokarmowy, pozycje do karmienia, laktator i kolki.';
+    case '09': return 'Pierwsza kąpiel, pielęgnacja kikuta pępowinowego, bezpieczny sen i pierwsza pomoc w zakrztuszeniu.';
+    default: return stage.description;
+  }
+}

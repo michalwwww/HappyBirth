@@ -1,0 +1,535 @@
+﻿<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HappyBirth · Centrum Dowodzenia 1 MLN PLN</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #FBF8F4;
+      --paper-card: #FFFFFF;
+      --ink: #1A1512;
+      --ink-2: #544A44;
+      --ink-3: #867A72;
+      --hb-primary: #EC008C;
+      --hb-deep: #C80077;
+      --hb-tint: #FAE3EB;
+      --hb-line: #EAE3DB;
+      --success: #15803D;
+      --success-bg: #DCFCE7;
+    }
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+    .font-serif-title {
+      font-family: 'Instrument Serif', Georgia, serif;
+    }
+    .card-hb {
+      background: var(--paper-card);
+      border: 1px solid var(--hb-line);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px -2px rgba(26, 21, 18, 0.04);
+    }
+    .badge-hb {
+      background-color: var(--hb-tint);
+      color: var(--hb-deep);
+      border: 1px solid rgba(236, 0, 140, 0.15);
+    }
+    .progress-bar-glow {
+      box-shadow: 0 0 15px rgba(236, 0, 140, 0.4);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      background: #EC008C;
+      cursor: pointer;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(236,0,140,0.4);
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+  <!-- HEADER GŁÓWNY -->
+  <header class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#EAE3DB]">
+    <div>
+      <div class="flex items-center gap-3">
+        <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full badge-hb">
+          Operacja Wigilia 2026
+        </span>
+        <span class="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Silnik Autonomiczny Aktywny
+        </span>
+      </div>
+      <h1 class="text-3xl md:text-5xl font-normal mt-2 font-serif-title text-[#1A1512]">
+        Centrum Dowodzenia <span class="text-[#EC008C] italic">HappyBirth</span>
+      </h1>
+      <p class="text-sm text-[#544A44] mt-1">
+        Model Wzrostu 1 000 000 PLN · Zero Podstaw · Wspólny Kocioł · Czysta Dźwignia Cyfrowa
+      </p>
+    </div>
+
+    <!-- SZYBKIE STATYSTYKI HEADERA -->
+    <div class="flex items-center gap-3">
+      <div class="card-hb px-4 py-2 text-right">
+        <div class="text-[11px] font-medium text-[#867A72] uppercase tracking-wider">Cena Katalogowa</div>
+        <div class="text-lg font-bold text-[#1A1512]">489 PLN</div>
+      </div>
+      <div class="card-hb px-4 py-2 text-right border-[#EC008C]/30 bg-[#FAE3EB]/30">
+        <div class="text-[11px] font-bold text-[#C80077] uppercase tracking-wider">Cena z Kodem (-90 zł)</div>
+        <div class="text-lg font-extrabold text-[#EC008C]">399 PLN</div>
+      </div>
+      <div class="card-hb px-4 py-2 text-right">
+        <div class="text-[11px] font-medium text-[#867A72] uppercase tracking-wider">Wymagany Wolumen</div>
+        <div class="text-lg font-bold text-[#1A1512]">2 500 sztuk</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto space-y-8">
+
+    <!-- SEKCJA 1: GŁÓWNY TERMOMETR CELU I 3 KAMIENIE MILOWE -->
+    <section class="card-hb p-6 md:p-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+        <div>
+          <div class="text-xs font-bold text-[#867A72] uppercase tracking-wider">Cel Finansowy Projektu</div>
+          <div class="text-2xl md:text-4xl font-extrabold text-[#1A1512] mt-1">
+            <span id="currentRevenueDisplay" class="text-[#EC008C]">0 PLN</span>
+            <span class="text-sm md:text-lg font-normal text-[#867A72]">/ 1 000 000 PLN</span>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-xs text-[#867A72]">Tempo docelowe: <strong class="text-[#1A1512]">~29 transakcji / dzień</strong></div>
+          <div class="text-xs text-[#867A72]">Horyzont: <strong class="text-[#EC008C]">83 dni do Wigilii</strong></div>
+        </div>
+      </div>
+
+      <!-- PASEK POSTĘPU -->
+      <div class="relative w-full h-5 bg-[#EAE3DB] rounded-full overflow-hidden p-0.5">
+        <div id="mainProgressBar" class="h-full bg-gradient-to-r from-[#EC008C] to-[#C80077] rounded-full transition-all duration-500 progress-bar-glow" style="width: 8%;"></div>
+      </div>
+
+      <!-- 3 KAMIENIE MILOWE -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+        <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/40">
+          <div class="flex items-center justify-between text-xs font-bold text-emerald-800">
+            <span>FAZA 1: PAŹDZIERNIK</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-200/60 text-emerald-900">Walidacja</span>
+          </div>
+          <div class="text-xl font-bold text-[#1A1512] mt-1">100 000 PLN</div>
+          <p class="text-xs text-[#544A44] mt-1">~250 transakcji. Uruchomienie kotła, pierwsze wypłaty i premia 5 000 zł dla podium.</p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-amber-200 bg-amber-50/40">
+          <div class="flex items-center justify-between text-xs font-bold text-amber-800">
+            <span>FAZA 2: LISTOPAD</span>
+            <span class="px-2 py-0.5 rounded-full bg-amber-200/60 text-amber-900">Black Week Blitz</span>
+          </div>
+          <div class="text-xl font-bold text-[#1A1512] mt-1">400 000 PLN</div>
+          <p class="text-xs text-[#544A44] mt-1">Flash sales 489 zł, siatka 20+ ambasadorek na IG, premia 15 000 zł dla liderów.</p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-[#EC008C]/30 bg-[#FAE3EB]/30">
+          <div class="flex items-center justify-between text-xs font-bold text-[#C80077]">
+            <span>FAZA 3: WIGILIA</span>
+            <span class="px-2 py-0.5 rounded-full bg-[#EC008C] text-white">Jackpot 1 MLN</span>
+          </div>
+          <div class="text-xl font-bold text-[#EC008C] mt-1">1 000 000 PLN</div>
+          <p class="text-xs text-[#544A44] mt-1">2 500 transakcji. Prezent cyfrowy pod choinkę, wypłata 20 000 zł Świątecznego Jackpota!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEKCJA 2: INTERAKTYWNY SYMULATOR ZYSKÓW (SUWAK DLA ZESPOŁU I ZAŁOŻYCIELI) -->
+    <section class="card-hb p-6 md:p-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-6">
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold font-serif-title text-[#1A1512]">
+            Interaktywny Symulator Przepływów Finansowych
+          </h2>
+          <p class="text-xs text-[#544A44]">
+            Przesuwaj suwak liczby sprzedaży w projekcie i zobacz, jak rośnie Wspólny Kocioł oraz zysk netto.
+          </p>
+        </div>
+        <span class="badge-hb text-xs font-bold px-3 py-1 rounded-full self-start md:self-auto">
+          Przelicznik w czasie rzeczywistym
+        </span>
+      </div>
+
+      <!-- SUWAK -->
+      <div class="bg-[#FBF8F4] p-5 rounded-xl border border-[#EAE3DB] mb-6">
+        <div class="flex justify-between items-center mb-2">
+          <label for="salesSlider" class="text-sm font-bold text-[#1A1512]">
+            Skumulowana Liczba Sprzedaży w Projekcie:
+          </label>
+          <span id="sliderValueDisplay" class="text-2xl font-extrabold text-[#EC008C]">
+            250 sztuk
+          </span>
+        </div>
+        <input type="range" id="salesSlider" min="50" max="2500" step="25" value="250" class="w-full accent-[#EC008C] h-2 bg-[#EAE3DB] rounded-lg">
+        <div class="flex justify-between text-[11px] text-[#867A72] mt-1 font-medium">
+          <span>50 szt. (Rozruch)</span>
+          <span>250 szt. (Próg 100k)</span>
+          <span>1 000 szt. (Black Week)</span>
+          <span>2 500 szt. (1 MLN PLN)</span>
+        </div>
+      </div>
+
+      <!-- KARTY WYNIKÓW SYMULATORA -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- KARTA 1: PRZYCHÓD ZE STRIPE -->
+        <div class="p-4 rounded-xl border border-[#EAE3DB] bg-white">
+          <div class="text-[11px] font-bold text-[#867A72] uppercase tracking-wider">Przychód Całkowity</div>
+          <div id="simGrossRevenue" class="text-2xl font-extrabold text-[#1A1512] mt-1">100 000 zł</div>
+          <div class="text-[11px] text-[#544A44] mt-1">ze Stripe przy AOV ~400 zł</div>
+        </div>
+
+        <!-- KARTA 2: WSPÓLNY KOCIOŁ NA GŁOWĘ -->
+        <div class="p-4 rounded-xl border border-[#EC008C]/40 bg-[#FAE3EB]/30">
+          <div class="text-[11px] font-extrabold text-[#C80077] uppercase tracking-wider">Kocioł: Na 1 Studenta</div>
+          <div id="simTeamPoolPerHead" class="text-2xl font-black text-[#EC008C] mt-1">2 500 zł</div>
+          <div class="text-[11px] text-[#C80077] mt-1">50 zł dzielone na 5 osób (10 zł/szt)</div>
+        </div>
+
+        <!-- KARTA 3: PRZYKŁADOWY ZAROBEK WILKA (KOCIOŁ + WŁASNY WYNIK) -->
+        <div class="p-4 rounded-xl border border-emerald-300 bg-emerald-50/50">
+          <div class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Zarobek Lidera (Wilka)</div>
+          <div id="simTopPerformerTotal" class="text-2xl font-extrabold text-emerald-700 mt-1">4 900 zł</div>
+          <div class="text-[11px] text-emerald-800 mt-1">Kocioł + 60 własnych kodów (+40 zł)</div>
+        </div>
+
+        <!-- KARTA 4: ZYSK DLA ZAŁOŻYCIELI (EBITDA) -->
+        <div class="p-4 rounded-xl border border-[#1A1512] bg-[#1A1512] text-white">
+          <div class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">Zysk Założycieli (EBITDA)</div>
+          <div id="simFoundersProfit" class="text-2xl font-extrabold text-white mt-1">68 000 zł</div>
+          <div class="text-[11px] text-neutral-400 mt-1">Po prowizjach, adsach i wypłatach</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEKCJA 3: RANKING LIDERÓW & BEZPIECZNIK ANTY-FREERIDER -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- LEWA: RANKING UCZESTNIKÓW (2 KOLUMNY) -->
+      <section class="lg:col-span-2 card-hb p-6 md:p-8">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-xl font-bold font-serif-title text-[#1A1512]">
+              Ranking Liderów & Unikalne Kody
+            </h2>
+            <p class="text-xs text-[#544A44]">
+              Tracking w czasie rzeczywistym. 50 zł z każdej sprzedaży do kotła + 40 zł z własnego kodu.
+            </p>
+          </div>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded bg-[#EAE3DB] text-[#1A1512]">
+            5 Kandydatów
+          </span>
+        </div>
+
+        <div class="space-y-3">
+          <!-- OSOBA 1: ZUZIA -->
+          <div class="p-4 rounded-xl border border-[#EAE3DB] bg-[#FBF8F4] flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-[#EC008C] text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                1
+              </div>
+              <div>
+                <div class="font-bold text-sm text-[#1A1512] flex items-center gap-2">
+                  Zuzia
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white border border-[#EAE3DB] text-[#C80077]">KOD: ZUZIA90</span>
+                </div>
+                <div class="text-xs text-[#867A72]">Wybrany front: <strong>Instagram Micro-Affiliate (Doule & Urofizjo)</strong></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-right">
+              <div>
+                <div class="text-xs text-[#867A72]">Własne kody</div>
+                <div class="text-sm font-bold text-[#1A1512]">0 szt.</div>
+              </div>
+              <div class="border-l border-[#EAE3DB] pl-4">
+                <div class="text-xs text-[#C80077] font-semibold">Tygodniowy Bilet</div>
+                <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">AKTYWNY</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- OSOBA 2: MICHAŁ -->
+          <div class="p-4 rounded-xl border border-[#EAE3DB] bg-[#FBF8F4] flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-[#544A44] text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                2
+              </div>
+              <div>
+                <div class="font-bold text-sm text-[#1A1512] flex items-center gap-2">
+                  Michał
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white border border-[#EAE3DB] text-[#C80077]">KOD: MICHAL90</span>
+                </div>
+                <div class="text-xs text-[#867A72]">Wybrany front: <strong>Grupy FB & Społeczności (Plan Porodu Trojan)</strong></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-right">
+              <div>
+                <div class="text-xs text-[#867A72]">Własne kody</div>
+                <div class="text-sm font-bold text-[#1A1512]">0 szt.</div>
+              </div>
+              <div class="border-l border-[#EAE3DB] pl-4">
+                <div class="text-xs text-[#C80077] font-semibold">Tygodniowy Bilet</div>
+                <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">AKTYWNY</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- OSOBA 3: MIA -->
+          <div class="p-4 rounded-xl border border-[#EAE3DB] bg-[#FBF8F4] flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-[#867A72] text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                3
+              </div>
+              <div>
+                <div class="font-bold text-sm text-[#1A1512] flex items-center gap-2">
+                  Mia
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white border border-[#EAE3DB] text-[#C80077]">KOD: MIA90</span>
+                </div>
+                <div class="text-xs text-[#867A72]">Wybrany front: <strong>TikTok & Reels (Wirale Praw Pacjenta)</strong></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-right">
+              <div>
+                <div class="text-xs text-[#867A72]">Własne kody</div>
+                <div class="text-sm font-bold text-[#1A1512]">0 szt.</div>
+              </div>
+              <div class="border-l border-[#EAE3DB] pl-4">
+                <div class="text-xs text-[#C80077] font-semibold">Tygodniowy Bilet</div>
+                <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">AKTYWNY</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- OSOBA 4: MARIA -->
+          <div class="p-4 rounded-xl border border-[#EAE3DB] bg-[#FBF8F4] flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-[#EAE3DB] text-[#544A44] font-bold flex items-center justify-center text-sm shadow-sm">
+                4
+              </div>
+              <div>
+                <div class="font-bold text-sm text-[#1A1512] flex items-center gap-2">
+                  Maria
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white border border-[#EAE3DB] text-[#C80077]">KOD: MARIA90</span>
+                </div>
+                <div class="text-xs text-[#867A72]">Wybrany front: <strong>Strefa Partnera / Społeczności Przyszłych Ojców</strong></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-right">
+              <div>
+                <div class="text-xs text-[#867A72]">Własne kody</div>
+                <div class="text-sm font-bold text-[#1A1512]">0 szt.</div>
+              </div>
+              <div class="border-l border-[#EAE3DB] pl-4">
+                <div class="text-xs text-[#C80077] font-semibold">Tygodniowy Bilet</div>
+                <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">AKTYWNY</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- OSOBA 5: TYMOTEUSZ (OPCJA) -->
+          <div class="p-4 rounded-xl border border-dashed border-[#867A72] bg-white flex flex-col md:flex-row md:items-center justify-between gap-3 opacity-90">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-neutral-200 text-[#544A44] font-bold flex items-center justify-center text-sm shadow-sm">
+                5
+              </div>
+              <div>
+                <div class="font-bold text-sm text-[#1A1512] flex items-center gap-2">
+                  Tymoteusz (w rezerwie)
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-neutral-100 text-[#544A44]">KOD: TYMEK90</span>
+                </div>
+                <div class="text-xs text-[#867A72]">Wybrany front: <strong>Guerilla Offline / Badania Prenatalne & Pustynie NFZ</strong></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-right">
+              <div>
+                <div class="text-xs text-[#867A72]">Status</div>
+                <div class="text-sm font-bold text-amber-700">Oczekiwanie do 12:00</div>
+              </div>
+              <div class="border-l border-[#EAE3DB] pl-4">
+                <div class="text-xs text-[#867A72]">Bilet</div>
+                <span class="text-xs font-bold text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded">NIEAKTYWNY</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRAWA: BEZPIECZNIK ANTY-FREERIDER (1 KOLUMNA) -->
+      <section class="card-hb p-6 md:p-8 flex flex-col justify-between border-red-200 bg-gradient-to-b from-white to-red-50/20">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-bold text-red-700 uppercase tracking-wider mb-2">
+            <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v4a1 1 0 102 0V7z" clip-rule="evenodd"></path></svg>
+            Twardy Strażnik Kotła
+          </div>
+          <h3 class="text-lg font-bold text-[#1A1512] mb-2 font-serif-title">
+            Zasada: Zero Jałmużny i Bilet Kwalifikacyjny
+          </h3>
+          <p class="text-xs text-[#544A44] leading-relaxed mb-4">
+            Wspólny Kocioł jest zasilany przez system i reklamy założycieli (50 zł/szt). Aby mieć prawo do tygodniowej wypłaty, student musi okazać dowód pracy.
+          </p>
+
+          <div class="space-y-3 text-xs">
+            <div class="p-3 bg-white rounded-lg border border-red-100 shadow-sm">
+              <strong class="text-[#1A1512] block mb-1">Warunek 1: Min. 5 własnych sprzedaży</strong>
+              Dowieziona sprzedaż z kodu = automatyczny bilet na dany tydzień.
+            </div>
+            <div class="p-3 bg-white rounded-lg border border-red-100 shadow-sm">
+              <strong class="text-[#1A1512] block mb-1">Warunek 2: Udokumentowana norma</strong>
+              10 rolek / 40 postów w grupach / 25 relacji z doulami na IG.
+            </div>
+            <div class="p-3 bg-red-100/70 text-red-900 rounded-lg border border-red-200 font-medium">
+              ⚠️ <strong>Brak kwalifikacji:</strong> Udział w kotle PRZEPADA i trafia jako premia do tych, którzy pracowali. 2 tygodnie z rzędu = usunięcie kodu w Stripe.
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-red-100 text-[11px] text-[#867A72]">
+          Rozliczenie: w każdy poniedziałek o 09:00 z raportu Stripe.
+        </div>
+      </section>
+    </div>
+
+    <!-- SEKCJA 4: 4 ZEWNĘTRZNE POLIGONY ŁOWIECKIE -->
+    <section class="card-hb p-6 md:p-8">
+      <div class="mb-6">
+        <h2 class="text-xl md:text-2xl font-bold font-serif-title text-[#1A1512]">
+          4 Zewnętrzne Poligony Łowieckie (Wyciągamy Maksa z Rynku)
+        </h2>
+        <p class="text-xs text-[#544A44]">
+          Zero wewnętrznej administracji. Studenci operują wyłącznie na zewnątrz, generując ruch i zaufanie.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- POLIGON 1 -->
+        <div class="p-5 rounded-xl border border-[#EAE3DB] bg-[#FBF8F4] flex flex-col justify-between">
+          <div>
+            <div class="text-[11px] font-bold text-[#C80077] uppercase tracking-wider">Poligon 1 · Konwersja 85%</div>
+            <h4 class="text-base font-bold text-[#1A1512] mt-1 mb-2 font-serif-title">Grupy FB & Społeczności</h4>
+            <p class="text-xs text-[#544A44] leading-relaxed mb-3">
+              Grupy ciążowe (*Mamy grudzień 2026*). Koń Trojański: darmowy generator Planu Porodu PDF. Zero spamu, kod podawany w komentarzach.
+            </p>
+          </div>
+          <div class="text-[11px] font-semibold text-[#867A72] pt-3 border-t border-[#EAE3DB]">
+            Cel: 10–15 sprzedaży / wątek
+          </div>
+        </div>
+
+        <!-- POLIGON 2 -->
+        <div class="p-5 rounded-xl border border-[#EAE3DB] bg-[#FBF8F4] flex flex-col justify-between">
+          <div>
+            <div class="text-[11px] font-bold text-[#EC008C] uppercase tracking-wider">Poligon 2 · Konwersja 80%</div>
+            <h4 class="text-base font-bold text-[#1A1512] mt-1 mb-2 font-serif-title">TikTok & Reels Virals</h4>
+            <p class="text-xs text-[#544A44] leading-relaxed mb-3">
+              Krótkie klipy 15–30s: prawa pacjenta na porodówce, nacięcie krocza, błędy facetów na izbie przyjęć. Kod w bio i na wideo.
+            </p>
+          </div>
+          <div class="text-[11px] font-semibold text-[#867A72] pt-3 border-t border-[#EAE3DB]">
+            Cel: 50–100 sprzedaży z wirala
+          </div>
+        </div>
+
+        <!-- POLIGON 3 -->
+        <div class="p-5 rounded-xl border border-[#EAE3DB] bg-[#FBF8F4] flex flex-col justify-between">
+          <div>
+            <div class="text-[11px] font-bold text-[#544A44] uppercase tracking-wider">Poligon 3 · Konwersja 75%</div>
+            <h4 class="text-base font-bold text-[#1A1512] mt-1 mb-2 font-serif-title">Doule & Urofizjoterapia IG</h4>
+            <p class="text-xs text-[#544A44] leading-relaxed mb-3">
+              Siatka mikrotwórczyń (3k–30k obs.). Oferta: kod -90 zł dla obserwatorek + 50 zł prowizji dla twórczyni za każde polecenie.
+            </p>
+          </div>
+          <div class="text-[11px] font-semibold text-[#867A72] pt-3 border-t border-[#EAE3DB]">
+            Cel: 15 doul = 50 szt./tydzień
+          </div>
+        </div>
+
+        <!-- POLIGON 4 -->
+        <div class="p-5 rounded-xl border border-[#EAE3DB] bg-[#FBF8F4] flex flex-col justify-between">
+          <div>
+            <div class="text-[11px] font-bold text-blue-700 uppercase tracking-wider">Poligon 4 · Błękitny Ocean</div>
+            <h4 class="text-base font-bold text-[#1A1512] mt-1 mb-2 font-serif-title">Strefa Partnera / Ojcowie</h4>
+            <p class="text-xs text-[#544A44] leading-relaxed mb-3">
+              Społeczności *Będę Tatą* i męskie fora. Konkretne techniki na ból lędźwi i obrona partnerki na izbie przyjęć bez nudy.
+            </p>
+          </div>
+          <div class="text-[11px] font-semibold text-[#867A72] pt-3 border-t border-[#EAE3DB]">
+            Cel: Zerowa konkurencja w PL
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER OPERACYJNY -->
+    <footer class="text-center text-xs text-[#867A72] pb-12 pt-4">
+      HappyBirth Technologies © 2026 · Ściśle Poufne · Zaprojektowane dla Zespołu Zarządzającego i Partnerów
+    </footer>
+
+  </main>
+
+  <!-- SKRYPT INTERAKTYWNY DLA SYMULATORA -->
+  <script>
+    const slider = document.getElementById('salesSlider');
+    const sliderDisplay = document.getElementById('sliderValueDisplay');
+    const mainProgressBar = document.getElementById('mainProgressBar');
+    const currentRevenueDisplay = document.getElementById('currentRevenueDisplay');
+
+    const simGrossRevenue = document.getElementById('simGrossRevenue');
+    const simTeamPoolPerHead = document.getElementById('simTeamPoolPerHead');
+    const simTopPerformerTotal = document.getElementById('simTopPerformerTotal');
+    const simFoundersProfit = document.getElementById('simFoundersProfit');
+
+    function updateCalculations(sales) {
+      // Założenia: AOV = 400 zł
+      const grossRevenue = sales * 400;
+      const progressPercent = Math.min(100, (grossRevenue / 1000000) * 100);
+
+      // Wspólny kocioł: 50 zł ze sztuki dzielone na 5 osób = 10 zł / sztuka na głowę
+      const poolPerHead = sales * 10;
+
+      // Przykładowy wilk: załóżmy, że generuje ok. 25% sprzedaży z własnego kodu (+40 zł direct)
+      const ownSales = Math.round(sales * 0.24);
+      const topPerformerDirect = ownSales * 40;
+      const topPerformerTotal = poolPerHead + topPerformerDirect;
+
+      // Założyciele:
+      // Przychód - Stripe (~7 zł/szt) - Ads (~65 zł/szt przy części sprzedaży) - Kocioł (50 zł/szt) - Direct (średnio ~16 zł/szt)
+      const stripeCost = sales * 7;
+      const adsCost = Math.round(sales * 0.6 * 65); // ok 60% sprzedaży idzie z reklam płatnych
+      const totalTeamCost = (sales * 50) + (sales * 0.4 * 40); // kocioł + prowizje direct
+      const foundersNet = Math.max(0, grossRevenue - stripeCost - adsCost - totalTeamCost);
+
+      // Aktualizacja DOM
+      sliderDisplay.innerText = sales.toLocaleString('pl-PL') + ' sztuk';
+      currentRevenueDisplay.innerText = grossRevenue.toLocaleString('pl-PL') + ' PLN';
+      mainProgressBar.style.width = Math.max(4, progressPercent) + '%';
+
+      simGrossRevenue.innerText = grossRevenue.toLocaleString('pl-PL') + ' zł';
+      simTeamPoolPerHead.innerText = poolPerHead.toLocaleString('pl-PL') + ' zł';
+      simTopPerformerTotal.innerText = topPerformerTotal.toLocaleString('pl-PL') + ' zł';
+      simFoundersProfit.innerText = foundersNet.toLocaleString('pl-PL') + ' zł';
+    }
+
+    slider.addEventListener('input', (e) => {
+      updateCalculations(parseInt(e.target.value, 10));
+    });
+
+    // Inicjalizacja
+    updateCalculations(250);
+  </script>
+</body>
+</html>
+

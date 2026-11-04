@@ -20,9 +20,9 @@ export const translations: Translations = {
     ru: 'Зона Родителей HappyBirth',
   },
   ribbonSubtitle: {
-    pl: 'Dla naszych Mam i Tatów · Dostęp na 12 msc od terminu porodu dla dwojga',
-    en: 'For our Moms and Dads · 12 months access from due date for two',
-    ru: 'Для наших Мам и Пап · Доступ на 12 месяцев с даты родов для двоих',
+    pl: 'Dla naszych Mam i Tatów · Dostęp na 18 miesięcy (548 dni) od zakupu dla dwojga',
+    en: 'For our Moms and Dads · 18 months (548 days) access from purchase for two',
+    ru: 'Для наших Мам и Пап · Доступ на 18 месяцев (548 дней) с момента покупки для двоих',
   },
   viewMode: {
     pl: 'Perspektywa:',
@@ -80,9 +80,9 @@ export const translations: Translations = {
     ru: 'Мед. стандарт',
   },
   btnBuy: {
-    pl: 'Kup dostęp · 349 zł',
-    en: 'Get Access · 349 PLN',
-    ru: 'Купить доступ · 349 zł',
+    pl: 'Kup dostęp · 489 zł',
+    en: 'Get Access · 489 PLN',
+    ru: 'Купить доступ · 489 zł',
   },
   btnLogin: {
     pl: 'Zaloguj się',
@@ -181,9 +181,9 @@ export const translations: Translations = {
     ru: 'Сбросить настройки',
   },
   a11yDeclaration: {
-    pl: 'Deklaracja dostępności UE',
-    en: 'EU Accessibility Declaration',
-    ru: 'Декларация доступности ЕС',
+    pl: 'Deklaracja dostępności cyfrowej',
+    en: 'Digital Accessibility Declaration',
+    ru: 'Декларация доступности',
   },
   // Tryby
   themeLight: {
@@ -219,6 +219,14 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       if (saved && (saved === 'pl' || saved === 'en' || saved === 'ru')) {
         setLangState(saved);
       }
+      const handleSync = () => {
+        const current = localStorage.getItem('hb_lang') as Language;
+        if (current && (current === 'pl' || current === 'en' || current === 'ru')) {
+          setLangState(current);
+        }
+      };
+      window.addEventListener('hb_lang_updated', handleSync);
+      return () => window.removeEventListener('hb_lang_updated', handleSync);
     }
   }, []);
 

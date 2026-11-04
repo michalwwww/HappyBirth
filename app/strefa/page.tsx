@@ -1,52 +1,183 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { stages, lessons, getLessonsByStage } from '@/lib/course-data';
+import Image from 'next/image';
+import {
+  stages,
+  lessons,
+  getLessonsByStage,
+  getStageDisplayTitle,
+  getStageShortBadge,
+  getStageFullDescription,
+} from '@/lib/course-data';
 import { useCourseProgress } from '@/lib/progress';
 import { StageIcon } from '@/components/stage-icons';
-import { PregnancyProfile, getSavedPregnancyProfile } from '@/lib/pregnancy';
+import {
+  PregnancyProfile,
+  getSavedPregnancyProfile,
+  savePregnancyProfile,
+  calculatePregnancyState,
+} from '@/lib/pregnancy';
 import { OnboardingWizard } from '@/components/onboarding-wizard';
-import { PregnancyTrackerCard } from '@/components/pregnancy-tracker-card';
+import { CloudflarePlayer } from '@/components/cloudflare-player';
+import { StudentReferralBox } from '@/components/student-referral-box';
+import { FinalQuizAndCertificate } from '@/components/final-quiz-certificate';
+import { openPrintableLessonWorksheet } from '@/lib/printable-worksheets';
+import {
+  activateStudentAccessLocally,
+  is100PercentPromo,
+  detectClientOrderBumpEdition,
+  isOrderBumpUnlockedLocally,
+} from '@/lib/promo';
+import { Lesson, Stage } from '@/lib/types';
 import {
   Play,
   CheckCircle2,
   Sparkles,
-  AlertCircle,
-  User,
   Clock,
   ArrowRight,
   Download,
   BookOpen,
   Calendar,
-  ShieldCheck,
-  ChevronRight,
-  Heart,
-  Feather,
-  Activity,
-  Baby,
   FileText,
+  User,
+  Heart,
+  ChevronRight,
+  ShieldCheck,
+  Flame,
 } from 'lucide-react';
-import Image from 'next/image';
-import { DailyTipCard } from '@/components/daily-tip-card';
 
-export default function StrefaDashboardPage() {
-  const { role, changeRole, completedLessons, percentCompleted } = useCourseProgress();
+function StrefaDashboardContent() {
+  const { role, changeRole, completedLessons, percentCompleted, toggleLessonCompletion } = useCourseProgress();
   const [pregnancyProfile, setPregnancyProfile] = useState<PregnancyProfile | null>(null);
+  const [accountInfo, setAccountInfo] = useState<{
+    email?: string;
+    fullName?: string;
+    orderNumber?: string | null;
+    orderBumpIncluded?: boolean;
+    expiresAt?: string;
+    daysRemaining?: number;
+    referralCode?: string;
+  } | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [hasOrderBump, setHasOrderBump] = useState<boolean>(false);
+  const [buyingOrderBump, setBuyingOrderBump] = useState<boolean>(false);
+  const [smartOrderBump, setSmartOrderBump] = useState(() =>
+    detectClientOrderBumpEdition({ countryCode: 'PL', uiLang: 'pl' })
+  );
+
+  const handleBuyStandaloneOrderBump = async () => {
+    try {
+      setBuyingOrderBump(true);
+      try {
+        localStorage.setItem('hb_order_bump_unlocked', 'true');
+      } catch (_) {}
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          onlyOrderBump: true,
+          includeOrderBump: true,
+          orderBumpEdition: smartOrderBump.editionKey,
+          email: accountInfo?.email || undefined,
+          termsAccepted: true,
+          waiverArt38Accepted: true,
+        }),
+      });
+      const data = await res.json();
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+      window.location.href = '/#cena';
+    } catch {
+      window.location.href = '/#cena';
+    } finally {
+      setBuyingOrderBump(false);
+    }
+  };
+
+  // Referencja do odtwarzacza wideo (do centrowania ekranu po płatności)
+  const playerSectionRef = useRef<HTMLElement>(null);
+
+  // Aktywna lekcja w kinie domowym na kokpicie
+  const [activeLessonId, setActiveLessonId] = useState<string>('lekcja-01');
+  const [shouldAutoplay, setShouldAutoplay] = useState(false);
 
   useEffect(() => {
-    setPregnancyProfile(getSavedPregnancyProfile());
+    const localProfile = getSavedPregnancyProfile();
+    setPregnancyProfile(localProfile);
+
+    if (typeof window !== 'undefined') {
+      const savedOverride = localStorage.getItem('hb_order_bump_edition_override');
+      const detected = detectClientOrderBumpEdition({
+        manualEditionOverride: savedOverride,
+      });
+      setSmartOrderBump(detected);
+      if (isOrderBumpUnlockedLocally()) {
+        setHasOrderBump(true);
+      }
+    }
+
+    // Pobierz dane konta i profil ciąży z Cloudflare D1 (/api/auth/me)
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.user) {
+          setAccountInfo({
+            email: data.user.email,
+            fullName: data.user.fullName,
+            orderNumber: data.user.orderNumber,
+            orderBumpIncluded: Boolean(data.user.orderBumpIncluded),
+            expiresAt: data.user.expiresAt,
+            daysRemaining: data.user.daysRemaining,
+            referralCode: data.user.referralCode,
+          });
+          if (data.user.orderBumpIncluded) {
+            setHasOrderBump(true);
+            try {
+              localStorage.setItem('hb_order_bump_unlocked', 'true');
+            } catch (_) {}
+          }
+          if (data.user.pregnancy?.dueDate && !localProfile?.dueDate) {
+            setPregnancyProfile(data.user.pregnancy);
+            savePregnancyProfile(data.user.pregnancy);
+          }
+        }
+      })
+      .catch(() => {});
+
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const sessionId = params.get('session_id');
       const payment = params.get('payment');
+      const promo = params.get('promo');
+      const lessonParam = params.get('lesson');
+      const autoplayParam = params.get('autoplay');
+
+      const isPromoOrSuccess =
+        (sessionId && (sessionId.startsWith('promo_') || sessionId.startsWith('demo_') || sessionId.toLowerCase().includes('test') || sessionId.toLowerCase().includes('promo'))) ||
+        payment === 'success' ||
+        Boolean(promo) ||
+        is100PercentPromo(promo);
+
+      // Natychmiastowe odblokowanie dostępu lokalnie
+      if (isPromoOrSuccess) {
+        activateStudentAccessLocally(promo || 'TEST100');
+        changeRole('student');
+        setPaymentSuccess(true);
+      }
 
       if (sessionId) {
         fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`)
           .then((res) => res.json())
           .then((data) => {
             if (data.success) {
+              const bumpUnlocked = Boolean(data.orderBumpIncluded || data.user?.orderBumpIncluded);
+              activateStudentAccessLocally(promo || 'TEST100', bumpUnlocked);
+              if (bumpUnlocked) setHasOrderBump(true);
               changeRole('student');
               setPaymentSuccess(true);
               window.dispatchEvent(new Event('hb_progress_updated'));
@@ -54,18 +185,48 @@ export default function StrefaDashboardPage() {
           })
           .catch((err) => console.error('Błąd weryfikacji płatności:', err));
       } else if (payment === 'success') {
+        activateStudentAccessLocally(promo || 'TEST100');
         changeRole('student');
         setPaymentSuccess(true);
         window.dispatchEvent(new Event('hb_progress_updated'));
       }
+
+      // Ustaw aktywną lekcję z parametru lub pierwszą nieukończoną
+      if (lessonParam && lessons.some((l) => l.id === lessonParam)) {
+        setActiveLessonId(lessonParam);
+      } else {
+        const nextUncompleted = lessons.find((l) => !completedLessons.includes(l.id));
+        if (nextUncompleted) {
+          setActiveLessonId(nextUncompleted.id);
+        }
+      }
+
+      // Autoplay po płatności lub parametrze
+      if (isPromoOrSuccess || autoplayParam === 'true') {
+        setShouldAutoplay(true);
+      }
+
+      // Automatyczne płynne wycentrowanie ekranu na filmie po zapłaceniu / zniżce
+      if (isPromoOrSuccess || payment === 'success' || sessionId) {
+        const timer = setTimeout(() => {
+          if (playerSectionRef.current) {
+            playerSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 300);
+        return () => clearTimeout(timer);
+      }
     }
-  }, []);
+  }, [completedLessons]);
 
-  // Znajdź następną nieukończoną lekcję
-  const nextLesson = lessons.find((l) => !completedLessons.includes(l.id)) || lessons[0];
-  const nextLessonStage = stages.find((s) => s.id === nextLesson.stageId);
+  // Wyznacz dane aktywnej lekcji i lekcji sąsiednich dla odtwarzacza
+  const activeLessonIndex = lessons.findIndex((l) => l.id === activeLessonId);
+  const activeLesson: Lesson = activeLessonIndex >= 0 ? lessons[activeLessonIndex] : lessons[0];
+  const prevLesson = activeLessonIndex > 0 ? lessons[activeLessonIndex - 1] : undefined;
+  const nextLesson = activeLessonIndex < lessons.length - 1 ? lessons[activeLessonIndex + 1] : undefined;
+  const activeStage = stages.find((s) => s.id === activeLesson.stageId);
+  const activeStageLessons = lessons.filter((l) => l.stageId === activeLesson.stageId);
 
-  // Szacowany pozostały czas
+  // Szacowany pozostały czas kursu
   const remainingMinutes = Math.round(
     lessons
       .filter((l) => !completedLessons.includes(l.id))
@@ -74,308 +235,499 @@ export default function StrefaDashboardPage() {
   const remainingHours = Math.floor(remainingMinutes / 60);
   const remainingMins = remainingMinutes % 60;
 
+  const handleSelectLesson = (lesson: Lesson, scrollToVideo = false) => {
+    setActiveLessonId(lesson.id);
+    setShouldAutoplay(true);
+    if (scrollToVideo && playerSectionRef.current) {
+      playerSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  const handleSelectStage = (stage: Stage) => {
+    const stageLessons = lessons.filter((l) => l.stageId === stage.id);
+    const uncompletedInStage = stageLessons.find((l) => !completedLessons.includes(l.id));
+    const target = uncompletedInStage || stageLessons[0];
+    if (target) {
+      handleSelectLesson(target, true);
+    }
+  };
+
+  const pregnancyState = pregnancyProfile?.dueDate
+    ? calculatePregnancyState(pregnancyProfile.dueDate)
+    : null;
+
+  const formattedExpiresDate = accountInfo?.expiresAt
+    ? new Date(accountInfo.expiresAt).toLocaleDateString('pl-PL')
+    : null;
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-10">
-      {/* Baner sukcesu po płatności Stripe */}
-      {paymentSuccess && (
-        <div className="rounded-3xl bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-950 border border-emerald-500/40 p-6 sm:p-8 text-white shadow-2xl flex flex-col sm:flex-row items-start sm:items-center gap-5 animate-in fade-in slide-in-from-top-4 duration-500">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-400 flex items-center justify-center shrink-0 shadow-inner">
-            <CheckCircle2 className="w-8 h-8" />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
+      {/* 1. BANER STATUSU DOSTĘPU 18 MIESIĘCY (548 DNI) DLA DWOJGA ([C1]) */}
+      <div className="rounded-2xl bg-gradient-to-r from-[#20071E] via-[#2E0B2C] to-[#1A0519] border border-[#DA0271]/50 p-4 sm:p-5 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#DA0271]/20 border border-[#DA0271]/40 text-[#FF4BA8] flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-5 h-5" />
           </div>
-          <div className="space-y-1.5 flex-1">
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" /> Płatność BLIK / Karta zatwierdzona
+          <div>
+            <div className="text-xs font-bold text-[#FF4BA8] uppercase tracking-wide flex flex-wrap items-center gap-1.5">
+              <span>Aktywny Pakiet · Dostęp ważny przez 18 miesięcy (548 dni) od zakupu</span>
+              {accountInfo?.email && (
+                <span className="text-white/80 font-mono text-[11px] bg-white/10 px-2 py-0.5 rounded-full">
+                  {accountInfo.email}
+                </span>
+              )}
+              {accountInfo?.orderNumber && (
+                <span className="text-emerald-300 font-mono text-[11px] bg-emerald-500/15 px-2 py-0.5 rounded-full">
+                  Zamówienie: {accountInfo.orderNumber}
+                </span>
+              )}
             </div>
-            <h3 className="font-brand-display font-bold text-xl sm:text-2xl text-white">
-              Wspaniale! Twój dostęp do HappyBirth jest w 100% aktywny 🎉
+            <h3 className="font-brand-display font-bold text-base sm:text-lg text-white">
+              {accountInfo?.fullName ? `Witaj, ${accountInfo.fullName}! ` : ''}Pełny dostęp dla dwojga: 52 lekcje w jakości 4K, Notatnik Rodzica PDF oraz Strefa Taty.
             </h3>
-            <p className="text-xs sm:text-sm text-emerald-100/80 leading-relaxed font-sans">
-              Odblokowaliśmy wszystkie 52 lekcje wideo, materiały PDF i dedykowaną Strefę dla Partnera. Dostęp jest ważny przez 12 miesięcy dla Ciebie i Twojego partnera.
-            </p>
           </div>
         </div>
-      )}
-
-      {/* 0. INTELIGENTNY TRACKER CIĄŻY I PERSONALIZACJA */}
-      {role === 'student' && (
-        <PregnancyTrackerCard 
-          profile={pregnancyProfile} 
-          onOpenWizard={() => setWizardOpen(true)} 
-        />
-      )}
-
-      {/* 1. HERO GREETING & PROGRESS CARD */}
-      <div className="rounded-3xl bg-gradient-to-r from-[#250A24] via-[#320D30] to-[#20071F] text-white p-6 sm:p-10 border border-[#461643] shadow-xl relative overflow-hidden">
-        {/* Dekoracyjne tło */}
-        <div className="absolute right-0 top-0 w-96 h-96 bg-[#EC008C]/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-          <div className="max-w-2xl space-y-3">
-            <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#EC008C] animate-pulse"></span>
-              <span className="text-xs font-bold uppercase tracking-widest text-[#EAD5E5]">
-                {role === 'partner' ? 'Strefa dla Taty / Osoby Towarzyszącej' : 'Strefa dla Mamy'}
-              </span>
-            </div>
-
-            <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-white tracking-tight leading-tight">
-              {role === 'partner'
-                ? 'Witaj w Strefie dla Taty!'
-                : 'Cześć! Spokojnego dnia.'}
-            </h1>
-
-            <p className="text-sm sm:text-base text-[#EAD5E5]/80 leading-relaxed font-sans">
-              Program szkoły rodzenia oparty o 4 Filary Spokoju HappyBirth i Standard Opieki Okołoporodowej. Czuła wiedza dla Ciebie i Twojej rodziny, do której wracacie w dowolnym momencie.
-            </p>
-
-            <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-[#EAD5E5]/70">
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#EC008C]" />
-                Pozostało do ukończenia: {remainingHours}h {remainingMins}min
-              </span>
-              <span>·</span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#FCD705]" />
-                {completedLessons.length} z 52 lekcji ukończonych
-              </span>
-            </div>
-          </div>
-
-          {/* Duży wskaźnik ukończenia */}
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md flex items-center gap-6 shrink-0">
-            <div className="relative w-20 h-20 flex items-center justify-center">
-              <svg className="w-20 h-20 -rotate-90" viewBox="0 0 36 36">
-                <path
-                  className="text-white/10"
-                  strokeWidth="3.5"
-                  stroke="currentColor"
-                  fill="none"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                />
-                <path
-                  className="text-[#EC008C] transition-all duration-1000 ease-out"
-                  strokeDasharray={`${percentCompleted}, 100`}
-                  strokeWidth="3.5"
-                  strokeLinecap="round"
-                  stroke="currentColor"
-                  fill="none"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                />
-              </svg>
-              <span className="absolute font-mono font-bold text-lg text-white">
-                {percentCompleted}%
-              </span>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-xs uppercase tracking-wider text-[#EAD5E5]/60 font-semibold">
-                Twój postęp
-              </div>
-              <div className="font-brand-display text-xl font-bold text-white">
-                {completedLessons.length === 52 ? 'Kurs ukończony!' : `${52 - completedLessons.length} lekcji przed Tobą`}
-              </div>
-              <div className="text-[11px] text-[#EAD5E5]/80">
-                Certyfikat imienny po 100%
-              </div>
-            </div>
-          </div>
-        </div>
+        <span className="inline-block self-start sm:self-auto text-xs bg-emerald-500/20 text-emerald-200 px-3.5 py-1.5 rounded-full border border-emerald-500/40 font-semibold whitespace-nowrap">
+          {formattedExpiresDate
+            ? `Ważny do ${formattedExpiresDate} (${accountInfo?.daysRemaining ?? 548} dni)`
+            : 'Dostęp aktywny (548 dni)'}
+        </span>
       </div>
 
-      {/* Daily Tip Widget */}
-      <DailyTipCard />
-
-      {/* 2. KARTA "KONTYNUUJ NAUKĘ" (Następna nierozpoczęta lekcja) */}
-      <div className="bg-white rounded-3xl border border-[#EAE3DB] p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#EC008C]" />
-            <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
-              Polecane do obejrzenia teraz
+      {/* 2. GŁÓWNY PLAYER NA SAMEJ GÓRZE (Kino Domowe & Playlista) */}
+      <section
+        ref={playerSectionRef}
+        id="odtwarzacz"
+        className="space-y-3.5 scroll-mt-20 pt-1"
+      >
+        {/* Nagłówek sekcji odtwarzacza z czytelnym modułem */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#DA0271] animate-pulse" />
+            <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
+              Odtwarzacz Kursu · 4K Master VOD
+            </span>
+            <span className="text-xs text-[#867A72] dark:text-[#C4ADC0]">·</span>
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#DA0271]/10 text-[#DA0271] dark:bg-[#DA0271]/20 dark:text-[#FF4BA8]">
+              {getStageDisplayTitle(activeStage)}
             </span>
           </div>
 
-          <Link
-            href="/strefa/lekcje"
-            className="text-xs font-semibold text-[#544A44] hover:text-[#EC008C] flex items-center gap-1 transition-colors"
-          >
-            <span>Wszystkie 52 lekcje</span>
-            <ChevronRight className="w-4 h-4" />
-          </Link>
+          <div className="flex items-center gap-3 text-xs text-[#544A44] dark:text-[#D7CCC3]">
+            <span>
+              Lekcja <strong>{activeLesson.lessonNumber} z 52</strong> ({activeLesson.durationFormatted})
+            </span>
+            <Link
+              href={`/strefa/lekcja/${activeLesson.id}`}
+              className="font-semibold text-[#DA0271] hover:underline flex items-center gap-1"
+              title="Otwórz lekcję w trybie pełnoekranowym"
+            >
+              <span>Pełny ekran</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-          <div className="lg:col-span-4 relative aspect-video rounded-2xl overflow-hidden bg-stone-900 group shadow-md">
-            <Image
-              src={nextLesson.thumbnailUrl}
-              alt={nextLesson.title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <Link
-                href={`/strefa/lekcja/${nextLesson.id}?autoplay=true`}
-                className="w-12 h-12 rounded-full bg-[#EC008C] text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform"
-              >
-                <Play className="w-5 h-5 fill-current ml-0.5" />
-              </Link>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          {/* LEWA KOLUMNA: WŁAŚCIWY ODTWARZACZ (8 cols) */}
+          <div className="lg:col-span-8 space-y-4">
+            <div className="rounded-3xl overflow-hidden shadow-2xl border border-[#461643] dark:border-[#3D0E39] bg-[#20071E]">
+              <CloudflarePlayer
+                lesson={activeLesson}
+                isCompleted={completedLessons.includes(activeLesson.id)}
+                onToggleComplete={() => toggleLessonCompletion(activeLesson.id)}
+                prevLesson={prevLesson}
+                nextLesson={nextLesson}
+                autoplay={shouldAutoplay}
+                onSelectLesson={(l) => handleSelectLesson(l)}
+              />
             </div>
-            <div className="absolute bottom-2.5 right-2.5 bg-black/80 text-white text-[11px] px-2 py-0.5 rounded font-mono font-medium">
-              {nextLesson.durationFormatted}
+
+            {/* Karta szczegółów aktualnie odtwarzanej lekcji */}
+            <div className="bg-[#FFFDFA] dark:bg-[#1C081A] rounded-3xl p-5 sm:p-6 border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm space-y-3.5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="text-xs font-bold px-3 py-1 rounded-full shadow-xs"
+                    style={{ backgroundColor: activeStage?.tint || '#FAE3EB', color: activeStage?.deep || '#C80077' }}
+                  >
+                    Moduł {parseInt(activeStage?.num || '1', 10)}: {getStageDisplayTitle(activeStage)}
+                  </span>
+                  <span className="text-xs text-[#867A72] dark:text-[#C4ADC0]">
+                    Lekcja {activeLesson.lessonNumber} z 52 · {activeLesson.durationFormatted}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => toggleLessonCompletion(activeLesson.id)}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                      completedLessons.includes(activeLesson.id)
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
+                        : 'bg-[#FBF8F4] dark:bg-[#250A24] text-[#544A44] dark:text-[#D7CCC3] hover:text-[#DA0271] border border-[#EAE3DB] dark:border-[#3D0E39]'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-3.5 h-3.5 ${completedLessons.includes(activeLesson.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-[#867A72]'}`} />
+                    <span>
+                      {completedLessons.includes(activeLesson.id) ? 'Ukończona ✓' : 'Oznacz jako ukończoną'}
+                    </span>
+                  </button>
+
+                  {nextLesson && (
+                    <button
+                      onClick={() => handleSelectLesson(nextLesson)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#DA0271] hover:bg-[#B90260] text-white text-xs font-semibold transition-colors cursor-pointer"
+                    >
+                      <span>Następna</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h1 className="font-brand-display font-semibold text-xl sm:text-2xl text-[#250A24] dark:text-[#FBF8F4]">
+                  {activeLesson.title}
+                </h1>
+                <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3] mt-1.5 leading-relaxed">
+                  {activeLesson.description}
+                </p>
+              </div>
+
+              {/* Materiały PDF do pobrania dla tej lekcji */}
+              {activeLesson.attachments && activeLesson.attachments.length > 0 && (
+                <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] space-y-2.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0] flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-[#DA0271]" /> Materiały do tej lekcji (PDF do druku):
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {activeLesson.attachments.map((att) => (
+                      <div
+                        key={att.id}
+                        className="p-2.5 rounded-xl bg-[#FBF8F4] dark:bg-[#220820] border border-[#EAE3DB] dark:border-[#3D0E39] flex items-center justify-between gap-2.5 text-xs"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <span className="w-6 h-6 rounded-md bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 flex items-center justify-center font-bold text-[9px]">
+                            PDF
+                          </span>
+                          <div>
+                            <div className="font-semibold text-[#250A24] dark:text-[#FBF8F4] text-xs">{att.name}</div>
+                            <div className="text-[10px] text-[#867A72] dark:text-[#C4ADC0]">{att.size}</div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => openPrintableLessonWorksheet(activeLesson, att.name)}
+                          className="p-1 rounded-md bg-white dark:bg-[#1C081A] hover:bg-[#DA0271] hover:text-white border border-[#EAE3DB] dark:border-[#3D0E39] transition-colors cursor-pointer text-[#250A24] dark:text-[#FBF8F4]"
+                          title="Otwórz i wydrukuj Kartę Pracy PDF"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="lg:col-span-8 space-y-3">
-            <div className="flex items-center gap-2">
-              <span
-                className="text-xs font-bold px-2.5 py-0.5 rounded-full"
-                style={{ backgroundColor: nextLessonStage?.tint, color: nextLessonStage?.deep }}
-              >
-                {nextLessonStage?.title}
-              </span>
-              <span className="text-xs text-[#867A72]">
-                Lekcja {nextLesson.lessonNumber} z 52
+          {/* PRAWA KOLUMNA: PLAYLISTA Z WYBOREM TEMATYCZNYM (4 cols) */}
+          <div className="lg:col-span-4 bg-[#FFFDFA] dark:bg-[#1C081A] rounded-3xl p-4 sm:p-5 border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm space-y-3.5">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#EAE3DB] dark:border-[#3D0E39]">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#DA0271]">
+                  Moduł {parseInt(activeStage?.num || '1', 10)} z 9
+                </span>
+                <h3 className="font-brand-display font-bold text-base text-[#250A24] dark:text-[#FBF8F4] leading-tight">
+                  {getStageDisplayTitle(activeStage)}
+                </h3>
+              </div>
+              <span className="text-xs font-mono font-semibold text-[#867A72] dark:text-[#C4ADC0]">
+                {activeStageLessons.filter((l) => completedLessons.includes(l.id)).length}/{activeStageLessons.length}
               </span>
             </div>
 
-            <h2 className="font-brand-display font-semibold text-xl sm:text-2xl text-[#1A1512]">
-              {nextLesson.title}
-            </h2>
+            {/* Lista lekcji w aktywnym module */}
+            <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
+              {activeStageLessons.map((l) => {
+                const isActive = l.id === activeLesson.id;
+                const isDone = completedLessons.includes(l.id);
 
-            <p className="text-sm text-[#544A44] line-clamp-2 leading-relaxed">
-              {nextLesson.description}
-            </p>
+                return (
+                  <button
+                    key={l.id}
+                    onClick={() => handleSelectLesson(l)}
+                    className={`w-full text-left p-2.5 rounded-xl border transition-all flex items-start gap-2.5 cursor-pointer ${
+                      isActive
+                        ? 'bg-[#DA0271]/10 dark:bg-[#DA0271]/20 border-[#DA0271] shadow-xs'
+                        : 'bg-[#FBF8F4] dark:bg-[#250A24] hover:bg-[#F3EBE3] dark:hover:bg-[#2F0D2E] border-[#EAE3DB] dark:border-[#3D0E39]'
+                    }`}
+                  >
+                    <div className="relative w-12 h-9 rounded-md overflow-hidden shrink-0 bg-black/20 flex items-center justify-center">
+                      <Image
+                        src={l.thumbnailUrl}
+                        alt={l.title}
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        {isActive ? (
+                          <span className="w-2 h-2 rounded-full bg-[#FCD705] animate-ping" />
+                        ) : (
+                          <Play className="w-3 h-3 text-white fill-current ml-0.5" />
+                        )}
+                      </div>
+                    </div>
 
-            <div className="pt-2 flex flex-wrap items-center gap-3">
-              <Link
-                href={`/strefa/lekcja/${nextLesson.id}?autoplay=true`}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs sm:text-sm font-semibold transition-all shadow-md shadow-[#EC008C]/25 hover:scale-105"
-              >
-                <Play className="w-3.5 h-3.5 fill-current text-[#FCD705]" />
-                <span>Odtwórz lekcję ({nextLesson.durationFormatted})</span>
-              </Link>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1 mb-0.5">
+                        <span className="text-[10px] font-bold text-[#867A72] dark:text-[#C4ADC0]">
+                          Lekcja {l.lessonNumber}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] font-mono text-[#867A72] dark:text-[#C4ADC0]">
+                            {l.durationFormatted}
+                          </span>
+                          {isDone && (
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                          )}
+                        </div>
+                      </div>
 
-              <Link
-                href="/strefa/lekcje"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-[#EAE3DB] hover:border-[#1A1512] text-xs sm:text-sm font-semibold text-[#544A44] transition-colors"
-              >
-                <span>Przeglądaj wg etapów</span>
-              </Link>
+                      <h4
+                        className={`text-xs font-semibold line-clamp-2 leading-snug ${
+                          isActive
+                            ? 'text-[#DA0271] dark:text-[#FF4BA8] font-bold'
+                            : 'text-[#250A24] dark:text-[#FBF8F4]'
+                        }`}
+                      >
+                        {l.title}
+                      </h4>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Szybki wybór modułów tematycznych (bez tajemniczego "etap etap") */}
+            <div className="pt-2.5 border-t border-[#EAE3DB] dark:border-[#3D0E39] space-y-2">
+              <span className="text-[11px] font-semibold text-[#867A72] dark:text-[#C4ADC0] block">
+                Zmień moduł tematyczny:
+              </span>
+              <div className="grid grid-cols-3 gap-1.5">
+                {stages.map((st) => {
+                  const isCurrent = st.id === activeLesson.stageId;
+                  return (
+                    <button
+                      key={st.id}
+                      onClick={() => handleSelectStage(st)}
+                      className={`text-[10px] py-1.5 px-1 rounded-lg font-semibold transition-all truncate text-center cursor-pointer ${
+                        isCurrent
+                          ? 'bg-[#DA0271] text-white shadow-xs'
+                          : 'bg-[#FBF8F4] dark:bg-[#250A24] hover:bg-[#EAE3DB] dark:hover:bg-[#3D0E39] text-[#544A44] dark:text-[#D7CCC3] border border-[#EAE3DB] dark:border-[#3D0E39]'
+                      }`}
+                      title={getStageDisplayTitle(st)}
+                    >
+                      {getStageShortBadge(st)}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="pt-1">
+                <Link
+                  href="/strefa/lekcje"
+                  className="w-full flex items-center justify-center gap-1 text-xs font-semibold text-[#DA0271] hover:underline py-1"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Katalog wszystkich 52 lekcji VOD &rarr;</span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* 3. KOMPAKTOWY PASEK STATUSU KURSANTKI I PROFILU CIĄŻY */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] shadow-xs space-y-3.5">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#20071E] dark:bg-[#250A24] text-[#FCD705] flex items-center justify-center shrink-0">
+              {role === 'partner' ? <User className="w-5 h-5 text-[#7FB3CC]" /> : <Heart className="w-5 h-5 text-[#DA0271]" />}
+            </div>
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0]">
+                Profil Kursantki i Status Konta {accountInfo?.email ? `(${accountInfo.email})` : ''}
+              </div>
+              <div className="font-brand-display font-semibold text-sm sm:text-base text-[#250A24] dark:text-[#FBF8F4]">
+                {role === 'partner' ? 'Strefa dla Partnera / Taty aktywna' : 'Strefa dla Mamy aktywna'} · Dostęp ważny 18 miesięcy (548 dni) dla dwojga
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs">
+            <div className="flex items-center gap-1.5 text-[#544A44] dark:text-[#D7CCC3]">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span><strong>{completedLessons.length}</strong> z 52 lekcji ukończonych ({percentCompleted}%)</span>
+            </div>
+
+            <div className="flex items-center gap-1.5 text-[#544A44] dark:text-[#D7CCC3]">
+              <Clock className="w-4 h-4 text-[#DA0271]" />
+              <span>Pozostało: <strong>{remainingHours}h {remainingMins}min</strong></span>
+            </div>
+
+            <button
+              onClick={() => setWizardOpen(true)}
+              className="text-xs font-semibold text-[#DA0271] hover:underline cursor-pointer flex items-center gap-1 border-l border-[#EAE3DB] dark:border-[#3D0E39] pl-3"
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>{pregnancyProfile?.dueDate ? 'Edytuj dane i termin porodu' : 'Ustaw termin porodu i dane'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Podsumowanie zapisanych danych ciążowych kursantki i partnera */}
+        {pregnancyProfile?.dueDate && pregnancyState && (
+          <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] flex flex-wrap items-center justify-between gap-2 text-xs text-[#544A44] dark:text-[#D7CCC3]">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2.5 py-1 rounded-full bg-[#FAE3EB] dark:bg-[#3B0D36] text-[#DA0271] dark:text-[#FF4BA8] font-bold">
+                {pregnancyState.formattedWeek} · {pregnancyState.trimesterLabel}
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+                Termin porodu: <strong>{pregnancyProfile.dueDate}</strong> ({pregnancyState.daysUntilDue >= 0 ? `za ${pregnancyState.daysUntilDue} dni` : 'po terminie'})
+              </span>
+              {pregnancyProfile.babyName && (
+                <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+                  Maluszek: <strong>{pregnancyProfile.babyName}</strong>
+                </span>
+              )}
+              {pregnancyProfile.partnerName && (
+                <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+                  Partner / Tata: <strong>{pregnancyProfile.partnerName}</strong>
+                </span>
+              )}
+              {pregnancyProfile.city && (
+                <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+                  Szpital / Miasto: <strong>{pregnancyProfile.city}</strong>
+                </span>
+              )}
+            </div>
+            <span className="text-[11px] text-[#867A72] dark:text-[#C4ADC0]">
+              Wielkość maluszka: <strong>{pregnancyState.babyComparison.fruit}</strong> ({pregnancyState.babyComparison.weight})
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* 3. SZYBKI DOSTĘP SOS (Licznik 5-1-1, Apteczka, Partner) */}
-      <div className="space-y-4">
+      {/* 4. SZYBKIE NARZĘDZIA SOS (3 najważniejsze kafelki dla rodziców) */}
+      <section className="space-y-3.5">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
-              Niezbędnik na każdy dzień i noc
+            <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
+              Praktyczny Niezbędnik Porodowy
             </span>
-            <h2 className="font-brand-display font-bold text-2xl sm:text-3xl text-[#1A1512] mt-0.5">
-              Narzędzia SOS
+            <h2 className="font-brand-display font-semibold text-xl sm:text-2xl text-[#250A24] dark:text-[#FBF8F4]">
+              Narzędzia SOS na każdy dzień i noc
             </h2>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Plan Porodu (PDF) */}
+          {/* Plan Porodu */}
           <Link
             href="/strefa/plan-porodu"
-            className="p-6 rounded-2xl bg-gradient-to-br from-[#EC008C] to-[#98269C] text-white flex flex-col justify-between min-h-[190px] shadow-sm hover:shadow-lg transition-all group"
+            className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#DA0271] to-[#250A24] text-white flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-lg transition-all group"
           >
             <div>
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-widest text-white/80">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">
                   Dokument do Szpitala
                 </span>
                 <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full font-mono font-bold">
                   PDF
                 </span>
               </div>
-              <h3 className="font-brand-display font-bold text-2xl mt-2 text-white">
+              <h3 className="font-brand-display font-semibold text-xl mt-1.5 text-white">
                 Kreator Planu Porodu
               </h3>
-              <p className="text-xs text-white/90 mt-2 leading-relaxed">
-                Zgodny ze Standardem MZ. Zaznacz preferencje, wydrukuj i weź ze sobą na izbę przyjęć.
+              <p className="text-xs text-white/90 mt-1 leading-relaxed">
+                Zgodny ze Standardem Opieki MZ. Zaznacz preferencje, wydrukuj i weź na izbę przyjęć.
               </p>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-white/20 mt-4 text-xs font-semibold">
-              <span>Wypełnij plan porodu</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <div className="flex items-center justify-between pt-3 border-t border-white/20 mt-3 text-xs font-semibold">
+              <span>Wypełnij formularz planu</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
 
-          {/* Cyfrowa Apteczka SOS */}
+          {/* Cyfrowa Apteczka */}
           <Link
             href="/strefa/apteczka"
-            className="p-6 rounded-2xl bg-[#FAE3EB] text-[#1A1512] border border-[#F3CAD9] flex flex-col justify-between min-h-[190px] shadow-sm hover:shadow-lg transition-all group"
+            className="p-5 sm:p-6 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] text-[#1A1512] dark:text-[#FBF8F4] flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-md transition-all group"
           >
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-[#EC008C]">
-                Szybka Pomoc
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#DA0271]">
+                Szybka Pomoc 24/7
               </span>
-              <h3 className="font-brand-display font-bold text-2xl mt-2 text-[#1A1512]">
-                Cyfrowa Apteczka
+              <h3 className="font-brand-display font-semibold text-xl mt-1.5 text-[#250A24] dark:text-[#FBF8F4]">
+                Cyfrowa Apteczka SOS
               </h3>
-              <p className="text-xs text-[#544A44] mt-2 leading-relaxed">
-                Wpisz dolegliwość (ból pleców, zgaga, wody, nawał) i przejdź do instrukcji.
+              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-1 leading-relaxed">
+                Wpisz dolegliwość (ból pleców, zgaga, wody, nawał) i przejdź do nagrania z instrukcją.
               </p>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-[#EC008C]/20 mt-4 text-xs font-semibold text-[#EC008C]">
+            <div className="flex items-center justify-between pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 text-xs font-semibold text-[#DA0271]">
               <span>Szukaj objawu</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
 
           {/* Strefa dla Taty */}
           <Link
             href="/strefa/partner"
-            className="p-6 rounded-2xl bg-[#EAD5E5] text-[#1A1512] border border-[#D5B8CF] flex flex-col justify-between min-h-[190px] shadow-sm hover:shadow-lg transition-all group"
+            className="p-5 sm:p-6 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] text-[#1A1512] dark:text-[#FBF8F4] flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-md transition-all group"
           >
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-[#98269C]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#7FB3CC]">
                 Wsparcie w Porodzie
               </span>
-              <h3 className="font-brand-display font-bold text-2xl mt-2 text-[#1A1512]">
+              <h3 className="font-brand-display font-semibold text-xl mt-1.5 text-[#250A24] dark:text-[#FBF8F4]">
                 Strefa dla Taty
               </h3>
-              <p className="text-xs text-[#544A44] mt-2 leading-relaxed">
-                Pigułka wiedzy dla osoby towarzyszącej: masaż krzyżowy, torba, prawa na izbie i zadania na sali.
+              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-1 leading-relaxed">
+                Pigułka wiedzy dla osoby towarzyszącej: masaż krzyżowy, prawa na izbie i sala porodowa.
               </p>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-[#98269C]/20 mt-4 text-xs font-semibold text-[#98269C]">
-              <span>Otwórz ściągę dla taty</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <div className="flex items-center justify-between pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 text-xs font-semibold text-[#7FB3CC]">
+              <span>Ściąga dla partnera</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
         </div>
-      </div>
+      </section>
 
-      {/* 4. KOKPIT 9 ETAPÓW (Interaktywne kafelki postępu) */}
-      <div className="space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+      {/* 5. PRZEJRZYSTA ŚCIEŻKA 9 MODUŁÓW KURSU (Zamiast tajemniczego "etap etap") */}
+      <section className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#867A72]">
-              Ścieżka edukacyjna
+            <span className="text-xs font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0]">
+              Pełny Program Szkoły Rodzenia
             </span>
-            <h2 className="font-brand-display font-bold text-2xl sm:text-3xl text-[#1A1512] mt-0.5">
-              9 Etapów Twojej Ciąży i Porodu
+            <h2 className="font-brand-display font-semibold text-xl sm:text-2xl text-[#250A24] dark:text-[#FBF8F4] mt-0.5">
+              9 Tematycznych Modułów Programu
             </h2>
-            <p className="text-xs sm:text-sm text-[#544A44] mt-1">
-              Kliknij dowolny etap, aby zobaczyć lekcje wideo dopasowane do Twojego trymestru.
+            <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3] mt-0.5">
+              Kliknięcie modułu ładuje go w odtwarzaczu u góry z pierwszą nieukończoną lekcją.
             </p>
           </div>
 
           <Link
             href="/strefa/lekcje"
-            className="text-xs font-semibold text-[#EC008C] hover:underline flex items-center gap-1 self-start sm:self-auto"
+            className="text-xs font-semibold text-[#DA0271] hover:underline flex items-center gap-1 self-start sm:self-auto"
           >
-            <span>Pokaż całą listę 52 lekcji</span>
+            <span>Katalog wszystkich 52 lekcji</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -393,53 +745,59 @@ export default function StrefaDashboardPage() {
               stageLessons.reduce((acc, curr) => acc + curr.durationSeconds, 0) / 60
             );
 
+            const isCurrentModule = stage.id === activeLesson.stageId;
+
             return (
-              <Link
+              <div
                 key={stage.id}
-                href={`/strefa/lekcje?stage=${stage.id}`}
-                className="group p-6 rounded-2xl bg-white border border-[#EAE3DB] hover:border-[#1A1512]/30 hover:shadow-md transition-all flex flex-col justify-between min-h-[220px]"
+                onClick={() => handleSelectStage(stage)}
+                className={`group p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border transition-all flex flex-col justify-between min-h-[210px] cursor-pointer hover:shadow-md ${
+                  isCurrentModule
+                    ? 'border-[#DA0271] ring-1 ring-[#DA0271]/50 shadow-xs'
+                    : 'border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271]/60'
+                }`}
               >
                 <div>
                   <div className="flex items-start justify-between">
                     <div
-                      className="w-11 h-11 transition-transform group-hover:scale-110"
+                      className="w-10 h-10 transition-transform group-hover:scale-105"
                       style={{ color: stage.deep }}
                     >
                       <StageIcon name={stage.id.replace('e-', '')} />
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <span
                         className="text-[10px] font-bold px-2 py-0.5 rounded-full"
                         style={{ backgroundColor: stage.tint, color: stage.deep }}
                       >
-                        Etap {stage.number}
+                        Moduł {stage.num}
                       </span>
                       {stagePercent === 100 && (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       )}
                     </div>
                   </div>
 
-                  <h3 className="font-brand-display font-semibold text-xl text-[#1A1512] mt-4 group-hover:text-[#EC008C] transition-colors">
-                    {stage.title}
+                  <h3 className="font-brand-display font-semibold text-lg text-[#250A24] dark:text-[#FBF8F4] mt-3 group-hover:text-[#DA0271] transition-colors leading-snug">
+                    {getStageDisplayTitle(stage)}
                   </h3>
-                  <p className="text-xs text-[#544A44] mt-1 line-clamp-2">
-                    {stage.subtitle}
+                  <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-1 line-clamp-2 leading-relaxed">
+                    {getStageFullDescription(stage)}
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-[#EAE3DB]/70 mt-4 space-y-2">
-                  <div className="flex items-center justify-between text-[11px] text-[#867A72]">
+                <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 space-y-2">
+                  <div className="flex items-center justify-between text-[11px] text-[#867A72] dark:text-[#C4ADC0]">
                     <span>
                       {stageLessons.length} lekcji · {totalStageMins} min
                     </span>
-                    <span className="font-mono font-semibold text-[#1A1512]">
+                    <span className="font-mono font-semibold text-[#250A24] dark:text-[#FBF8F4]">
                       {stageCompleted}/{stageLessons.length} ({stagePercent}%)
                     </span>
                   </div>
 
-                  <div className="w-full bg-[#EAE3DB] h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-[#EAE3DB] dark:bg-[#2C0C2B] h-1.5 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{
@@ -449,223 +807,181 @@ export default function StrefaDashboardPage() {
                     />
                   </div>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* 5. 4 FILARY SPOKOJU HAPPYBIRTH & STANDARD MEDYCZNY */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-[#FBF8F4] border border-[#EAE3DB] space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* 6. PLIKI I CHECKLISTY DO POBRANIA (PDF) */}
+      <section className="p-5 sm:p-6 rounded-3xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-4 border-b border-[#EAE3DB] dark:border-[#3D0E39]">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#EC008C]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
-                Metodologia i fundament opieki
-              </span>
-            </div>
-            <h2 className="font-brand-display font-bold text-2xl sm:text-3xl text-[#1A1512] mt-1">
-              4 Filary Spokoju HappyBirth
-            </h2>
-            <p className="text-xs sm:text-sm text-[#544A44] mt-1">
-              Oparte o 14 lat doświadczenia szkoły rodzenia Mama Gaja (od 2012 r.), 18 000 porodów i Standard Opieki Okołoporodowej MZ.
-            </p>
-          </div>
-
-          <Link
-            href="/strefa/standard-medyczny"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold transition-all shrink-0 shadow-md shadow-[#EC008C]/25 hover:scale-105"
-          >
-            <ShieldCheck className="w-4 h-4 text-[#FCD705]" />
-            <span>Standard merytoryczny & E-E-A-T</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link
-            href="/strefa/lekcje?stage=stage-05"
-            className="p-5 rounded-2xl bg-white border border-[#EAE3DB] hover:border-[#EC008C] transition-all group flex flex-col justify-between"
-          >
-            <div className="space-y-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#FAE3EB] text-[#EC008C] flex items-center justify-center font-bold">
-                <Feather className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono font-bold text-[#867A72]">FILAR 01</span>
-                <h3 className="font-brand-display font-bold text-base text-[#1A1512] group-hover:text-[#EC008C] transition-colors">
-                  Poród & Oddech
-                </h3>
-              </div>
-              <p className="text-xs text-[#544A44] leading-relaxed">
-                Pozycje wertykalne, oddech przeponowy, niefarmakologiczne łagodzenie bólu i ochrona krocza.
-              </p>
-            </div>
-            <div className="pt-3 border-t border-[#EAE3DB]/70 mt-3 text-[11px] font-semibold text-[#EC008C] flex items-center justify-between">
-              <span>Zobacz lekcje porodu</span>
-              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-
-          <Link
-            href="/strefa/lekcje?stage=stage-03"
-            className="p-5 rounded-2xl bg-white border border-[#EAE3DB] hover:border-[#98269C] transition-all group flex flex-col justify-between"
-          >
-            <div className="space-y-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#EAD5E5] text-[#98269C] flex items-center justify-center font-bold">
-                <Activity className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono font-bold text-[#867A72]">FILAR 02</span>
-                <h3 className="font-brand-display font-bold text-base text-[#1A1512] group-hover:text-[#98269C] transition-colors">
-                  Ciało & Dno Miednicy
-                </h3>
-              </div>
-              <p className="text-xs text-[#544A44] leading-relaxed">
-                Fizjoterapia uroginekologiczna, masaż krzyżowy z partnerem, mobilność miednicy i bezpieczny połóg.
-              </p>
-            </div>
-            <div className="pt-3 border-t border-[#EAE3DB]/70 mt-3 text-[11px] font-semibold text-[#98269C] flex items-center justify-between">
-              <span>Lekcje fizjoterapii</span>
-              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-
-          <Link
-            href="/strefa/lekcje?stage=stage-08"
-            className="p-5 rounded-2xl bg-white border border-[#EAE3DB] hover:border-[#0088BC] transition-all group flex flex-col justify-between"
-          >
-            <div className="space-y-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#D0EBF3] text-[#0088BC] flex items-center justify-center font-bold">
-                <Heart className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono font-bold text-[#867A72]">FILAR 03</span>
-                <h3 className="font-brand-display font-bold text-base text-[#1A1512] group-hover:text-[#0088BC] transition-colors">
-                  Laktacja & Więź
-                </h3>
-              </div>
-              <p className="text-xs text-[#544A44] leading-relaxed">
-                Fizjologia karmienia, asymetryczny chwyt, nawały pokarmowe oraz czułe karmienie bez presji.
-              </p>
-            </div>
-            <div className="pt-3 border-t border-[#EAE3DB]/70 mt-3 text-[11px] font-semibold text-[#0088BC] flex items-center justify-between">
-              <span>Lekcje laktacji</span>
-              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-
-          <Link
-            href="/strefa/lekcje?stage=stage-09"
-            className="p-5 rounded-2xl bg-white border border-[#EAE3DB] hover:border-[#347A22] transition-all group flex flex-col justify-between"
-          >
-            <div className="space-y-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#DFEED4] text-[#347A22] flex items-center justify-center font-bold">
-                <Baby className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono font-bold text-[#867A72]">FILAR 04</span>
-                <h3 className="font-brand-display font-bold text-base text-[#1A1512] group-hover:text-[#347A22] transition-colors">
-                  Noworodek & I Rok
-                </h3>
-              </div>
-              <p className="text-xs text-[#544A44] leading-relaxed">
-                Kąpiel noworodka, kikut pępowinowy, bezpieczny sen, pierwsza pomoc i zdrowy rozsądek o 3:00 w nocy.
-              </p>
-            </div>
-            <div className="pt-3 border-t border-[#EAE3DB]/70 mt-3 text-[11px] font-semibold text-[#347A22] flex items-center justify-between">
-              <span>Opieka nad dzieckiem</span>
-              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* 6. PLIKI I CHECKLISTY DO POBRANIA */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white border border-[#EAE3DB] shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#EAE3DB]">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
-              Pliki do druku i na telefon
+            <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
+              Pliki do druku A4 i na telefon
             </span>
-            <h2 className="font-brand-display font-bold text-2xl text-[#1A1512] mt-0.5">
-              Materiały do pobrania
+            <h2 className="font-brand-display font-semibold text-xl text-[#250A24] dark:text-[#FBF8F4] mt-0.5">
+              Materiały i szablony do pobrania (PDF)
             </h2>
           </div>
-          <span className="text-xs text-[#867A72]">
-            Formaty PDF przygotowane do druku A4
+          <span className="text-xs text-[#867A72] dark:text-[#C4ADC0]">
+            Formaty PDF gotowe do druku
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6">
-          <div className="p-4 rounded-xl border border-[#EAE3DB] hover:border-[#EC008C] transition-colors flex flex-col justify-between">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-4">
+          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#EC008C] uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-[#DA0271] uppercase tracking-wider">
                 PDF · 2 strony
               </span>
-              <h4 className="text-sm font-bold text-[#1A1512]">Plan Porodu (Standard MZ)</h4>
-              <p className="text-xs text-[#544A44]">
+              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">Plan Porodu (Standard MZ)</h4>
+              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3]">
                 16 kluczowych punktów do przekazania położnej na izbie przyjęć.
               </p>
             </div>
-            <button className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] hover:text-[#EC008C]">
+            <Link href="/strefa/plan-porodu" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#DA0271] hover:underline">
               <Download className="w-3.5 h-3.5" />
-              <span>Pobierz wzór PDF</span>
-            </button>
+              <span>Otwórz wzór PDF</span>
+            </Link>
           </div>
 
-          <div className="p-4 rounded-xl border border-[#EAE3DB] hover:border-[#EC008C] transition-colors flex flex-col justify-between">
+          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#EC008C] uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-[#DA0271] uppercase tracking-wider">
                 PDF · 3 strefy
               </span>
-              <h4 className="text-sm font-bold text-[#1A1512]">Torba do szpitala</h4>
-              <p className="text-xs text-[#544A44]">
+              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">Torba do szpitala</h4>
+              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3]">
                 Pakowanie: dokumenty, strefa porodu, strefa połogu i noworodka.
               </p>
             </div>
-            <button className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] hover:text-[#EC008C]">
+            <Link
+              href="/kalkulator-wyprawki"
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] dark:text-[#FBF8F4] hover:text-[#DA0271] cursor-pointer"
+            >
               <Download className="w-3.5 h-3.5" />
-              <span>Pobierz checklistę</span>
-            </button>
+              <span>Otwórz checklistę PDF</span>
+            </Link>
           </div>
 
-          <div className="p-4 rounded-xl border border-[#EAE3DB] hover:border-[#EC008C] transition-colors flex flex-col justify-between">
+          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#EC008C] uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-[#DA0271] uppercase tracking-wider">
                 PDF · Kalendarz
               </span>
-              <h4 className="text-sm font-bold text-[#1A1512]">Badania w ciąży</h4>
-              <p className="text-xs text-[#544A44]">
+              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">Badania w ciąży</h4>
+              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3]">
                 Tabela badań laboratoryjnych i USG wg Standardu Opieki Okołoporodowej.
               </p>
             </div>
-            <button className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] hover:text-[#EC008C]">
+            <a
+              href="/materialy/kalendarz-badan-w-ciazy-happybirth.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] dark:text-[#FBF8F4] hover:text-[#DA0271] cursor-pointer"
+            >
               <Download className="w-3.5 h-3.5" />
-              <span>Pobierz kalendarz</span>
-            </button>
+              <span>Pobierz kalendarz PDF</span>
+            </a>
           </div>
 
-          <div className="p-4 rounded-xl border border-[#EAE3DB] hover:border-[#98269C] transition-colors flex flex-col justify-between">
+          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#7FB3CC] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#98269C] uppercase tracking-wider">
-                PDF · Ściąga
-              </span>
-              <h4 className="text-sm font-bold text-[#1A1512]">Ściąga dla Taty</h4>
-              <p className="text-xs text-[#544A44]">
-                Ściąga na porodówkę: punkty ucisku, pozycje i zadania osoby towarzyszącej.
+              <div className="flex flex-wrap items-center justify-between gap-1">
+                <span className="text-[10px] font-bold text-[#7FB3CC] uppercase tracking-wider">
+                  ✨ {smartOrderBump.autoDetectedBadge}
+                </span>
+                {hasOrderBump ? (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                    ✓ Pakiet odblokowany
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#DA0271]/15 text-[#DA0271] dark:text-[#FF7AC3]">
+                    🔒 Dodatek Order Bump (+49 zł)
+                  </span>
+                )}
+              </div>
+              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">
+                {smartOrderBump.checkoutTitlePl}
+              </h4>
+              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3]">
+                {smartOrderBump.checkoutDescPl}
               </p>
             </div>
-            <button className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] hover:text-[#98269C]">
-              <Download className="w-3.5 h-3.5" />
-              <span>Pobierz ściągę</span>
-            </button>
+            {hasOrderBump ? (
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <a
+                  href={`${smartOrderBump.editionConfig.url}&unlocked=1`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#7FB3CC] hover:underline"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Otwórz pełny pakiet PDF ({smartOrderBump.editionConfig.languageLabel})</span>
+                </a>
+                <a
+                  href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-uk&unlocked=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+                >
+                  🇵🇱🇬🇧 UK/IE
+                </a>
+                <a
+                  href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-de&unlocked=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+                >
+                  🇵🇱🇩🇪 DACH
+                </a>
+                <a
+                  href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-nl&unlocked=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+                >
+                  🇵🇱🇳🇱 NL
+                </a>
+              </div>
+            ) : (
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                <a
+                  href={`${smartOrderBump.editionConfig.url}&preview=1`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#7FB3CC] hover:underline"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Podgląd Karty #1 (Demo)</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={handleBuyStandaloneOrderBump}
+                  disabled={buyingOrderBump}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#DA0271] text-white text-[11px] font-bold hover:bg-[#B8005E] cursor-pointer disabled:opacity-60"
+                >
+                  <span>
+                    {buyingOrderBump
+                      ? 'Otwieranie Stripe...'
+                      : `Dokup pełny pakiet (${smartOrderBump.editionConfig.priceDisplay || '+49 zł'})`}
+                  </span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* MODAL ONBOARDINGU / PERSONALIZACJI */}
+      {/* 7. [C4] STUDENT REFERRAL BOX (Poleć kurs przyjaciółce w ciąży -> -10% dla niej + E-book Kulinarny PDF dla Ciebie) */}
+      <StudentReferralBox />
+
+      {/* 8. [C3] KRÓTKI QUIZ KOŃCOWY + IMIENNY CERTYFIKAT UKOŃCZENIA SZKOŁY RODZENIA */}
+      <FinalQuizAndCertificate />
+
+      {/* MODAL ONBOARDINGU / PERSONALIZACJI TERMINU */}
       <OnboardingWizard
         isOpen={wizardOpen}
         onClose={() => setWizardOpen(false)}
@@ -673,5 +989,20 @@ export default function StrefaDashboardPage() {
         initialProfile={pregnancyProfile}
       />
     </div>
+  );
+}
+
+export default function StrefaDashboardPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="max-w-7xl mx-auto px-4 py-16 text-center text-[#867A72] dark:text-[#C4ADC0]">
+          <div className="w-10 h-10 border-4 border-[#DA0271]/30 border-t-[#DA0271] rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm">Ładowanie Strefy Rodziców...</p>
+        </div>
+      }
+    >
+      <StrefaDashboardContent />
+    </React.Suspense>
   );
 }

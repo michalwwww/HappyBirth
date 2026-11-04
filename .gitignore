@@ -19,3 +19,6 @@ Thumbs.db
 tsconfig.tsbuildinfo
 .wrangler/
 .wrangler
+spółka/
+sp*ka/
+HappyBirth-przekazanie*/

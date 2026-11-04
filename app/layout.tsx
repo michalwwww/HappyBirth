@@ -72,7 +72,7 @@ const educationalJsonLd = {
       '@id': 'https://happybirth.pl/#course',
       name: 'Edukacyjny Kurs Przygotowania do Porodu i Rodzicielstwa Online',
       description:
-        'Kompleksowy program edukacyjny online w formule e-learning VOD dla mam i ojców. 52 filmowe lekcje w 9 modułach tematycznych.',
+        'Kompleksowy program edukacyjny online w formule e-learning VOD dla mam i ojców. 52 filmowe lekcje 4K w 8 modułach tematycznych (288 min) z 18-miesięcznym dostępem.',
       provider: {
         '@id': 'https://happybirth.pl/#organization',
       },
@@ -86,7 +86,7 @@ const educationalJsonLd = {
       },
       offers: {
         '@type': 'Offer',
-        price: '349',
+        price: '489',
         priceCurrency: 'PLN',
         availability: 'https://schema.org/InStock',
         category: 'Education / E-learning Course',
@@ -103,15 +103,39 @@ export default function RootLayout({
   return (
     <html
       lang="pl"
+      data-fonty="a"
       className={`scroll-smooth ${bricolage.variable} ${instrumentSerif.variable} ${inter.variable}`}
     >
       <head>
+        <link rel="stylesheet" href="/assets/hb.e90a1fdd5e.css" />
+        <link as="font" crossOrigin="" href="/f/hanken-lat.woff2" rel="preload" type="font/woff2" />
+        <link as="font" crossOrigin="" href="/f/instrument-sans-rg-lat.woff2" rel="preload" type="font/woff2" />
+        <link as="font" crossOrigin="" href="/f/instrument-serif-rg-lat.woff2" rel="preload" type="font/woff2" />
+        <link as="font" crossOrigin="" href="/f/instrument-serif-it-lat.woff2" rel="preload" type="font/woff2" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(educationalJsonLd) }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+              try {
+                var t = localStorage.getItem('hb_theme');
+                if (t === 'dark') {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+                var l = localStorage.getItem('hb_lang');
+                if (l && (l === 'pl' || l === 'en' || l === 'ru')) {
+                  document.documentElement.lang = l;
+                }
+              } catch (e) {}
+            })()`,
+          }}
+        />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#FBF8F4] dark:bg-[#140513] text-[#1A1512] dark:text-[#FBF8F4] antialiased selection:bg-[#EC008C]/20">
+      <body className="min-h-screen flex flex-col bg-[#FBF8F4] dark:bg-[#140513] text-[#1A1512] dark:text-[#FBF8F4] antialiased selection:bg-[#EC008C]/20 transition-colors duration-200">
         <I18nProvider>
           {children}
           <CookieBanner />

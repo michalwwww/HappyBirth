@@ -7,6 +7,7 @@ import { getLessonById, getAdjacentLessons, getLessonsByStage, getStageById } fr
 import { CloudflarePlayer } from '@/components/cloudflare-player';
 import { LessonCard } from '@/components/lesson-card';
 import { useCourseProgress } from '@/lib/progress';
+import { openPrintableLessonWorksheet } from '@/lib/printable-worksheets';
 import { FileText, Download, ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface StrefaLessonClientProps {
@@ -31,9 +32,9 @@ export default function StrefaLessonClient({ lessonId }: StrefaLessonClientProps
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
       {/* Breadcrumb & Navigation */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#867A72]">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#867A72] dark:text-[#C4ADC0]">
         <div className="flex items-center space-x-2">
-          <Link href={`${prefix}/lekcje`} className="hover:text-[#1A1512] transition-colors flex items-center gap-1">
+          <Link href={`${prefix}/lekcje`} className="hover:text-[#250A24] dark:hover:text-[#FBF8F4] transition-colors flex items-center gap-1">
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Katalog lekcji</span>
           </Link>
@@ -45,14 +46,14 @@ export default function StrefaLessonClient({ lessonId }: StrefaLessonClientProps
             {stage?.title}
           </span>
           <span>/</span>
-          <span className="text-[#1A1512] font-semibold">Lekcja {lesson.lessonNumber}</span>
+          <span className="text-[#250A24] dark:text-[#FBF8F4] font-semibold">Lekcja {lesson.lessonNumber}</span>
         </div>
 
         <div className="flex items-center space-x-2">
           {prev && (
             <Link
               href={`${prefix}/lekcja/${prev.id}`}
-              className="hover:text-[#1A1512] transition-colors flex items-center gap-1"
+              className="hover:text-[#250A24] dark:hover:text-[#FBF8F4] transition-colors flex items-center gap-1"
             >
               <span>Poprzednia</span>
             </Link>
@@ -61,7 +62,7 @@ export default function StrefaLessonClient({ lessonId }: StrefaLessonClientProps
           {next && (
             <Link
               href={`${prefix}/lekcja/${next.id}?autoplay=true`}
-              className="hover:text-[#1A1512] transition-colors flex items-center gap-1 font-semibold text-[#EC008C]"
+              className="hover:text-[#250A24] dark:hover:text-[#FBF8F4] transition-colors flex items-center gap-1 font-semibold text-[#DA0271]"
             >
               <span>Następna</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -84,7 +85,7 @@ export default function StrefaLessonClient({ lessonId }: StrefaLessonClientProps
           />
 
           {/* Lesson Title & Stage */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#EAE3DB] space-y-4 shadow-sm">
+          <div className="bg-[#FFFDFA] dark:bg-[#1C081A] rounded-3xl p-6 sm:p-8 border border-[#EAE3DB] dark:border-[#3D0E39] space-y-4 shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span
                 className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold font-mono tracking-wider"
@@ -93,46 +94,46 @@ export default function StrefaLessonClient({ lessonId }: StrefaLessonClientProps
                 ETAP {stage?.num} · {stage?.title}
               </span>
 
-              <span className="text-xs text-[#867A72] font-medium font-mono">
+              <span className="text-xs text-[#867A72] dark:text-[#C4ADC0] font-medium font-mono">
                 Czas nagrania: {lesson.durationFormatted} min
               </span>
             </div>
 
-            <h1 className="font-brand-display font-bold text-2xl sm:text-3xl text-[#1A1512] leading-tight">
+            <h1 className="font-brand-display font-semibold text-2xl sm:text-3xl text-[#250A24] dark:text-[#FBF8F4] leading-tight">
               {lesson.title}
             </h1>
 
-            <p className="text-sm text-[#544A44] leading-relaxed">
+            <p className="text-sm text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
               {lesson.description}
             </p>
 
             {/* Attachments Section */}
             {lesson.attachments && lesson.attachments.length > 0 && (
-              <div className="pt-4 border-t border-[#EAE3DB] space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#867A72] flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-[#EC008C]" /> Materiały do pobrania (PDF)
+              <div className="pt-4 border-t border-[#EAE3DB] dark:border-[#3D0E39] space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0] flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-[#DA0271]" /> Materiały do pobrania (PDF)
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {lesson.attachments.map((att) => (
                     <div
                       key={att.id}
-                      className="p-3.5 rounded-2xl bg-[#FBF8F4] border border-[#EAE3DB] flex items-center justify-between gap-3 text-xs"
+                      className="p-3.5 rounded-2xl bg-[#FBF8F4] dark:bg-[#220820] border border-[#EAE3DB] dark:border-[#3D0E39] flex items-center justify-between gap-3 text-xs"
                     >
                       <div className="flex items-center space-x-2.5">
                         <div className="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-[10px]">
                           PDF
                         </div>
                         <div>
-                          <div className="font-semibold text-[#1A1512]">{att.name}</div>
-                          <div className="text-[11px] text-[#867A72]">{att.size}</div>
+                          <div className="font-semibold text-[#250A24] dark:text-[#FBF8F4]">{att.name}</div>
+                          <div className="text-[11px] text-[#867A72] dark:text-[#C4ADC0]">{att.size}</div>
                         </div>
                       </div>
 
                       <button
-                        onClick={() => alert(`Pobieranie materiału: ${att.name}`)}
-                        className="p-2 rounded-lg bg-white hover:bg-[#EC008C] hover:text-white hover:border-[#EC008C] border border-[#EAE3DB] transition-colors"
-                        title="Pobierz PDF"
+                        onClick={() => openPrintableLessonWorksheet(lesson, att.name)}
+                        className="p-2 rounded-lg bg-white dark:bg-[#1C081A] hover:bg-[#DA0271] hover:text-white hover:border-[#DA0271] border border-[#EAE3DB] dark:border-[#3D0E39] transition-colors cursor-pointer text-[#250A24] dark:text-[#FBF8F4]"
+                        title="Otwórz i wydrukuj Kartę Pracy PDF"
                       >
                         <Download className="w-3.5 h-3.5" />
                       </button>
@@ -146,13 +147,13 @@ export default function StrefaLessonClient({ lessonId }: StrefaLessonClientProps
 
         {/* Right Col (4 cols): Stage Lessons Sidebar */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="bg-white rounded-3xl p-6 border border-[#EAE3DB] shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE3DB]">
+          <div className="bg-[#FFFDFA] dark:bg-[#1C081A] rounded-3xl p-6 border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#EAE3DB] dark:border-[#3D0E39]">
               <div>
-                <h3 className="font-brand-display font-bold text-base text-[#1A1512]">
+                <h3 className="font-brand-display font-semibold text-base text-[#250A24] dark:text-[#FBF8F4]">
                   Lekcje w tym etapie
                 </h3>
-                <p className="text-xs text-[#867A72]">
+                <p className="text-xs text-[#867A72] dark:text-[#C4ADC0]">
                   {stage?.title} ({stageLessons.length} lekcji)
                 </p>
               </div>

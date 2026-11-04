@@ -9,9 +9,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('hb_theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-      
+      const shouldBeDark = savedTheme === 'dark';
       setIsDark(shouldBeDark);
       if (shouldBeDark) {
         document.documentElement.classList.add('dark');
@@ -19,6 +17,14 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
         document.documentElement.classList.remove('dark');
       }
     }
+
+    const handleSync = () => {
+      if (typeof window !== 'undefined') {
+        setIsDark(document.documentElement.classList.contains('dark'));
+      }
+    };
+    window.addEventListener('hb_theme_updated', handleSync);
+    return () => window.removeEventListener('hb_theme_updated', handleSync);
   }, []);
 
   const toggleTheme = () => {
