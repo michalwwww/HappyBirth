@@ -13,7 +13,6 @@ import { getMarketingTranslations } from '@/lib/marketing-i18n';
 export function MarketingNavbar() {
   const isDev = typeof window !== 'undefined' && window.location.hostname.includes('localhost');
   const strefaUrl = isDev ? '/strefa' : 'https://strefa.happybirth.pl';
-  const partnerzyUrl = isDev ? '/partnerzy' : 'https://partnerzy.happybirth.pl';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { lang } = useI18n();
   const t = getMarketingTranslations(lang).nav;
@@ -77,6 +76,7 @@ export function MarketingNavbar() {
             <span className="text-[#EAD5E5]/60 hidden lg:inline border-l border-[#461643] pl-2.5">{t.haveAccount}</span>
             <a
               href={strefaUrl}
+              rel="nofollow"
               className="inline-flex items-center gap-1 font-semibold text-white hover:text-[#EC008C] transition-colors whitespace-nowrap"
             >
               <LogIn className="w-3 h-3 text-[#EC008C]" />
@@ -118,6 +118,7 @@ export function MarketingNavbar() {
           <div className="flex items-center space-x-3 shrink-0">
             <a
               href={strefaUrl}
+              rel="nofollow"
               className="hidden sm:inline-flex items-center space-x-1 text-xs font-semibold text-[#544A44] dark:text-[#D7CCC3] hover:text-[#EC008C] dark:hover:text-[#EC008C] px-2 py-1.5 transition-colors whitespace-nowrap"
             >
               <span>{t.zoneBtn}</span>
@@ -158,13 +159,13 @@ export function MarketingNavbar() {
                   {link.label}
                 </a>
               ))}
-              <a
-                href={partnerzyUrl}
+              <Link
+                href="/dla-ciebie"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-3 py-2.5 rounded-xl text-sm font-medium text-[#867A72] dark:text-[#A2958C] hover:bg-stone-100 dark:hover:bg-white/5 hover:text-[#1A1512] dark:hover:text-white transition-colors"
               >
-                {t.partnerB2B}
-              </a>
+                Dla Ciebie · Prawa i Standard 2026
+              </Link>
             </div>
 
             <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3A1038] space-y-2.5">
@@ -175,6 +176,7 @@ export function MarketingNavbar() {
 
               <a
                 href={strefaUrl}
+                rel="nofollow"
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full py-2.5 rounded-full border border-[#EAE3DB] dark:border-[#3A1038] bg-white dark:bg-[#250A24] text-[#1A1512] dark:text-[#FBF8F4] text-xs font-semibold flex items-center justify-center gap-1.5 hover:border-[#EC008C] transition-colors"
               >
@@ -188,4 +190,3 @@ export function MarketingNavbar() {
     </header>
   );
 }
-

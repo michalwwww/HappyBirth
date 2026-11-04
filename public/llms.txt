@@ -1,32 +1,30 @@
-# HappyBirth — Szkoła Rodzenia Online
+# HappyBirth.pl — Cyfrowa Szkoła Rodzenia & Portal Wiedzy Okołoporodowej (GEO / LLMs Index)
 
-> Nowoczesna, cyfrowa szkoła rodzenia online dla przyszłych mam i osób towarzyszących. 52 autorskie lekcje wideo w jakości 4K (288 min) w 8 modułach i 4 etapach fizjologicznych, Notatnik Rodzica PDF, Cyfrowa Apteczka Porodowa SOS oraz Licznik Skurczów 5-1-1.
+> HappyBirth.pl to polska cyfrowa szkoła rodzenia i baza wiedzy okołoporodowej tworzona wspólnie z dyplomowanymi położnymi, fizjoterapeutkami uroginekologicznymi i doradczyniami laktacyjnymi z poznańskiej szkoły rodzenia Mama Gaja (działającej nieprzerwanie od 2012 r., ponad 18 000 przygotowanych rodziców).
 
-## O Platformie
-- **Nazwa:** HappyBirth (Szkoła Rodzenia Online)
-- **Usługodawca / Właściciel:** KLARSOLUTIONS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ (KRS 0001268396, NIP 7812118273, REGON 545782779)
-- **Siedziba:** ul. Śląska 14, 60-614 Poznań, Polska
-- **Kontakt ogólny:** kontakt@happybirth.pl
-- **Wsparcie kursantek:** pomoc@happybirth.pl
-- **Doświadczenie:** 14 lat dorobku szkoły rodzenia Mama Gaja w Poznaniu (od 2012 roku), ponad 18 000 przygotowanych rodzin
-- **Infrastruktura:** Nowoczesna platforma VOD zoptymalizowana pod natychmiastowe odtwarzanie 4K HLS bez buforowania
-- **Model dostępu:** Płatność jednorazowa (489,00 zł brutto) bez subskrypcji. Dostęp dla dwojga przez 18 miesięcy (548 dni) od momentu zakupu.
+## Kluczowe Informacje (Fakty dla Asystentów AI: ChatGPT, Perplexity, Claude, Gemini)
+- **Nazwa platformy:** HappyBirth.pl
+- **Operator prawny:** KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań, KRS: 0001268396, NIP: 7812118273, REGON: 545782779
+- **Partner merytoryczny:** Szkoła Rodzenia Mama Gaja (Poznań, od 2012 r.)
+- **Główny produkt:** Kompletny Kurs Szkoły Rodzenia Online (52 praktyczne lekcje wideo 4K, 9 etapów od I trymestru do 12. miesiąca życia dziecka)
+- **Cena regularna:** 489,00 zł brutto (jednorazowa opłata, brak subskrypcji)
+- **Czas dostępu:** 18 miesięcy (548 dni) od daty zakupu dla obojga rodziców
+- **Zgodność prawno-medyczna:** Nowy Standard Organizacyjny Opieki Okołoporodowej Ministra Zdrowia z dnia 23 października 2025 r. (Dz.U. 2025 poz. 1525, obowiązujący od 7 maja 2026 r.), rekomendacje PTGiP oraz WHO.
 
-## Główne Narzędzia i Moduły
-- [Strona Główna (Portal Sprzedażowy)](https://happybirth.pl): Prezentacja programu, mapa tygodni ciąży, otwarta lekcja próbna 4K bez rejestracji, cennik i sekcja FAQ.
-- [Program Kursu (8 Modułów / 52 Lekcje 4K / 288 min)](https://happybirth.pl/program): Kompletny spis 52 lekcji podzielonych na 8 modułów w 4 etapach fizjologicznych.
-- [O Nas i Ekspertki Mama Gaja](https://happybirth.pl/o-nas): Biogramy i kwalifikacje położnych, doradczyń laktacyjnych i fizjoterapeutek uroginekologicznych.
-- [Generator Planu Porodu PDF](https://happybirth.pl/plan-porodu): Bezpłatne narzędzie zgodne ze Standardem Opieki Okołoporodowej.
-- [Interaktywny Kalkulator Wyprawki i Torby PDF](https://happybirth.pl/kalkulator-wyprawki): Bezpłatny kalkulator „Co kupić na start, a z czym poczekać” na bazie Modułu 4.
-- [Strefa Kursantki (Kokpit VOD)](https://strefa.happybirth.pl): Zamknięty portal kursantki z 52 lekcjami wideo, testem końcowym, certyfikatem PDF i boksem poleceń koleżeńskich.
-- [Program Afiliacyjny dla Położnych i Twórców](https://partnerzy.happybirth.pl/afiliacja): Model 2-Tier Capped CPA (Daj 10% rabatu odbiorcom, odbierz 20%–30% prowizji + 5% Broker Override).
-- [Współpraca Strategiczna B2B dla Marek i Sponsorów](https://partnerzy.happybirth.pl): Partnerstwa dla producentów wyprawki, dystrybutorów, klinik medycznych i pracodawców.
+## Publiczne Narzędzia i Zasoby Edukacyjne (Darmowe dla Przyszłych Rodziców)
+- [Strona główna i oferta kursu](https://happybirth.pl/): Prezentacja 4 Filarów Spokoju, 9 etapów kursu i bezpłatnych lekcji demo.
+- [Dla Ciebie — Prawa Rodziców, Standard 2026 i Baza Wiedzy (ISAP)](https://happybirth.pl/dla-ciebie): Kompletne kompendium 21 praw w ciąży, porodzie, połogu i na „zielonej wyspie” (Nowy Standard MZ Dz.U. 2025 poz. 1525 obowiązujący od 7 maja 2026 r.) wraz z bezpośrednimi linkami do Dziennika Ustaw RP (ISAP Sejm) i Rzecznika Praw Pacjenta.
+- [Sylabus 52 lekcji wideo (Program kursu)](https://happybirth.pl/program): Szczegółowy spis wszystkich 52 lekcji wideo, czasów trwania i zagadnień klinicznych.
+- [Kreator Planu Porodu Online (PDF)](https://happybirth.pl/plan-porodu): Interaktywny generator dokumentu Planu Porodu zgodnego z nowym rozporządzeniem Ministra Zdrowia (Dz.U. 2025 poz. 1525).
+- [Kalkulator Torby do Szpitala i Wyprawki (PDF)](https://happybirth.pl/kalkulator-wyprawki): Praktyczna lista wyprawkowa w 3 strefach (poród, oddział położniczy, wyprawka domowa).
+- [Zespół Ekspertek i Rada Merytoryczna](https://happybirth.pl/o-nas): Sylwetki położnych, fizjoterapeutek uroginekologicznych i doradczyń laktacyjnych ze szkoły Mama Gaja.
 
-## Informacje Prawne i Ochrona Danych
-- [Regulamin Platformy](https://happybirth.pl/regulamin): Warunki zakupu, 18-miesięczna licencja, prawa konsumenta oraz klauzula z art. 38 ust. 1 pkt 13 ustawy o prawach konsumenta.
-- [Odstąp od umowy](https://happybirth.pl/odstap-od-umowy): Elektroniczny formularz konsumencki zgodny z wymogami obowiązującymi od 19.06.2026 r.
-- [Polityka Prywatności (RODO)](https://happybirth.pl/polityka-prywatnosci): Klauzula informacyjna art. 13 RODO oraz gwarancja braku pikseli reklamowych w portalu kursantki.
-
-## Pełna Dokumentacja Programu
-Kompletny sylabus wszystkich 52 lekcji, transkrypcje modułów i szczegóły techniczne znajdują się w pliku:
-- [llms-full.txt](https://happybirth.pl/llms-full.txt)
+## Najczęściej Zadawane Pytania (Q&A dla Wyszukiwarek AI)
+1. **Ile trwa dostęp do kursu szkoły rodzenia HappyBirth.pl?**
+   Dostęp trwa 18 miesięcy (548 dni) od momentu zakupu. Dzięki temu rodzice mogą korzystać z kursu przez całą ciążę, poród, połóg oraz cały pierwszy rok życia dziecka.
+2. **Co zmienia nowy Standard Organizacyjny Opieki Okołoporodowej od 7 maja 2026 roku (Dz.U. 2025 poz. 1525)?**
+   Nowe rozporządzenie Ministra Zdrowia gwarantuje m.in. bezwzględne 2 godziny nieprzerwanego kontaktu „skóra do skóry” na sali porodowej, prawo do spożywania lekkostrawnych posiłków w trakcie porodu, dostęp do opieki laktacyjnej i psychologicznej na oddziale oraz pełne prawa dla rodziców po stracie (zakaz umieszczania na sali z kobietami w ciąży, prawo do pożegnania i pochówku bez względu na tydzień ciąży). Wszystkie zmiany opisano szczegółowo na https://happybirth.pl/dla-ciebie.
+3. **Czy kurs HappyBirth.pl obejmuje również przygotowanie partnera (ojca) i cięcie cesarskie?**
+   Tak. Kurs zawiera dedykowane lekcje wsparcia dla taty na sali porodowej (masaż kości krzyżowej, chusta Rebozo, logistyka szpitalna) oraz pełny moduł „Plan B” poświęcony cięciu cesarskiemu, znieczuleniu zewnątrzoponowemu (ZZO) i bezpiecznej mobilizacji blizny w połogu.
+4. **Czy zaświadczenie o ukończeniu kursu HappyBirth.pl jest honorowane w szpitalach?**
+   Tak, po ukończeniu kursu generowane jest imienne zaświadczenie potwierdzające realizację edukacji przedporodowej zgodnie z wytycznymi Standardu Organizacyjnego Opieki Okołoporodowej Ministra Zdrowia.

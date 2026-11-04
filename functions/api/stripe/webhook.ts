@@ -203,9 +203,25 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           }
         }
 
-        // 6. [D1b] + [D2] Rozliczenie prowizji afiliacyjnej (Kod rabatowy nadrzędny wobec ?ref= cookie + blokada self-referral)
+        // 6. [D1b] + [D2] Rozliczenie prowizji afiliacyjnej (Kod rabatowy nadrzędny wobec ?ref= cookie + blokada self-referral + blokada VIP100/0 PLN)
+        const bumpMinorByCurrency: Record<string, number> = {
+          PLN: 4900,
+          EUR: 1200,
+          USD: 1400,
+          GBP: 1000,
+        };
+        const bumpMinor = orderBumpIncluded
+          ? (bumpMinorByCurrency[sessionCurrency] ?? 4900)
+          : 0;
+        const courseNetBase = Math.max(0, amountTotal - bumpMinor);
+        const isFreeOrTestCode =
+          courseNetBase <= 0 ||
+          promoCode === 'TEST' ||
+          promoCode === 'TEST100' ||
+          promoCode.includes('100');
+
         const lookupKey = promoCode || refCookie;
-        if (!isOnlyOrderBump && lookupKey && !promoCode.startsWith('MAMA-')) {
+        if (!isOnlyOrderBump && !isFreeOrTestCode && lookupKey && !promoCode.startsWith('MAMA-')) {
           const affiliate = await env.DB.prepare(
             `SELECT id, email, promo_code, tier1_rate, referred_by_broker_id, tier2_override_rate
              FROM affiliates
@@ -223,8 +239,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             const matchedByPromo =
               Boolean(promoCode) &&
               String(affiliate.promo_code || '').toUpperCase() === promoCode;
-            const courseNetBase = promoCode ? 44010 : 48900;
-            const tier1Rate = Number(affiliate.tier1_rate || 0.2);
+            const tier1Rate = Math.min(0.3, Math.max(0.2, Number(affiliate.tier1_rate || 0.2)));
             const tier1Comm = Math.round(courseNetBase * tier1Rate);
             const tier2Comm = affiliate.referred_by_broker_id
               ? Math.round(courseNetBase * Number(affiliate.tier2_override_rate || 0.05))
@@ -301,7 +316,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     }
   }
 
-  // [A7] + [D2] Obsługa zwrotów (charge.refunded) — wycofanie dostępu i anulowanie prowizji afiliacyjnych
+  // [A7] + [D2] + [D5a] Obsługa zwrotów (charge.refunded) — rozróżnienie zwrotu częściowego (Order Bump 49 zł) od pełnego zwrotu kursu
   if (event.type === 'charge.refunded') {
     const charge = event.data?.object || {};
     const customerEmail = String(
@@ -309,30 +324,63 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     )
       .trim()
       .toLowerCase();
+    const chargeAmount = Number(charge.amount || 0);
+    const amountRefunded = Number(charge.amount_refunded || 0);
+    const isPartialRefund =
+      charge.refunded === false ||
+      (chargeAmount > 0 && amountRefunded > 0 && amountRefunded < chargeAmount);
 
     if (env.DB) {
       try {
-        if (customerEmail) {
-          const userRow = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
-            .bind(customerEmail)
-            .first();
-          if (userRow?.id) {
-            await env.DB.prepare("UPDATE enrollments SET status = 'refunded' WHERE user_id = ?")
-              .bind(userRow.id)
-              .run();
-            await env.DB.prepare("UPDATE orders SET status = 'refunded' WHERE user_id = ? OR customer_email = ?")
-              .bind(userRow.id, customerEmail)
-              .run();
-          } else {
-            await env.DB.prepare("UPDATE orders SET status = 'refunded' WHERE customer_email = ?")
+        if (isPartialRefund) {
+          // [D5a] Częściowy zwrot (np. 14-dniowy zwrot Order Bumpa +49 zł) — ZACHOWAJ dostęp do 52 lekcji kursu głównego!
+          if (customerEmail) {
+            const userRow = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
               .bind(customerEmail)
-              .run();
+              .first();
+            if (userRow?.id) {
+              await env.DB.prepare(
+                'UPDATE enrollments SET order_bump_included = 0 WHERE user_id = ?'
+              )
+                .bind(userRow.id)
+                .run();
+              await env.DB.prepare(
+                "UPDATE orders SET order_bump_included = 0, status = 'partially_refunded' WHERE user_id = ? OR customer_email = ?"
+              )
+                .bind(userRow.id, customerEmail)
+                .run();
+            } else {
+              await env.DB.prepare(
+                "UPDATE orders SET order_bump_included = 0, status = 'partially_refunded' WHERE customer_email = ?"
+              )
+                .bind(customerEmail)
+                .run();
+            }
           }
+        } else {
+          // Pełny zwrot zamówienia — wycofanie dostępu i anulowanie prowizji afiliacyjnych
+          if (customerEmail) {
+            const userRow = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
+              .bind(customerEmail)
+              .first();
+            if (userRow?.id) {
+              await env.DB.prepare("UPDATE enrollments SET status = 'refunded' WHERE user_id = ?")
+                .bind(userRow.id)
+                .run();
+              await env.DB.prepare("UPDATE orders SET status = 'refunded' WHERE user_id = ? OR customer_email = ?")
+                .bind(userRow.id, customerEmail)
+                .run();
+            } else {
+              await env.DB.prepare("UPDATE orders SET status = 'refunded' WHERE customer_email = ?")
+                .bind(customerEmail)
+                .run();
+            }
+          }
+          await env.DB.prepare(
+            `UPDATE affiliate_commissions SET status = 'CANCELLED'
+             WHERE order_id IN (SELECT id FROM orders WHERE status = 'refunded')`
+          ).run();
         }
-        await env.DB.prepare(
-          `UPDATE affiliate_commissions SET status = 'CANCELLED'
-           WHERE order_id IN (SELECT id FROM orders WHERE status = 'refunded')`
-        ).run();
       } catch (refundErr) {
         console.error('Błąd aktualizacji statusu zwrotu w D1:', refundErr);
       }

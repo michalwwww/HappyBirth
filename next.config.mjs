@@ -1,27 +1,28 @@
 /** @type {import('next').NextConfig} */
+const isStaticExport =
+  process.env.STATIC_EXPORT === 'true' || process.env.NEXT_EXPORT === 'true';
+
 const nextConfig = {
-  reactStrictMode: true,
-  // Eksport statyczny aktywowany tylko podczas budowania dla Cloudflare Pages (NEXT_EXPORT=true)
-  ...(process.env.NEXT_EXPORT === 'true' ? { output: 'export' } : {}),
+  ...(isStaticExport ? { output: 'export' } : {}),
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
   images: {
     unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'customer-6d9sm694eja9tkvc.cloudflarestream.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-    ],
   },
-  async rewrites() {
-    return [
-      { source: '/standard-merytoryczny', destination: '/standard-merytoryczny.html' },
-      { source: '/polityka-cookies', destination: '/polityka-cookies.html' },
-    ];
-  },
+  ...(isStaticExport
+    ? {}
+    : {
+        async rewrites() {
+          return [
+            { source: '/standard-merytoryczny', destination: '/dla-ciebie' },
+            { source: '/polityka-cookies', destination: '/polityka-prywatnosci' },
+          ];
+        },
+      }),
 };
 
 export default nextConfig;

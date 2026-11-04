@@ -77,10 +77,10 @@ export function StrefaFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/standard-merytoryczny" className="text-[#EAD5E5]/80 hover:text-[#FCD705] transition-colors flex items-center gap-1">
+                <a href="https://happybirth.pl/dla-ciebie" className="text-[#EAD5E5]/80 hover:text-[#FCD705] transition-colors flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Standard merytoryczny & E-E-A-T</span>
-                </Link>
+                  <span>Dla Ciebie · Prawa i Standard 2026</span>
+                </a>
               </li>
             </ul>
           </div>

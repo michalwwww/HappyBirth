@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 /**
- * [D4a-1] Podstrona https://happybirth.pl/afiliacja
+ * [D4a-1] Subdomena https://afiliacja.happybirth.pl
  * Program Afiliacyjny dla Położnych, Fizjoterapeutek, Doradczyń Laktacyjnych i Twórców
  * Model [D1b]: 2-Tier Capped CPA („Daj 10%, Odbierz 20%–30% + 5% Broker”)
  */
@@ -285,7 +285,7 @@ export default function AfiliacjaPage() {
       {/* 4. FAQ DLA PARTNERÓW AFILIACYJNYCH */}
       <section className="py-10 px-4 sm:px-6 max-w-4xl mx-auto space-y-6">
         <h2 className="font-brand-display text-2xl sm:text-3xl font-bold text-center text-[#1A1512]">
-          Najczęstsze pytania partnerów (/afiliacja)
+          Najczęstsze pytania partnerów (afiliacja.happybirth.pl)
         </h2>
         <div className="space-y-3">
           {[
@@ -310,12 +310,12 @@ export default function AfiliacjaPage() {
         </div>
       </section>
 
-      {/* 5. FORMULARZ ZGŁOSZENIOWY DO PROGRAMU AFILIACYJNEGO */}
+      {/* 5. FORMULARZ ZGŁOSZENIOWY DO PROGRAMU AFILIACYJNYCH */}
       <section className="py-14 sm:py-20 px-4 sm:px-6 max-w-3xl mx-auto" id="zgloszenie">
         <div className="bg-white rounded-3xl p-7 sm:p-12 border border-[#EAE3DB] shadow-xl space-y-6">
           <div className="space-y-2 text-center">
             <span className="text-xs font-bold uppercase tracking-widest text-[#DA0271]">
-              Formularz rejestracyjny (/afiliacja)
+              Formularz rejestracyjny (afiliacja.happybirth.pl)
             </span>
             <h2 className="font-brand-display font-bold text-2xl sm:text-3xl text-[#1A1512]">
               Zgłoś się do Programu Afiliacyjnego HappyBirth.pl
@@ -427,7 +427,7 @@ export default function AfiliacjaPage() {
                   className="mt-0.5 w-4 h-4 rounded text-[#DA0271] focus:ring-[#DA0271]"
                 />
                 <label htmlFor="aff-rodo">
-                  Akceptuję <Link href="/polityka-prywatnosci" className="underline">Politykę Prywatności</Link> (operator: KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań) i wyrażam zgodę na kontakt w celu uruchomienia współpracy afiliacyjnej.
+                  Akceptuję <a href="https://happybirth.pl/polityka-prywatnosci" className="underline">Politykę Prywatności</a> (operator: KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań) i wyrażam zgodę na kontakt w celu uruchomienia współpracy afiliacyjnej.
                 </label>
               </div>
 
@@ -436,7 +436,7 @@ export default function AfiliacjaPage() {
                 disabled={loading}
                 className="w-full py-4 rounded-full bg-[#DA0271] hover:bg-[#B8005F] text-white font-bold text-sm transition-all shadow-md cursor-pointer disabled:opacity-60"
               >
-                {loading ? 'Wysyłanie zgłoszenia...' : 'Wyślij zgłoszenie do programu /afiliacja →'}
+                {loading ? 'Wysyłanie zgłoszenia...' : 'Wyślij zgłoszenie do programu afiliacyjnego →'}
               </button>
             </form>
           )}
@@ -449,10 +449,10 @@ export default function AfiliacjaPage() {
           Operator prawny: <strong>KLARSOLUTIONS Sp. z o.o.</strong>, ul. Śląska 14, 60-614 Poznań · NIP: 7812118273 · KRS: 0001268396 · REGON: 545782779
         </div>
         <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/" className="underline hover:text-[#DA0271]">Strona główna</Link>
-          <Link href="/partnerzy" className="underline hover:text-[#DA0271]">Współpraca dla Marek B2B (/partnerzy)</Link>
-          <Link href="/regulamin" className="underline hover:text-[#DA0271]">Regulamin</Link>
-          <Link href="/odstap-od-umowy" className="underline hover:text-[#DA0271]">Odstąp od umowy</Link>
+          <a href="https://happybirth.pl" className="underline hover:text-[#DA0271]">Strona główna (happybirth.pl)</a>
+          <a href="https://partnerzy.happybirth.pl" className="underline hover:text-[#DA0271]">Współpraca dla Marek B2B (partnerzy.happybirth.pl)</a>
+          <a href="https://happybirth.pl/regulamin" className="underline hover:text-[#DA0271]">Regulamin</a>
+          <a href="https://happybirth.pl/odstap-od-umowy" className="underline hover:text-[#DA0271]">Odstąp od umowy</a>
         </div>
       </footer>
     </div>

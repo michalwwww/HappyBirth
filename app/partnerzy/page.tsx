@@ -17,10 +17,10 @@ import {
 } from 'lucide-react';
 
 /**
- * [D4a-2] Podstrona https://happybirth.pl/partnerzy
+ * [D4a-2] Subdomena https://partnerzy.happybirth.pl
  * Dedykowana, wizerunkowa wizytówka B2B dla marek, producentów wyprawki,
  * dystrybutorów, klinik medycznych, szpitali i pracodawców.
- * (Program prowizyjny dla położnych i twórców został wydzielony na /afiliacja).
+ * (Program prowizyjny dla położnych i twórców został wydzielony na subdomenę afiliacja.happybirth.pl).
  */
 export default function PartnerzyB2BPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -73,13 +73,13 @@ export default function PartnerzyB2BPage() {
           </Link>
 
           <div className="flex items-center gap-3 sm:gap-5">
-            <Link
-              href="/afiliacja"
+            <a
+              href="https://afiliacja.happybirth.pl"
               className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-[#DA0271] hover:underline"
             >
               <Users className="w-3.5 h-3.5" />
               <span>Program dla Położnych i Twórców →</span>
-            </Link>
+            </a>
             <a
               href="https://happybirth.pl"
               className="text-xs font-semibold text-[#544A44] hover:text-[#DA0271]"
@@ -123,12 +123,12 @@ export default function PartnerzyB2BPage() {
               <span>Porozmawiajmy o partnerstwie marki</span>
               <ArrowRight className="w-4 h-4" />
             </a>
-            <Link
-              href="/afiliacja"
+            <a
+              href="https://afiliacja.happybirth.pl"
               className="inline-flex items-center gap-2 px-6 py-4 rounded-full border border-[#EAE3DB] bg-white hover:bg-stone-50 text-xs sm:text-sm font-bold text-[#1A1512]"
             >
-              <span>Szukasz programu prowizyjnego dla położnych i twórców? Przejdź do /afiliacja →</span>
-            </Link>
+              <span>Szukasz programu prowizyjnego dla położnych i twórców? Przejdź do afiliacja.happybirth.pl →</span>
+            </a>
           </div>
         </div>
       </section>
@@ -366,7 +366,7 @@ export default function PartnerzyB2BPage() {
                   className="mt-0.5 w-4 h-4 rounded text-[#DA0271] focus:ring-[#DA0271]"
                 />
                 <label htmlFor="b2b-rodo">
-                  Wyrażam zgodę na przetwarzanie danych kontaktowych przez KLARSOLUTIONS Sp. z o.o. (ul. Śląska 14, 60-614 Poznań) w celu obsługi zapytania B2B zgodnie z <Link href="/polityka-prywatnosci" className="underline">Polityką Prywatności</Link>.
+                  Wyrażam zgodę na przetwarzanie danych kontaktowych przez KLARSOLUTIONS Sp. z o.o. (ul. Śląska 14, 60-614 Poznań) w celu obsługi zapytania B2B zgodnie z <a href="https://happybirth.pl/polityka-prywatnosci" className="underline">Polityką Prywatności</a>.
                 </label>
               </div>
 
@@ -382,12 +382,12 @@ export default function PartnerzyB2BPage() {
 
           {/* Przycisk przekierowujący dla twórców i położnych */}
           <div className="pt-4 border-t border-[#EAE3DB] text-center">
-            <Link
-              href="/afiliacja"
+            <a
+              href="https://afiliacja.happybirth.pl"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-[#DA0271] hover:underline"
             >
-              <span>Szukasz programu prowizyjnego dla położnych i twórców? Przejdź do zakładki /afiliacja →</span>
-            </Link>
+              <span>Szukasz programu prowizyjnego dla położnych i twórców? Przejdź na afiliacja.happybirth.pl →</span>
+            </a>
           </div>
         </div>
       </section>
@@ -398,10 +398,10 @@ export default function PartnerzyB2BPage() {
           Operator prawny: <strong>KLARSOLUTIONS Sp. z o.o.</strong>, ul. Śląska 14, 60-614 Poznań · NIP: 7812118273 · KRS: 0001268396 · REGON: 545782779
         </div>
         <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/" className="underline hover:text-[#DA0271]">Strona główna</Link>
-          <Link href="/afiliacja" className="underline hover:text-[#DA0271]">Program Afiliacyjny (/afiliacja)</Link>
-          <Link href="/regulamin" className="underline hover:text-[#DA0271]">Regulamin</Link>
-          <Link href="/odstap-od-umowy" className="underline hover:text-[#DA0271]">Odstąp od umowy</Link>
+          <a href="https://happybirth.pl" className="underline hover:text-[#DA0271]">Strona główna (happybirth.pl)</a>
+          <a href="https://afiliacja.happybirth.pl" className="underline hover:text-[#DA0271]">Program Afiliacyjny (afiliacja.happybirth.pl)</a>
+          <a href="https://happybirth.pl/regulamin" className="underline hover:text-[#DA0271]">Regulamin</a>
+          <a href="https://happybirth.pl/odstap-od-umowy" className="underline hover:text-[#DA0271]">Odstąp od umowy</a>
         </div>
       </footer>
     </div>

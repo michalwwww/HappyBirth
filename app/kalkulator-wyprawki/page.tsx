@@ -387,22 +387,22 @@ export default function KalkulatorWyprawkiPage() {
               })}
             </div>
 
-            {/* Powierzchnia dla partnerów strategicznych z /partnerzy */}
+            {/* Sekcja edukacyjna: Standard Opieki Okołoporodowej 2026 */}
             <div className="p-6 rounded-3xl bg-white border border-[#EAE3DB] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="space-y-1">
                 <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#DA0271]">
-                  <Building2 className="w-4 h-4" />
-                  <span>Strefa Partnerów Strategicznych HappyBirth.pl</span>
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Twoje prawa na porodówce 2026 (Dz.U. 2025 poz. 1525)</span>
                 </div>
                 <p className="text-xs text-[#544A44]">
-                  Jesteś producentem bezpiecznych artykułów dziecięcych lub wyprawkowych? Poznaj możliwości ekspozycji w Module 4 i materiałach PDF.
+                  Sprawdź 21 praw przyszłej mamy i taty obowiązujących od 7 maja 2026 r.: gwarantowane 2 godziny kontaktu „skóra do skóry”, lekki posiłek w porodzie i opieka laktacyjna.
                 </p>
               </div>
               <Link
-                href="/partnerzy"
+                href="/dla-ciebie"
                 className="px-5 py-2.5 rounded-full border border-[#EAE3DB] hover:border-[#DA0271] text-xs font-bold text-[#1A1512] shrink-0"
               >
-                Współpraca dla Marek (/partnerzy) →
+                Dla Ciebie · Prawa i Wiedza 2026 →
               </Link>
             </div>
           </div>

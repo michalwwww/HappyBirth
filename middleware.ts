@@ -51,19 +51,27 @@ export function middleware(request: NextRequest) {
     return res;
   };
 
-  // 1. Bypass statycznych zasobów, arkuszy /materialy/*, obrazów, fontów i API
+  const STATIC_ASSET_EXT_REGEX =
+    /\.(css|js|mjs|map|png|jpg|jpeg|gif|webp|avif|svg|ico|woff|woff2|ttf|otf|eot|mp4|webm|pdf|xml|json|webmanifest)$/i;
+
+  // 1. Bypass wyłącznie prawdziwych zasobów statycznych (CSS/JS/obrazy/fonty), arkuszy /materialy/*, SEO/GEO txt oraz API
   if (
     url.pathname.startsWith('/_next') ||
     url.pathname.startsWith('/api') ||
     url.pathname.startsWith('/materialy') ||
-    url.pathname.includes('.') ||
-    url.pathname.startsWith('/favicon')
+    url.pathname.startsWith('/favicon') ||
+    url.pathname === '/robots.txt' ||
+    url.pathname === '/llms.txt' ||
+    url.pathname === '/llms-full.txt' ||
+    STATIC_ASSET_EXT_REGEX.test(url.pathname)
   ) {
     return attachSecurityAndTracking(NextResponse.next(), false);
   }
 
+  const cleanPath = (url.pathname.replace(/\.(html|txt)$/i, '') || '/').replace(/\/+$/, '') || '/';
+
   // -------------------------------------------------------------
-  // A. SUBDOMENA PARTNERZY (partnerzy.happybirth.pl -> /partnerzy)
+  // A. SUBDOMENA PARTNERZY (partnerzy.happybirth.pl -> wyłącznie B2B na root '/')
   // -------------------------------------------------------------
   if (hostname.startsWith('partnerzy.')) {
     if (isAdBot) {
@@ -72,15 +80,18 @@ export function middleware(request: NextRequest) {
         headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
       });
     }
-    if (url.pathname === '/' || url.pathname === '') {
+    if (cleanPath === '/' || cleanPath === '/partnerzy') {
       url.pathname = '/partnerzy';
       return attachSecurityAndTracking(NextResponse.rewrite(url), true);
     }
-    return attachSecurityAndTracking(NextResponse.next(), true);
+    return new NextResponse('404 Not Found', {
+      status: 404,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
+    });
   }
 
   // -------------------------------------------------------------
-  // A2. SUBDOMENA AFILIACJA (afiliacja.happybirth.pl -> /afiliacja)
+  // A2. SUBDOMENA AFILIACJA (afiliacja.happybirth.pl -> wyłącznie Afiliacja na root '/')
   // -------------------------------------------------------------
   if (hostname.startsWith('afiliacja.')) {
     if (isAdBot) {
@@ -89,11 +100,14 @@ export function middleware(request: NextRequest) {
         headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
       });
     }
-    if (url.pathname === '/' || url.pathname === '') {
+    if (cleanPath === '/' || cleanPath === '/afiliacja') {
       url.pathname = '/afiliacja';
       return attachSecurityAndTracking(NextResponse.rewrite(url), true);
     }
-    return attachSecurityAndTracking(NextResponse.next(), true);
+    return new NextResponse('404 Not Found', {
+      status: 404,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
+    });
   }
 
   // -------------------------------------------------------------
@@ -106,6 +120,12 @@ export function middleware(request: NextRequest) {
         headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
       });
     }
+    if (cleanPath.startsWith('/afiliacja') || cleanPath.startsWith('/partnerzy')) {
+      return new NextResponse('404 Not Found', {
+        status: 404,
+        headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
+      });
+    }
     if (!url.pathname.startsWith('/strefa')) {
       url.pathname = `/strefa${url.pathname === '/' ? '' : url.pathname}`;
     }
@@ -114,29 +134,46 @@ export function middleware(request: NextRequest) {
 
   // -------------------------------------------------------------
   // C. DOMENA GŁÓWNA PRODUKCYJNA (happybirth.pl / www.happybirth.pl)
-  //    Twarda separacja subdomen (301 Redirect)
+  //    Twarda separacja: podstrony /afiliacja, /partnerzy, /marketing, /challenge są zablokowane (404 Not Found)
   // -------------------------------------------------------------
   const isMainProdHost = hostname === 'happybirth.pl' || hostname === 'www.happybirth.pl';
   const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny'];
   const isStudentShortRoute = studentRoutes.some(
-    (route) => url.pathname === route || url.pathname.startsWith(`${route}/`)
+    (route) => cleanPath === route || cleanPath.startsWith(`${route}/`)
   );
-  const isStrefaPath = url.pathname === '/strefa' || url.pathname.startsWith('/strefa/');
-  const isPartnerzyPath = url.pathname === '/partnerzy' || url.pathname.startsWith('/partnerzy/');
-  const isAfiliacjaPath = url.pathname === '/afiliacja' || url.pathname.startsWith('/afiliacja/');
+  const isStrefaPath = cleanPath === '/strefa' || cleanPath.startsWith('/strefa/');
+  const isPartnerzyPath = cleanPath === '/partnerzy' || cleanPath.startsWith('/partnerzy/');
+  const isAfiliacjaPath = cleanPath === '/afiliacja' || cleanPath.startsWith('/afiliacja/');
+  const isLegacyInternalPath =
+    cleanPath === '/marketing' ||
+    cleanPath.startsWith('/marketing/') ||
+    cleanPath === '/challenge';
+
+  if (isLegacyInternalPath) {
+    return new NextResponse('404 Not Found', {
+      status: 404,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
+    });
+  }
 
   if (isMainProdHost) {
+    if (isPartnerzyPath || isAfiliacjaPath) {
+      return new NextResponse('404 Not Found', {
+        status: 404,
+        headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
+      });
+    }
     if (isStrefaPath || isStudentShortRoute) {
+      if (isAdBot) {
+        return new NextResponse('404 Not Found', {
+          status: 404,
+          headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
+        });
+      }
       const cleanSubpath = isStrefaPath
-        ? url.pathname.replace(/^\/strefa/, '') || '/'
-        : url.pathname;
+        ? cleanPath.replace(/^\/strefa/, '') || '/'
+        : cleanPath;
       return NextResponse.redirect(`https://strefa.happybirth.pl${cleanSubpath}${url.search}`, 301);
-    }
-    if (isPartnerzyPath) {
-      return NextResponse.redirect(`https://partnerzy.happybirth.pl/${url.search}`, 301);
-    }
-    if (isAfiliacjaPath) {
-      return NextResponse.redirect(`https://partnerzy.happybirth.pl/afiliacja${url.search}`, 301);
     }
   }
 

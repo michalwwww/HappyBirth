@@ -98,7 +98,15 @@ interface DictContent {
   faq: {
     kicker: string;
     title: string;
-    items: { q: string; a: string }[];
+    lead?: string;
+    items: {
+      id?: string;
+      category?: string;
+      q: string;
+      a: string;
+      linkHref?: string;
+      linkLabel?: string;
+    }[];
   };
   footer: {
     desc: string;
@@ -123,7 +131,7 @@ const DICT: Record<Language, DictContent> = {
     enterZone: 'Strefa kursantki',
     ticker: [
       '52 krótkie lekcje 4K',
-      'Położne ze szkoły Mama Gaja',
+      'Dyplomowane ekspertki Mama Gaja',
       '18 miesięcy dostępu',
       'Dostęp dla dwojga w cenie',
       '489 zł jednorazowo',
@@ -140,7 +148,7 @@ const DICT: Record<Language, DictContent> = {
     hero: {
       title1: 'Szkoła rodzenia online dla Twojego spokoju.',
       title2: 'Jeden tydzień naraz.',
-      lead: '52 krótkie lekcje wideo (po 5–7 minut) nagrane z położnymi ze szkoły rodzenia Mama Gaja. Oglądasz we własnym tempie — od pierwszych tygodni ciąży do pierwszego roku z dzieckiem.',
+      lead: '52 krótkie lekcje wideo (po 5–7 minut) nagrane z dyplomowanymi ekspertkami ze szkoły rodzenia Mama Gaja. Oglądasz we własnym tempie — od pierwszych tygodni ciąży do pierwszego roku z dzieckiem.',
       ctaBuy: 'Kup kurs · 489 zł',
       ctaTrailer: 'Obejrzyj lekcję za darmo',
       facts: [
@@ -152,7 +160,7 @@ const DICT: Record<Language, DictContent> = {
     map: {
       kicker: 'Mapa programu',
       title: 'Sprawdź, od czego zacząć w Twoim tygodniu.',
-      lead: 'Przesuń suwak na swój tydzień ciąży lub miesiąc z maluszkiem.',
+      lead: 'Przesuń suwak na swój tydzień ciąży lub miesiąc z dzieckiem.',
       notice: 'Wszystkie 52 lekcje otrzymujesz od razu na 18 miesięcy od zakupu.',
       sliderLabel: 'Przesuń suwak na swój obecny tydzień ciąży',
       sliderFallback: 'Suwak podpowiada moduły dopasowane do Twojego etapu.',
@@ -187,8 +195,8 @@ const DICT: Record<Language, DictContent> = {
     program: {
       kicker: 'Program',
       title: '52 lekcje w 8 modułach.',
-      titleSub: 'Prawie 5 godzin esencji wideo.',
-      lead: 'Każda lekcja trwa średnio 5–7 minut. Bez lania wody i bez dojazdów.',
+      titleSub: 'Prawie 5 godzin materiału wideo.',
+      lead: 'Każda lekcja trwa średnio 5 do 7 minut. Bez lania wody i bez dojazdów.',
       topBtn: 'Zobacz pełną listę 52 lekcji',
       topSub: 'Wszystkie tematy i czasy trwania bez logowania',
       bottomTitle: 'Pełny spis 52 lekcji z czasami trwania',
@@ -196,13 +204,13 @@ const DICT: Record<Language, DictContent> = {
       bottomBtn: 'Lista 52 lekcji',
       modules: [
         { nr: 1, title: 'Ciąża tydzień po tygodniu', meta: '5 lekcji · 18 min', desc: 'Rozwój dziecka, zmiany w ciele i spokój w pierwszych tygodniach.' },
-        { nr: 2, title: 'Zdrowie i kalendarz badań', meta: '7 lekcji · 34 min', desc: 'Badania, dieta, codzienne dolegliwości i ważne sygnały.' },
-        { nr: 3, title: 'Komfort, sen i ruch', meta: '6 lekcji · 38 min', desc: 'Ćwiczenia z fizjoterapeutką odciążające kręgosłup i miednicę.' },
+        { nr: 2, title: 'Zdrowie i kalendarz badań', meta: '7 lekcji · 34 min', desc: 'Badania, dieta, codzienne samopoczucie i ważne sygnały.' },
+        { nr: 3, title: 'Komfort, sen i ruch', meta: '6 lekcji · 38 min', desc: 'Ćwiczenia ze specjalistką fizjoterapii odciążające kręgosłup i miednicę.' },
         { nr: 4, title: 'Wyprawka bez przepłacania', meta: '7 lekcji · 44 min', desc: 'Wózek, fotelik, łóżeczko, apteczka i ubranka na start.' },
         { nr: 5, title: 'Aktywny poród i rola taty', meta: '9 lekcji · 54 min', desc: 'Plan porodu, torba, oddech, pozycje wertykalne i wsparcie partnera.' },
         { nr: 6, title: 'Połóg i regeneracja mamy', meta: '5 lekcji · 32 min', desc: 'Gojenie, emocje, powrót do sił i ćwiczenia dna miednicy.' },
-        { nr: 7, title: 'Opieka nad noworodkiem', meta: '9 lekcji · 44 min', desc: 'Kąpiel krok po kroku, bezpieczny sen, szczepienia i pierwsza pomoc.' },
-        { nr: 8, title: 'Karmienie i laktacja', meta: '4 lekcje · 24 min', desc: 'Wygodne pozycje, prawidłowy chwyt, laktator i łagodzenie kolek.' },
+        { nr: 7, title: 'Opieka nad noworodkiem', meta: '9 lekcji · 44 min', desc: 'Kąpiel krok po kroku, bezpieczny sen, kalendarz profilaktyki i pierwsza pomoc.' },
+        { nr: 8, title: 'Karmienie i laktacja', meta: '4 lekcje · 24 min', desc: 'Wygodne pozycje, prawidłowy chwyt, laktator i spokojniejsze wieczory.' },
       ],
     },
     pricing: {
@@ -212,39 +220,130 @@ const DICT: Record<Language, DictContent> = {
       price: '489,00 zł',
       unit: 'jednorazowo',
       features: [
-        '52 lekcje wideo 4K w 8 modułach (ok. 5h materiału)',
+        '52 lekcje wideo w 8 modułach (prawie 5 godzin materiału wideo)',
         'Dostęp na 18 miesięcy (548 dni) od zakupu',
         'Wspólny dostęp dla Ciebie i partnera (Strefa Taty)',
         'Notatnik Rodzica, Plan Porodu i checklisty PDF',
         'Działa na telefonie, laptopie i Smart TV',
       ],
       cta: 'Kup dostęp',
-      promoTrigger: 'Masz kod rabatowy od położnej lub przyjaciółki?',
-      promoPlaceholder: 'Wpisz kod (np. POLOZNA10)',
+      promoTrigger: 'Masz kod rabatowy od partnera lub przyjaciółki?',
+      promoPlaceholder: 'Wpisz kod rabatowy',
       promoApply: 'Zastosuj',
       trust: 'BLIK · Karta · Apple Pay / Google Pay · Natychmiastowy dostęp',
       whyTitle: 'Dlaczego rodzice wybierają HappyBirth?',
       reasons: [
         { title: '18 miesięcy dostępu.', desc: 'Kupujesz raz i korzystasz przez całą ciążę, poród oraz pierwszy rok dziecka.' },
         { title: 'Po 5–7 minut dziennie.', desc: 'Krótkie, konkretne odcinki, które obejrzysz nawet wieczorem na kanapie.' },
-        { title: 'Partner wie, co robić.', desc: 'Praktyczne instrukcje masażu, pakowania torby i wsparcia na sali porodowej.' },
-        { title: 'Spokój o 3:00 w nocy.', desc: 'Kąpiel, laktacja, kolki i pierwsza pomoc zawsze pod ręką w telefonie.' },
+        { title: 'Osoba towarzysząca wie, co robić.', desc: 'Praktyczne instrukcje masażu, pakowania torby i wsparcia na sali porodowej.' },
+        { title: 'Spokój o 3:00 w nocy.', desc: 'Kąpiel, karmienie, sen i pierwsza pomoc zawsze pod ręką w telefonie.' },
       ],
     },
     faq: {
-      kicker: 'Pytania',
-      title: 'Częste pytania',
+      kicker: 'Pytania i odpowiedzi (E-E-A-T · Stan prawny od 7 maja 2026 r.)',
+      title: 'Pytania, które zadajecie najczęściej.',
+      lead: 'Zebraliśmy konkretne odpowiedzi o programie 52 lekcji, nauce we dwoje, prawach rodziców od 7 maja 2026 r. (Dz.U. 2025 poz. 1525) oraz zasadach zakupu w KLARSOLUTIONS Sp. z o.o.',
       items: [
-        { q: 'Czy kurs online zastąpi stacjonarną szkołę rodzenia?', a: 'Tak. Otrzymujesz kompletny program położnych ze szkoły rodzenia Mama Gaja — z tą przewagą, że do każdego ćwiczenia i instruktażu kąpieli możesz wrócić w dowolnej chwili.' },
-        { q: 'Na jak długo otrzymuję dostęp?', a: 'Na pełne 18 miesięcy (548 dni) od dnia zakupu. Wystarczy na całą ciążę oraz pierwszy rok życia maluszka.' },
-        { q: 'Czy partner płaci dodatkowo?', a: 'Nie. Dostęp dla dwojga (w tym dedykowana Strefa Taty) jest wliczony w cenę 489 zł.' },
-        { q: 'Kiedy otrzymam dostęp po opłaceniu?', a: 'Natychmiast po płatności BLIK lub kartą zostaniesz przekierowana do Strefy ze wszystkimi 52 lekcjami.' },
-        { q: 'Czy otrzymam fakturę VAT?', a: 'Tak, po zakupie wystawiamy fakturę VAT 23% (KLARSOLUTIONS Sp. z o.o.).' },
-        { q: 'Kto prowadzi lekcje?', a: 'Dyplomowane położne, doradczyni laktacyjna i fizjoterapeutka uroginekologiczna z poznańskiej szkoły rodzenia Mama Gaja (działającej od 2012 r.).' },
+        {
+          id: 'pytanie-1',
+          category: 'Program i nauka we dwoje',
+          q: 'Czy kurs online zastępuje stacjonarną szkołę rodzenia na sali?',
+          a: 'Kurs obejmuje kompletny program edukacyjny przygotowujący do porodu i pierwszego roku z dzieckiem w formie 52 lekcji wideo (prawie 5 godzin nagrań) prowadzonych przez dyplomowane ekspertki ze szkoły rodzenia Mama Gaja (działającej od 2012 r.). Nie zastępuje spotkań na żywo ani wizyt kontrolnych, ale możecie łączyć go z zajęciami na sali i wracać do każdego instruktażu dowolnie wiele razy przez 18 miesięcy.',
+          linkHref: '/program',
+          linkLabel: 'Zobacz pełny spis 52 lekcji w 8 modułach →',
+        },
+        {
+          id: 'pytanie-2',
+          category: 'Program i nauka we dwoje',
+          q: 'Kiedy najlepiej rozpocząć naukę w kursie według standardu od 7 maja 2026 roku?',
+          a: 'Naukę możecie rozpocząć w dowolnym tygodniu ciąży — już od pierwszego trymestru. Zgodnie ze znowelizowanym Standardem Organizacyjnym Opieki Okołoporodowej obowiązującym od 7 maja 2026 r. (Dz.U. 2025 poz. 1525), edukacja przedporodowa przysługuje już od pierwszej wizyty potwierdzającej ciążę (do 10. tygodnia), a nie dopiero od 21. tygodnia. Wszystkie 52 lekcje są otwarte od pierwszego dnia na 18 miesięcy.',
+          linkHref: '/dla-ciebie#edukacja-przedporodowa-od-pierwszej-wizyty',
+          linkLabel: 'Sprawdź nowe prawo o edukacji od 1. wizyty (od 7 maja 2026 r.) →',
+        },
+        {
+          id: 'pytanie-3',
+          category: 'Program i nauka we dwoje',
+          q: 'Czy osoba towarzysząca (ojciec dziecka, partner, bliska osoba) ma dostęp w cenie?',
+          a: 'Tak. Dostęp dla dwojga jest wliczony w jedną cenę 489,00 zł brutto bez żadnych dopłat. Od 7 maja 2026 r. przepisy (Dz.U. 2025 poz. 1525) wprost obejmują edukacją przedporodową także ojca dziecka. W kursie druga osoba otrzymuje konkretne zadania: techniki masażu i odciążania pleców (lekcje 31–32), plan porodu (lekcja 26), pakowanie torby w 3 strefach (lekcja 27) oraz montaż fotelika i pierwszą kąpiel (lekcje 19 i 44).',
+          linkHref: '/dla-ciebie#obecnosc-osoby-bliskiej',
+          linkLabel: 'Poznaj prawa osoby bliskiej w szpitalu →',
+        },
+        {
+          id: 'pytanie-4',
+          category: 'Program i nauka we dwoje',
+          q: 'Kto przygotował lekcje i jakie doświadczenie stoi za programem HappyBirth?',
+          a: 'Wszystkie 52 lekcje wideo nagraliśmy z zespołem dyplomowanych ekspertek edukacji okołoporodowej, specjalistek laktacji i fizjoterapii z poznańskiej szkoły rodzenia Mama Gaja, która działa nieprzerwanie od 2012 roku (14 lat praktyki dydaktycznej i ponad 18 000 urodzeń w rodzinach przygotowywanych w naszych szkołach rodzenia). Program uwzględnia wytyczne polskiego Standardu Organizacyjnego Opieki Okołoporodowej.',
+          linkHref: '/o-nas',
+          linkLabel: 'Poznaj zespół ekspertek Szkoły Rodzenia Mama Gaja →',
+        },
+        {
+          id: 'pytanie-5',
+          category: 'Dostęp i narzędzia PDF',
+          q: 'Ile trwa cały kurs wideo i jak długo działa dostęp do platformy?',
+          a: 'Kurs składa się z 52 lekcji w 8 modułach, co daje łącznie prawie 5 godzin (dokładnie 4 godziny i 48 minut) esencjonalnego materiału wideo. Pojedynczy odcinek trwa średnio 5 do 7 minut, więc mieści się w każdy wieczór. Dostęp do całej platformy trwa 18 miesięcy (548 dni) od dnia zakupu — obejmuje całą ciążę, poród i pierwszy rok z dzieckiem.',
+          linkHref: '/program',
+          linkLabel: 'Sprawdź czasy trwania poszczególnych modułów →',
+        },
+        {
+          id: 'pytanie-6',
+          category: 'Dostęp i narzędzia PDF',
+          q: 'Na jakich urządzeniach możemy oglądać lekcje i jak szybko otwiera się dostęp?',
+          a: 'Lekcje oglądacie bezpośrednio w przeglądarce internetowej na telefonie, tablecie, laptopie lub telewizorze Smart TV — bez instalowania dodatkowych aplikacji. Dostęp do Strefy Kursantki otwiera się automatycznie natychmiast po płatności BLIK, kartą płatniczą, Apple Pay lub Google Pay.',
+          linkHref: '#bezplatna-lekcja',
+          linkLabel: 'Przetestuj odtwarzacz w bezpłatnej Lekcji 1 →',
+        },
+        {
+          id: 'pytanie-7',
+          category: 'Dostęp i narzędzia PDF',
+          q: 'Jakie bezpłatne narzędzia PDF i materiały są dostępne przed zakupem i w kursie?',
+          a: 'Już przed zakupem możecie bezpłatnie obejrzeć Lekcję 1 (5 min 33 s) bez zakładania konta, wygenerować własny dokument w Kreatorze Planu Porodu PDF, spakować torbę z Kalkulatorem Wyprawki PDF oraz sprawdzić 21 praw w Bazie Wiedzy 2026. W Strefie Kursantki po zakupie czekają karty pracy PDF, Notatnik Rodzica oraz cyfrowy stoper skurczów.',
+          linkHref: '/plan-porodu',
+          linkLabel: 'Otwórz bezpłatny Kreator Planu Porodu PDF →',
+        },
+        {
+          id: 'pytanie-8',
+          category: 'Dostęp i narzędzia PDF',
+          q: 'Czy musimy oglądać lekcje po kolei według sztywnego grafiku?',
+          a: 'Nie. To nie jest sztywny grafik zajęć grupowych. Wszystkie 52 lekcje w 8 modułach są dostępne od pierwszego dnia. Interaktywna mapa programu na stronie podpowiada, które moduły przydają się w Waszym obecnym tygodniu ciąży lub miesiącu z dzieckiem, ale oglądacie je w dowolnej kolejności.',
+          linkHref: '#mapa',
+          linkLabel: 'Przejdź do interaktywnej mapy tygodni →',
+        },
+        {
+          id: 'pytanie-9',
+          category: 'Zakup, prawo i edukacja',
+          q: 'Ile kosztuje kurs i czy jest to abonament odnawialny?',
+          a: 'Kurs kosztuje 489,00 zł brutto (w tym 23% VAT). Jest to płatność jednorazowa za pełne 18 miesięcy (548 dni) dostępu dla dwojga — bez abonamentu, bez subskrypcji i bez automatycznego odnawiania. Stosujemy stałą, uczciwą cenę zgodnie z dyrektywą Omnibus, bez sztucznych przekreśleń.',
+          linkHref: '#cena',
+          linkLabel: 'Przejdź do podsumowania oferty (489,00 zł) →',
+        },
+        {
+          id: 'pytanie-10',
+          category: 'Zakup, prawo i edukacja',
+          q: 'Kto jest sprzedawcą kursu i czy otrzymamy fakturę VAT?',
+          a: 'Operatorem prawnym i sprzedawcą jest polska spółka KLARSOLUTIONS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ z siedzibą w Poznaniu (ul. Śląska 14, 60-614 Poznań, KRS: 0001268396, NIP: 7812118273, REGON: 545782779, kapitał zakładowy 5 000,00 PLN). Po każdym zakupie automatycznie wystawiamy i przesyłamy na e-mail potwierdzenie zawarcia umowy na trwałym nośniku oraz dokument sprzedaży (w tym fakturę VAT 23%).',
+          linkHref: '/regulamin',
+          linkLabel: 'Zobacz pełne dane sprzedawcy w Regulaminie →',
+        },
+        {
+          id: 'pytanie-11',
+          category: 'Zakup, prawo i edukacja',
+          q: 'Jak działa prawo odstąpienia od umowy przez 14 dni oraz zgoda na natychmiastowy start?',
+          a: 'Zgodnie z ustawą o prawach konsumenta przysługuje Wam 14 dni na odstąpienie od umowy zawartej na odległość. Ponieważ kurs jest treścią cyfrową dostarczaną natychmiast, bezpośrednio przed płatnością możecie wyrazić dobrowolną zgodę na udostępnienie lekcji od razu przed upływem 14 dni (art. 38 ust. 1 pkt 13 ustawy o prawach konsumenta), co wiąże się z wygaśnięciem prawa odstąpienia z chwilą rozpoczęcia świadczenia.',
+          linkHref: '/odstap-od-umowy',
+          linkLabel: 'Szczegóły i elektroniczny formularz odstąpienia od umowy →',
+        },
+        {
+          id: 'pytanie-12',
+          category: 'Zakup, prawo i edukacja',
+          q: 'Czy kurs zastępuje konsultację z lekarzem lub wykwalifikowaną specjalistką?',
+          a: 'Nie. Materiały HappyBirth stanowią pozaszkolną formę edukacji dorosłych (PKD 85.59.B). Mają wyłącznie charakter edukacyjny i organizacyjny — nie są świadczeniem zdrowotnym, nie zawierają diagnozy ani porady medycznej i nie zastępują opieki lekarza ani innej osoby wykonującej zawód medyczny, która prowadzi ciążę. Jeśli coś Was niepokoi, skonsultujcie się z osobą prowadzącą ciążę, a w sytuacji zagrożenia zdrowia lub życia dzwońcie pod numer 112.',
+          linkHref: '/dla-ciebie',
+          linkLabel: 'Przejdź do Bazy Wiedzy Edukacyjno-Prawnej (/dla-ciebie) →',
+        },
       ],
     },
     footer: {
-      desc: 'Szkoła rodzenia online. Nagrana z ekspertkami ze szkoły rodzenia Mama Gaja.',
+      desc: 'Szkoła rodzenia online dla dwojga. Nagrana z dyplomowanymi ekspertkami ze szkoły rodzenia Mama Gaja.',
       course: 'Kurs i Narzędzia',
       happybirth: 'Współpraca i O Nas',
       docs: 'Dokumenty',
@@ -252,9 +351,9 @@ const DICT: Record<Language, DictContent> = {
       privacy: 'Polityka prywatności',
       cookies: 'Polityka cookies',
       withdrawal: 'Odstąp od umowy',
-      affiliate: 'Afiliacja (Położne i Twórczynie)',
-      b2bPartners: 'Współpraca B2B (Marki i Kliniki)',
-      legalBar: 'Materiały mają charakter edukacyjny i nie zastępują porady lekarskiej. W nagłych wypadkach dzwoń pod 112.',
+      affiliate: 'Afiliacja (Ekspertki i Twórczynie)',
+      b2bPartners: 'Współpraca B2B (Marki i Partnerzy)',
+      legalBar: 'Materiały HappyBirth mają charakter edukacyjny i nie zastępują porady lekarza ani wykwalifikowanej specjalistki. W sytuacji zagrożenia zdrowia lub życia dzwońcie pod numer 112.',
     },
   },
   en: {
@@ -516,6 +615,7 @@ export default function RootPage() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [waiverArt38Accepted, setWaiverArt38Accepted] = useState(false);
   const [checkboxError, setCheckboxError] = useState<string | null>(null);
+  const [faqCategory, setFaqCategory] = useState<string>('Wszystkie');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -737,8 +837,9 @@ export default function RootPage() {
             <a href="#program">{t.nav.program}</a>
             <a href="#mapa">{t.nav.week}</a>
             <a href="#bezplatna-lekcja">{t.nav.trailer}</a>
+            <Link href="/dla-ciebie">Dla Ciebie · Prawa 2026</Link>
             <Link href="/o-nas">{t.nav.experts}</Link>
-            <a href="#faq">{t.nav.faq}</a>
+            <a href="#pytania">{t.nav.faq}</a>
             <a href="https://strefa.happybirth.pl" rel="nofollow" className="text-[#DA0271] font-semibold hover:underline">{t.nav.zone}</a>
           </nav>
           <details className="menu">
@@ -748,11 +849,12 @@ export default function RootPage() {
               <a href="#mapa">{t.nav.week}</a>
               <a href="#bezplatna-lekcja">{t.nav.trailer}</a>
               <Link href="/program">{t.program.topBtn}</Link>
+              <Link href="/dla-ciebie">Dla Ciebie · Wiedza i Prawa 2026</Link>
               <Link href="/o-nas">{t.nav.experts}</Link>
               <Link href="/plan-porodu">Plan Porodu PDF</Link>
               <Link href="/kalkulator-wyprawki">Kalkulator Wyprawki PDF</Link>
-              <a href="#faq">{t.nav.faq}</a>
-              <Link href="/strefa">{t.nav.zone}</Link>
+              <a href="#pytania">{t.nav.faq}</a>
+              <a href="https://strefa.happybirth.pl" rel="nofollow">{t.nav.zone}</a>
               <a href="#cena">{t.nav.cta}</a>
             </nav>
           </details>
@@ -1325,21 +1427,117 @@ export default function RootPage() {
           </div>
         </section>
 
-        {/* 6. FAQ */}
-        <section aria-labelledby="faq-tyt" className="sek len" id="faq">
+        {/* 6. PYTANIA / FAQ (E-E-A-T + GEO / AEO / Anti-Flagging Educational Shield) */}
+        <section aria-labelledby="faq-tyt" className="sek len scroll-mt-20" id="pytania">
+          <span id="faq" className="sr-only" aria-hidden="true" />
           <div className="wrap">
-            <div className="naglowek">
+            <div className="naglowek space-y-3">
               <p className="kicker">{t.faq.kicker}</p>
               <h2 className="h2" id="faq-tyt">{t.faq.title}</h2>
+              {t.faq.lead && (
+                <p className="text-sm sm:text-base text-[#544A44] dark:text-[#C5B5C3] max-w-3xl leading-relaxed">
+                  {t.faq.lead}
+                </p>
+              )}
             </div>
+
+            {/* Pigułki kategorii pytań (widoczne dla języka PL) */}
+            {lang === 'pl' && (
+              <div
+                className="flex flex-wrap items-center gap-2 mt-6 mb-4"
+                role="tablist"
+                aria-label="Kategorie najczęstszych pytań"
+              >
+                {[
+                  'Wszystkie',
+                  'Program i nauka we dwoje',
+                  'Dostęp i narzędzia PDF',
+                  'Zakup, prawo i edukacja',
+                ].map((cat) => {
+                  const active = faqCategory === cat;
+                  const count =
+                    cat === 'Wszystkie'
+                      ? t.faq.items.length
+                      : t.faq.items.filter((i) => i.category === cat).length;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setFaqCategory(cat)}
+                      className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                        active
+                          ? 'bg-[#250A24] dark:bg-[#FECB22] text-white dark:text-[#1A1512] shadow-sm'
+                          : 'bg-white dark:bg-[#1E081D] text-[#544A44] dark:text-[#EAD5E5] border border-[#EAE3DB] dark:border-[#3A1038] hover:border-[#DA0271]'
+                      }`}
+                    >
+                      {cat} <span className="opacity-75 ml-0.5">({count})</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             <div className="faq">
-              {t.faq.items.map((item, idx) => (
-                <details key={idx}>
-                  <summary>{item.q}</summary>
-                  <p>{item.a}</p>
-                </details>
-              ))}
+              {t.faq.items
+                .filter(
+                  (item) =>
+                    lang !== 'pl' ||
+                    faqCategory === 'Wszystkie' ||
+                    item.category === faqCategory
+                )
+                .map((item, idx) => (
+                  <details key={item.id || idx} id={item.id}>
+                    <summary>
+                      <span className="inline-flex flex-wrap items-center gap-2">
+                        {item.category && (
+                          <span className="px-2.5 py-0.5 rounded-full bg-[#FAE3EB] dark:bg-[#3A1038] text-[#DA0271] dark:text-[#FF85C0] text-[11px] font-bold">
+                            {item.category}
+                          </span>
+                        )}
+                        <span>{item.q}</span>
+                      </span>
+                    </summary>
+                    <div className="space-y-2.5">
+                      <p>{item.a}</p>
+                      {item.linkHref && item.linkLabel && (
+                        <p className="pt-1">
+                          <Link
+                            href={item.linkHref}
+                            className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-[#DA0271] hover:underline"
+                          >
+                            <span>{item.linkLabel}</span>
+                          </Link>
+                        </p>
+                      )}
+                    </div>
+                  </details>
+                ))}
             </div>
+
+            {/* Most E-E-A-T z sekcji pytań do pełnej Bazy Wiedzy 2026 (/dla-ciebie) */}
+            {lang === 'pl' && (
+              <div className="mt-8 p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#1E081D] border border-[#EAE3DB] dark:border-[#3A1038] flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-sm">
+                <div className="space-y-1.5 max-w-2xl">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271] block">
+                    Kompendium Edukacyjno-Prawne E-E-A-T · Od 7 maja 2026 r.
+                  </span>
+                  <h3 className="font-brand-display font-bold text-lg sm:text-xl text-[#250A24] dark:text-white">
+                    Chcecie poznać wszystkie 21 praw ze Standardu Opieki Okołoporodowej 2026?
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#C5B5C3] leading-relaxed">
+                    Sprawdźcie naszą Bazę Wiedzy dla Rodziców: każde hasło wyjaśnione prostym językiem, z podstawą prawną w ISAP Sejm RP (Dz.U. 2025 poz. 1525) oraz wskazówką praktyczną dla dwojga.
+                  </p>
+                </div>
+                <Link
+                  href="/dla-ciebie"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#250A24] hover:bg-[#DA0271] text-white text-xs sm:text-sm font-bold transition-colors shrink-0"
+                >
+                  <span>Otwórz Bazę Wiedzy (21 haseł) →</span>
+                </Link>
+              </div>
+            )}
           </div>
         </section>
       </main>
@@ -1361,6 +1559,7 @@ export default function RootPage() {
               <h2>{t.footer.course}</h2>
               <ul>
                 <li><Link href="/program">{t.program.topBtn}</Link></li>
+                <li><Link href="/dla-ciebie">Dla Ciebie · Prawa i Wiedza 2026</Link></li>
                 <li><a href="#bezplatna-lekcja">{t.nav.trailer}</a></li>
                 <li><Link href="/plan-porodu">Plan Porodu PDF</Link></li>
                 <li><Link href="/kalkulator-wyprawki">Kalkulator Wyprawki PDF</Link></li>
@@ -1371,9 +1570,9 @@ export default function RootPage() {
               <h2>{t.footer.happybirth}</h2>
               <ul>
                 <li><Link href="/o-nas">{t.nav.experts}</Link></li>
-                <li><a href="https://partnerzy.happybirth.pl/afiliacja" rel="nofollow noopener">{t.footer.affiliate}</a></li>
-                <li><a href="https://partnerzy.happybirth.pl" rel="nofollow noopener">{t.footer.b2bPartners}</a></li>
+                <li><Link href="/dla-ciebie">Prawa i Standard 2026 (ISAP)</Link></li>
                 <li><a href="https://www.instagram.com/happybirth.pl/" rel="noreferrer" target="_blank">Instagram</a></li>
+                <li><a href="mailto:kontakt@happybirth.pl">kontakt@happybirth.pl</a></li>
               </ul>
             </div>
             <div>

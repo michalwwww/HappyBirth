@@ -173,10 +173,16 @@ export async function POST(req: NextRequest) {
                 }
               : null;
 
-          const courseOnlyGrossGrosze = Math.max(
-            0,
-            amountTotalGrosze - (orderBumpIncluded ? ORDER_BUMP_PRICE_GROSZE : 0)
-          );
+          const bumpMinorByCurrency: Record<string, number> = {
+            PLN: ORDER_BUMP_PRICE_GROSZE,
+            EUR: 1200,
+            USD: 1400,
+            GBP: 1000,
+          };
+          const bumpMinor = orderBumpIncluded
+            ? (bumpMinorByCurrency[sessionCurrency] ?? ORDER_BUMP_PRICE_GROSZE)
+            : 0;
+          const courseOnlyGrossGrosze = Math.max(0, amountTotalGrosze - bumpMinor);
 
           const comm = calculateTwoTierCommission({
             buyerEmail: customerEmail,
@@ -303,27 +309,48 @@ export async function POST(req: NextRequest) {
   }
 
   // ============================================================================
-  // 2. [A7] + [D2] OBSŁUGA ZWROTU ŚRODKÓW (charge.refunded)
+  // 2. [A7] + [D2] + [D5a] OBSŁUGA ZWROTU ŚRODKÓW (charge.refunded)
   // ============================================================================
   if (event.type === 'charge.refunded') {
     const charge = event.data.object as Stripe.Charge;
     const customerEmail = charge.billing_details?.email?.trim().toLowerCase();
+    const chargeAmount = Number(charge.amount || 0);
+    const amountRefunded = Number(charge.amount_refunded || 0);
+    const isPartialRefund =
+      charge.refunded === false ||
+      (chargeAmount > 0 && amountRefunded > 0 && amountRefunded < chargeAmount);
 
-    console.log(`🔄 [Stripe Webhook] Otrzymano zdarzenie charge.refunded (${charge.id}) dla: ${customerEmail}`);
+    console.log(
+      `🔄 [Stripe Webhook] Otrzymano zdarzenie charge.refunded (${charge.id}, partial=${isPartialRefund}) dla: ${customerEmail}`
+    );
 
     try {
-      if (customerEmail) {
-        const user = await d1First<{ id: string }>('SELECT id FROM users WHERE email = ?', [customerEmail]);
-        if (user?.id) {
-          await d1Run("UPDATE enrollments SET status = 'refunded' WHERE user_id = ?", [user.id]);
-          await d1Run("UPDATE orders SET status = 'refunded' WHERE user_id = ?", [user.id]);
+      if (isPartialRefund) {
+        // [D5a] Częściowy zwrot (np. 14-dniowy zwrot Order Bumpa +49 zł) — ZACHOWAJ dostęp do 52 lekcji kursu głównego!
+        if (customerEmail) {
+          const user = await d1First<{ id: string }>('SELECT id FROM users WHERE email = ?', [customerEmail]);
+          if (user?.id) {
+            await d1Run('UPDATE enrollments SET order_bump_included = 0 WHERE user_id = ?', [user.id]);
+            await d1Run(
+              "UPDATE orders SET order_bump_included = 0, status = 'partially_refunded' WHERE user_id = ?",
+              [user.id]
+            );
+          }
         }
+      } else {
+        if (customerEmail) {
+          const user = await d1First<{ id: string }>('SELECT id FROM users WHERE email = ?', [customerEmail]);
+          if (user?.id) {
+            await d1Run("UPDATE enrollments SET status = 'refunded' WHERE user_id = ?", [user.id]);
+            await d1Run("UPDATE orders SET status = 'refunded' WHERE user_id = ?", [user.id]);
+          }
+        }
+        // Anuluj prowizje afiliacyjne powiązane ze zwróconym zamówieniem
+        await d1Run(
+          `UPDATE affiliate_commissions SET status = 'CANCELLED'
+           WHERE order_id IN (SELECT id FROM orders WHERE status = 'refunded')`
+        );
       }
-      // Anuluj prowizje afiliacyjne powiązane ze zwróconym zamówieniem
-      await d1Run(
-        `UPDATE affiliate_commissions SET status = 'CANCELLED'
-         WHERE order_id IN (SELECT id FROM orders WHERE status = 'refunded')`
-      );
     } catch (refundErr) {
       console.error('❌ Błąd aktualizacji statusu zwrotu w D1:', refundErr);
     }

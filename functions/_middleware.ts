@@ -53,9 +53,25 @@ function withSecurityAndTrackingHeaders(
 
 function isProtectedPaidLessonPath(pathname: string): boolean {
   // lekcja-01 jest otwartą lekcją pokazową; lekcje 02..52 wymagają aktywnej sesji kursantki
-  const m = pathname.match(/^\/(?:strefa\/)?lekcja\/(lekcja-\d+)/);
+  const clean = pathname.replace(/\.(html|txt)$/i, '');
+  const m = clean.match(/^\/(?:strefa\/)?lekcja\/(lekcja-\d+)/);
   if (!m) return false;
   return m[1] !== 'lekcja-01';
+}
+
+const STATIC_ASSET_EXT_REGEX =
+  /\.(css|js|mjs|map|png|jpg|jpeg|gif|svg|webp|avif|ico|woff|woff2|ttf|otf|eot|vtt|mp4|webm|pdf|json|xml|webmanifest)$/i;
+
+function notFoundResponse(): Response {
+  return new Response('404 Not Found', {
+    status: 404,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+      'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  });
 }
 
 export async function onRequest(context: PagesContext): Promise<Response> {
@@ -65,19 +81,25 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   const refParam = url.searchParams.get('ref');
   const isAdBot = AD_BOT_REGEX.test(userAgent);
 
-  // 1. Przepuść bez zmian pliki statyczne, arkusze PDF/HTML (/materialy/*), chunki JS, CSS, obrazy, favicon oraz endpointy API
+  // Znormalizowana ścieżka bez przyrostków eksportu statycznego Next.js (.html / .txt RSC)
+  const cleanPath = (url.pathname.replace(/\.(html|txt)$/i, '') || '/').replace(/\/+$/, '') || '/';
+
+  // 1. Przepuść bez zmian wyłącznie prawdziwe zasoby statyczne (CSS/JS/obrazy/fonty), arkusze /materialy/*, SEO/GEO txt oraz endpointy API
   if (
     url.pathname.startsWith('/api') ||
     url.pathname.startsWith('/_next') ||
     url.pathname.startsWith('/materialy') ||
-    url.pathname.includes('.') ||
-    url.pathname.startsWith('/favicon')
+    url.pathname.startsWith('/favicon') ||
+    url.pathname === '/robots.txt' ||
+    url.pathname === '/llms.txt' ||
+    url.pathname === '/llms-full.txt' ||
+    STATIC_ASSET_EXT_REGEX.test(url.pathname)
   ) {
     const res = await context.next();
     return withSecurityAndTrackingHeaders(res, { noIndex: false });
   }
 
-  // 2. SUBDOMENA B2B I AFILIACJI: partnerzy.happybirth.pl
+  // 2. SUBDOMENA B2B: partnerzy.happybirth.pl (wyłącznie strona B2B na root '/', zero podstron /afiliacja lub /strefa)
   if (host.startsWith('partnerzy.')) {
     if (isAdBot) {
       return new Response('Access restricted for ad crawlers.', {
@@ -89,17 +111,16 @@ export async function onRequest(context: PagesContext): Promise<Response> {
         },
       });
     }
-    if (url.pathname === '/' || url.pathname === '') {
+    if (cleanPath === '/' || cleanPath === '/partnerzy') {
       const targetUrl = new URL(url.toString());
-      targetUrl.pathname = '/partnerzy';
+      targetUrl.pathname = url.pathname.endsWith('.txt') ? '/partnerzy.txt' : '/partnerzy';
       const res = await context.env.ASSETS.fetch(targetUrl);
       return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
     }
-    const res = await context.next();
-    return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
+    return notFoundResponse();
   }
 
-  // 3. SUBDOMENA AFILIACJI: afiliacja.happybirth.pl
+  // 3. SUBDOMENA AFILIACJI: afiliacja.happybirth.pl (wyłącznie strona afiliacyjna na root '/', zero podstron /partnerzy lub /strefa)
   if (host.startsWith('afiliacja.')) {
     if (isAdBot) {
       return new Response('Access restricted for ad crawlers.', {
@@ -111,14 +132,13 @@ export async function onRequest(context: PagesContext): Promise<Response> {
         },
       });
     }
-    if (url.pathname === '/' || url.pathname === '') {
+    if (cleanPath === '/' || cleanPath === '/afiliacja') {
       const targetUrl = new URL(url.toString());
-      targetUrl.pathname = '/afiliacja';
+      targetUrl.pathname = url.pathname.endsWith('.txt') ? '/afiliacja.txt' : '/afiliacja';
       const res = await context.env.ASSETS.fetch(targetUrl);
       return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
     }
-    const res = await context.next();
-    return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
+    return notFoundResponse();
   }
 
   // 4. SUBDOMENA KURSANTKI: strefa.happybirth.pl
@@ -134,6 +154,10 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       });
     }
 
+    if (cleanPath.startsWith('/afiliacja') || cleanPath.startsWith('/partnerzy')) {
+      return notFoundResponse();
+    }
+
     // Paywall na poziomie Edge dla płatnych lekcji wideo (lekcja-02 .. lekcja-52)
     if (isProtectedPaidLessonPath(url.pathname)) {
       const session = await getEdgeSession(context.request, context.env);
@@ -141,7 +165,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
         return new Response(null, {
           status: 302,
           headers: {
-            Location: `https://strefa.happybirth.pl/login?redirect=${encodeURIComponent(url.pathname)}`,
+            Location: `https://strefa.happybirth.pl/login?redirect=${encodeURIComponent(cleanPath)}`,
             'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
             'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
           },
@@ -158,28 +182,38 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     return withSecurityAndTrackingHeaders(response, { noIndex: true });
   }
 
-  // 5. DOMENA GŁÓWNA PRODUKCYJNA (happybirth.pl / www.happybirth.pl):
-  //    Twarda izolacja: przekierowania 301 ze ścieżek /strefa, /partnerzy, /afiliacja na dedykowane subdomeny
-  const isMainProdHost = host === 'happybirth.pl' || host === 'www.happybirth.pl';
+  // 5. DOMENA GŁÓWNA PRODUKCYJNA (happybirth.pl / www.happybirth.pl / *.pages.dev):
+  //    Twarda separacja: podstrony /afiliacja, /partnerzy, /marketing, /challenge NIE ISTNIEJĄ na domenie głównej (404 Not Found).
+  const isMainProdHost = !host.includes('localhost') && !host.includes('127.0.0.1');
   const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny'];
   const isStudentShortRoute = studentRoutes.some(
-    (route) => url.pathname === route || url.pathname.startsWith(`${route}/`)
+    (route) => cleanPath === route || cleanPath.startsWith(`${route}/`)
   );
-  const isStrefaPath = url.pathname === '/strefa' || url.pathname.startsWith('/strefa/');
-  const isPartnerzyPath = url.pathname === '/partnerzy' || url.pathname.startsWith('/partnerzy/');
-  const isAfiliacjaPath = url.pathname === '/afiliacja' || url.pathname.startsWith('/afiliacja/');
+  const isStrefaPath = cleanPath === '/strefa' || cleanPath.startsWith('/strefa/');
+  const isPartnerzyPath = cleanPath === '/partnerzy' || cleanPath.startsWith('/partnerzy/');
+  const isAfiliacjaPath = cleanPath === '/afiliacja' || cleanPath.startsWith('/afiliacja/');
+  const isLegacyInternalPath =
+    cleanPath === '/marketing' ||
+    cleanPath.startsWith('/marketing/') ||
+    cleanPath === '/challenge';
+
+  if (isLegacyInternalPath) {
+    return notFoundResponse();
+  }
 
   if (isMainProdHost) {
+    // Całkowita blokada podstron /afiliacja i /partnerzy na domenie głównej happybirth.pl (brak przekierowań łączących domenę B2C z afiliacją)
+    if (isAfiliacjaPath || isPartnerzyPath) {
+      return notFoundResponse();
+    }
+
     if (isStrefaPath || isStudentShortRoute) {
       if (isAdBot) {
-        return new Response('Redirect restricted for ad crawlers.', {
-          status: 403,
-          headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
-        });
+        return notFoundResponse();
       }
       const cleanSubpath = isStrefaPath
-        ? url.pathname.replace(/^\/strefa/, '') || '/'
-        : url.pathname;
+        ? cleanPath.replace(/^\/strefa/, '') || '/'
+        : cleanPath;
       return new Response(null, {
         status: 301,
         headers: {
@@ -189,44 +223,13 @@ export async function onRequest(context: PagesContext): Promise<Response> {
         },
       });
     }
-
-    if (isPartnerzyPath) {
-      if (isAdBot) {
-        return new Response('Redirect restricted for ad crawlers.', {
-          status: 403,
-          headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
-        });
-      }
-      return new Response(null, {
-        status: 301,
-        headers: {
-          Location: `https://partnerzy.happybirth.pl/${url.search}`,
-          'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
-          'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
-        },
-      });
-    }
-
-    if (isAfiliacjaPath) {
-      if (isAdBot) {
-        return new Response('Redirect restricted for ad crawlers.', {
-          status: 403,
-          headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet' },
-        });
-      }
-      return new Response(null, {
-        status: 301,
-        headers: {
-          Location: `https://partnerzy.happybirth.pl/afiliacja${url.search}`,
-          'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
-          'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
-        },
-      });
-    }
   }
 
-  // Fallback dla środowisk podglądowych (*.pages.dev / localhost)
+  // Fallback wyłącznie dla lokalnego środowiska podglądowego (localhost)
   if (isStrefaPath || isStudentShortRoute || isPartnerzyPath || isAfiliacjaPath) {
+    if (isAdBot) {
+      return notFoundResponse();
+    }
     if (isStudentShortRoute) {
       const targetUrl = new URL(url.toString());
       targetUrl.pathname = `/strefa${url.pathname}`;
