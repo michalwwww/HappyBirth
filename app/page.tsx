@@ -566,7 +566,6 @@ export default function RootPage() {
       setAppliedPromo(code);
       setAppliedDiscountPercent(100);
       setPromoError(null);
-      activateStudentAccessLocally(code);
       return;
     }
 
@@ -623,12 +622,6 @@ export default function RootPage() {
     try {
       setLoading(true);
       const currentPromo = (appliedPromo || promoCodeInput).trim().toUpperCase();
-
-      if (is100PercentPromo(currentPromo)) {
-        activateStudentAccessLocally(currentPromo, includeOrderBump);
-        window.location.href = `/strefa?session_id=promo_test_100&payment=success&promo=${encodeURIComponent(currentPromo)}`;
-        return;
-      }
 
       try {
         if (includeOrderBump) {

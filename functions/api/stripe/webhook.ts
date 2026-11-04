@@ -76,7 +76,11 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     event.type === 'checkout.session.async_payment_succeeded'
   ) {
     const session = event.data?.object || {};
-    if (session.payment_status && session.payment_status !== 'paid') {
+    if (
+      session.payment_status &&
+      session.payment_status !== 'paid' &&
+      session.payment_status !== 'no_payment_required'
+    ) {
       return new Response(JSON.stringify({ received: true, status: 'awaiting_payment' }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -90,7 +94,10 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       .trim()
       .toLowerCase();
     const customerName = String(session.customer_details?.name || 'Kursantka HappyBirth').trim();
-    const amountTotal = Number(session.amount_total || 48900);
+    const amountTotal =
+      session.amount_total !== undefined && session.amount_total !== null
+        ? Number(session.amount_total)
+        : 48900;
     const metadata = session.metadata || {};
     const sessionCurrency = String(session.currency || metadata.currency || 'PLN').toUpperCase();
     const orderBumpIncluded = metadata.order_bump_included === 'true' ? 1 : 0;

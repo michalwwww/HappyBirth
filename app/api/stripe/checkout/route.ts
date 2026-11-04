@@ -77,11 +77,12 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const pricing = resolvePricingForCurrency(currency, promoResult.valid);
+    const isVip100 = cleanPromo === 'VIP100';
+    const pricing = resolvePricingForCurrency(currency, promoResult.valid && promoResult.discountPercent === 10);
     const isPln = pricing.currency === 'pln';
     const activeLocale = (locale || pricing.stripeLocale || 'pl').toString();
     const activeCourseAmountGrosze = isPln
-      ? promoResult.valid
+      ? promoResult.valid && promoResult.discountPercent === 10
         ? 44010
         : BASE_COURSE_PRICE_GROSZE // 440,10 zł lub 489,00 zł brutto
       : pricing.activeCourseMinorUnits;
@@ -221,7 +222,6 @@ export async function POST(req: NextRequest) {
     const sessionParams: any = {
       mode: 'payment',
       line_items: lineItems,
-      allow_promotion_codes: !promoResult.valid && !isStandaloneOrderBump,
       invoice_creation: { enabled: true },
       tax_id_collection: { enabled: true },
       metadata,
@@ -229,6 +229,33 @@ export async function POST(req: NextRequest) {
       success_url: `${origin}/strefa?session_id={CHECKOUT_SESSION_ID}&payment=success`,
       cancel_url: isStandaloneOrderBump ? `${origin}/strefa` : `${origin}/#cena`,
     };
+
+    if (isVip100) {
+      const promoLookupRes = await fetch(
+        'https://api.stripe.com/v1/promotion_codes?code=VIP100&active=true&limit=1',
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+            'Stripe-Version': '2024-06-20',
+          },
+        }
+      );
+      const promoLookupData: any = await promoLookupRes.json();
+      const foundPromo = promoLookupData?.data?.[0];
+      if (
+        !foundPromo ||
+        !foundPromo.active ||
+        (foundPromo.max_redemptions && (foundPromo.times_redeemed || 0) >= foundPromo.max_redemptions)
+      ) {
+        return NextResponse.json(
+          { error: 'Kod rabatowy VIP100 wykorzystał już maksymalny limit 10 użyć.' },
+          { status: 400 }
+        );
+      }
+      sessionParams.discounts = [{ promotion_code: foundPromo.id }];
+    } else {
+      sessionParams.allow_promotion_codes = !promoResult.valid && !isStandaloneOrderBump;
+    }
 
     if (email && typeof email === 'string' && email.includes('@')) {
       sessionParams.customer_email = email.trim();

@@ -76,7 +76,10 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
     }
 
     const sessionData: any = await stripeRes.json();
-    if (sessionData.payment_status !== 'paid') {
+    if (
+      sessionData.payment_status !== 'paid' &&
+      sessionData.payment_status !== 'no_payment_required'
+    ) {
       return new Response(
         JSON.stringify({
           success: false,

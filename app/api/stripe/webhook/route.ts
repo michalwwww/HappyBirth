@@ -48,7 +48,10 @@ export async function POST(req: NextRequest) {
     const buyerIp = session.metadata?.buyer_ip || '0.0.0.0';
     const termsSha256 = session.metadata?.terms_sha256 || getTermsSha256Hash();
     const waiverCheckboxText = session.metadata?.waiver_checkbox_text || CHECKBOX_2_ART38_WAIVER_TEXT;
-    const amountTotalGrosze = session.amount_total || 48900;
+    const amountTotalGrosze =
+      session.amount_total !== undefined && session.amount_total !== null
+        ? session.amount_total
+        : 48900;
     const sessionCurrency = (session.currency || session.metadata?.currency || 'PLN').toUpperCase();
 
     console.log(

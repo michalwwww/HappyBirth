@@ -137,8 +137,9 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       );
     }
 
-    const has10Discount = cleanPromo ? await isAuthorized10PercentPromo(cleanPromo, env.DB) : false;
-    if (cleanPromo && !has10Discount) {
+    const isVip100 = cleanPromo === 'VIP100';
+    const has10Discount = cleanPromo && !isVip100 ? await isAuthorized10PercentPromo(cleanPromo, env.DB) : false;
+    if (cleanPromo && !has10Discount && !isVip100) {
       return new Response(
         JSON.stringify({
           error: 'Podany kod rabatowy jest nieaktywny lub nieprawidłowy. Sprawdź pisownię kodu.',
@@ -153,6 +154,34 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         status: 500,
         headers: { 'Content-Type': 'application/json' },
       });
+    }
+
+    let vipPromoStripeId = '';
+    if (isVip100) {
+      const promoLookupRes = await fetch(
+        'https://api.stripe.com/v1/promotion_codes?code=VIP100&active=true&limit=1',
+        {
+          headers: {
+            Authorization: `Bearer ${stripeSecretKey}`,
+            'Stripe-Version': '2024-06-20',
+          },
+        }
+      );
+      const promoLookupData: any = await promoLookupRes.json();
+      const foundPromo = promoLookupData?.data?.[0];
+      if (
+        !foundPromo ||
+        !foundPromo.active ||
+        (foundPromo.max_redemptions && (foundPromo.times_redeemed || 0) >= foundPromo.max_redemptions)
+      ) {
+        return new Response(
+          JSON.stringify({
+            error: 'Kod rabatowy VIP100 wykorzystał już maksymalny limit 10 użyć.',
+          }),
+          { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+        );
+      }
+      vipPromoStripeId = foundPromo.id;
     }
 
     const normCurrency = (String(currency || 'pln').trim().toLowerCase() as EdgeCurrency);
@@ -177,7 +206,11 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const params = new URLSearchParams();
     params.append('mode', 'payment');
     params.append('locale', activeLocale);
-    params.append('allow_promotion_codes', has10Discount || isStandaloneOrderBump ? 'false' : 'true');
+    if (vipPromoStripeId) {
+      params.append('discounts[0][promotion_code]', vipPromoStripeId);
+    } else {
+      params.append('allow_promotion_codes', has10Discount || isStandaloneOrderBump ? 'false' : 'true');
+    }
     params.append('invoice_creation[enabled]', 'true');
     params.append('tax_id_collection[enabled]', 'true');
     params.append(
@@ -255,7 +288,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('metadata[order_bump_included]', shouldIncludeBumpItem ? 'true' : 'false');
     params.append('metadata[only_order_bump]', isStandaloneOrderBump ? 'true' : 'false');
     params.append('metadata[order_bump_edition]', requestedEditionKey);
-    params.append('metadata[promo_code]', has10Discount && !isStandaloneOrderBump ? cleanPromo : '');
+    params.append('metadata[promo_code]', (has10Discount || isVip100) && !isStandaloneOrderBump ? cleanPromo : '');
     params.append('metadata[affiliate_ref_cookie]', isStandaloneOrderBump ? '' : String(cookieRef).slice(0, 80));
     params.append(
       'metadata[attribution_priority]',

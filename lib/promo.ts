@@ -531,16 +531,17 @@ export function is10PercentAffiliatePromo(code?: string | null): boolean {
 }
 
 /**
- * [A4] Kody 100% (TEST) są bezwzględnie wyłączone na produkcji.
- * Działają wyłącznie lokalnie w środowisku deweloperskim (NODE_ENV === 'development').
+ * Autoryzowany kod VIP100 (-100%, limit 10 sztuk weryfikowany w Stripe Live).
+ * Publiczne kody testowe (TEST, TEST100, FREE) pozostają bezwzględnie wyłączone.
  */
 export function is100PercentPromo(code?: string | null): boolean {
   if (!code) return false;
-  if (process.env.NODE_ENV === 'production') {
-    return false;
-  }
   const clean = code.trim().toUpperCase();
-  return clean === 'DEV100_LOCAL';
+  if (clean === 'VIP100') return true;
+  if (process.env.NODE_ENV !== 'production' && clean === 'DEV100_LOCAL') {
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -575,6 +576,19 @@ export function validatePromoCode(rawCode?: string | null): PromoValidationResul
       omnibusNotice: OMNIBUS_LOWEST_30_DAYS_TEXT,
       sourceType: 'invalid',
       errorMessage: 'Ten kod testowy jest nieaktywny. Wpisz kod rabatowy (-10%) od swojej położnej, partnera lub koleżanki.',
+    };
+  }
+
+  // 0. Autoryzowany kod VIP100 (-100%, limit 10 szt. w Stripe Checkout)
+  if (clean === 'VIP100') {
+    return {
+      valid: true,
+      code: clean,
+      discountPercent: 100,
+      basePricePln: BASE_COURSE_PRICE_PLN,
+      discountedCoursePricePln: 0,
+      omnibusNotice: OMNIBUS_LOWEST_30_DAYS_TEXT,
+      sourceType: 'affiliate',
     };
   }
 
