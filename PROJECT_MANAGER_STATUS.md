@@ -1,7 +1,7 @@
 # HappyBirth · Dashboard Operacyjny Project Managera (SSOT)
-**Stan na dzień:** 2 listopada 2026 r., godz. 12:25 CET  
+**Stan na dzień:** 4 listopada 2026 r., godz. 15:15 CET  
 **Rola:** Technical & Commercial Project Manager  
-**Tryb wdrożenia:** Pełne wdrożenie produkcyjne kodu, funkcji Edge i bazy D1 w **Trybie Weryfikacyjnym Stripe (`TEST MODE` — `sk_test_...` / `pk_test_...`)** przed przełączeniem na klucze Live.
+**Tryb wdrożenia:** **PEŁNY TRYB PRODUKCYJNY (`LIVE MODE` — `acct_1UY4JZEH677qRgtB`, `cs_live_...`)** wdrożony na `https://happybirth.pl`, `https://strefa.happybirth.pl` oraz `https://partnerzy.happybirth.pl`.
 
 ---
 
@@ -18,7 +18,8 @@
 | **E1–E5** | Tarcza Prawna Art. 38 ust. 1 pkt 13 u.p.k. + przycisk `/odstap-od-umowy` (wymóg 19.06.2026) + Izolacja RODO/Ad-Bot | Michał / Antigravity | **WDROŻONE (PASS)** | Dwa niezaznaczone domyślnie checkboxy w koszyku, rejestr dowodowy SHA-256 w `orders`, automatyczna odmowa zwrotu po otwarciu kursu (`first_content_accessed_at IS NOT NULL`), blokada `403` dla botów reklamowych w `/strefa`, `/partnerzy`, `/afiliacja`. |
 | **F2–F4** | Mikro-narzędzia Lead Magnet (`/plan-porodu`, `/kalkulator-wyprawki`), sekwencja 4 maili CRM i pakiet Outreach (30 podmiotów) | Michał / Antigravity | **WDROŻONE (PASS)** | Gotowe generatory A4 do druku/PDF, endpoint `/api/leads` oraz pakiet w `wersja_27_10_2026/PAKIET_OUTREACH_F2_ORAZ_SEKWENCJA_CRM_F4.md`. |
 | **D1 DB** | Migracja schematu 13 tabel Cloudflare D1 (`local` + `remote`) | Michał / Antigravity | **WDROŻONE (PASS)** | Wszystkie 13 tabel i kolumny (`users`, `enrollments`, `orders`, `withdrawal_requests`, `lesson_progress`, `certificates`, `student_referrals`, `affiliates`, `affiliate_commissions`, `partnership_inquiries`, `auth_tokens`, `contraction_sessions`, `leads`) zsynchronizowane lokalnie i zdalnie. |
-| **STRIPE** | Weryfikacja płatności w trybie testowym (`sk_test_...` / `pk_test_...`) | Zespół | **AKTYWNY TRYB TESTOWY** | Kasa i weryfikacja sesji (`cs_test_...`) działają w trybie testowym Stripe. Po zatwierdzeniu testów E2E przez zespół — podmiana na klucze `sk_live_...` / `pk_live_...`. |
+| **STRIPE** | Produkcyjna bramka płatności (`LIVE MODE` — `acct_1UY4JZEH677qRgtB`, BLIK, Karty, Apple/Google Pay) | Michał / Antigravity | **WDROŻONE (LIVE PASS)** | Produkt główny (`prod_VZDFMnoll6uY6Q`, `price_1UY4pQEH677qRgtBYLHWVdfK` — 489,00 PLN inclusive), Order Bump (`prod_VZDFzNYoE5DbXf`, `price_1UY4pREH677qRgtBqCutkzSJ` — 49,00 PLN inclusive), 11 kodów `-10%` oraz webhook `we_1UY4r5EH677qRgtBzLcQJUCF` aktywne na `https://happybirth.pl/api/stripe/webhook`. Sesje `cs_live_...` zweryfikowane E2E. |
+| **RESEND** | Poczta transakcyjna dla domeny `happybirth.pl` (`DKIM`, `SPF`, `DMARC` — `Verified`) | Michał / Antigravity | **WDROŻONE (LIVE PASS)** | Klucz `RESEND_API_KEY` oraz nadawca `Szkoła Rodzenia HappyBirth <kontakt@happybirth.pl>` wgrane na produkcję Cloudflare Pages. Aktywna wysyłka Magic Linków, potwierdzeń na trwałym nośniku (Art. 38 ust. 1 pkt 13 u.p.k.) oraz materiałów Lead Magnet. |
 
 ---
 
@@ -30,9 +31,8 @@
 
 ---
 
-## 3. Checklista Przełączenia na Produkcję (Go-Live Switch)
+## 3. Status Wdrożenia Produkcyjnego (Go-Live Completed — 04.11.2026)
 
-Po zakończeniu testów weryfikacyjnych przez zespół, aby przełączyć bramkę na płatności rzeczywiste:
-1. W panelu Cloudflare Pages (`Settings -> Environment variables`) podmienić `STRIPE_SECRET_KEY` na `sk_live_...`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` na `pk_live_...`, `NEXT_PUBLIC_STRIPE_PRICE_ID` na produkcyjny identyfikator ceny `489,00 PLN` oraz `STRIPE_WEBHOOK_SECRET` na klucz produkcyjnego webhooka (`https://happybirth.pl/api/stripe/webhook`).
-2. Upewnić się, że w Cloudflare Pages ustawiony jest klucz `RESEND_API_KEY` dla domeny `happybirth.pl` (wysyłka potwierdzeń na trwałym nośniku i magic linków).
-3. Wykonać jedną rzeczywistą transakcję kontrolną BLIK/karta i potwierdzić odbiór maila z potwierdzeniem Art. 38 ust. 1 pkt 13 u.p.k.
+1. **[ZREALIZOWANE]** Wszystkie klucze produkcyjne Stripe Live (`STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`), Cloudflare Stream (`CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_STREAM_API_TOKEN`) oraz `SESSION_SECRET` zostały wgrane do projektu `happybirth` w Cloudflare Pages.
+2. **[ZREALIZOWANE]** Klucz `RESEND_API_KEY` dla zweryfikowanej domeny `happybirth.pl` został wgrany na produkcję i aktywowany we wszystkich funkcjach brzegowych.
+3. **[GOTOWE DO SPRZEDAŻY]** System na `https://happybirth.pl`, `https://strefa.happybirth.pl` i `https://partnerzy.happybirth.pl` przyjmuje rzeczywiste płatności BLIK, kartami, Apple Pay i Google Pay.
