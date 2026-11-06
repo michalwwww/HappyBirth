@@ -78,17 +78,17 @@ export default function PublicPlanPoroduLeadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF8F4] text-[#1A1512] flex flex-col selection:bg-[#EC008C]/20">
+    <div className="min-h-screen bg-[#FDFAF6] dark:bg-[#1B1424] text-[#4A3A5E] dark:text-[#F4EEF7] flex flex-col selection:bg-[#DA0271]/20">
       {/* Czysty Header */}
-      <header className="border-b border-[#EAE3DB] bg-white/95 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-[#EADFD3] dark:border-[#3B3050] bg-white/95 dark:bg-[#2C2240]/95 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3 group">
             <Logo className="h-9 w-auto object-contain group-hover:scale-105 transition-transform" />
-            <div className="border-l border-[#EAE3DB] pl-2.5">
-              <span className="font-brand-display font-bold text-sm text-[#1A1512] block leading-none">
+            <div className="border-l border-[#EADFD3] dark:border-[#3B3050] pl-2.5">
+              <span className="font-brand-display font-bold text-sm text-[#4A3A5E] dark:text-[#F4EEF7] block leading-none">
                 Plan Porodu PDF
               </span>
-              <span className="text-[10px] uppercase tracking-wider text-[#867A72] font-semibold">
+              <span className="text-[10px] uppercase tracking-wider text-[#7A6786] dark:text-[#B9ACC8] font-semibold">
                 standard opieki okołoporodowej
               </span>
             </div>
@@ -96,7 +96,7 @@ export default function PublicPlanPoroduLeadPage() {
 
           <Link
             href="/"
-            className="text-xs font-semibold text-[#544A44] hover:text-[#EC008C] transition-colors flex items-center gap-1"
+            className="text-xs font-semibold text-[#6E5C7D] dark:text-[#D5CAE0] hover:text-[#DA0271] transition-colors flex items-center gap-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Wróć do HappyBirth</span>
@@ -107,31 +107,31 @@ export default function PublicPlanPoroduLeadPage() {
       <main className="flex-1 py-10 sm:py-16 px-4 sm:px-6 max-w-5xl mx-auto w-full space-y-10">
         {/* Wstęp merytoryczno-prawny (Sterylna Śluza dla bota Mety) */}
         <div className="text-center max-w-3xl mx-auto space-y-3.5">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] border border-[#F3CAD9] text-xs font-semibold text-[#EC008C]">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F9E6EC] dark:bg-[#3A2033] border border-[#EAADC0] dark:border-[#4E2840] text-xs font-semibold text-[color:var(--hb-mag-t)]">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Oficjalny Szablon Praw Pacjenta dla Szpitali</span>
           </div>
 
-          <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-[#1A1512] tracking-tight leading-tight">
+          <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-[#4A3A5E] dark:text-[#F4EEF7] tracking-tight leading-tight">
             Interaktywny Kreator i Wzór{' '}
-            <em className="font-brand-serif italic font-normal text-[#EC008C]">
+            <em className="font-brand-serif italic font-normal text-[color:var(--hb-mag-t)]">
               Planu Porodu (PDF)
             </em>
           </h1>
 
-          <p className="text-sm sm:text-base text-[#544A44] leading-relaxed max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-[#6E5C7D] dark:text-[#D5CAE0] leading-relaxed max-w-2xl mx-auto">
             Zgodnie ze Standardem Organizacyjnym Opieki Okołoporodowej w Polsce masz ustawowe prawo przedstawić personelowi medycznemu swoje świadome preferencje. Wygenerujcie dokument we dwoje, wydrukujcie i weźcie ze sobą do szpitala.
           </p>
         </div>
 
         {/* Faza 1: Sterylny Formularz Zapisu (Widoczny przed odblokowaniem) */}
         {!unlocked ? (
-          <div className="max-w-xl mx-auto bg-white rounded-3xl p-6 sm:p-10 border border-[#EAE3DB] shadow-xl space-y-6">
-            <div className="space-y-2 border-b border-[#EAE3DB] pb-5">
-              <h2 className="font-brand-display font-bold text-xl text-[#250A24]">
+          <div className="max-w-xl mx-auto bg-white dark:bg-[#2C2240] rounded-3xl p-6 sm:p-10 border border-[#EADFD3] dark:border-[#3B3050] shadow-xl space-y-6">
+            <div className="space-y-2 border-b border-[#EADFD3] dark:border-[#3B3050] pb-5">
+              <h2 className="font-brand-display font-bold text-xl text-[#4A3A5E] dark:text-[#F4EEF7]">
                 Odbierz bezpłatny dostęp do kreatora i wzoru PDF
               </h2>
-              <p className="text-xs text-[#867A72]">
+              <p className="text-xs text-[#7A6786] dark:text-[#B9ACC8]">
                 Wpisz poniższe dane, aby natychmiast odblokować interaktywny formularz oraz otrzymać kopię dokumentu i bezpłatną lekcję demonstracyjną na e-mail.
               </p>
             </div>
@@ -144,7 +144,7 @@ export default function PublicPlanPoroduLeadPage() {
               )}
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#342D28] block">
+                <label className="text-xs font-semibold text-[#4A3A5E] dark:text-[#F4EEF7] block">
                   Twoje Imię
                 </label>
                 <input
@@ -153,12 +153,12 @@ export default function PublicPlanPoroduLeadPage() {
                   placeholder="np. Anna"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] focus:outline-none focus:ring-2 focus:ring-[#EC008C] text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-sm"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#342D28] block">
+                <label className="text-xs font-semibold text-[#4A3A5E] dark:text-[#F4EEF7] block">
                   Adres e-mail (do wysyłki gotowego PDF)
                 </label>
                 <input
@@ -167,12 +167,12 @@ export default function PublicPlanPoroduLeadPage() {
                   placeholder="twoj.mail@domena.pl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] focus:outline-none focus:ring-2 focus:ring-[#EC008C] text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-sm"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#342D28] block">
+                <label className="text-xs font-semibold text-[#4A3A5E] dark:text-[#F4EEF7] block">
                   Przewidywany termin porodu (opcjonalnie)
                 </label>
                 <div className="relative">
@@ -180,10 +180,10 @@ export default function PublicPlanPoroduLeadPage() {
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] focus:outline-none focus:ring-2 focus:ring-[#EC008C] text-sm text-[#544A44]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-sm text-[#6E5C7D] dark:text-[#D5CAE0]"
                   />
                 </div>
-                <p className="text-[11px] text-[#867A72]">
+                <p className="text-[11px] text-[#7A6786] dark:text-[#B9ACC8]">
                   Dzięki temu dopasujemy wskazówki i ściągi do aktualnego etapu ciąży.
                 </p>
               </div>
@@ -195,10 +195,10 @@ export default function PublicPlanPoroduLeadPage() {
                   checked={rodoConsent}
                   onChange={(e) => setRodoConsent(e.target.checked)}
                   required
-                  className="mt-0.5 rounded text-[#EC008C] focus:ring-[#EC008C]"
+                  className="mt-0.5 rounded text-[color:var(--hb-mag-t)] focus:ring-[#DA0271]"
                 />
-                <label htmlFor="rodo" className="text-[11px] text-[#867A72] leading-tight">
-                  Zgadzam się na przetwarzanie danych w celu wygenerowania Planu Porodu oraz otrzymania bezpłatnych materiałów edukacyjnych HappyBirth zgodnie z <Link href="/polityka-prywatnosci" className="underline hover:text-[#EC008C]">Polityką Prywatności</Link>.
+                <label htmlFor="rodo" className="text-[11px] text-[#7A6786] dark:text-[#B9ACC8] leading-tight">
+                  Zgadzam się na przetwarzanie danych w celu wygenerowania Planu Porodu oraz otrzymania bezpłatnych materiałów edukacyjnych HappyBirth zgodnie z <Link href="/polityka-prywatnosci" className="underline hover:text-[#DA0271]">Polityką Prywatności</Link>.
                 </label>
               </div>
 
@@ -206,7 +206,7 @@ export default function PublicPlanPoroduLeadPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white font-semibold text-sm transition-all shadow-lg shadow-[#EC008C]/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+                  className="w-full py-3.5 rounded-full bg-[#DA0271] hover:bg-[#C00265] text-white font-semibold text-sm transition-all shadow-lg shadow-[#DA0271]/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
                 >
                   {loading ? (
                     <>
@@ -222,7 +222,7 @@ export default function PublicPlanPoroduLeadPage() {
                 </button>
               </div>
 
-              <div className="pt-2 flex items-center justify-center gap-4 text-[11px] text-[#867A72]">
+              <div className="pt-2 flex items-center justify-center gap-4 text-[11px] text-[#7A6786] dark:text-[#B9ACC8]">
                 <div className="flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                   <span>100% Bezpłatnie</span>
@@ -249,20 +249,20 @@ export default function PublicPlanPoroduLeadPage() {
             <BirthPlanGenerator />
 
             {/* Pasek Zachęty do Pełnego Kursu VOD */}
-            <div className="rounded-3xl bg-gradient-to-r from-[#250A24] via-[#3B1038] to-[#20071F] p-8 sm:p-10 text-white border border-[#461643] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 mt-12 print:hidden">
+            <div className="rounded-3xl bg-gradient-to-r from-[#3F3054] via-[#55406E] to-[#3F3054] p-8 sm:p-10 text-white border border-[#6E5C7D] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 mt-12 print:hidden">
               <div className="space-y-2 text-center md:text-left">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#EC008C]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[color:var(--hb-mag-t)]">
                   Kompleksowe Przygotowanie
                 </span>
                 <h3 className="font-brand-display font-bold text-2xl sm:text-3xl text-white">
                   Chcecie rodzić w pełnym spokoju?
                 </h3>
-                <p className="text-xs sm:text-sm text-[#EAD5E5]/80 max-w-xl">
+                <p className="text-xs sm:text-sm text-[#E8DEF0]/80 max-w-xl">
                   52 filmowe lekcje 4K, techniki oddechowe, masaż dla partnera i wsparcie przez 18 miesięcy (548 dni) od zakupu.
                 </p>
               </div>
 
-              <BuyCourseButton className="px-8 py-4 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white font-semibold text-sm transition-all shadow-xl shadow-[#EC008C]/30 hover:scale-105 shrink-0 cursor-pointer">
+              <BuyCourseButton className="px-8 py-4 rounded-full bg-[#DA0271] hover:bg-[#C00265] text-white font-semibold text-sm transition-all shadow-xl shadow-[#DA0271]/30 hover:scale-105 shrink-0 cursor-pointer">
                 <span>Dołącz do kursu · 489 zł</span>
                 <ArrowRight className="w-4 h-4 ml-2 inline" />
               </BuyCourseButton>

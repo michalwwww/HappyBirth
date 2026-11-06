@@ -74,12 +74,12 @@ export default function OdstapOdUmowyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF8F4] text-[#1A1512]">
-      <header className="border-b border-[#EAE3DB] bg-white/95 sticky top-0 z-40 backdrop-blur-md">
+    <div className="min-h-screen bg-[#FDFAF6] dark:bg-[#1B1424] text-[#4A3A5E] dark:text-[#F4EEF7]">
+      <header className="border-b border-[#EADFD3] dark:border-[#3B3050] bg-white/95 dark:bg-[#2C2240]/95 sticky top-0 z-40 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#544A44] hover:text-[#DA0271]"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#6E5C7D] dark:text-[#D5CAE0] hover:text-[#DA0271]"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Wróć do strony głównej</span>
@@ -92,26 +92,26 @@ export default function OdstapOdUmowyPage() {
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16 space-y-8">
         <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] border border-[#F3CAD9] text-xs font-bold text-[#DA0271]">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F9E6EC] dark:bg-[#3A2033] border border-[#EAADC0] dark:border-[#4E2840] text-xs font-bold text-[color:var(--hb-mag-t)]">
             <FileText className="w-3.5 h-3.5" />
             <span>Elektroniczny formularz konsumencki (wymóg od 19.06.2026 r.)</span>
           </div>
-          <h1 className="font-brand-display font-bold text-3xl sm:text-4xl text-[#1A1512]">
+          <h1 className="font-brand-display font-bold text-3xl sm:text-4xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             Odstąp od umowy
           </h1>
-          <p className="text-xs sm:text-sm text-[#544A44] leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#6E5C7D] dark:text-[#D5CAE0] leading-relaxed">
             Poniższy formularz umożliwia złożenie oświadczenia o odstąpieniu od umowy zawartej na odległość z <strong>{OPERATOR_LEGAL_DATA.fullName}</strong> ({OPERATOR_LEGAL_DATA.address}, NIP: {OPERATOR_LEGAL_DATA.nip}, KRS: {OPERATOR_LEGAL_DATA.krs}) bez konieczności logowania.
           </p>
         </div>
 
         {responseState ? (
-          <div className="bg-white rounded-3xl p-7 sm:p-10 border border-[#EAE3DB] shadow-md space-y-5">
+          <div className="bg-white dark:bg-[#2C2240] rounded-3xl p-7 sm:p-10 border border-[#EADFD3] dark:border-[#3B3050] shadow-md space-y-5">
             <div className="flex items-center gap-3 text-emerald-700 font-bold text-base">
               <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
               <span>Potwierdzenie wpływu oświadczenia o odstąpieniu od umowy</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-[#FBF8F4] border border-[#EAE3DB] text-xs sm:text-sm text-[#342D28] space-y-2 leading-relaxed">
+            <div className="p-4 rounded-2xl bg-[#FDFAF6] dark:bg-[#1B1424] border border-[#EADFD3] dark:border-[#3B3050] text-xs sm:text-sm text-[#4A3A5E] dark:text-[#F4EEF7] space-y-2 leading-relaxed">
               <div>
                 <strong>Data i godzina złożenia oświadczenia (UTC):</strong> <code>{responseState.timestamp}</code>
               </div>
@@ -123,19 +123,19 @@ export default function OdstapOdUmowyPage() {
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-[#FAE3EB]/60 border border-[#F3CAD9] text-xs sm:text-sm text-[#541235] leading-relaxed">
+            <div className="p-5 rounded-2xl bg-[#F9E6EC]/60 dark:bg-[#3A2033]/60 border border-[#EAADC0] dark:border-[#4E2840] text-xs sm:text-sm text-[#4A3A5E] dark:text-[#F4EEF7] leading-relaxed">
               <strong>Informacja prawna dot. statusu zamówienia:</strong>
               <p className="mt-1">{responseState.message}</p>
             </div>
 
-            <p className="text-xs text-[#867A72]">
+            <p className="text-xs text-[#7A6786] dark:text-[#B9ACC8]">
               Kopia niniejszego potwierdzenia została automatycznie wysłana na Twój adres e-mail (trwały nośnik). W razie pytań skontaktuj się z nami pod adresem: <strong>{OPERATOR_LEGAL_DATA.supportEmail}</strong>.
             </p>
           </div>
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="bg-white rounded-3xl p-6 sm:p-10 border border-[#EAE3DB] shadow-md space-y-5"
+            className="bg-white dark:bg-[#2C2240] rounded-3xl p-6 sm:p-10 border border-[#EADFD3] dark:border-[#3B3050] shadow-md space-y-5"
           >
             {errorMsg && (
               <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
@@ -145,7 +145,7 @@ export default function OdstapOdUmowyPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#6E5C7D] dark:text-[#D5CAE0] mb-1.5">
                   Imię i nazwisko
                 </label>
                 <input
@@ -154,12 +154,12 @@ export default function OdstapOdUmowyPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="np. Anna Kowalska"
-                  className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
+                  className="w-full px-4 py-3 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] text-sm focus:outline-none focus:border-[#DA0271]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#6E5C7D] dark:text-[#D5CAE0] mb-1.5">
                   Adres e-mail użyty przy zakupie
                 </label>
                 <input
@@ -168,13 +168,13 @@ export default function OdstapOdUmowyPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="twoj@email.pl"
-                  className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
+                  className="w-full px-4 py-3 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] text-sm focus:outline-none focus:border-[#DA0271]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#6E5C7D] dark:text-[#D5CAE0] mb-1.5">
                 Numer zamówienia (lub ID sesji płatności)
               </label>
               <input
@@ -183,35 +183,35 @@ export default function OdstapOdUmowyPage() {
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
                 placeholder="np. HB-2026-XXXXXX"
-                className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
+                className="w-full px-4 py-3 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] text-sm focus:outline-none focus:border-[#DA0271]"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44]">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#6E5C7D] dark:text-[#D5CAE0]">
                 Zakres odstąpienia od umowy
               </label>
               <div className="space-y-2.5">
-                <label className="flex items-start gap-2.5 p-3.5 rounded-xl border border-[#EAE3DB] bg-[#FBF8F4] text-xs sm:text-sm cursor-pointer">
+                <label className="flex items-start gap-2.5 p-3.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] bg-[#FDFAF6] dark:bg-[#1B1424] text-xs sm:text-sm cursor-pointer">
                   <input
                     type="radio"
                     name="withdrawal-scope"
                     checked={scope === 'full_order'}
                     onChange={() => setScope('full_order')}
-                    className="mt-0.5 text-[#DA0271] focus:ring-[#DA0271]"
+                    className="mt-0.5 text-[color:var(--hb-mag-t)] focus:ring-[#DA0271]"
                   />
                   <span>
                     <strong>Całe zamówienie</strong> (Kurs Szkoły Rodzenia Online HappyBirth.pl — 489,00 zł brutto)
                   </span>
                 </label>
 
-                <label className="flex items-start gap-2.5 p-3.5 rounded-xl border border-[#EAE3DB] bg-[#FBF8F4] text-xs sm:text-sm cursor-pointer">
+                <label className="flex items-start gap-2.5 p-3.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] bg-[#FDFAF6] dark:bg-[#1B1424] text-xs sm:text-sm cursor-pointer">
                   <input
                     type="radio"
                     name="withdrawal-scope"
                     checked={scope === 'order_bump_only'}
                     onChange={() => setScope('order_bump_only')}
-                    className="mt-0.5 text-[#DA0271] focus:ring-[#DA0271]"
+                    className="mt-0.5 text-[color:var(--hb-mag-t)] focus:ring-[#DA0271]"
                   />
                   <span>
                     <strong>Częściowe odstąpienie — wyłącznie od niewykorzystanego dodatku z Order Bumpa (+49,00 zł)</strong> przy zachowaniu pełnego dostępu do kursu głównego
@@ -221,7 +221,7 @@ export default function OdstapOdUmowyPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#6E5C7D] dark:text-[#D5CAE0] mb-1.5">
                 Dodatkowe uwagi (opcjonalnie — nie jest wymagane podawanie przyczyny)
               </label>
               <textarea
@@ -229,12 +229,12 @@ export default function OdstapOdUmowyPage() {
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Pole nieobowiązkowe"
-                className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
+                className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] text-sm focus:outline-none focus:border-[#DA0271]"
               />
             </div>
 
-            <div className="p-4 rounded-2xl bg-[#FBF8F4] border border-[#EAE3DB] text-xs text-[#544A44] flex items-start gap-2.5 leading-relaxed">
-              <Info className="w-4 h-4 text-[#DA0271] shrink-0 mt-0.5" />
+            <div className="p-4 rounded-2xl bg-[#FDFAF6] dark:bg-[#1B1424] border border-[#EADFD3] dark:border-[#3B3050] text-xs text-[#6E5C7D] dark:text-[#D5CAE0] flex items-start gap-2.5 leading-relaxed">
+              <Info className="w-4 h-4 text-[color:var(--hb-mag-t)] shrink-0 mt-0.5" />
               <span>
                 Przypomnienie prawne: Zgodnie z <strong>art. 38 ust. 1 pkt 13 ustawy o prawach konsumenta</strong>, prawo odstąpienia od umowy o dostarczanie treści cyfrowych niedostarczanych na nośniku materialnym wygasa z chwilą rozpoczęcia korzystania z kursu (otwarcia materiałów w Strefie Kursantki) po uprzednim wyrażeniu zgody w koszyku przed zakupem.
               </span>
@@ -243,7 +243,7 @@ export default function OdstapOdUmowyPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 rounded-full bg-[#DA0271] hover:bg-[#B8005F] text-white font-bold text-sm transition-all shadow-md cursor-pointer disabled:opacity-60"
+              className="w-full py-4 rounded-full bg-[#DA0271] hover:bg-[#C00265] text-white font-bold text-sm transition-all shadow-md cursor-pointer disabled:opacity-60"
             >
               {loading ? 'Rejestrowanie oświadczenia...' : 'Potwierdź odstąpienie od umowy'}
             </button>

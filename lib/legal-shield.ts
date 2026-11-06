@@ -24,13 +24,16 @@ export const OPERATOR_LEGAL_DATA = {
 /**
  * [E1] Dwa osobne, niezaznaczone domyślnie checkboxy w koszyku
  */
+// Teksty zgód dokładnie takie, jak przy polach wyboru na stronie głównej (poprawki z 04.11.2026),
+// żeby zapis dowodowy i e-mail na trwałym nośniku powtarzały to, co klient zaznaczył.
 export const CHECKBOX_1_TERMS_TEXT =
-  'Akceptuję Regulamin i Politykę Prywatności.';
+  'Akceptuję Regulamin oraz Politykę Prywatności';
 
 export const CHECKBOX_2_ART38_WAIVER_TEXT =
-  'Chcę otrzymać dostęp do kursu od razu po opłaceniu i wiem, że tracę wtedy 14-dniowe prawo do odstąpienia od umowy (art. 38 ust. 1 pkt 13 u.p.k.).';
+  'Tak, chcę otrzymać dostęp do kursu natychmiast po opłaceniu i zgodnie z art. 38 ust. 1 pkt 13 u.p.k. zgadzam się na utratę 14-dniowego prawa do odstąpienia od umowy';
 
-export const TERMS_VERSION_ID = '2026-10-27-v2.0-18M';
+// 04.11.2026: nowy tekst zgody z art. 38, więc nowa wersja; ten sam skrót jest wpisany w functions/api/stripe/*.ts
+export const TERMS_VERSION_ID = '2026-11-04-v2.1-18M';
 
 export function getTermsSha256Hash(): string {
   const canonicalTermsSummary = `${OPERATOR_LEGAL_DATA.fullName}|NIP:${OPERATOR_LEGAL_DATA.nip}|KRS:${OPERATOR_LEGAL_DATA.krs}|PRICE:489.00_PLN_GROSS|ACCESS:18_MONTHS_548_DAYS|MODULES:8_LESSONS:52|WAIVER_ART38:${CHECKBOX_2_ART38_WAIVER_TEXT}|VERSION:${TERMS_VERSION_ID}`;

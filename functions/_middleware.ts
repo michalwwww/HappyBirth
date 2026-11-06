@@ -185,7 +185,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   // 5. DOMENA GŁÓWNA PRODUKCYJNA (happybirth.pl / www.happybirth.pl / *.pages.dev):
   //    Twarda separacja: podstrony /afiliacja, /partnerzy, /marketing, /challenge NIE ISTNIEJĄ na domenie głównej (404 Not Found).
   const isMainProdHost = !host.includes('localhost') && !host.includes('127.0.0.1');
-  const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny'];
+  const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny', '/wiedza'];
   const isStudentShortRoute = studentRoutes.some(
     (route) => cleanPath === route || cleanPath.startsWith(`${route}/`)
   );

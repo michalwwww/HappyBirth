@@ -121,25 +121,25 @@ export function OnboardingWizard({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-xl bg-[#FBF8F4] border border-[#EAE3DB] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-xl bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-kosc)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header modalny */}
-        <div className="p-6 pb-4 border-b border-[#EAE3DB] bg-white flex items-center justify-between">
+        <div className="p-6 pb-4 border-b border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] bg-white dark:bg-[color:var(--hb-karta)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-[#FAE3EB] text-[#EC008C] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-2xl bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] flex items-center justify-center">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-brand-display font-bold text-lg text-[#1A1512]">
+              <h2 className="font-brand-display font-bold text-lg text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
                 Personalizacja Twojej Strefy
               </h2>
-              <p className="text-xs text-[#544A44]">
+              <p className="text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                 Krok {step} z 3 · Dopasowujemy 52 lekcje do Twojego etapu
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-[#867A72] hover:text-[#1A1512] rounded-full hover:bg-[#F6F2EC] transition-colors"
+            className="p-2 text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] hover:text-[color:var(--hb-ink)] dark:hover:text-[color:var(--hb-ink)] rounded-full hover:bg-[color:var(--hb-papier)] dark:hover:bg-[color:var(--hb-papier)] transition-colors"
             title="Zamknij"
           >
             <X className="w-5 h-5" />
@@ -147,9 +147,9 @@ export function OnboardingWizard({
         </div>
 
         {/* Pasek postępu */}
-        <div className="w-full bg-[#EAE3DB] h-1.5">
+        <div className="w-full bg-[color:var(--hb-linia)] dark:bg-[color:var(--hb-linia)] h-1.5">
           <div 
-            className="bg-[#EC008C] h-1.5 transition-all duration-300"
+            className="bg-[color:var(--hb-mag)] h-1.5 transition-all duration-300"
             style={{ width: `${(step / 3) * 100}%` }}
           />
         </div>
@@ -160,10 +160,10 @@ export function OnboardingWizard({
           {step === 1 && (
             <div className="space-y-5">
               <div>
-                <h3 className="text-base font-bold text-[#1A1512] mb-1">
+                <h3 className="text-base font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] mb-1">
                   Kiedy powitacie Wasze maleństwo?
                 </h3>
-                <p className="text-xs text-[#544A44]">
+                <p className="text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                   Wybierz najwygodniejszy sposób określenia etapu ciąży. W dowolnej chwili możesz go zmienić w profilu.
                 </p>
               </div>
@@ -175,8 +175,8 @@ export function OnboardingWizard({
                   onClick={() => setDateMethod('usg')}
                   className={`p-3 rounded-2xl border text-center transition-all ${
                     dateMethod === 'usg'
-                      ? 'border-[#EC008C] bg-[#FAE3EB] text-[#EC008C] font-bold shadow-sm'
-                      : 'border-[#EAE3DB] bg-white text-[#544A44] hover:border-[#867A72]'
+                      ? 'border-[color:var(--hb-mag)] bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] font-bold shadow-sm'
+                      : 'border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] bg-white dark:bg-[color:var(--hb-karta)] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] hover:border-[color:var(--hb-ink3)]'
                   }`}
                 >
                   <Calendar className="w-4 h-4 mx-auto mb-1" />
@@ -188,8 +188,8 @@ export function OnboardingWizard({
                   onClick={() => setDateMethod('om')}
                   className={`p-3 rounded-2xl border text-center transition-all ${
                     dateMethod === 'om'
-                      ? 'border-[#EC008C] bg-[#FAE3EB] text-[#EC008C] font-bold shadow-sm'
-                      : 'border-[#EAE3DB] bg-white text-[#544A44] hover:border-[#867A72]'
+                      ? 'border-[color:var(--hb-mag)] bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] font-bold shadow-sm'
+                      : 'border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] bg-white dark:bg-[color:var(--hb-karta)] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] hover:border-[color:var(--hb-ink3)]'
                   }`}
                 >
                   <Heart className="w-4 h-4 mx-auto mb-1" />
@@ -204,8 +204,8 @@ export function OnboardingWizard({
                   }}
                   className={`p-3 rounded-2xl border text-center transition-all ${
                     dateMethod === 'gestational_week'
-                      ? 'border-[#EC008C] bg-[#FAE3EB] text-[#EC008C] font-bold shadow-sm'
-                      : 'border-[#EAE3DB] bg-white text-[#544A44] hover:border-[#867A72]'
+                      ? 'border-[color:var(--hb-mag)] bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] font-bold shadow-sm'
+                      : 'border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] bg-white dark:bg-[color:var(--hb-karta)] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] hover:border-[color:var(--hb-ink3)]'
                   }`}
                 >
                   <Sparkles className="w-4 h-4 mx-auto mb-1" />
@@ -215,17 +215,17 @@ export function OnboardingWizard({
 
               {/* Formularz dla metody USG */}
               {dateMethod === 'usg' && (
-                <div className="bg-white p-4 rounded-2xl border border-[#EAE3DB] space-y-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44]">
+                <div className="bg-white dark:bg-[color:var(--hb-karta)] p-4 rounded-2xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] space-y-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                     Przewidywany termin porodu (z karty ciąży):
                   </label>
                   <input
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
                   />
-                  <p className="text-[11px] text-[#867A72]">
+                  <p className="text-[11px] text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
                     Data wyznaczona przez lekarza na podstawie USG genetycznego CRL lub karty ciąży.
                   </p>
                 </div>
@@ -233,20 +233,20 @@ export function OnboardingWizard({
 
               {/* Formularz dla metody OM */}
               {dateMethod === 'om' && (
-                <div className="bg-white p-4 rounded-2xl border border-[#EAE3DB] space-y-3">
+                <div className="bg-white dark:bg-[color:var(--hb-karta)] p-4 rounded-2xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] space-y-3">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] mb-1">
                       Pierwszy dzień ostatniej miesiączki:
                     </label>
                     <input
                       type="date"
                       value={lmpDate}
                       onChange={(e) => handleLmpChange(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+                      className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
                     />
                   </div>
                   {dueDate && (
-                    <div className="p-3 bg-[#FAE3EB] rounded-xl border border-[#F3CAD9] text-xs text-[#EC008C] flex items-center justify-between">
+                    <div className="p-3 bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] rounded-xl border border-[color:var(--hb-p1t)] dark:border-[color:var(--hb-p1t)] text-xs text-[color:var(--hb-mag-t)] flex items-center justify-between">
                       <span>Wyliczony termin (Reguła Naegelego):</span>
                       <strong className="text-sm">{dueDate}</strong>
                     </div>
@@ -256,12 +256,12 @@ export function OnboardingWizard({
 
               {/* Formularz dla metody suwaka tygodnia */}
               {dateMethod === 'gestational_week' && (
-                <div className="bg-white p-4 rounded-2xl border border-[#EAE3DB] space-y-3">
+                <div className="bg-white dark:bg-[color:var(--hb-karta)] p-4 rounded-2xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold uppercase tracking-wider text-[#544A44]">
+                    <label className="text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                       Obecny tydzień ciąży:
                     </label>
-                    <span className="text-sm font-bold text-[#EC008C] bg-[#FAE3EB] px-2.5 py-0.5 rounded-full">
+                    <span className="text-sm font-bold text-[color:var(--hb-mag-t)] bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] px-2.5 py-0.5 rounded-full">
                       {currentWeekChoice}. tydzień
                     </span>
                   </div>
@@ -271,15 +271,15 @@ export function OnboardingWizard({
                     max="41"
                     value={currentWeekChoice}
                     onChange={(e) => handleWeekSliderChange(Number(e.target.value))}
-                    className="w-full accent-[#EC008C] cursor-pointer"
+                    className="w-full accent-[color:var(--hb-mag)] cursor-pointer"
                   />
-                  <div className="flex justify-between text-[10px] text-[#867A72]">
+                  <div className="flex justify-between text-[10px] text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
                     <span>4 tc (Początek)</span>
                     <span>20 tc (Półmetek)</span>
                     <span>40 tc (Termin)</span>
                   </div>
                   {dueDate && (
-                    <p className="text-[11px] text-[#867A72] text-center pt-1">
+                    <p className="text-[11px] text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] text-center pt-1">
                       Szacowany termin porodu: <strong>{dueDate}</strong>
                     </p>
                   )}
@@ -292,37 +292,37 @@ export function OnboardingWizard({
           {step === 2 && (
             <div className="space-y-5">
               <div>
-                <h3 className="text-base font-bold text-[#1A1512] mb-1">
+                <h3 className="text-base font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] mb-1">
                   Poznajmy Was bliżej!
                 </h3>
-                <p className="text-xs text-[#544A44]">
+                <p className="text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                   Dzięki temu treści będą zwracać się bezpośrednio do Was i Waszego maleństwa.
                 </p>
               </div>
 
               {/* Imię dziecka */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44]">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                   Imię dziecka (lub jak je czule nazywacie):
                 </label>
                 <div className="relative">
-                  <Baby className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#867A72]" />
+                  <Baby className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]" />
                   <input
                     type="text"
                     value={babyName}
                     onChange={(e) => setBabyName(e.target.value)}
                     placeholder="np. Zosia, Janek, nasz Skarb..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
                   />
                 </div>
-                <p className="text-[11px] text-[#867A72]">
+                <p className="text-[11px] text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
                   Możesz zostawić puste, jeśli jeszcze wybieracie imię.
                 </p>
               </div>
 
               {/* Płeć dziecka */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44]">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                   Płeć maluszka:
                 </label>
                 <div className="grid grid-cols-4 gap-2 text-xs">
@@ -338,8 +338,8 @@ export function OnboardingWizard({
                       onClick={() => setBabyGender(item.id as any)}
                       className={`p-2.5 rounded-xl border text-center transition-all ${
                         babyGender === item.id
-                          ? 'border-[#EC008C] bg-[#FAE3EB] text-[#EC008C] font-bold shadow-sm'
-                          : 'border-[#EAE3DB] bg-white text-[#544A44] hover:border-[#867A72]'
+                          ? 'border-[color:var(--hb-mag)] bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] font-bold shadow-sm'
+                          : 'border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] bg-white dark:bg-[color:var(--hb-karta)] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] hover:border-[color:var(--hb-ink3)]'
                       }`}
                     >
                       <div className="text-base mb-0.5">{item.icon}</div>
@@ -350,21 +350,21 @@ export function OnboardingWizard({
               </div>
 
               {/* Imię Partnera */}
-              <div className="space-y-1.5 pt-2 border-t border-[#EAE3DB]">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44]">
+              <div className="space-y-1.5 pt-2 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                   Imię Partnera / Taty:
                 </label>
                 <div className="relative">
-                  <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#867A72]" />
+                  <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]" />
                   <input
                     type="text"
                     value={partnerName}
                     onChange={(e) => setPartnerName(e.target.value)}
                     placeholder="np. Michał, Tomek..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:ring-2 focus:ring-[#98269C]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-noc)]"
                   />
                 </div>
-                <p className="text-[11px] text-[#867A72]">
+                <p className="text-[11px] text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
                   W module <strong>Strefa Partnera</strong> przygotujemy dla Niego imienną ściągę na salę porodową!
                 </p>
               </div>
@@ -375,17 +375,17 @@ export function OnboardingWizard({
           {step === 3 && (
             <div className="space-y-5">
               <div>
-                <h3 className="text-base font-bold text-[#1A1512] mb-1">
+                <h3 className="text-base font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] mb-1">
                   Plan porodu i preferencje
                 </h3>
-                <p className="text-xs text-[#544A44]">
+                <p className="text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                   Dostosujemy rekomendacje technik oddechowych i znieczulenia do Twojej drogi.
                 </p>
               </div>
 
               {/* Kolejność porodu */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44]">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                   Czy to Twój pierwszy poród?
                 </label>
                 <div className="grid grid-cols-2 gap-2 text-xs">
@@ -394,8 +394,8 @@ export function OnboardingWizard({
                     onClick={() => setParity('first_baby')}
                     className={`p-3 rounded-xl border text-center transition-all ${
                       parity === 'first_baby'
-                        ? 'border-[#EC008C] bg-[#FAE3EB] text-[#EC008C] font-bold'
-                        : 'border-[#EAE3DB] bg-white text-[#544A44]'
+                        ? 'border-[color:var(--hb-mag)] bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] font-bold'
+                        : 'border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] bg-white dark:bg-[color:var(--hb-karta)] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]'
                     }`}
                   >
                     Tak, pierwsze dziecko
@@ -405,8 +405,8 @@ export function OnboardingWizard({
                     onClick={() => setParity('subsequent_baby')}
                     className={`p-3 rounded-xl border text-center transition-all ${
                       parity === 'subsequent_baby'
-                        ? 'border-[#EC008C] bg-[#FAE3EB] text-[#EC008C] font-bold'
-                        : 'border-[#EAE3DB] bg-white text-[#544A44]'
+                        ? 'border-[color:var(--hb-mag)] bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] font-bold'
+                        : 'border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] bg-white dark:bg-[color:var(--hb-karta)] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]'
                     }`}
                   >
                     Kolejne dziecko (wieloródka)
@@ -416,7 +416,7 @@ export function OnboardingWizard({
 
               {/* Preferowany rodzaj porodu */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44]">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                   Planowany rodzaj porodu:
                 </label>
                 <div className="grid grid-cols-2 gap-2 text-xs">
@@ -432,8 +432,8 @@ export function OnboardingWizard({
                       onClick={() => setPlannedBirthType(opt.id as any)}
                       className={`p-2.5 rounded-xl border text-left transition-all ${
                         plannedBirthType === opt.id
-                          ? 'border-[#EC008C] bg-[#FAE3EB] text-[#EC008C] font-semibold'
-                          : 'border-[#EAE3DB] bg-white text-[#544A44]'
+                          ? 'border-[color:var(--hb-mag)] bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] font-semibold'
+                          : 'border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] bg-white dark:bg-[color:var(--hb-karta)] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]'
                       }`}
                     >
                       {opt.label}
@@ -444,7 +444,7 @@ export function OnboardingWizard({
 
               {/* Miasto porodu */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44]">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                   Miasto lub planowany szpital (opcjonalnie):
                 </label>
                 <input
@@ -452,21 +452,21 @@ export function OnboardingWizard({
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="np. Warszawa, Szpital Żelazna / Poznań, Polna..."
-                  className="w-full px-4 py-2 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+                  className="w-full px-4 py-2 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
                 />
               </div>
 
               {/* Zgoda RODO - dane medyczne */}
-              <div className="p-3.5 bg-white rounded-2xl border border-[#EAE3DB] flex items-start gap-3">
+              <div className="p-3.5 bg-white dark:bg-[color:var(--hb-karta)] rounded-2xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="rodo_consent"
                   checked={rodoConsent}
                   onChange={(e) => setRodoConsent(e.target.checked)}
-                  className="mt-1 w-4 h-4 accent-[#EC008C] rounded cursor-pointer"
+                  className="mt-1 w-4 h-4 accent-[color:var(--hb-mag)] rounded cursor-pointer"
                 />
-                <label htmlFor="rodo_consent" className="text-[11px] text-[#544A44] leading-relaxed cursor-pointer">
-                  <span className="font-semibold text-[#1A1512]">Zgoda na personalizację (RODO): </span>
+                <label htmlFor="rodo_consent" className="text-[11px] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] leading-relaxed cursor-pointer">
+                  <span className="font-semibold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">Zgoda na personalizację (RODO): </span>
                   Wyrażam zgodę na przetwarzanie podanych danych dotyczących przebiegu ciąży w celu personalizacji programu edukacyjnego, rekomendacji lekcji i narzędzi w Strefie HappyBirth. Dane są poufne i chronione.
                 </label>
               </div>
@@ -475,12 +475,12 @@ export function OnboardingWizard({
         </div>
 
         {/* Stopka modalna z nawigacją */}
-        <div className="p-5 border-t border-[#EAE3DB] bg-white flex items-center justify-between">
+        <div className="p-5 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] bg-white dark:bg-[color:var(--hb-karta)] flex items-center justify-between">
           {step > 1 ? (
             <button
               type="button"
               onClick={() => setStep((step - 1) as any)}
-              className="px-4 py-2.5 rounded-full border border-[#EAE3DB] text-xs font-semibold text-[#544A44] hover:bg-[#F6F2EC] flex items-center gap-1.5 transition-colors"
+              className="px-4 py-2.5 rounded-full border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-xs font-semibold text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] hover:bg-[color:var(--hb-papier)] dark:hover:bg-[color:var(--hb-papier)] flex items-center gap-1.5 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Wstecz</span>
@@ -489,7 +489,7 @@ export function OnboardingWizard({
             <button
               type="button"
               onClick={onClose}
-              className="text-xs text-[#867A72] hover:text-[#1A1512] px-2 py-1"
+              className="text-xs text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] hover:text-[color:var(--hb-ink)] dark:hover:text-[color:var(--hb-ink)] px-2 py-1"
             >
               Uzupełnię później
             </button>
@@ -499,7 +499,7 @@ export function OnboardingWizard({
             <button
               type="button"
               onClick={handleNextStep}
-              className="px-6 py-2.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold transition-all shadow-md shadow-[#EC008C]/25 flex items-center gap-1.5"
+              className="px-6 py-2.5 rounded-full bg-[color:var(--hb-mag)] hover:bg-[color:var(--hb-mag-h)] text-[color:var(--hb-cta-ink)] text-xs font-semibold transition-all shadow-md shadow-[color:color-mix(in_srgb,var(--hb-mag)_25%,transparent)] flex items-center gap-1.5"
             >
               <span>Dalej</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -508,7 +508,7 @@ export function OnboardingWizard({
             <button
               type="button"
               onClick={handleSave}
-              className="px-6 py-2.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold transition-all shadow-md shadow-[#EC008C]/25 flex items-center gap-1.5"
+              className="px-6 py-2.5 rounded-full bg-[color:var(--hb-mag)] hover:bg-[color:var(--hb-mag-h)] text-[color:var(--hb-cta-ink)] text-xs font-semibold transition-all shadow-md shadow-[color:color-mix(in_srgb,var(--hb-mag)_25%,transparent)] flex items-center gap-1.5"
             >
               <Check className="w-4 h-4" />
               <span>Zapisz i spersonalizuj kurs</span>

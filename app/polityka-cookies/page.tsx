@@ -1,0 +1,86 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { PageShell, Okruszki } from '@/components/site/page-shell';
+
+// Polityka cookies: projekt z naszej wersji v1 (24.09.2026) w układzie v3. Poprawione tylko fakty
+// sprzeczne z obecną stroną (baner zgód istnieje, pamięć przeglądarki, sesja logowania, brak lekcji
+// bezpłatnej). Dokument nadal czeka na weryfikację prawnika.
+
+export const metadata: Metadata = {
+  title: 'Polityka cookies · HappyBirth',
+  description: 'Jakie pliki cookies i dane w pamięci przeglądarki zapisuje strona HappyBirth.',
+  alternates: { canonical: 'https://happybirth.pl/polityka-cookies' },
+};
+
+export default function PolitykaCookiesPage() {
+  return (
+    <PageShell>
+      <section className="hb-strona-glowa">
+        <div className="hb-wrap">
+          <Okruszki biezaca="Polityka cookies" />
+          <h1 className="hb-h1">Polityka cookies HappyBirth</h1>
+          <p className="hb-uwaga" style={{ marginTop: 22, maxWidth: 760 }}>
+            <b>Projekt dokumentu.</b> Do weryfikacji przez prawnika przed publikacją. Wersja z 13 października 2026.
+          </p>
+        </div>
+      </section>
+      <section className="hb-sek hb-papier" style={{ paddingTop: 48 }}>
+        <div className="hb-wrap">
+          <div className="hb-proza">
+            <h2>1. Krótko</h2>
+            <p>
+              Strona happybirth.pl nie używa plików cookies analitycznych ani reklamowych. Baner przy pierwszej wizycie pyta o zgodę i zapisuje
+              Twój wybór. Jeśli kiedyś dodamy narzędzia, które wymagają zgody, załadują się dopiero po jej udzieleniu.
+            </p>
+            <h2>2. Co może zapisać się w Twojej przeglądarce</h2>
+            <div className="hb-tabela">
+              <table>
+                <thead>
+                  <tr><th>Mechanizm</th><th>Kto</th><th>Po co</th><th>Czy wymaga zgody</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Techniczne pliki cookies bezpieczeństwa, na przykład __cf_bm</td>
+                    <td>Cloudflare</td>
+                    <td>ochrona przed ruchem automatycznym i atakami</td>
+                    <td>nie, są niezbędne do działania i bezpieczeństwa strony</td>
+                  </tr>
+                  <tr>
+                    <td>Plik cookie sesji logowania (hb_session)</td>
+                    <td>HappyBirth</td>
+                    <td>utrzymanie zalogowania w strefie kursu</td>
+                    <td>nie, jest niezbędny do korzystania ze strefy kursu</td>
+                  </tr>
+                  <tr>
+                    <td>Pamięć przeglądarki (localStorage)</td>
+                    <td>HappyBirth</td>
+                    <td>zapamiętanie wyboru w banerze, języka, trybu jasnego lub ciemnego, ustawień dostępności, postępu w lekcjach i treści przygotowanych w strefie kursu</td>
+                    <td>nie, służy funkcjom, z których korzystasz</td>
+                  </tr>
+                  <tr>
+                    <td>Odtwarzacz wideo</td>
+                    <td>Cloudflare Stream</td>
+                    <td>odtworzenie zwiastuna i lekcji, które uruchamiasz kliknięciem; odtwarzacz łączy się z serwerami Cloudflare Stream</td>
+                    <td>nie, ładuje się dopiero na Twoje żądanie</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h2>3. Statystyka bez cookies</h2>
+            <p>Liczbę odwiedzin mierzymy narzędziem Cloudflare Web Analytics, które nie zapisuje plików cookies ani nie tworzy identyfikatorów użytkownika.</p>
+            <h2>4. Jak zarządzać cookies</h2>
+            <p>
+              Pliki cookies i pamięć przeglądarki możesz w każdej chwili usunąć albo zablokować w ustawieniach przeglądarki. Zablokowanie
+              mechanizmów niezbędnych może utrudnić korzystanie ze strefy kursu.
+            </p>
+            <h2>5. Kontakt</h2>
+            <p>
+              Pytania o cookies i dane osobowe: <a href="mailto:kontakt@happybirth.pl">kontakt@happybirth.pl</a>. Więcej w{' '}
+              <Link href="/polityka-prywatnosci">polityce prywatności</Link>.
+            </p>
+          </div>
+        </div>
+      </section>
+    </PageShell>
+  );
+}

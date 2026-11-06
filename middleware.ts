@@ -137,7 +137,7 @@ export function middleware(request: NextRequest) {
   //    Twarda separacja: podstrony /afiliacja, /partnerzy, /marketing, /challenge są zablokowane (404 Not Found)
   // -------------------------------------------------------------
   const isMainProdHost = hostname === 'happybirth.pl' || hostname === 'www.happybirth.pl';
-  const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny'];
+  const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny', '/wiedza'];
   const isStudentShortRoute = studentRoutes.some(
     (route) => cleanPath === route || cleanPath.startsWith(`${route}/`)
   );

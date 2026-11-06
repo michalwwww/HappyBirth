@@ -57,19 +57,11 @@ export function AccessibilityToolbar() {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
 
-    // Font size - polaczenie zoom (skalowanie calej strony) i klas font-size
-    if (s.fontSize === '115%') {
-      root.classList.add('a11y-font-115');
-      root.classList.remove('a11y-font-130');
-      (root.style as any).zoom = '1.15';
-    } else if (s.fontSize === '130%') {
-      root.classList.add('a11y-font-130');
-      root.classList.remove('a11y-font-115');
-      (root.style as any).zoom = '1.30';
-    } else {
-      root.classList.remove('a11y-font-115', 'a11y-font-130');
-      (root.style as any).zoom = '';
-    }
+    // Rozmiar tekstu: jedna klasa na <html> z powiększeniem całej strony (zoom w globals.css).
+    // Bez zoomu w stylu inline i bez em na każdym elemencie, które się mnożyły (runda X1).
+    root.classList.toggle('a11y-font-115', s.fontSize === '115%');
+    root.classList.toggle('a11y-font-130', s.fontSize === '130%');
+    (root.style as any).zoom = '';
 
     // High Contrast
     if (s.highContrast) {
@@ -100,6 +92,21 @@ export function AccessibilityToolbar() {
     }
   };
 
+  // okna: Escape zamyka, fokus trafia na przycisk zamknięcia (runda X1)
+  useEffect(() => {
+    if (!isOpen && !showDeclaration) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (showDeclaration) setShowDeclaration(false); else setIsOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    const id = window.setTimeout(() => {
+      const x = document.querySelectorAll<HTMLButtonElement>('.hb-a11y-x');
+      x[x.length - 1]?.focus();
+    }, 30);
+    return () => { document.removeEventListener('keydown', onKey); window.clearTimeout(id); };
+  }, [isOpen, showDeclaration]);
+
   const updateSetting = <K extends keyof A11ySettings>(key: K, value: A11ySettings[K]) => {
     const updated = { ...settings, [key]: value };
     setSettings(updated);
@@ -117,193 +124,82 @@ export function AccessibilityToolbar() {
     }
   };
 
+  const Przelacznik = ({ id, opis, ikona, wl }: { id: keyof A11ySettings; opis: string; ikona: React.ReactNode; wl: boolean }) => (
+    <button aria-pressed={wl} className="hb-a11y-wiersz" onClick={() => updateSetting(id, !wl as never)} type="button">
+      <span aria-hidden="true" className="hb-a11y-ikona">{ikona}</span>
+      <span>{opis}</span>
+      <i aria-hidden="true" className="hb-przelacznik" />
+    </button>
+  );
+
   return (
     <>
-      {/* Panel Dostępności (Modal / Popover) */}
+      {/* Okno ułatwień dostępu (runda X1): kolory i przyciski z bieżącej palety strony */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div data-a11y-modal="true" className="w-full max-w-md bg-white dark:bg-[#1C081A] rounded-3xl p-6 border border-[#EAE3DB] dark:border-[#3A1038] shadow-2xl space-y-6 text-[#1A1512] dark:text-[#FBF8F4]">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-[#EAE3DB] dark:border-[#3A1038]">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#EC008C]/10 text-[#EC008C] flex items-center justify-center">
-                  <Accessibility className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="font-brand-display font-bold text-base leading-tight">
-                    Ułatwienia dostępu
-                  </h3>
-                  <span className="text-[10px] text-[#867A72] dark:text-[#A2958C] uppercase tracking-wider font-semibold">
-                    Standard WCAG 2.1 AA · Dostępność cyfrowa
-                  </span>
-                </div>
+        <div className="hb-a11y-tlo" onClick={(e) => { if (e.target === e.currentTarget) setIsOpen(false); }}>
+          <div aria-labelledby="hb-a11y-tyt" aria-modal="true" className="hb-a11y" data-a11y-modal="true" role="dialog">
+            <div className="hb-a11y-glowa">
+              <span aria-hidden="true" className="hb-szklo hb-a11y-znak"><Accessibility /></span>
+              <div>
+                <h3 id="hb-a11y-tyt">Ułatwienia dostępu</h3>
+                <p>Standard WCAG 2.1 AA · Dostępność cyfrowa</p>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-white/10 text-[#867A72] dark:text-[#A2958C] hover:text-[#1A1512] dark:hover:text-white transition-colors"
-                aria-label="Zamknij ułatwienia dostępu"
-              >
-                <X className="w-4 h-4" />
+              <button aria-label="Zamknij ułatwienia dostępu" className="hb-szklo hb-a11y-x" onClick={() => setIsOpen(false)} type="button">
+                <X />
               </button>
             </div>
 
-            {/* Opcje */}
-            {/* Opcje */}
-            <div className="space-y-4 text-xs">
-              {/* 1. Rozmiar tekstu */}
-              <div className="space-y-1.5">
-                <label className="font-semibold flex items-center gap-1.5 text-[#1A1512] dark:text-[#FBF8F4]">
-                  <Type className="w-3.5 h-3.5 text-[#EC008C]" />
-                  <span>Rozmiar tekstu</span>
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['100%', '115%', '130%'] as const).map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => updateSetting('fontSize', size)}
-                      className={`py-2 px-3 rounded-xl border text-center font-medium transition-all ${
-                        settings.fontSize === size
-                          ? 'border-[#EC008C] bg-[#FAE3EB] dark:bg-[#3D0E39] text-[#EC008C] font-bold shadow-sm'
-                          : 'border-[#EAE3DB] dark:border-[#3A1038] bg-neutral-50 dark:bg-[#250A24] hover:border-[#867A72] text-[#544A44] dark:text-[#D7CCC3]'
-                      }`}
-                    >
-                      {size === '100%' ? 'Domyślny' : size === '115%' ? 'Większy +15%' : 'Duży +30%'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 2. Przełączniki funkcji */}
-              <div className="space-y-2 pt-2 border-t border-[#EAE3DB] dark:border-[#3A1038]">
-                {/* Wysoki Kontrast */}
-                <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2 text-[#1A1512] dark:text-[#FBF8F4]">
-                    <Contrast className="w-3.5 h-3.5 text-[#EC008C]" />
-                    <span>Wysoki kontrast (żółć na czerni)</span>
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={settings.highContrast}
-                    onChange={(e) => updateSetting('highContrast', e.target.checked)}
-                    className="w-4 h-4 accent-[#EC008C] rounded cursor-pointer"
-                  />
-                </div>
-
-                {/* Podkreślenie linków */}
-                <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2 text-[#1A1512] dark:text-[#FBF8F4]">
-                    <Underline className="w-3.5 h-3.5 text-[#EC008C]" />
-                    <span>Podkreślenie odnośników</span>
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={settings.underlineLinks}
-                    onChange={(e) => updateSetting('underlineLinks', e.target.checked)}
-                    className="w-4 h-4 accent-[#EC008C] rounded cursor-pointer"
-                  />
-                </div>
-
-                {/* Czytelna czcionka dla dyslektyków */}
-                <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2 text-[#1A1512] dark:text-[#FBF8F4]">
-                    <BookOpen className="w-3.5 h-3.5 text-[#EC008C]" />
-                    <span>Prosty krój pisma (Arial / bezszeryfowy)</span>
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={settings.readableFont}
-                    onChange={(e) => updateSetting('readableFont', e.target.checked)}
-                    className="w-4 h-4 accent-[#EC008C] rounded cursor-pointer"
-                  />
-                </div>
-
-                {/* Zatrzymanie animacji */}
-                <div className="flex items-center justify-between py-1.5">
-                  <span className="flex items-center gap-2 text-[#1A1512] dark:text-[#FBF8F4]">
-                    <PauseCircle className="w-3.5 h-3.5 text-[#EC008C]" />
-                    <span>Zatrzymanie animacji i ruchu</span>
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={settings.reduceMotion}
-                    onChange={(e) => updateSetting('reduceMotion', e.target.checked)}
-                    className="w-4 h-4 accent-[#EC008C] rounded cursor-pointer"
-                  />
-                </div>
+            <div className="hb-a11y-sekcja">
+              <p className="hb-a11y-tyt"><Type aria-hidden="true" />Rozmiar tekstu</p>
+              <div className="hb-a11y-rozmiary" role="group" aria-label="Rozmiar tekstu">
+                {(['100%', '115%', '130%'] as const).map((size) => (
+                  <button aria-pressed={settings.fontSize === size} className="hb-szklo" key={size} onClick={() => updateSetting('fontSize', size)} type="button">
+                    {size === '100%' ? 'Domyślny' : size === '115%' ? 'Większy +15%' : 'Duży +30%'}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Footer / Reset & Deklaracja */}
-            <div className="pt-4 border-t border-[#EAE3DB] dark:border-[#3A1038] flex items-center justify-between text-xs">
-              <button
-                type="button"
-                onClick={resetSettings}
-                className="text-[#867A72] dark:text-[#A2958C] hover:text-[#EC008C] flex items-center gap-1 font-medium transition-colors"
-              >
-                <RotateCcw className="w-3 h-3" />
-                <span>Resetuj ustawienia</span>
-              </button>
+            <div className="hb-a11y-sekcja">
+              <Przelacznik id="highContrast" ikona={<Contrast />} opis="Wysoki kontrast (żółć i biel na czerni)" wl={settings.highContrast} />
+              <Przelacznik id="underlineLinks" ikona={<Underline />} opis="Podkreślenie odnośników" wl={settings.underlineLinks} />
+              <Przelacznik id="readableFont" ikona={<BookOpen />} opis="Prosty krój pisma (bezszeryfowy)" wl={settings.readableFont} />
+              <Przelacznik id="reduceMotion" ikona={<PauseCircle />} opis="Zatrzymanie animacji i ruchu" wl={settings.reduceMotion} />
+            </div>
 
-              <button
-                type="button"
-                onClick={() => setShowDeclaration(true)}
-                className="text-[#EC008C] hover:underline font-semibold flex items-center gap-1"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>{t('a11yDeclaration')}</span>
-              </button>
+            <div className="hb-a11y-stopka">
+              <button className="hb-a11y-link" onClick={resetSettings} type="button"><RotateCcw aria-hidden="true" />Resetuj ustawienia</button>
+              <button className="hb-a11y-link hb-a11y-mocny" onClick={() => setShowDeclaration(true)} type="button"><ShieldCheck aria-hidden="true" />{t('a11yDeclaration')}</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal Deklaracji Dostępności UE */}
+      {/* Deklaracja dostępności (EAA, WCAG 2.1 AA) */}
       {showDeclaration && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 border border-[#EAE3DB] shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto text-xs text-[#544A44]">
-            <div className="flex items-center justify-between pb-3 border-b border-[#EAE3DB]">
-              <h3 className="font-brand-display font-bold text-lg text-[#1A1512]">
-                Deklaracja Dostępności Cyfrowej (WCAG 2.1 AA / EAA)
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowDeclaration(false)}
-                className="p-1 rounded-full text-[#867A72] hover:text-[#1A1512]"
-              >
-                <X className="w-4 h-4" />
-              </button>
+        <div className="hb-a11y-tlo" onClick={(e) => { if (e.target === e.currentTarget) setShowDeclaration(false); }}>
+          <div aria-labelledby="hb-dekl-tyt" aria-modal="true" className="hb-a11y hb-a11y-dekl" data-a11y-modal="true" role="dialog">
+            <div className="hb-a11y-glowa">
+              <span aria-hidden="true" className="hb-szklo hb-a11y-znak"><ShieldCheck /></span>
+              <div><h3 id="hb-dekl-tyt">Deklaracja dostępności cyfrowej</h3><p>WCAG 2.1 AA · European Accessibility Act</p></div>
+              <button aria-label="Zamknij deklarację" className="hb-szklo hb-a11y-x" onClick={() => setShowDeclaration(false)} type="button"><X /></button>
             </div>
-
-            <p className="leading-relaxed">
+            <p>
               Platforma edukacyjna <strong>HappyBirth</strong> (KLARSolutions sp. z o.o.) zobowiązuje się do zapewnienia dostępności swojej strony internetowej zgodnie z przepisami ustawy z dnia 4 kwietnia 2019 r. o dostępności cyfrowej stron internetowych oraz wytycznymi <strong>European Accessibility Act (EAA)</strong> i standardem <strong>WCAG 2.1 na poziomie AA</strong>.
             </p>
-
-            <div className="space-y-2 bg-neutral-50 p-3.5 rounded-2xl border border-[#EAE3DB]">
-              <h4 className="font-bold text-[#1A1512]">Zastosowane udogodnienia:</h4>
-              <ul className="list-disc pl-4 space-y-1">
-                <li>Pełna obsługa nawigacji za pomocą samej klawiatury (Focus outlines).</li>
+            <div className="hb-a11y-ramka">
+              <h4>Zastosowane udogodnienia:</h4>
+              <ul>
+                <li>Pełna obsługa nawigacji za pomocą samej klawiatury (widoczny fokus).</li>
                 <li>Transkrypcje tekstowe i napisy dla materiałów wideo w odtwarzaczu Cloudflare Stream.</li>
-                <li>Możliwość dynamicznego powiększenia tekstu do 130% bez utraty struktury strony.</li>
-                <li>Tryb wysokiego kontrastu oraz czytelnej typografii dla osób z dysleksją.</li>
-                <li>Ochrona przed miganiem elementów dla osób ze schorzeniami neurologicznymi.</li>
+                <li>Możliwość powiększenia całej strony do 130% bez utraty struktury.</li>
+                <li>Tryb wysokiego kontrastu oraz prosty krój pisma dla osób z dysleksją.</li>
+                <li>Zatrzymanie animacji i ruchu, także karuzel i osi czasu.</li>
               </ul>
             </div>
-
-            <p className="leading-relaxed">
-              W przypadku problemów z dostępnością strony prosimy o kontakt:  
-              <strong> e-mail: kontakt@happybirth.pl</strong>. Zgłoszenia rozpatrujemy niezwłocznie.
-            </p>
-
-            <div className="pt-2 text-right">
-              <button
-                type="button"
-                onClick={() => setShowDeclaration(false)}
-                className="px-5 py-2 rounded-full bg-[#EC008C] text-white font-semibold"
-              >
-                Rozumiem
-              </button>
+            <p>W przypadku problemów z dostępnością strony prosimy o kontakt: <strong>kontakt@happybirth.pl</strong>. Zgłoszenia rozpatrujemy niezwłocznie.</p>
+            <div className="hb-a11y-dol">
+              <button className="hb-btn hb-btn-kup hb-maly-btn" onClick={() => setShowDeclaration(false)} type="button">Rozumiem</button>
             </div>
           </div>
         </div>

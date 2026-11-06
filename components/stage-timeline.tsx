@@ -25,12 +25,12 @@ export function StageTimeline({ currentStageId }: { currentStageId?: string }) {
               href={stageLessons.length > 0 ? `/lekcja/${stageLessons[0].id}` : '/#etapy'}
               className={`group relative rounded-[14px] p-6 min-h-[220px] flex flex-col justify-between overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
                 isActive
-                  ? 'ring-2 ring-[#EC008C] shadow-md'
+                  ? 'ring-2 ring-[color:var(--hb-mag)] shadow-md'
                   : ''
               }`}
               style={{
                 backgroundColor: stage.accentBg,
-                color: '#1A1512',
+                color: '#4A3A5E',
               }}
             >
               {/* Top row: Icon & Number */}
@@ -53,7 +53,7 @@ export function StageTimeline({ currentStageId }: { currentStageId?: string }) {
                   {stage.weeks}
                 </div>
 
-                <h3 className="font-brand-display text-2xl font-bold tracking-tight leading-snug group-hover:text-[#EC008C] transition-colors">
+                <h3 className="font-brand-display text-2xl font-bold tracking-tight leading-snug group-hover:text-[color:var(--hb-mag-t)] transition-colors">
                   {stage.title}
                 </h3>
 
@@ -81,7 +81,7 @@ export function StageTimeline({ currentStageId }: { currentStageId?: string }) {
                     )}
                   </div>
 
-                  <span className="inline-flex items-center font-bold gap-1 group-hover:translate-x-1 transition-transform text-[#1A1512]">
+                  <span className="inline-flex items-center font-bold gap-1 group-hover:translate-x-1 transition-transform text-[color:var(--hb-ink)]">
                     <span>Przejdź</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </span>

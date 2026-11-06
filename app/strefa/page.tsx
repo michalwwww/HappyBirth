@@ -154,7 +154,13 @@ function StrefaDashboardContent() {
       const sessionId = params.get('session_id');
       const payment = params.get('payment');
       const promo = params.get('promo');
-      const lessonParam = params.get('lesson');
+      // Lekcja wybrana przyciskiem Odtwórz na stronie Program przed zakupem
+      // (components/site/program-explorer.tsx). Działa tylko po płatności i tylko wtedy, gdy adres nie podaje lekcji.
+      let lekcjaPoZakupie: string | null = null;
+      if (!params.get('lesson') && (sessionId || payment === 'success')) {
+        try { lekcjaPoZakupie = sessionStorage.getItem('hb_lekcja_po_zakupie'); } catch { /* brak pamięci sesji */ }
+      }
+      const lessonParam = params.get('lesson') || lekcjaPoZakupie;
       const autoplayParam = params.get('autoplay');
 
       const isPromoOrSuccess =
@@ -263,13 +269,13 @@ function StrefaDashboardContent() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
       {/* 1. BANER STATUSU DOSTĘPU 18 MIESIĘCY (548 DNI) DLA DWOJGA ([C1]) */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#20071E] via-[#2E0B2C] to-[#1A0519] border border-[#DA0271]/50 p-4 sm:p-5 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="rounded-2xl bg-gradient-to-r from-[color:var(--hb-noc2)] via-[color:var(--hb-noc2)] to-[color:var(--hb-noc3)] border border-[color:color-mix(in_srgb,var(--hb-mag)_50%,transparent)] p-4 sm:p-5 text-[color:var(--hb-cta-ink)] shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#DA0271]/20 border border-[#DA0271]/40 text-[#FF4BA8] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[color:color-mix(in_srgb,var(--hb-mag)_20%,transparent)] border border-[color:color-mix(in_srgb,var(--hb-mag)_40%,transparent)] text-[#FF9CC6] flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xs font-bold text-[#FF4BA8] uppercase tracking-wide flex flex-wrap items-center gap-1.5">
+            <div className="text-xs font-bold text-[#FF9CC6] uppercase tracking-wide flex flex-wrap items-center gap-1.5">
               <span>Aktywny Pakiet · Dostęp ważny przez 18 miesięcy (548 dni) od zakupu</span>
               {accountInfo?.email && (
                 <span className="text-white/80 font-mono text-[11px] bg-white/10 px-2 py-0.5 rounded-full">
@@ -303,23 +309,23 @@ function StrefaDashboardContent() {
         {/* Nagłówek sekcji odtwarzacza z czytelnym modułem */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#DA0271] animate-pulse" />
-            <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
+            <span className="w-2.5 h-2.5 rounded-full bg-[color:var(--hb-mag)] animate-pulse" />
+            <span className="text-xs font-bold uppercase tracking-wider text-[color:var(--hb-mag-t)]">
               Odtwarzacz Kursu · 4K Master VOD
             </span>
-            <span className="text-xs text-[#867A72] dark:text-[#C4ADC0]">·</span>
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#DA0271]/10 text-[#DA0271] dark:bg-[#DA0271]/20 dark:text-[#FF4BA8]">
+            <span className="text-xs text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">·</span>
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[color:color-mix(in_srgb,var(--hb-mag)_10%,transparent)] text-[color:var(--hb-mag-t)] dark:bg-[color:color-mix(in_srgb,var(--hb-mag)_20%,transparent)] dark:text-[color:var(--hb-mag-t)]">
               {getStageDisplayTitle(activeStage)}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-[#544A44] dark:text-[#D7CCC3]">
+          <div className="flex items-center gap-3 text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
             <span>
               Lekcja <strong>{activeLesson.lessonNumber} z 52</strong> ({activeLesson.durationFormatted})
             </span>
             <Link
               href={`/strefa/lekcja/${activeLesson.id}`}
-              className="font-semibold text-[#DA0271] hover:underline flex items-center gap-1"
+              className="font-semibold text-[color:var(--hb-mag-t)] hover:underline flex items-center gap-1"
               title="Otwórz lekcję w trybie pełnoekranowym"
             >
               <span>Pełny ekran</span>
@@ -331,7 +337,7 @@ function StrefaDashboardContent() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           {/* LEWA KOLUMNA: WŁAŚCIWY ODTWARZACZ (8 cols) */}
           <div className="lg:col-span-8 space-y-4">
-            <div className="rounded-3xl overflow-hidden shadow-2xl border border-[#461643] dark:border-[#3D0E39] bg-[#20071E]">
+            <div className="rounded-3xl overflow-hidden shadow-2xl border border-[color:var(--hb-ink2)] dark:border-[color:var(--hb-linia)] bg-[color:var(--hb-noc2)]">
               <CloudflarePlayer
                 lesson={activeLesson}
                 isCompleted={completedLessons.includes(activeLesson.id)}
@@ -344,16 +350,16 @@ function StrefaDashboardContent() {
             </div>
 
             {/* Karta szczegółów aktualnie odtwarzanej lekcji */}
-            <div className="bg-[#FFFDFA] dark:bg-[#1C081A] rounded-3xl p-5 sm:p-6 border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm space-y-3.5">
+            <div className="bg-[color:var(--hb-karta)] dark:bg-[color:var(--hb-karta)] rounded-3xl p-5 sm:p-6 border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] shadow-sm space-y-3.5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <span
                     className="text-xs font-bold px-3 py-1 rounded-full shadow-xs"
-                    style={{ backgroundColor: activeStage?.tint || '#FAE3EB', color: activeStage?.deep || '#C80077' }}
+                    style={{ backgroundColor: activeStage?.tint || '#F9E6EC', color: activeStage?.deep || '#C00265' }}
                   >
                     Moduł {parseInt(activeStage?.num || '1', 10)}: {getStageDisplayTitle(activeStage)}
                   </span>
-                  <span className="text-xs text-[#867A72] dark:text-[#C4ADC0]">
+                  <span className="text-xs text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
                     Lekcja {activeLesson.lessonNumber} z 52 · {activeLesson.durationFormatted}
                   </span>
                 </div>
@@ -364,10 +370,10 @@ function StrefaDashboardContent() {
                     className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                       completedLessons.includes(activeLesson.id)
                         ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
-                        : 'bg-[#FBF8F4] dark:bg-[#250A24] text-[#544A44] dark:text-[#D7CCC3] hover:text-[#DA0271] border border-[#EAE3DB] dark:border-[#3D0E39]'
+                        : 'bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] hover:text-[color:var(--hb-mag-t)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]'
                     }`}
                   >
-                    <CheckCircle2 className={`w-3.5 h-3.5 ${completedLessons.includes(activeLesson.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-[#867A72]'}`} />
+                    <CheckCircle2 className={`w-3.5 h-3.5 ${completedLessons.includes(activeLesson.id) ? 'text-emerald-600 dark:text-emerald-400' : 'text-[color:var(--hb-ink3)]'}`} />
                     <span>
                       {completedLessons.includes(activeLesson.id) ? 'Ukończona ✓' : 'Oznacz jako ukończoną'}
                     </span>
@@ -376,7 +382,7 @@ function StrefaDashboardContent() {
                   {nextLesson && (
                     <button
                       onClick={() => handleSelectLesson(nextLesson)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#DA0271] hover:bg-[#B90260] text-white text-xs font-semibold transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[color:var(--hb-mag)] hover:bg-[color:var(--hb-mag-h)] text-[color:var(--hb-cta-ink)] text-xs font-semibold transition-colors cursor-pointer"
                     >
                       <span>Następna</span>
                       <ArrowRight className="w-3 h-3" />
@@ -386,38 +392,38 @@ function StrefaDashboardContent() {
               </div>
 
               <div>
-                <h1 className="font-brand-display font-semibold text-xl sm:text-2xl text-[#250A24] dark:text-[#FBF8F4]">
+                <h1 className="font-brand-display font-semibold text-xl sm:text-2xl text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
                   {activeLesson.title}
                 </h1>
-                <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3] mt-1.5 leading-relaxed">
+                <p className="text-xs sm:text-sm text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] mt-1.5 leading-relaxed">
                   {activeLesson.description}
                 </p>
               </div>
 
               {/* Materiały PDF do pobrania dla tej lekcji */}
               {activeLesson.attachments && activeLesson.attachments.length > 0 && (
-                <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] space-y-2.5">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0] flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-[#DA0271]" /> Materiały do tej lekcji (PDF do druku):
+                <div className="pt-3 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] space-y-2.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-[color:var(--hb-mag-t)]" /> Materiały do tej lekcji (PDF do druku):
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {activeLesson.attachments.map((att) => (
                       <div
                         key={att.id}
-                        className="p-2.5 rounded-xl bg-[#FBF8F4] dark:bg-[#220820] border border-[#EAE3DB] dark:border-[#3D0E39] flex items-center justify-between gap-2.5 text-xs"
+                        className="p-2.5 rounded-xl bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-noc2)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] flex items-center justify-between gap-2.5 text-xs"
                       >
                         <div className="flex items-center space-x-2">
                           <span className="w-6 h-6 rounded-md bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 flex items-center justify-center font-bold text-[9px]">
                             PDF
                           </span>
                           <div>
-                            <div className="font-semibold text-[#250A24] dark:text-[#FBF8F4] text-xs">{att.name}</div>
-                            <div className="text-[10px] text-[#867A72] dark:text-[#C4ADC0]">{att.size}</div>
+                            <div className="font-semibold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] text-xs">{att.name}</div>
+                            <div className="text-[10px] text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">{att.size}</div>
                           </div>
                         </div>
                         <button
                           onClick={() => openPrintableLessonWorksheet(activeLesson, att.name)}
-                          className="p-1 rounded-md bg-white dark:bg-[#1C081A] hover:bg-[#DA0271] hover:text-white border border-[#EAE3DB] dark:border-[#3D0E39] transition-colors cursor-pointer text-[#250A24] dark:text-[#FBF8F4]"
+                          className="p-1 rounded-md bg-white dark:bg-[color:var(--hb-karta)] hover:bg-[color:var(--hb-mag)] hover:text-[color:var(--hb-cta-ink)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] transition-colors cursor-pointer text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]"
                           title="Otwórz i wydrukuj Kartę Pracy PDF"
                         >
                           <Download className="w-3.5 h-3.5" />
@@ -431,17 +437,17 @@ function StrefaDashboardContent() {
           </div>
 
           {/* PRAWA KOLUMNA: PLAYLISTA Z WYBOREM TEMATYCZNYM (4 cols) */}
-          <div className="lg:col-span-4 bg-[#FFFDFA] dark:bg-[#1C081A] rounded-3xl p-4 sm:p-5 border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm space-y-3.5">
-            <div className="flex items-center justify-between pb-2.5 border-b border-[#EAE3DB] dark:border-[#3D0E39]">
+          <div className="lg:col-span-4 bg-[color:var(--hb-karta)] dark:bg-[color:var(--hb-karta)] rounded-3xl p-4 sm:p-5 border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] shadow-sm space-y-3.5">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#DA0271]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--hb-mag-t)]">
                   Moduł {parseInt(activeStage?.num || '1', 10)} z 9
                 </span>
-                <h3 className="font-brand-display font-bold text-base text-[#250A24] dark:text-[#FBF8F4] leading-tight">
+                <h3 className="font-brand-display font-bold text-base text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] leading-tight">
                   {getStageDisplayTitle(activeStage)}
                 </h3>
               </div>
-              <span className="text-xs font-mono font-semibold text-[#867A72] dark:text-[#C4ADC0]">
+              <span className="text-xs font-mono font-semibold text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
                 {activeStageLessons.filter((l) => completedLessons.includes(l.id)).length}/{activeStageLessons.length}
               </span>
             </div>
@@ -458,8 +464,8 @@ function StrefaDashboardContent() {
                     onClick={() => handleSelectLesson(l)}
                     className={`w-full text-left p-2.5 rounded-xl border transition-all flex items-start gap-2.5 cursor-pointer ${
                       isActive
-                        ? 'bg-[#DA0271]/10 dark:bg-[#DA0271]/20 border-[#DA0271] shadow-xs'
-                        : 'bg-[#FBF8F4] dark:bg-[#250A24] hover:bg-[#F3EBE3] dark:hover:bg-[#2F0D2E] border-[#EAE3DB] dark:border-[#3D0E39]'
+                        ? 'bg-[color:color-mix(in_srgb,var(--hb-mag)_10%,transparent)] dark:bg-[color:color-mix(in_srgb,var(--hb-mag)_20%,transparent)] border-[color:var(--hb-mag)] shadow-xs'
+                        : 'bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] hover:bg-[color:var(--hb-len)] dark:hover:bg-[color:var(--hb-noc)] border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]'
                     }`}
                   >
                     <div className="relative w-12 h-9 rounded-md overflow-hidden shrink-0 bg-black/20 flex items-center justify-center">
@@ -471,7 +477,7 @@ function StrefaDashboardContent() {
                       />
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                         {isActive ? (
-                          <span className="w-2 h-2 rounded-full bg-[#FCD705] animate-ping" />
+                          <span className="w-2 h-2 rounded-full bg-[color:var(--hb-zol)] animate-ping" />
                         ) : (
                           <Play className="w-3 h-3 text-white fill-current ml-0.5" />
                         )}
@@ -480,11 +486,11 @@ function StrefaDashboardContent() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1 mb-0.5">
-                        <span className="text-[10px] font-bold text-[#867A72] dark:text-[#C4ADC0]">
+                        <span className="text-[10px] font-bold text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
                           Lekcja {l.lessonNumber}
                         </span>
                         <div className="flex items-center gap-1">
-                          <span className="text-[10px] font-mono text-[#867A72] dark:text-[#C4ADC0]">
+                          <span className="text-[10px] font-mono text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
                             {l.durationFormatted}
                           </span>
                           {isDone && (
@@ -496,8 +502,8 @@ function StrefaDashboardContent() {
                       <h4
                         className={`text-xs font-semibold line-clamp-2 leading-snug ${
                           isActive
-                            ? 'text-[#DA0271] dark:text-[#FF4BA8] font-bold'
-                            : 'text-[#250A24] dark:text-[#FBF8F4]'
+                            ? 'text-[color:var(--hb-mag-t)] dark:text-[color:var(--hb-mag-t)] font-bold'
+                            : 'text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]'
                         }`}
                       >
                         {l.title}
@@ -509,8 +515,8 @@ function StrefaDashboardContent() {
             </div>
 
             {/* Szybki wybór modułów tematycznych (bez tajemniczego "etap etap") */}
-            <div className="pt-2.5 border-t border-[#EAE3DB] dark:border-[#3D0E39] space-y-2">
-              <span className="text-[11px] font-semibold text-[#867A72] dark:text-[#C4ADC0] block">
+            <div className="pt-2.5 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] space-y-2">
+              <span className="text-[11px] font-semibold text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] block">
                 Zmień moduł tematyczny:
               </span>
               <div className="grid grid-cols-3 gap-1.5">
@@ -522,8 +528,8 @@ function StrefaDashboardContent() {
                       onClick={() => handleSelectStage(st)}
                       className={`text-[10px] py-1.5 px-1 rounded-lg font-semibold transition-all truncate text-center cursor-pointer ${
                         isCurrent
-                          ? 'bg-[#DA0271] text-white shadow-xs'
-                          : 'bg-[#FBF8F4] dark:bg-[#250A24] hover:bg-[#EAE3DB] dark:hover:bg-[#3D0E39] text-[#544A44] dark:text-[#D7CCC3] border border-[#EAE3DB] dark:border-[#3D0E39]'
+                          ? 'bg-[color:var(--hb-mag)] text-[color:var(--hb-cta-ink)] shadow-xs'
+                          : 'bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] hover:bg-[color:var(--hb-linia)] dark:hover:bg-[color:var(--hb-linia)] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]'
                       }`}
                       title={getStageDisplayTitle(st)}
                     >
@@ -536,7 +542,7 @@ function StrefaDashboardContent() {
               <div className="pt-1">
                 <Link
                   href="/strefa/lekcje"
-                  className="w-full flex items-center justify-center gap-1 text-xs font-semibold text-[#DA0271] hover:underline py-1"
+                  className="w-full flex items-center justify-center gap-1 text-xs font-semibold text-[color:var(--hb-mag-t)] hover:underline py-1"
                 >
                   <BookOpen className="w-3.5 h-3.5" />
                   <span>Katalog wszystkich 52 lekcji VOD &rarr;</span>
@@ -548,36 +554,36 @@ function StrefaDashboardContent() {
       </section>
 
       {/* 3. KOMPAKTOWY PASEK STATUSU KURSANTKI I PROFILU CIĄŻY */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] shadow-xs space-y-3.5">
+      <div className="p-4 sm:p-5 rounded-2xl bg-[color:var(--hb-karta)] dark:bg-[color:var(--hb-karta)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] shadow-xs space-y-3.5">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#20071E] dark:bg-[#250A24] text-[#FCD705] flex items-center justify-center shrink-0">
-              {role === 'partner' ? <User className="w-5 h-5 text-[#7FB3CC]" /> : <Heart className="w-5 h-5 text-[#DA0271]" />}
+            <div className="w-10 h-10 rounded-xl bg-[color:var(--hb-noc2)] dark:bg-[color:var(--hb-papier)] text-[color:var(--hb-zol)] flex items-center justify-center shrink-0">
+              {role === 'partner' ? <User className="w-5 h-5 text-[color:var(--hb-p4g)]" /> : <Heart className="w-5 h-5 text-[color:var(--hb-mag-t)]" />}
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
                 Profil Kursantki i Status Konta {accountInfo?.email ? `(${accountInfo.email})` : ''}
               </div>
-              <div className="font-brand-display font-semibold text-sm sm:text-base text-[#250A24] dark:text-[#FBF8F4]">
+              <div className="font-brand-display font-semibold text-sm sm:text-base text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
                 {role === 'partner' ? 'Strefa dla Partnera / Taty aktywna' : 'Strefa dla Mamy aktywna'} · Dostęp ważny 18 miesięcy (548 dni) dla dwojga
               </div>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs">
-            <div className="flex items-center gap-1.5 text-[#544A44] dark:text-[#D7CCC3]">
+            <div className="flex items-center gap-1.5 text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span><strong>{completedLessons.length}</strong> z 52 lekcji ukończonych ({percentCompleted}%)</span>
             </div>
 
-            <div className="flex items-center gap-1.5 text-[#544A44] dark:text-[#D7CCC3]">
-              <Clock className="w-4 h-4 text-[#DA0271]" />
+            <div className="flex items-center gap-1.5 text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
+              <Clock className="w-4 h-4 text-[color:var(--hb-mag-t)]" />
               <span>Pozostało: <strong>{remainingHours}h {remainingMins}min</strong></span>
             </div>
 
             <button
               onClick={() => setWizardOpen(true)}
-              className="text-xs font-semibold text-[#DA0271] hover:underline cursor-pointer flex items-center gap-1 border-l border-[#EAE3DB] dark:border-[#3D0E39] pl-3"
+              className="text-xs font-semibold text-[color:var(--hb-mag-t)] hover:underline cursor-pointer flex items-center gap-1 border-l border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] pl-3"
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>{pregnancyProfile?.dueDate ? 'Edytuj dane i termin porodu' : 'Ustaw termin porodu i dane'}</span>
@@ -587,31 +593,31 @@ function StrefaDashboardContent() {
 
         {/* Podsumowanie zapisanych danych ciążowych kursantki i partnera */}
         {pregnancyProfile?.dueDate && pregnancyState && (
-          <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] flex flex-wrap items-center justify-between gap-2 text-xs text-[#544A44] dark:text-[#D7CCC3]">
+          <div className="pt-3 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] flex flex-wrap items-center justify-between gap-2 text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full bg-[#FAE3EB] dark:bg-[#3B0D36] text-[#DA0271] dark:text-[#FF4BA8] font-bold">
+              <span className="px-2.5 py-1 rounded-full bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] dark:text-[color:var(--hb-mag-t)] font-bold">
                 {pregnancyState.formattedWeek} · {pregnancyState.trimesterLabel}
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+              <span className="px-2.5 py-1 rounded-full bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]">
                 Termin porodu: <strong>{pregnancyProfile.dueDate}</strong> ({pregnancyState.daysUntilDue >= 0 ? `za ${pregnancyState.daysUntilDue} dni` : 'po terminie'})
               </span>
               {pregnancyProfile.babyName && (
-                <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+                <span className="px-2.5 py-1 rounded-full bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]">
                   Maluszek: <strong>{pregnancyProfile.babyName}</strong>
                 </span>
               )}
               {pregnancyProfile.partnerName && (
-                <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+                <span className="px-2.5 py-1 rounded-full bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]">
                   Partner / Tata: <strong>{pregnancyProfile.partnerName}</strong>
                 </span>
               )}
               {pregnancyProfile.city && (
-                <span className="px-2.5 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39]">
+                <span className="px-2.5 py-1 rounded-full bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]">
                   Szpital / Miasto: <strong>{pregnancyProfile.city}</strong>
                 </span>
               )}
             </div>
-            <span className="text-[11px] text-[#867A72] dark:text-[#C4ADC0]">
+            <span className="text-[11px] text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
               Wielkość maluszka: <strong>{pregnancyState.babyComparison.fruit}</strong> ({pregnancyState.babyComparison.weight})
             </span>
           </div>
@@ -622,10 +628,10 @@ function StrefaDashboardContent() {
       <section className="space-y-3.5">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[color:var(--hb-mag-t)]">
               Praktyczny Niezbędnik Porodowy
             </span>
-            <h2 className="font-brand-display font-semibold text-xl sm:text-2xl text-[#250A24] dark:text-[#FBF8F4]">
+            <h2 className="font-brand-display font-semibold text-xl sm:text-2xl text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
               Narzędzia SOS na każdy dzień i noc
             </h2>
           </div>
@@ -635,7 +641,7 @@ function StrefaDashboardContent() {
           {/* Plan Porodu */}
           <Link
             href="/strefa/plan-porodu"
-            className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#DA0271] to-[#250A24] text-white flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-lg transition-all group"
+            className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[color:var(--hb-mag)] to-[color:var(--hb-noc2)] text-[color:var(--hb-cta-ink)] flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-lg transition-all group"
           >
             <div>
               <div className="flex items-center justify-between">
@@ -663,21 +669,21 @@ function StrefaDashboardContent() {
           {/* Cyfrowa Apteczka */}
           <Link
             href="/strefa/apteczka"
-            className="p-5 sm:p-6 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] text-[#1A1512] dark:text-[#FBF8F4] flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-md transition-all group"
+            className="p-5 sm:p-6 rounded-2xl bg-[color:var(--hb-karta)] dark:bg-[color:var(--hb-karta)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-md transition-all group"
           >
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#DA0271]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--hb-mag-t)]">
                 Szybka Pomoc 24/7
               </span>
-              <h3 className="font-brand-display font-semibold text-xl mt-1.5 text-[#250A24] dark:text-[#FBF8F4]">
+              <h3 className="font-brand-display font-semibold text-xl mt-1.5 text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
                 Cyfrowa Apteczka SOS
               </h3>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-1 leading-relaxed">
+              <p className="text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] mt-1 leading-relaxed">
                 Wpisz dolegliwość (ból pleców, zgaga, wody, nawał) i przejdź do nagrania z instrukcją.
               </p>
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 text-xs font-semibold text-[#DA0271]">
+            <div className="flex items-center justify-between pt-3 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] mt-3 text-xs font-semibold text-[color:var(--hb-mag-t)]">
               <span>Szukaj objawu</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
@@ -686,21 +692,21 @@ function StrefaDashboardContent() {
           {/* Strefa dla Taty */}
           <Link
             href="/strefa/partner"
-            className="p-5 sm:p-6 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] text-[#1A1512] dark:text-[#FBF8F4] flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-md transition-all group"
+            className="p-5 sm:p-6 rounded-2xl bg-[color:var(--hb-karta)] dark:bg-[color:var(--hb-karta)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] flex flex-col justify-between min-h-[170px] shadow-sm hover:shadow-md transition-all group"
           >
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#7FB3CC]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--hb-p4g)]">
                 Wsparcie w Porodzie
               </span>
-              <h3 className="font-brand-display font-semibold text-xl mt-1.5 text-[#250A24] dark:text-[#FBF8F4]">
+              <h3 className="font-brand-display font-semibold text-xl mt-1.5 text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
                 Strefa dla Taty
               </h3>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-1 leading-relaxed">
+              <p className="text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] mt-1 leading-relaxed">
                 Pigułka wiedzy dla osoby towarzyszącej: masaż krzyżowy, prawa na izbie i sala porodowa.
               </p>
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 text-xs font-semibold text-[#7FB3CC]">
+            <div className="flex items-center justify-between pt-3 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] mt-3 text-xs font-semibold text-[color:var(--hb-p4g)]">
               <span>Ściąga dla partnera</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
@@ -712,20 +718,20 @@ function StrefaDashboardContent() {
       <section className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#867A72] dark:text-[#C4ADC0]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
               Pełny Program Szkoły Rodzenia
             </span>
-            <h2 className="font-brand-display font-semibold text-xl sm:text-2xl text-[#250A24] dark:text-[#FBF8F4] mt-0.5">
+            <h2 className="font-brand-display font-semibold text-xl sm:text-2xl text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] mt-0.5">
               9 Tematycznych Modułów Programu
             </h2>
-            <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3] mt-0.5">
+            <p className="text-xs sm:text-sm text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] mt-0.5">
               Kliknięcie modułu ładuje go w odtwarzaczu u góry z pierwszą nieukończoną lekcją.
             </p>
           </div>
 
           <Link
             href="/strefa/lekcje"
-            className="text-xs font-semibold text-[#DA0271] hover:underline flex items-center gap-1 self-start sm:self-auto"
+            className="text-xs font-semibold text-[color:var(--hb-mag-t)] hover:underline flex items-center gap-1 self-start sm:self-auto"
           >
             <span>Katalog wszystkich 52 lekcji</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -751,19 +757,19 @@ function StrefaDashboardContent() {
               <div
                 key={stage.id}
                 onClick={() => handleSelectStage(stage)}
-                className={`group p-5 rounded-2xl bg-[#FFFDFA] dark:bg-[#1C081A] border transition-all flex flex-col justify-between min-h-[210px] cursor-pointer hover:shadow-md ${
+                className={`group p-5 rounded-2xl bg-[color:var(--hb-karta)] dark:bg-[color:var(--hb-karta)] border transition-all flex flex-col justify-between min-h-[210px] cursor-pointer hover:shadow-md ${
                   isCurrentModule
-                    ? 'border-[#DA0271] ring-1 ring-[#DA0271]/50 shadow-xs'
-                    : 'border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271]/60'
+                    ? 'border-[color:var(--hb-mag)] ring-1 ring-[color:color-mix(in_srgb,var(--hb-mag)_50%,transparent)] shadow-xs'
+                    : 'border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] hover:border-[color:color-mix(in_srgb,var(--hb-mag)_60%,transparent)]'
                 }`}
               >
                 <div>
                   <div className="flex items-start justify-between">
                     <div
-                      className="w-10 h-10 transition-transform group-hover:scale-105"
-                      style={{ color: stage.deep }}
+                      className="w-10 h-10 transition-transform group-hover:scale-105 hb-kolor-danych"
+                      style={{ '--kd': stage.deep } as React.CSSProperties}
                     >
-                      <StageIcon name={stage.id.replace('e-', '')} />
+                      <StageIcon id={stage.id} />
                     </div>
 
                     <div className="flex items-center gap-1.5">
@@ -779,25 +785,25 @@ function StrefaDashboardContent() {
                     </div>
                   </div>
 
-                  <h3 className="font-brand-display font-semibold text-lg text-[#250A24] dark:text-[#FBF8F4] mt-3 group-hover:text-[#DA0271] transition-colors leading-snug">
+                  <h3 className="font-brand-display font-semibold text-lg text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] mt-3 group-hover:text-[color:var(--hb-mag-t)] transition-colors leading-snug">
                     {getStageDisplayTitle(stage)}
                   </h3>
-                  <p className="text-xs text-[#544A44] dark:text-[#D7CCC3] mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] mt-1 line-clamp-2 leading-relaxed">
                     {getStageFullDescription(stage)}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-[#EAE3DB] dark:border-[#3D0E39] mt-3 space-y-2">
-                  <div className="flex items-center justify-between text-[11px] text-[#867A72] dark:text-[#C4ADC0]">
+                <div className="pt-3 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] mt-3 space-y-2">
+                  <div className="flex items-center justify-between text-[11px] text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
                     <span>
                       {stageLessons.length} lekcji · {totalStageMins} min
                     </span>
-                    <span className="font-mono font-semibold text-[#250A24] dark:text-[#FBF8F4]">
+                    <span className="font-mono font-semibold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
                       {stageCompleted}/{stageLessons.length} ({stagePercent}%)
                     </span>
                   </div>
 
-                  <div className="w-full bg-[#EAE3DB] dark:bg-[#2C0C2B] h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-[color:var(--hb-linia)] dark:bg-[color:var(--hb-noc)] h-1.5 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{
@@ -814,64 +820,64 @@ function StrefaDashboardContent() {
       </section>
 
       {/* 6. PLIKI I CHECKLISTY DO POBRANIA (PDF) */}
-      <section className="p-5 sm:p-6 rounded-3xl bg-[#FFFDFA] dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-4 border-b border-[#EAE3DB] dark:border-[#3D0E39]">
+      <section className="p-5 sm:p-6 rounded-3xl bg-[color:var(--hb-karta)] dark:bg-[color:var(--hb-karta)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-4 border-b border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[color:var(--hb-mag-t)]">
               Pliki do druku A4 i na telefon
             </span>
-            <h2 className="font-brand-display font-semibold text-xl text-[#250A24] dark:text-[#FBF8F4] mt-0.5">
+            <h2 className="font-brand-display font-semibold text-xl text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] mt-0.5">
               Materiały i szablony do pobrania (PDF)
             </h2>
           </div>
-          <span className="text-xs text-[#867A72] dark:text-[#C4ADC0]">
+          <span className="text-xs text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
             Formaty PDF gotowe do druku
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-4">
-          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
+          <div className="p-3.5 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] hover:border-[color:var(--hb-mag)] transition-colors flex flex-col justify-between bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-noc2)]">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#DA0271] uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-[color:var(--hb-mag-t)] uppercase tracking-wider">
                 PDF · 2 strony
               </span>
-              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">Plan Porodu (Standard MZ)</h4>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3]">
+              <h4 className="text-sm font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">Plan Porodu (Standard MZ)</h4>
+              <p className="text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                 16 kluczowych punktów do przekazania położnej na izbie przyjęć.
               </p>
             </div>
-            <Link href="/strefa/plan-porodu" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#DA0271] hover:underline">
+            <Link href="/strefa/plan-porodu" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[color:var(--hb-mag-t)] hover:underline">
               <Download className="w-3.5 h-3.5" />
               <span>Otwórz wzór PDF</span>
             </Link>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
+          <div className="p-3.5 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] hover:border-[color:var(--hb-mag)] transition-colors flex flex-col justify-between bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-noc2)]">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#DA0271] uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-[color:var(--hb-mag-t)] uppercase tracking-wider">
                 PDF · 3 strefy
               </span>
-              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">Torba do szpitala</h4>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3]">
+              <h4 className="text-sm font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">Torba do szpitala</h4>
+              <p className="text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                 Pakowanie: dokumenty, strefa porodu, strefa połogu i noworodka.
               </p>
             </div>
             <Link
               href="/kalkulator-wyprawki"
-              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] dark:text-[#FBF8F4] hover:text-[#DA0271] cursor-pointer"
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] hover:text-[color:var(--hb-mag-t)] cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Otwórz checklistę PDF</span>
             </Link>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
+          <div className="p-3.5 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] hover:border-[color:var(--hb-mag)] transition-colors flex flex-col justify-between bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-noc2)]">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-[#DA0271] uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-[color:var(--hb-mag-t)] uppercase tracking-wider">
                 PDF · Kalendarz
               </span>
-              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">Badania w ciąży</h4>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3]">
+              <h4 className="text-sm font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">Badania w ciąży</h4>
+              <p className="text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                 Tabela badań laboratoryjnych i USG wg Standardu Opieki Okołoporodowej.
               </p>
             </div>
@@ -879,17 +885,17 @@ function StrefaDashboardContent() {
               href="/materialy/kalendarz-badan-w-ciazy-happybirth.html"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#250A24] dark:text-[#FBF8F4] hover:text-[#DA0271] cursor-pointer"
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] hover:text-[color:var(--hb-mag-t)] cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Pobierz kalendarz PDF</span>
             </a>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#7FB3CC] transition-colors flex flex-col justify-between bg-[#FBF8F4] dark:bg-[#220820]">
+          <div className="p-3.5 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] hover:border-[color:var(--hb-p4)] transition-colors flex flex-col justify-between bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-noc2)]">
             <div className="space-y-1">
               <div className="flex flex-wrap items-center justify-between gap-1">
-                <span className="text-[10px] font-bold text-[#7FB3CC] uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-[color:var(--hb-p4g)] uppercase tracking-wider">
                   ✨ {smartOrderBump.autoDetectedBadge}
                 </span>
                 {hasOrderBump ? (
@@ -897,15 +903,15 @@ function StrefaDashboardContent() {
                     ✓ Pakiet odblokowany
                   </span>
                 ) : (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#DA0271]/15 text-[#DA0271] dark:text-[#FF7AC3]">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[color:color-mix(in_srgb,var(--hb-mag)_15%,transparent)] text-[color:var(--hb-mag-t)] dark:text-[color:var(--hb-mag-t)]">
                     🔒 Dodatek Order Bump (+49 zł)
                   </span>
                 )}
               </div>
-              <h4 className="text-sm font-bold text-[#250A24] dark:text-[#FBF8F4]">
+              <h4 className="text-sm font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
                 {smartOrderBump.checkoutTitlePl}
               </h4>
-              <p className="text-xs text-[#544A44] dark:text-[#D7CCC3]">
+              <p className="text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                 {smartOrderBump.checkoutDescPl}
               </p>
             </div>
@@ -915,7 +921,7 @@ function StrefaDashboardContent() {
                   href={`${smartOrderBump.editionConfig.url}&unlocked=1`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#7FB3CC] hover:underline"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[color:var(--hb-p4g)] hover:underline"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Otwórz pełny pakiet PDF ({smartOrderBump.editionConfig.languageLabel})</span>
@@ -924,7 +930,7 @@ function StrefaDashboardContent() {
                   href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-uk&unlocked=1"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[color:color-mix(in_srgb,var(--hb-p4)_15%,transparent)] text-[color:var(--hb-p4g)] hover:bg-[color:color-mix(in_srgb,var(--hb-p4)_25%,transparent)]"
                 >
                   🇵🇱🇬🇧 UK/IE
                 </a>
@@ -932,7 +938,7 @@ function StrefaDashboardContent() {
                   href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-de&unlocked=1"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[color:color-mix(in_srgb,var(--hb-p4)_15%,transparent)] text-[color:var(--hb-p4g)] hover:bg-[color:color-mix(in_srgb,var(--hb-p4)_25%,transparent)]"
                 >
                   🇵🇱🇩🇪 DACH
                 </a>
@@ -940,7 +946,7 @@ function StrefaDashboardContent() {
                   href="/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html?edition=pl-nl&unlocked=1"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#7FB3CC]/15 text-[#7FB3CC] hover:bg-[#7FB3CC]/25"
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[color:color-mix(in_srgb,var(--hb-p4)_15%,transparent)] text-[color:var(--hb-p4g)] hover:bg-[color:color-mix(in_srgb,var(--hb-p4)_25%,transparent)]"
                 >
                   🇵🇱🇳🇱 NL
                 </a>
@@ -951,7 +957,7 @@ function StrefaDashboardContent() {
                   href={`${smartOrderBump.editionConfig.url}&preview=1`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#7FB3CC] hover:underline"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--hb-p4g)] hover:underline"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Podgląd Karty #1 (Demo)</span>
@@ -960,7 +966,7 @@ function StrefaDashboardContent() {
                   type="button"
                   onClick={handleBuyStandaloneOrderBump}
                   disabled={buyingOrderBump}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#DA0271] text-white text-[11px] font-bold hover:bg-[#B8005E] cursor-pointer disabled:opacity-60"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[color:var(--hb-mag)] text-[color:var(--hb-cta-ink)] text-[11px] font-bold hover:bg-[color:var(--hb-mag-h)] cursor-pointer disabled:opacity-60"
                 >
                   <span>
                     {buyingOrderBump
@@ -996,8 +1002,8 @@ export default function StrefaDashboardPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="max-w-7xl mx-auto px-4 py-16 text-center text-[#867A72] dark:text-[#C4ADC0]">
-          <div className="w-10 h-10 border-4 border-[#DA0271]/30 border-t-[#DA0271] rounded-full animate-spin mx-auto mb-3" />
+        <div className="max-w-7xl mx-auto px-4 py-16 text-center text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
+          <div className="w-10 h-10 border-4 border-[color:color-mix(in_srgb,var(--hb-mag)_30%,transparent)] border-t-[color:var(--hb-mag)] rounded-full animate-spin mx-auto mb-3" />
           <p className="text-sm">Ładowanie Strefy Rodziców...</p>
         </div>
       }

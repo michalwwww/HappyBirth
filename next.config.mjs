@@ -1,3 +1,9 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 /** @type {import('next').NextConfig} */
 const isStaticExport =
   process.env.STATIC_EXPORT === 'true' || process.env.NEXT_EXPORT === 'true';
@@ -13,16 +19,13 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  ...(isStaticExport
-    ? {}
-    : {
-        async rewrites() {
-          return [
-            { source: '/standard-merytoryczny', destination: '/dla-ciebie' },
-            { source: '/polityka-cookies', destination: '/polityka-prywatnosci' },
-          ];
-        },
-      }),
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      '@': path.resolve(__dirname),
+    };
+    return config;
+  },
 };
 
 export default nextConfig;

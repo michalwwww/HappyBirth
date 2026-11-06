@@ -9,7 +9,7 @@ export default function PolitykaPrywatnosciPage() {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#867A72] hover:text-[#EC008C] transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#7A6786] dark:text-[#B9ACC8] hover:text-[#DA0271] transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Wróć do strony głównej</span>
@@ -17,30 +17,30 @@ export default function PolitykaPrywatnosciPage() {
       </div>
 
       {/* Header */}
-      <div className="space-y-4 border-b border-[#EAE3DB] pb-8">
+      <div className="space-y-4 border-b border-[#EADFD3] dark:border-[#3B3050] pb-8">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#DFEED4] border border-[#C5E1B3] text-xs font-semibold text-[#347A22]">
           <Lock className="w-3.5 h-3.5" />
           <span>Ochrona danych osobowych (RODO / UK GDPR / CCPA)</span>
         </div>
-        <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-[#1A1512] tracking-tight">
+        <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-[#4A3A5E] dark:text-[#F4EEF7] tracking-tight">
           Polityka Prywatności i Plików Cookies
         </h1>
-        <p className="text-sm sm:text-base text-[#544A44] leading-relaxed">
+        <p className="text-sm sm:text-base text-[#6E5C7D] dark:text-[#D5CAE0] leading-relaxed">
           Szanujemy Twoją prywatność. Poniższy dokument wyjaśnia w przejrzysty sposób, jakie dane zbieramy, w jakim celu je przetwarzamy oraz jak dbamy o ich bezpieczeństwo zgodnie z Rozporządzeniem RODO.
         </p>
       </div>
 
       {/* Treść */}
-      <div className="space-y-8 text-sm sm:text-base text-[#342D28] leading-relaxed font-sans">
+      <div className="space-y-8 text-sm sm:text-base text-[#4A3A5E] dark:text-[#F4EEF7] leading-relaxed font-sans">
         {/* 1. Administrator */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             1. Administrator Danych Osobowych
           </h2>
           <p>
             Administratorem Twoich danych osobowych w rozumieniu art. 4 pkt 7 RODO jest:
           </p>
-          <div className="p-5 rounded-2xl bg-white border border-[#EAE3DB] space-y-1.5 text-sm">
+          <div className="p-5 rounded-2xl bg-white dark:bg-[#2C2240] border border-[#EADFD3] dark:border-[#3B3050] space-y-1.5 text-sm">
             <p><strong>KLARSOLUTIONS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</strong> (skrót: <strong>KLARSolutions sp. z o.o.</strong>)</p>
             <p>Adres siedziby: ul. Śląska 14, 60-614 Poznań, Polska</p>
             <p>KRS: <strong>0001268396</strong> · NIP: <strong>7812118273</strong> · REGON: <strong>545782779</strong></p>
@@ -53,7 +53,7 @@ export default function PolitykaPrywatnosciPage() {
 
         {/* 2. Cele i podstawy prawne przetwarzania */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             2. Cele, Zakres i Podstawy Prawne Przetwarzania
           </h2>
           <p>Przetwarzamy Twoje dane w następujących celach:</p>
@@ -75,12 +75,12 @@ export default function PolitykaPrywatnosciPage() {
 
         {/* 3. Prywatność medyczna */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             3. Ochrona Prywatności Medycznej (Brak Pikseli w Strefie Kursantki)
           </h2>
-          <div className="p-5 rounded-2xl bg-[#FAE3EB] border border-[#F3CAD9] text-sm text-[#541235] space-y-2">
+          <div className="p-5 rounded-2xl bg-[#F9E6EC] dark:bg-[#3A2033] border border-[#EAADC0] dark:border-[#4E2840] text-sm text-[#4A3A5E] dark:text-[#F4EEF7] space-y-2">
             <p className="font-bold flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-[#EC008C]" />
+              <ShieldCheck className="w-4 h-4 text-[color:var(--hb-mag-t)]" />
               Zasada zerowej inwigilacji wewnątrz kursu:
             </p>
             <p>
@@ -94,7 +94,7 @@ export default function PolitykaPrywatnosciPage() {
 
         {/* 4. Odbiorcy danych */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             4. Odbiorcy Danych (Podmioty Przetwarzające)
           </h2>
           <p>Twoje dane mogą być powierzane zaufanym podmiotom technicznym:</p>
@@ -107,7 +107,7 @@ export default function PolitykaPrywatnosciPage() {
 
         {/* 5. Pliki Cookies i LocalStorage */}
         <section className="space-y-3" id="cookies">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             5. Pliki Cookies i Pamięć Lokalna (LocalStorage)
           </h2>
           <p>
@@ -126,7 +126,7 @@ export default function PolitykaPrywatnosciPage() {
 
         {/* 6. Prawa Użytkownika */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             6. Twoje Prawa Zgodnie z RODO
           </h2>
           <p>Przysługuje Ci prawo do:</p>
@@ -145,11 +145,11 @@ export default function PolitykaPrywatnosciPage() {
         </section>
 
         {/* 7. International Privacy Notice (UK GDPR, CCPA/CPRA, LGPD) */}
-        <section className="space-y-3 pt-4 border-t border-[#EAE3DB]">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+        <section className="space-y-3 pt-4 border-t border-[#EADFD3] dark:border-[#3B3050]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             7. International Privacy & Health Data Protection Notice (UK GDPR / US CCPA / Brazil LGPD)
           </h2>
-          <p className="text-xs sm:text-sm text-[#544A44]">
+          <p className="text-xs sm:text-sm text-[#6E5C7D] dark:text-[#D5CAE0]">
             For users accessing HappyBirth from the United Kingdom (UK GDPR & Data Protection Act 2018), the United States (including California CCPA/CPRA), Australia (Privacy Act 1988), and Brazil (LGPD Lei nº 13.709/2018): <strong>KLARSOLUTIONS Sp. z o.o. does NOT sell, rent, or share sensitive pregnancy or health-related data with any third-party advertising networks (such as Meta, TikTok, or Google Ads).</strong> All interactive birth plan preferences and checklists are stored locally in your browser (<code>localStorage</code>), and the Student Zone (<code>/strefa/*</code>) operates under a strict zero-advertising-pixel policy.
           </p>
         </section>

@@ -81,7 +81,7 @@ export function SosContractionCounter() {
   };
 
   return (
-    <div className="w-full bg-white rounded-3xl border border-[#EAE3DB] p-6 sm:p-8 shadow-xl">
+    <div className="w-full bg-white dark:bg-[color:var(--hb-karta)] rounded-3xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] p-6 sm:p-8 shadow-xl">
       {/* Alert banner when 5-1-1 is met */}
       {is511Alert && (
         <div className="mb-6 p-4 rounded-2xl bg-rose-50 border-2 border-rose-500 text-rose-950 flex items-start space-x-3 animate-bounce">
@@ -97,11 +97,11 @@ export function SosContractionCounter() {
 
       {/* Main Counter Display */}
       <div className="flex flex-col items-center justify-center py-6 text-center">
-        <span className="text-xs font-bold tracking-wider uppercase text-[#867A72] mb-2">
+        <span className="text-xs font-bold tracking-wider uppercase text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] mb-2">
           {isActive ? 'Skurcz w toku... Oddychaj torem dolnożebrowym' : 'Licznik gotowy'}
         </span>
 
-        <div className="font-mono font-bold text-6xl sm:text-7xl tracking-tight text-[#1A1512] mb-6">
+        <div className="font-mono font-bold text-6xl sm:text-7xl tracking-tight text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] mb-6">
           {formatTime(seconds)}
         </div>
 
@@ -112,7 +112,7 @@ export function SosContractionCounter() {
             className={`px-8 py-4 rounded-full font-bold text-base shadow-lg transition-all transform active:scale-95 flex items-center space-x-2 ${
               isActive
                 ? 'bg-rose-600 text-white hover:bg-rose-700 animate-pulse'
-                : 'bg-[#EC008C] text-white hover:bg-[#C80077]'
+                : 'bg-[color:var(--hb-mag)] text-[color:var(--hb-cta-ink)] hover:bg-[color:var(--hb-mag-h)]'
             }`}
           >
             {isActive ? (
@@ -131,7 +131,7 @@ export function SosContractionCounter() {
           {contractions.length > 0 && !isActive && (
             <button
               onClick={handleReset}
-              className="p-4 rounded-full bg-[#FBF8F4] text-[#867A72] hover:text-[#1A1512] border border-[#EAE3DB] transition-colors"
+              className="p-4 rounded-full bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] hover:text-[color:var(--hb-ink)] dark:hover:text-[color:var(--hb-ink)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] transition-colors"
               title="Wyczyść historię"
             >
               <RotateCcw className="w-5 h-5" />
@@ -141,10 +141,10 @@ export function SosContractionCounter() {
       </div>
 
       {/* 5-1-1 Explanation Box */}
-      <div className="my-6 p-4 rounded-2xl bg-[#FBF8F4] border border-[#EAE3DB] text-xs text-[#544A44] flex items-center justify-between gap-4">
+      <div className="my-6 p-4 rounded-2xl bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-kosc)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] flex items-center justify-between gap-4">
         <div>
-          <span className="font-bold text-[#1A1512]">Reguła szpitalna 5-1-1:</span>
-          <span className="ml-1 text-[#867A72]">
+          <span className="font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">Reguła szpitalna 5-1-1:</span>
+          <span className="ml-1 text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
             Skurcze co <strong>5 minut</strong>, trwające <strong>1 minutę</strong>, przez co najmniej <strong>1 godzinę</strong>.
           </span>
         </div>
@@ -157,29 +157,29 @@ export function SosContractionCounter() {
 
       {/* History Table */}
       {contractions.length > 0 && (
-        <div className="mt-6 border-t border-[#EAE3DB] pt-4">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-[#867A72] mb-3 flex items-center gap-1.5">
+        <div className="mt-6 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] pt-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] mb-3 flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5" /> Ostatnie skurcze ({contractions.length})
           </h4>
           <div className="max-h-48 overflow-y-auto space-y-2 pr-1">
             {contractions.map((c, index) => (
               <div
                 key={c.id}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50 border border-[#EAE3DB] text-xs"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-[color:var(--hb-papier)] dark:bg-[color:var(--hb-papier)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-xs"
               >
                 <div className="flex items-center space-x-3">
-                  <span className="font-mono font-bold text-[#867A72]">#{contractions.length - index}</span>
-                  <span className="text-[#1A1512] font-medium">
+                  <span className="font-mono font-bold text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">#{contractions.length - index}</span>
+                  <span className="text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] font-medium">
                     {c.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </span>
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <span className="text-[#544A44]">
-                    Czas trwania: <strong className="text-[#1A1512]">{c.durationSeconds} s</strong>
+                  <span className="text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
+                    Czas trwania: <strong className="text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">{c.durationSeconds} s</strong>
                   </span>
                   {c.intervalMinutes !== undefined && (
-                    <span className="font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">
+                    <span className="font-semibold text-[color:var(--hb-p4g)] dark:text-[color:var(--hb-p4g)] bg-[color:var(--hb-p4l)] dark:bg-[color:var(--hb-p4l)] px-2 py-0.5 rounded-md">
                       Odstęp: {c.intervalMinutes} min
                     </span>
                   )}
@@ -191,7 +191,7 @@ export function SosContractionCounter() {
       )}
 
       {/* Emergency 112 Red Flags */}
-      <div className="mt-8 pt-6 border-t border-[#EAE3DB]">
+      <div className="mt-8 pt-6 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]">
         <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 text-amber-950 text-xs">
           <div className="flex items-center justify-between gap-2 mb-2">
             <span className="font-bold flex items-center gap-1 text-amber-900 uppercase tracking-wider">

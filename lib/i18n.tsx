@@ -69,6 +69,11 @@ export const translations: Translations = {
     en: 'Birth Plan',
     ru: 'План родов',
   },
+  navKnowledge: {
+    pl: 'Wiedza',
+    en: 'Knowledge',
+    ru: 'Знания',
+  },
   navPartner: {
     pl: 'Dla Taty',
     en: 'For Dad',

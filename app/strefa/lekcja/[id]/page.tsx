@@ -17,8 +17,8 @@ export default async function StrefaLessonPage({
   return (
     <Suspense
       fallback={
-        <div className="max-w-7xl mx-auto px-4 py-16 text-center text-[#867A72]">
-          <div className="w-10 h-10 border-4 border-[#EC008C]/30 border-t-[#EC008C] rounded-full animate-spin mx-auto mb-3" />
+        <div className="max-w-7xl mx-auto px-4 py-16 text-center text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
+          <div className="w-10 h-10 border-4 border-[color:color-mix(in_srgb,var(--hb-mag)_30%,transparent)] border-t-[color:var(--hb-mag)] rounded-full animate-spin mx-auto mb-3" />
           <p className="text-sm">Ładowanie lekcji VOD...</p>
         </div>
       }

@@ -17,7 +17,7 @@ export default function RegulaminPage() {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#867A72] hover:text-[#EC008C] transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#7A6786] dark:text-[#B9ACC8] hover:text-[#DA0271] transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Wróć do strony głównej</span>
@@ -25,31 +25,31 @@ export default function RegulaminPage() {
       </div>
 
       {/* Header */}
-      <div className="space-y-4 border-b border-[#EAE3DB] pb-8">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] border border-[#F3CAD9] text-xs font-semibold text-[#EC008C]">
+      <div className="space-y-4 border-b border-[#EADFD3] dark:border-[#3B3050] pb-8">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F9E6EC] dark:bg-[#3A2033] border border-[#EAADC0] dark:border-[#4E2840] text-xs font-semibold text-[color:var(--hb-mag-t)]">
           <FileText className="w-3.5 h-3.5" />
           <span>Dokument prawny · Wersja zaktualizowana 27.10.2026 r.</span>
         </div>
-        <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-[#1A1512] tracking-tight">
+        <h1 className="font-brand-display font-bold text-3xl sm:text-5xl text-[#4A3A5E] dark:text-[#F4EEF7] tracking-tight">
           Regulamin Świadczenia Usług i Sprzedaży Kursu Online HappyBirth.pl
         </h1>
-        <p className="text-sm sm:text-base text-[#544A44] leading-relaxed">
+        <p className="text-sm sm:text-base text-[#6E5C7D] dark:text-[#D5CAE0] leading-relaxed">
           Niniejszy regulamin określa zasady korzystania z platformy internetowej HappyBirth.pl oraz warunki zakupu 18-miesięcznego dostępu do materiałów edukacyjnych VOD.
         </p>
       </div>
 
       {/* Treść Regulaminu */}
-      <div className="space-y-8 text-sm sm:text-base text-[#342D28] leading-relaxed font-sans">
+      <div className="space-y-8 text-sm sm:text-base text-[#4A3A5E] dark:text-[#F4EEF7] leading-relaxed font-sans">
         {/* § 1 */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             § 1. Postanowienia ogólne i dane Usługodawcy
           </h2>
           <p>
             1. Właścicielem, operatorem prawnym i administratorem platformy internetowej dostępnej pod adresem{' '}
             <strong>happybirth.pl</strong> oraz <strong>strefa.happybirth.pl</strong> (zwanej dalej „Platformą” lub „Serwisem”) jest:
           </p>
-          <div className="p-5 rounded-2xl bg-white border border-[#EAE3DB] space-y-1.5 text-sm">
+          <div className="p-5 rounded-2xl bg-white dark:bg-[#2C2240] border border-[#EADFD3] dark:border-[#3B3050] space-y-1.5 text-sm">
             <p>
               <strong>KLARSOLUTIONS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</strong> (skrót:{' '}
               <strong>KLARSOLUTIONS Sp. z o.o.</strong>)
@@ -76,7 +76,7 @@ export default function RegulaminPage() {
 
         {/* § 2 */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             § 2. Definicje
           </h2>
           <ul className="list-disc pl-5 space-y-1.5">
@@ -97,7 +97,7 @@ export default function RegulaminPage() {
 
         {/* § 3 */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             § 3. Przedmiot Usługi, Struktura 8 Modułów i 18-Miesięczny Okres Dostępu
           </h2>
           <p>
@@ -114,12 +114,12 @@ export default function RegulaminPage() {
 
         {/* § 4 */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             § 4. Charakter Edukacyjny Materiałów (Nota Medyczna)
           </h2>
-          <div className="p-5 rounded-2xl bg-[#FAE3EB] border border-[#F3CAD9] text-sm text-[#541235] space-y-2">
+          <div className="p-5 rounded-2xl bg-[#F9E6EC] dark:bg-[#3A2033] border border-[#EAADC0] dark:border-[#4E2840] text-sm text-[#4A3A5E] dark:text-[#F4EEF7] space-y-2">
             <p className="font-bold flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-[#EC008C]" />
+              <ShieldCheck className="w-4 h-4 text-[color:var(--hb-mag-t)]" />
               Ważna informacja dla przyszłych rodziców:
             </p>
             <p>
@@ -133,7 +133,7 @@ export default function RegulaminPage() {
 
         {/* § 5 */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             § 5. Ceny, Dyrektywa Omnibus i Płatności
           </h2>
           <p>
@@ -159,12 +159,12 @@ export default function RegulaminPage() {
 
         {/* § 6 */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             § 6. Prawo Odstąpienia od Umowy (Art. 38 ust. 1 pkt 13 u.p.k.) oraz Przycisk „Odstąp od umowy”
           </h2>
           <p>
             1. Co do zasady, Konsumentowi przysługuje prawo do odstąpienia od umowy zawartej na odległość w terminie 14 dni bez podawania przyczyny. Elektroniczny formularz odstąpienia od umowy dostępny jest bez konieczności logowania pod stałym adresem:{' '}
-            <Link href="/odstap-od-umowy" className="text-[#DA0271] font-bold underline">
+            <Link href="/odstap-od-umowy" className="text-[color:var(--hb-mag-t)] font-bold underline">
               https://happybirth.pl/odstap-od-umowy
             </Link>
             .
@@ -187,7 +187,7 @@ export default function RegulaminPage() {
 
         {/* § 7 */}
         <section className="space-y-3">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             § 7. Reklamacje i Wsparcie Techniczne
           </h2>
           <p>
@@ -196,11 +196,11 @@ export default function RegulaminPage() {
         </section>
 
         {/* § 8 */}
-        <section className="space-y-3 pt-4 border-t border-[#EAE3DB]">
-          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#1A1512]">
+        <section className="space-y-3 pt-4 border-t border-[#EADFD3] dark:border-[#3B3050]">
+          <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[#4A3A5E] dark:text-[#F4EEF7]">
             § 8. International Consumer Terms & Medical Disclaimer (English Summary for UK / US / EU / AU / UAE Customers)
           </h2>
-          <div className="p-5 rounded-2xl bg-white border border-[#EAE3DB] space-y-2.5 text-xs sm:text-sm text-[#544A44]">
+          <div className="p-5 rounded-2xl bg-white dark:bg-[#2C2240] border border-[#EADFD3] dark:border-[#3B3050] space-y-2.5 text-xs sm:text-sm text-[#6E5C7D] dark:text-[#D5CAE0]">
             <p>
               <strong>1. Service Provider & Merchant of Record:</strong> HappyBirth is operated by <strong>KLARSOLUTIONS Sp. z o.o.</strong>, registered in Poland (ul. Śląska 14, 60-614 Poznań, KRS: 0001268396, EU VAT ID: PL7812118273, e-mail: <strong>kontakt@happybirth.pl</strong>).
             </p>
