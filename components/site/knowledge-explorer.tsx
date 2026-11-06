@@ -8,14 +8,18 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { KARTY, TEMATY, ZRODLA } from '@/lib/dla-ciebie-data';
 import { LEKCJE } from '@/lib/program-data';
+import { czyTekstPasuje, normSearch, podswietlTekst } from '@/lib/search-utils';
 import { IconLupa } from './icons';
 
-const PL: Record<string, string> = { ą: 'a', ć: 'c', ę: 'e', ł: 'l', ń: 'n', ó: 'o', ś: 's', ź: 'z', ż: 'z' };
-const norm = (s: string) => s.toLowerCase().replace(/[ąćęłńóśźż]/g, (c) => PL[c] || c);
 const ZR = Object.fromEntries(ZRODLA.map((z) => [z.id, z]));
 const NAZWA_ZR: Record<string, string> = { 'std-2026': 'Standard opieki okołoporodowej', upp: 'Ustawa o prawach pacjenta' };
 const nazwaZrodla = (id: string) => NAZWA_ZR[id] || ZR[id]?.skrot || id;
 const hasla = (n: number) => (n === 1 ? 'hasło' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'hasła' : 'haseł');
+
+function Podswietl({ tekst, q }: { tekst: string; q: string }) {
+  if (!q) return <>{tekst}</>;
+  return <span data-podswietl="">{podswietlTekst(tekst, q)}</span>;
+}
 
 export function KnowledgeExplorer({ ids, wStrefie = false }: { ids?: string[]; wStrefie?: boolean }) {
   const karty = useMemo(() => (ids ? KARTY.filter((k) => ids.includes(k.id)) : KARTY), [ids]);
@@ -23,7 +27,7 @@ export function KnowledgeExplorer({ ids, wStrefie = false }: { ids?: string[]; w
   const [q, setQ] = useState('');
   const [temat, setTemat] = useState<string>('all');
   const [ile, setIle] = useState(12);
-  const fraza = norm(q.trim());
+  const fraza = normSearch(q);
 
   // odnośniki #haslo-… (np. z listy najważniejszych zmian) muszą trafić w kartę także przy stronicowaniu
   useEffect(() => {
@@ -40,8 +44,25 @@ export function KnowledgeExplorer({ ids, wStrefie = false }: { ids?: string[]; w
     return () => window.removeEventListener('hashchange', doHasla);
   }, [karty]);
 
-  const lista = useMemo(() => karty.filter((k) => (temat === 'all' || k.temat === temat)
-    && (!fraza || norm(`${k.tytul} ${k.tekst}`).includes(fraza))), [karty, temat, fraza]);
+  const listaWszystkie = useMemo(
+    () =>
+      karty.filter(
+        (k) =>
+          !fraza ||
+          czyTekstPasuje(
+            q,
+            k.tytul,
+            k.tekst,
+            k.cytaty.map((c) => c.tekst).join(' ')
+          )
+      ),
+    [karty, q, fraza]
+  );
+
+  const lista = useMemo(
+    () => (temat === 'all' ? listaWszystkie : listaWszystkie.filter((k) => k.temat === temat)),
+    [listaWszystkie, temat]
+  );
 
   const liczby = useMemo(() => {
     const m: Record<string, number> = {};
@@ -55,7 +76,20 @@ export function KnowledgeExplorer({ ids, wStrefie = false }: { ids?: string[]; w
         <div className="hb-szukaj">
           <IconLupa />
           <label className="hb-sr" htmlFor="szukaj-hasla">Szukajcie hasła</label>
-          <input id="szukaj-hasla" onChange={(e) => { setQ(e.target.value); setIle(12); }} placeholder="Szukajcie, np. plan porodu, osoba bliska, karmienie" type="search" value={q} />
+          <input
+            id="szukaj-hasla"
+            onChange={(e) => { setQ(e.target.value); setIle(12); }}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' && q) {
+                e.preventDefault();
+                setQ('');
+                setIle(12);
+              }
+            }}
+            placeholder="Szukajcie, np. plan porodu, osoba bliska, karmienie"
+            type="search"
+            value={q}
+          />
         </div>
         <div aria-label="Temat" className="hb-chipy" role="group">
           <button aria-pressed={temat === 'all'} className="hb-chip" onClick={() => { setTemat('all'); setIle(12); }} type="button">Wszystkie</button>
@@ -65,9 +99,36 @@ export function KnowledgeExplorer({ ids, wStrefie = false }: { ids?: string[]; w
         </div>
       </div>
 
-      <p aria-live="polite" className="hb-podsum"><span><b>{lista.length}</b> {hasla(lista.length)}</span></p>
+      <p aria-live="polite" className="hb-podsum">
+        <span>
+          <b>{lista.length}</b> {hasla(lista.length)}
+          {fraza && lista.length === 0 && listaWszystkie.length > 0 && temat !== 'all' && (
+            <>
+              {' '}
+              —{' '}
+              <button className="hb-zwin" onClick={() => setTemat('all')} type="button">
+                pokaż ze wszystkich tematów ({listaWszystkie.length})
+              </button>
+            </>
+          )}
+        </span>
+      </p>
 
-      {lista.length === 0 && <p className="hb-brak">Nie ma hasła o tym temacie. Spróbujcie innego słowa albo wybierzcie inny temat.</p>}
+      {lista.length === 0 && (
+        <div className="hb-brak">
+          {listaWszystkie.length > 0 && temat !== 'all' ? (
+            <p>
+              W wybranym temacie nie ma pasującego hasła, ale znaleźliśmy{' '}
+              <b>{listaWszystkie.length}</b> {hasla(listaWszystkie.length)} w pozostałych tematach.{' '}
+              <button className="hb-zwin" onClick={() => setTemat('all')} type="button">
+                Pokaż wszystkie tematy
+              </button>
+            </p>
+          ) : (
+            <p>Nie ma hasła o tym temacie. Spróbujcie innego słowa albo wybierzcie inny temat.</p>
+          )}
+        </div>
+      )}
 
       <div className="hb-hasla-l">
         {lista.slice(0, ile).map((k) => (
@@ -77,14 +138,14 @@ export function KnowledgeExplorer({ ids, wStrefie = false }: { ids?: string[]; w
                 {k.zmiana === 'nowe' ? 'Nowe od 7 maja 2026' : 'Zmienione w 2026'}
               </span>
             )}
-            <h3>{k.tytul}</h3>
-            <p>{k.tekst}</p>
+            <h3><Podswietl q={q} tekst={k.tytul} /></h3>
+            <p><Podswietl q={q} tekst={k.tekst} /></p>
             {k.cytaty.length > 0 ? (
               <details className="hb-przepis">
                 <summary>Zobaczcie przepis</summary>
                 {k.cytaty.map((c, i) => (
                   <blockquote className="hb-cytat" key={i}>
-                    „{c.tekst}”
+                    „<Podswietl q={q} tekst={c.tekst} />”
                     <cite>{nazwaZrodla(c.zrodlo)}{c.lok ? `, ${c.lok}` : ''}</cite>
                   </blockquote>
                 ))}

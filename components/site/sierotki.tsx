@@ -9,25 +9,24 @@ import { usePathname } from 'next/navigation';
 
 const LITERY: Record<string, string> = { pl: 'aiouwzAIOUWZ', ru: 'авиксоуяАВИКСОУЯ' };
 const KORZENIE = '#tresc, .hb-stopka';
-const POMIN = 'script,style,textarea,input,select,code,pre,[contenteditable]';
+const POMIN = 'script,style,textarea,input,select,code,pre,[contenteditable],mark,[data-podswietl]';
+
+export function poprawSierotkiTekst(v: string, lang = 'pl'): string {
+  const litery = LITERY[lang];
+  const jednoliterowe = litery ? new RegExp(`(^|[\\s(„«"])([${litery}]) +`, 'g') : null;
+  const liczby = /(\d) +(?=[^\s\d])/g;
+  let n = v;
+  if (jednoliterowe) {
+    // dwa przebiegi: „i w domu” ma dwa jednoliterowe słowa obok siebie
+    n = n.replace(jednoliterowe, '$1$2\u00A0').replace(jednoliterowe, '$1$2\u00A0');
+  }
+  return n.replace(liczby, '$1\u00A0');
+}
 
 export function useSierotki(lang: string, korzenie: string = KORZENIE) {
   const sciezka = usePathname();
 
   useEffect(() => {
-    const litery = LITERY[lang];
-    const jednoliterowe = litery ? new RegExp(`(^|[\\s(„«"])([${litery}]) +`, 'g') : null;
-    const liczby = /(\d) +(?=[^\s\d])/g;
-
-    const popraw = (v: string) => {
-      let n = v;
-      if (jednoliterowe) {
-        // dwa przebiegi: „i w domu” ma dwa jednoliterowe słowa obok siebie
-        n = n.replace(jednoliterowe, '$1$2 ').replace(jednoliterowe, '$1$2 ');
-      }
-      return n.replace(liczby, '$1 ');
-    };
-
     const przejdz = () => {
       document.querySelectorAll(korzenie).forEach((korzen) => {
         const w = document.createTreeWalker(korzen, NodeFilter.SHOW_TEXT, {
@@ -41,7 +40,7 @@ export function useSierotki(lang: string, korzenie: string = KORZENIE) {
         while (w.nextNode()) wezly.push(w.currentNode as Text);
         wezly.forEach((t) => {
           const v = t.nodeValue || '';
-          const n = popraw(v);
+          const n = poprawSierotkiTekst(v, lang);
           if (n !== v) t.nodeValue = n;
         });
       });

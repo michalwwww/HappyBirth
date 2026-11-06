@@ -772,7 +772,9 @@ html.dark .hb-modul-tyt{color:var(--hb-noc3);background:linear-gradient(180deg,c
 .hb-lekcja-nr{font:800 13px/1 var(--hb-t);color:var(--hb-ink3);font-variant-numeric:tabular-nums}
 .hb-lekcja-t{font-weight:600;line-height:1.4}
 .hb-lekcja-czas{font:700 13.5px/1 var(--hb-t);color:var(--hb-ink2);font-variant-numeric:tabular-nums;white-space:nowrap}
-.hb-lekcja mark{background:color-mix(in srgb,var(--hb-zol) 55%,transparent);color:inherit;border-radius:4px;padding:0 2px}
+.hb-lekcja mark,.hb-modul-opis mark,.hb-haslo mark{background:color-mix(in srgb,var(--hb-zol) 55%,transparent);color:inherit;border-radius:4px;padding:0 2px}
+.hb-modul-tyt mark{background:rgba(255,255,255,.28);color:inherit;border-radius:4px;padding:0 3px;text-decoration:underline;text-underline-offset:.14em}
+html.dark .hb-modul-tyt mark{background:rgba(0,0,0,.22)}
 .hb-brak{padding:28px;text-align:center;color:var(--hb-ink2)}
 /* przycisk na końcu strony (Program, Wiedza): bez ceny, na środku */
 .hb-cta-srodek{display:flex;justify-content:center;margin-top:clamp(36px,4.4vw,56px)}

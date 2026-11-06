@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { medicineCabinetItems, getLessonById } from '@/lib/course-data';
 import { Search, Sparkles, ArrowRight, Play, Tag } from 'lucide-react';
+import { czyTekstPasuje } from '@/lib/search-utils';
 
 export function DigitalMedicineCabinet() {
   const pathname = usePathname();
@@ -28,9 +29,8 @@ export function DigitalMedicineCabinet() {
   const filteredItems = medicineCabinetItems.filter((item) => {
     const matchesCategory = activeCategory === 'Wszystko' || item.category === activeCategory;
     const matchesSearch =
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.tag.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.previewText.toLowerCase().includes(searchQuery.toLowerCase());
+      !searchQuery.trim() ||
+      czyTekstPasuje(searchQuery, item.title, item.tag, item.previewText, item.category);
     return matchesCategory && matchesSearch;
   });
 

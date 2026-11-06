@@ -9,6 +9,11 @@ import { BuyCourseButton } from '@/components/buy-button';
 import { Search, Filter, Sparkles, CheckCircle2, ArrowLeft, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { isCourseUnlockedLocally } from '@/lib/promo';
+import {
+  DODATKOWE_SLOWO_KLUCZOWE_LEKCJI,
+  czyTekstPasuje,
+  rozpoznajNumerLekcji,
+} from '@/lib/search-utils';
 
 function StrefaLessonsContent() {
   const searchParams = useSearchParams();
@@ -30,12 +35,18 @@ function StrefaLessonsContent() {
     }
   }, [searchParams]);
 
+  const nrSzukany = rozpoznajNumerLekcji(search);
   const filteredLessons = lessons.filter((l) => {
     const matchesStage = selectedStage === 'all' || l.stageId === selectedStage;
     const matchesSearch =
-      l.title.toLowerCase().includes(search.toLowerCase()) ||
-      l.description.toLowerCase().includes(search.toLowerCase()) ||
-      l.lessonNumber.toString() === search.trim();
+      !search.trim() ||
+      (nrSzukany !== null && l.lessonNumber === nrSzukany) ||
+      czyTekstPasuje(
+        search,
+        l.title,
+        l.description,
+        DODATKOWE_SLOWO_KLUCZOWE_LEKCJI[l.lessonNumber]
+      );
     return matchesStage && matchesSearch;
   });
 
