@@ -234,7 +234,7 @@ export default function KalkulatorWyprawkiPage() {
                     placeholder="np. Kasia"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] text-sm focus:outline-none focus:border-[#DA0271]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] bg-white dark:bg-[#1B1424] text-[#4A3A5E] dark:text-[#F4EEF7] text-base sm:text-sm focus:outline-none focus:border-[#DA0271]"
                   />
                 </div>
 
@@ -248,7 +248,7 @@ export default function KalkulatorWyprawkiPage() {
                     placeholder="twoj@email.pl"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] text-sm focus:outline-none focus:border-[#DA0271]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] bg-white dark:bg-[#1B1424] text-[#4A3A5E] dark:text-[#F4EEF7] text-base sm:text-sm focus:outline-none focus:border-[#DA0271]"
                   />
                 </div>
               </div>
@@ -263,7 +263,7 @@ export default function KalkulatorWyprawkiPage() {
                     required
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] text-sm text-[#6E5C7D] dark:text-[#D5CAE0] focus:outline-none focus:border-[#DA0271]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] bg-white dark:bg-[#1B1424] text-base sm:text-sm text-[#6E5C7D] dark:text-[#D5CAE0] focus:outline-none focus:border-[#DA0271]"
                   />
                 </div>
 
@@ -274,7 +274,7 @@ export default function KalkulatorWyprawkiPage() {
                   <select
                     value={season}
                     onChange={(e) => setSeason(e.target.value as any)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] text-sm bg-white dark:bg-[#2C2240] focus:outline-none focus:border-[#DA0271]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] text-base sm:text-sm bg-white dark:bg-[#2C2240] focus:outline-none focus:border-[#DA0271]"
                   >
                     <option value="jesien_zima">Jesień / Zima (ciepły śpiworek do fotelika)</option>
                     <option value="wiosna_lato">Wiosna / Lato (lekki muślin i bambus)</option>
@@ -326,8 +326,8 @@ export default function KalkulatorWyprawkiPage() {
           </div>
         ) : (
           <div className="space-y-8">
-            <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-3 text-xs sm:text-sm text-emerald-950">
+            <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3 text-xs sm:text-sm text-emerald-950 dark:text-emerald-100">
                 <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
                 <div>
                   <strong>Lista wyprawkowa dla {name || 'Ciebie'} została wygenerowana!</strong> Zaznacz skompletowane pozycje i zapisz listę jako PDF.
@@ -353,9 +353,9 @@ export default function KalkulatorWyprawkiPage() {
                     className={`p-5 rounded-2xl border transition-all cursor-pointer flex items-start justify-between gap-4 ${
                       item.essentialOnStart
                         ? isChecked
-                          ? 'bg-emerald-50/70 border-emerald-300'
+                          ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700/60'
                           : 'bg-white dark:bg-[#2C2240] border-[#EADFD3] dark:border-[#3B3050]'
-                        : 'bg-amber-50/60 border-amber-200'
+                        : 'bg-amber-50/60 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50'
                     }`}
                   >
                     <div className="flex items-start gap-3">

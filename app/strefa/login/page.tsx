@@ -168,7 +168,7 @@ export default function StrefaLoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="twoj-email@example.com"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)] text-sm text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-kosc)]"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)] text-base sm:text-sm text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-kosc)]"
                     />
                   </div>
                 </div>

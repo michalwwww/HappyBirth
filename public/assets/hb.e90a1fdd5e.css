@@ -114,7 +114,7 @@ section[id],[id].kotwica{scroll-margin-top:92px}
 
 /* nawigacja */
 /* nagłówek w ciemniejszym odcieniu ecru, półprzezroczysty (tura 2, sekcja 2) */
-.nav{position:sticky;top:0;z-index:50;background:rgba(239,229,216,.82);backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid var(--linia2)}
+.nav{position:sticky;top:0;z-index:50;background:rgba(239,229,216,.82);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid var(--linia2)}
 @supports not (backdrop-filter:blur(2px)){.nav{background:rgba(239,229,216,.97)}}
 /* Logo, menu i KUP w jednym rzędzie: logo trzyma się przycisków, menu rozkłada się
    na środku, KUP stoi osobno po prawej (tura 3, sekcja Menu). */

@@ -153,7 +153,7 @@ export default function PublicPlanPoroduLeadPage() {
                   placeholder="np. Anna"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] bg-white dark:bg-[#1B1424] text-[#4A3A5E] dark:text-[#F4EEF7] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-base sm:text-sm"
                 />
               </div>
 
@@ -167,7 +167,7 @@ export default function PublicPlanPoroduLeadPage() {
                   placeholder="twoj.mail@domena.pl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] bg-white dark:bg-[#1B1424] text-[#4A3A5E] dark:text-[#F4EEF7] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-base sm:text-sm"
                 />
               </div>
 
@@ -180,7 +180,7 @@ export default function PublicPlanPoroduLeadPage() {
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-sm text-[#6E5C7D] dark:text-[#D5CAE0]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#EADFD3] dark:border-[#3B3050] bg-white dark:bg-[#1B1424] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-base sm:text-sm text-[#6E5C7D] dark:text-[#D5CAE0]"
                   />
                 </div>
                 <p className="text-[11px] text-[#7A6786] dark:text-[#B9ACC8]">
@@ -237,7 +237,7 @@ export default function PublicPlanPoroduLeadPage() {
         ) : (
           /* Faza 2: Odsłonięty Pełny Kreator (Po wypełnieniu formularza) */
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-center justify-between gap-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-100 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
                 <div className="text-xs sm:text-sm">

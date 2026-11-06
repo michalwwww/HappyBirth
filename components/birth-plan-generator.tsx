@@ -484,7 +484,11 @@ export function BirthPlanGenerator() {
     saveData(initial, langMode);
   };
 
+  const [inAppPrintHint, setInAppPrintHint] = useState(false);
   const handlePrint = () => {
+    if (typeof navigator !== 'undefined' && /Instagram|FBAN|FBAV|TikTok|BytedanceWebview|Musical\.ly/i.test(navigator.userAgent)) {
+      setInAppPrintHint(true);
+    }
     saveData(selectedOptions, langMode);
     window.print();
   };
@@ -557,9 +561,14 @@ export function BirthPlanGenerator() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2 text-[11px] text-[color:var(--hb-ink2)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_80%,transparent)] pt-1">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-[color:var(--hb-ink2)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_80%,transparent)] pt-1">
           <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>{activeMeta.legalNote}</span>
+        {inAppPrintHint && (
+          <div className="w-full mt-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-100 text-xs leading-relaxed">
+            <strong>Wskazówka dla przeglądarek w aplikacjach (Instagram / Facebook / TikTok):</strong> Jeśli systemowe okno zapisu PDF nie otworzyło się automatycznie, kliknij ikonę menu <strong>⋯</strong> w prawym górnym rogu ekranu i wybierz <strong>„Otwórz w przeglądarce zewnętrznej” (Safari / Chrome)</strong> — Twoje zaznaczone opcje są bezpiecznie zapisane.
+          </div>
+        )}
         </div>
       </div>
 
@@ -600,7 +609,7 @@ export function BirthPlanGenerator() {
                 saveData();
               }}
               placeholder="np. Anna Kowalska"
-              className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
+              className="w-full text-base sm:text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
             />
           </div>
 
@@ -616,7 +625,7 @@ export function BirthPlanGenerator() {
                 saveData();
               }}
               placeholder="np. Piotr Kowalski"
-              className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
+              className="w-full text-base sm:text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
             />
           </div>
 
@@ -632,7 +641,7 @@ export function BirthPlanGenerator() {
                 saveData();
               }}
               placeholder="np. St Mary's / Kreißsaal / Szpital"
-              className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
+              className="w-full text-base sm:text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
             />
           </div>
 
@@ -647,7 +656,7 @@ export function BirthPlanGenerator() {
                 setDueDate(e.target.value);
                 saveData();
               }}
-              className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
+              className="w-full text-base sm:text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
             />
           </div>
         </div>

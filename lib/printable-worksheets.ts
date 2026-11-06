@@ -141,5 +141,19 @@ export function openPrintableLessonWorksheet(lesson: Lesson, attachmentName?: st
   if (win) {
     win.document.write(html);
     win.document.close();
+  } else {
+    try {
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `karta-pracy-lekcja-${lesson.lessonNumber}-happybirth.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+    } catch {
+      window.print();
+    }
   }
 }

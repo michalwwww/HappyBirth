@@ -806,14 +806,14 @@ export function HomeVariantV1() {
 
       {/* Kompaktowy pasek narzędziowy */}
       <div className="bg-[#20071E] dark:bg-[#0F020E] text-[#EAD5E5] border-b border-[#3D0E39] px-3 sm:px-6 py-1.5 text-xs">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center space-x-2 shrink-0">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+          <div className="hidden md:flex items-center space-x-2 shrink-0">
             <span className="w-2 h-2 rounded-full bg-[#DA0271]"></span>
             <span className="font-semibold text-white">{t.ribbonTitle}</span>
             <span className="text-[#EAD5E5]/80 hidden sm:inline">{t.ribbonDesc}</span>
           </div>
 
-          <div className="flex items-center gap-2 text-[11px] shrink-0">
+          <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2 text-[11px] ml-auto">
             <LanguageSwitcher />
             <ThemeToggle />
             <button
@@ -1335,7 +1335,7 @@ export function HomeVariantV1() {
                               handleApplyPromo();
                             }
                           }}
-                          className="flex-1 px-3 py-2 text-xs font-semibold uppercase rounded-xl border border-[#EAE3DB] dark:border-[#3A1038] bg-[#FDFAF6] dark:bg-[#250A24] text-[#1A1512] dark:text-white focus:outline-none focus:border-[#DA0271]"
+                          className="flex-1 min-w-0 px-3 py-2 text-base sm:text-xs font-semibold uppercase rounded-xl border border-[#EAE3DB] dark:border-[#3A1038] bg-[#FDFAF6] dark:bg-[#250A24] text-[#1A1512] dark:text-white focus:outline-none focus:border-[#DA0271]"
                         />
                         <button
                           type="button"
