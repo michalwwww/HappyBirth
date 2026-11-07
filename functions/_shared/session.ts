@@ -91,10 +91,20 @@ export async function getEdgeSession(
   return verifySignedSessionToken(rawToken, env?.SESSION_SECRET || 'happybirth-edge-secret-2026');
 }
 
-export function formatSessionSetCookie(token: string): string {
-  return `${COOKIE_NAME}=${encodeURIComponent(token)}; Max-Age=${SESSION_TTL_SECONDS}; Path=/; HttpOnly; Secure; SameSite=Lax`;
+export function formatSessionSetCookie(token: string, host?: string): string {
+  const cleanHost = (host || '').toLowerCase().split(':')[0];
+  const domainAttr =
+    cleanHost === 'happybirth.pl' || cleanHost.endsWith('.happybirth.pl')
+      ? '; Domain=.happybirth.pl'
+      : '';
+  return `${COOKIE_NAME}=${encodeURIComponent(token)}; Max-Age=${SESSION_TTL_SECONDS}; Path=/${domainAttr}; HttpOnly; Secure; SameSite=Lax`;
 }
 
-export function formatClearSessionCookie(): string {
-  return `${COOKIE_NAME}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax`;
+export function formatClearSessionCookie(host?: string): string {
+  const cleanHost = (host || '').toLowerCase().split(':')[0];
+  const domainAttr =
+    cleanHost === 'happybirth.pl' || cleanHost.endsWith('.happybirth.pl')
+      ? '; Domain=.happybirth.pl'
+      : '';
+  return `${COOKIE_NAME}=; Max-Age=0; Path=/${domainAttr}; HttpOnly; Secure; SameSite=Lax`;
 }

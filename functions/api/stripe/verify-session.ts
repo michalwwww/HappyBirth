@@ -138,6 +138,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       { userId, email: email || 'student@happybirth.pl', role: 'student' },
       env.SESSION_SECRET
     );
+    const host = request.headers.get('host') || undefined;
 
     return new Response(
       JSON.stringify({
@@ -152,7 +153,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         status: 200,
         headers: {
           'Content-Type': 'application/json',
-          'Set-Cookie': formatSessionSetCookie(signedCookieToken),
+          'Set-Cookie': formatSessionSetCookie(signedCookieToken, host),
         },
       }
     );

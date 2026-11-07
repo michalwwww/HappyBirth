@@ -4,6 +4,13 @@ interface Env {
   RESEND_FROM?: string;
 }
 
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+]);
+
 export async function onRequestPost(context: { request: Request; env: Env }): Promise<Response> {
   try {
     const { request, env } = context;
@@ -19,10 +26,39 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       );
     }
 
+    const isTeamEmail = TEAM_WHITELIST_EMAILS.has(email);
     const token = crypto.randomUUID();
 
     if (env.DB) {
       try {
+        if (!isTeamEmail) {
+          const accessRow = await env.DB.prepare(
+            `SELECT u.id
+             FROM users u
+             LEFT JOIN enrollments e ON e.user_id = u.id
+             LEFT JOIN orders o ON (o.user_id = u.id OR o.customer_email = u.email)
+             WHERE u.email = ?
+               AND (
+                 (e.status = 'active' AND (e.expires_at IS NULL OR datetime(e.expires_at) > datetime('now')))
+                 OR o.status IN ('paid', 'partially_refunded')
+                 OR u.role IN ('admin', 'partner')
+               )
+             LIMIT 1`
+          )
+            .bind(email)
+            .first();
+
+          if (!accessRow) {
+            return new Response(
+              JSON.stringify({
+                error:
+                  'Nie znaleźliśmy aktywnego kursu dla podanego adresu e-mail. Upewnij się, że wpisujesz adres użyty podczas zakupu lub kup dostęp do kursu.',
+              }),
+              { status: 403, headers: { 'Content-Type': 'application/json' } }
+            );
+          }
+        }
+
         await env.DB.prepare(
           `INSERT INTO auth_tokens (token, email, expires_at, used)
            VALUES (?, ?, datetime('now', '+24 hours'), 0)`

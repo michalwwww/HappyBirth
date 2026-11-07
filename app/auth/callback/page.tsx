@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCourseProgress } from '@/lib/progress';
 import { Sparkles, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -10,7 +9,6 @@ function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const { changeRole } = useCourseProgress();
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -22,16 +20,13 @@ function AuthCallbackContent() {
     }
 
     const token = searchParams.get('token');
-    const nextUrl = searchParams.get('next') || '/strefa';
-
     if (token) {
       window.location.href = `/api/auth/verify?token=${encodeURIComponent(token)}`;
       return;
     }
 
-    changeRole('student');
-    router.replace(nextUrl);
-  }, [searchParams, router, changeRole]);
+    router.replace('/strefa/login');
+  }, [searchParams, router]);
 
   if (errorMsg) {
     return (

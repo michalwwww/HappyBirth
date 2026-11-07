@@ -1,6 +1,6 @@
 // Cloudflare Pages Functions - Native Edge Middleware
 // Wymusza twardą separację subdomen (strefa.happybirth.pl, partnerzy.happybirth.pl, afiliacja.happybirth.pl),
-// chroni płatne lekcje wideo (lekcja-02..52) za Paywallem sesyjnym HMAC-SHA256,
+// chroni płatne lekcje wideo za Paywallem sesyjnym HMAC-SHA256,
 // dodaje nagłówki bezpieczeństwa OWASP, blokuje boty reklamowe Meta/Google przed skanowaniem strefy medycznej
 // i afiliacji ([E5] & Zero-Burn Guardrails) oraz obsługuje 30-dniowe ciasteczko afiliacyjne hb_aff_ref ([D2]).
 
@@ -19,6 +19,7 @@ interface PagesContext {
 
 const AFFILIATE_COOKIE_MAX_AGE = 30 * 24 * 60 * 60; // 30 dni
 const AD_BOT_REGEX = /Facebot|facebookexternalhit|Meta-ExternalAgent|AdsBot-Google|Mediapartners-Google|Bytespider|TikTok/i;
+const FREE_PREVIEW_LESSONS = new Set(['lekcja-01', 'lekcja-06', 'lekcja-26', 'lekcja-40']);
 
 function withSecurityAndTrackingHeaders(
   response: Response,
@@ -52,11 +53,11 @@ function withSecurityAndTrackingHeaders(
 }
 
 function isProtectedPaidLessonPath(pathname: string): boolean {
-  // lekcja-01 jest otwartą lekcją pokazową; lekcje 02..52 wymagają aktywnej sesji kursantki
+  // lekcja-01, lekcja-06, lekcja-26 i lekcja-40 są otwartymi lekcjami pokazowymi; pozostałe lekcje wymagają aktywnej sesji kursantki
   const clean = pathname.replace(/\.(html|txt)$/i, '');
   const m = clean.match(/^\/(?:strefa\/)?lekcja\/(lekcja-\d+)/);
   if (!m) return false;
-  return m[1] !== 'lekcja-01';
+  return !FREE_PREVIEW_LESSONS.has(m[1]);
 }
 
 const STATIC_ASSET_EXT_REGEX =
@@ -158,7 +159,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       return notFoundResponse();
     }
 
-    // Paywall na poziomie Edge dla płatnych lekcji wideo (lekcja-02 .. lekcja-52)
+    // Paywall na poziomie Edge dla płatnych lekcji wideo
     if (isProtectedPaidLessonPath(url.pathname)) {
       const session = await getEdgeSession(context.request, context.env);
       if (!session) {
@@ -202,7 +203,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   }
 
   if (isMainProdHost) {
-    // Całkowita blokada podstron /afiliacja i /partnerzy na domenie głównej happybirth.pl (brak przekierowań łączących domenę B2C z afiliacją)
+    // Całkowita blokada podstron /afiliacja i /partnerzy na domenie głównej happybirth.pl
     if (isAfiliacjaPath || isPartnerzyPath) {
       return notFoundResponse();
     }

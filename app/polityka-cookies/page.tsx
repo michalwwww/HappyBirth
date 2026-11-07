@@ -2,10 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PageShell, Okruszki } from '@/components/site/page-shell';
 
-// Polityka cookies: projekt z naszej wersji v1 (24.09.2026) w układzie v3. Poprawione tylko fakty
-// sprzeczne z obecną stroną (baner zgód istnieje, pamięć przeglądarki, sesja logowania, brak lekcji
-// bezpłatnej). Dokument nadal czeka na weryfikację prawnika.
-
 export const metadata: Metadata = {
   title: 'Polityka cookies · HappyBirth',
   description: 'Jakie pliki cookies i dane w pamięci przeglądarki zapisuje strona HappyBirth.',
@@ -19,8 +15,9 @@ export default function PolitykaCookiesPage() {
         <div className="hb-wrap">
           <Okruszki biezaca="Polityka cookies" />
           <h1 className="hb-h1">Polityka cookies HappyBirth</h1>
-          <p className="hb-uwaga" style={{ marginTop: 22, maxWidth: 760 }}>
-            <b>Projekt dokumentu.</b> Do weryfikacji przez prawnika przed publikacją. Wersja z 13 października 2026.
+          <p className="hb-lead">
+            Administratorem serwisu <strong>happybirth.pl</strong> oraz <strong>strefa.happybirth.pl</strong> jest{' '}
+            <strong>KLARSOLUTIONS Sp. z o.o.</strong> z siedzibą w Poznaniu (ul. Śląska 14, 60-614 Poznań, KRS: 0001268396, NIP: 7812118273, REGON: 545782779).
           </p>
         </div>
       </section>
@@ -29,8 +26,8 @@ export default function PolitykaCookiesPage() {
           <div className="hb-proza">
             <h2>1. Krótko</h2>
             <p>
-              Strona happybirth.pl nie używa plików cookies analitycznych ani reklamowych. Baner przy pierwszej wizycie pyta o zgodę i zapisuje
-              Twój wybór. Jeśli kiedyś dodamy narzędzia, które wymagają zgody, załadują się dopiero po jej udzieleniu.
+              Strona happybirth.pl domyślnie korzysta wyłącznie z niezbędnych technicznych plików cookies zapewniających bezpieczeństwo i działanie sesji. Baner przy pierwszej wizycie pyta o zgodę i zapisuje
+              Twój wybór. Wewnątrz zamkniętej Strefy Kursantki (<strong>strefa.happybirth.pl</strong>) obowiązuje całkowity zakaz ładowania pikseli reklamowych podmiotów trzecich.
             </p>
             <h2>2. Co może zapisać się w Twojej przeglądarce</h2>
             <div className="hb-tabela">
@@ -47,8 +44,8 @@ export default function PolitykaCookiesPage() {
                   </tr>
                   <tr>
                     <td>Plik cookie sesji logowania (hb_session)</td>
-                    <td>HappyBirth</td>
-                    <td>utrzymanie zalogowania w strefie kursu</td>
+                    <td>HappyBirth (KLARSOLUTIONS Sp. z o.o.)</td>
+                    <td>utrzymanie bezpiecznego zalogowania w strefie kursu (podpis HMAC-SHA256)</td>
                     <td>nie, jest niezbędny do korzystania ze strefy kursu</td>
                   </tr>
                   <tr>

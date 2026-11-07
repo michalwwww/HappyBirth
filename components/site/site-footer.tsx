@@ -1,9 +1,8 @@
 'use client';
 
-// Wspólna stopka stron publicznych v3 (poprawki z 04.11.2026, X1: mniejsza i w kolorze palety): jeden kolor, cały tekst
-// i logo w bieli. Znak: logo, claim DOŚWIADCZENIE MAMY wersalikami i oś czasu jako część logo
-// w białych kreskach, pod nim kolorowe znaki Instagrama, TikToka i Facebooka. Trzy kolumny odnośników,
-// dane spółki w jednej linii i na samym dole informacja o wizualizacjach AI i numerze 112.
+// Wspólna stopka stron publicznych v3: jeden kolor, cały tekst i logo w bieli.
+// Znak: logo, claim DOŚWIADCZENIE MAMY wersalikami i oś czasu jako część logo w białych kreskach,
+// pod nim kolorowe znaki Instagrama, TikToka i Facebooka. Trzy kolumny odnośników, dane spółki w jednej linii.
 import React from 'react';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n';
@@ -16,7 +15,6 @@ export function SiteFooter({ multilingual = false }: { multilingual?: boolean })
   const t = SHELL[multilingual ? lang : 'pl'] || SHELL.pl;
   const f = t.footer;
   const l = f.linki;
-  // adres e-mail w danych spółki jako odnośnik
   const [firma, email] = f.firma.split(' · kontakt@happybirth.pl');
 
   return (
@@ -45,8 +43,8 @@ export function SiteFooter({ multilingual = false }: { multilingual?: boolean })
             <h2>{f.kolumny.wspolpraca}</h2>
             <ul>
               <li><Link href="/o-nas">{l.oNas}</Link></li>
-              <li><a href="/afiliacja">{l.afiliacja}</a></li>
-              <li><a href="/partnerzy">{l.b2b}</a></li>
+              <li><a href="https://afiliacja.happybirth.pl">{l.afiliacja}</a></li>
+              <li><a href="https://partnerzy.happybirth.pl">{l.b2b}</a></li>
             </ul>
           </div>
           <div>
@@ -54,7 +52,7 @@ export function SiteFooter({ multilingual = false }: { multilingual?: boolean })
             <ul>
               <li><Link href="/regulamin">{l.regulamin}</Link></li>
               <li><Link href="/polityka-prywatnosci">{l.prywatnosc}</Link></li>
-              <li><a href="/polityka-prywatnosci#cookies">{l.cookies}</a></li>
+              <li><Link href="/polityka-cookies">{l.cookies}</Link></li>
               <li><Link href="/odstap-od-umowy">{l.odstap}</Link></li>
             </ul>
           </div>

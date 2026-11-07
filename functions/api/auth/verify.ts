@@ -11,7 +11,8 @@ interface Env {
 async function verifyMagicTokenAndIssueCookie(
   token: string,
   emailFallback: string,
-  env: Env
+  env: Env,
+  host?: string
 ): Promise<{ ok: boolean; error?: string; userId?: string; email?: string; setCookie?: string }> {
   if (!token) {
     return { ok: false, error: 'Brak tokenu weryfikacyjnego.' };
@@ -68,17 +69,18 @@ async function verifyMagicTokenAndIssueCookie(
     ok: true,
     userId,
     email: verifiedEmail,
-    setCookie: formatSessionSetCookie(signedCookieToken),
+    setCookie: formatSessionSetCookie(signedCookieToken, host),
   };
 }
 
 export async function onRequestGet(context: { request: Request; env: Env }): Promise<Response> {
   const { request, env } = context;
   const url = new URL(request.url);
+  const host = request.headers.get('host') || undefined;
   const token = (url.searchParams.get('token') || '').trim();
   const email = (url.searchParams.get('email') || '').trim().toLowerCase();
 
-  const res = await verifyMagicTokenAndIssueCookie(token, email, env);
+  const res = await verifyMagicTokenAndIssueCookie(token, email, env, host);
   if (!res.ok || !res.setCookie) {
     return new Response(null, {
       status: 302,
@@ -100,13 +102,14 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
 export async function onRequestPost(context: { request: Request; env: Env }): Promise<Response> {
   try {
     const { request, env } = context;
+    const host = request.headers.get('host') || undefined;
     const body: any = await request.json().catch(() => ({}));
     const token = String(body.token || '').trim();
     const emailParam = String(body.email || '')
       .trim()
       .toLowerCase();
 
-    const res = await verifyMagicTokenAndIssueCookie(token, emailParam, env);
+    const res = await verifyMagicTokenAndIssueCookie(token, emailParam, env, host);
     if (!res.ok || !res.setCookie) {
       return new Response(
         JSON.stringify({ success: false, error: res.error || 'Błąd weryfikacji tokenu.' }),

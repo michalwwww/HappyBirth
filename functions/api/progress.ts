@@ -22,18 +22,24 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
   }
 
   try {
-    // [C1] Weryfikacja 18-miesięcznego okresu dostępu (548 dni od zakupu)
+    // [C1] Weryfikacja statusu i 18-miesięcznego okresu dostępu (548 dni od zakupu)
     const enrollment = await env.DB.prepare(
       `SELECT status, expires_at FROM enrollments WHERE user_id = ? ORDER BY created_at DESC LIMIT 1`
     )
       .bind(session.userId)
       .first();
 
-    if (enrollment?.expires_at && new Date(enrollment.expires_at).getTime() < Date.now()) {
+    if (
+      enrollment?.status === 'refunded' ||
+      (enrollment?.expires_at && new Date(enrollment.expires_at).getTime() < Date.now())
+    ) {
       return new Response(
         JSON.stringify({
           expired: true,
-          error: 'Twój 18-miesięczny dostęp do kursu wygasł.',
+          error:
+            enrollment?.status === 'refunded'
+              ? 'Dostęp do kursu został wycofany w związku ze zwrotem zamówienia.'
+              : 'Twój 18-miesięczny dostęp do kursu wygasł.',
           completedLessons: [],
           positions: {},
           lessonPositions: {},

@@ -10,9 +10,9 @@ export function getStoredCompletedLessons(): string[] {
   if (typeof window === 'undefined') return [];
   try {
     const data = localStorage.getItem(COMPLETED_LESSONS_KEY);
-    return data ? JSON.parse(data) : ['lekcja-01']; // default 1st completed for demo
+    return data ? JSON.parse(data) : [];
   } catch {
-    return ['lekcja-01'];
+    return [];
   }
 }
 
@@ -49,27 +49,32 @@ export function useCourseProgress() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // 1. Natychmiast załaduj z localStorage (domyślnie 'guest', lub 'student' jeśli hb_unlocked)
     const localLessons = getStoredCompletedLessons();
     setCompletedLessons(localLessons);
-    // Wolny dostęp zespołu: domyślna rola to student
-    const storedRole = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || 'student';
+
+    const isUnlocked = localStorage.getItem('hb_unlocked') === 'true';
+    const storedRole = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || (isUnlocked ? 'student' : 'guest');
     setRole(storedRole);
     setIsLoaded(true);
 
-    // Weryfikacja ze stanem serwera
+    // Weryfikacja ze stanem serwera (/api/auth/me)
     fetch('/api/auth/me')
       .then((res) => res.json())
       .then((data) => {
-        if (data.authenticated && (data.user?.hasActiveCourse || data.user?.role === 'student' || data.user?.role === 'partner')) {
+        if (data.authenticated && data.user?.hasActiveCourse) {
           const validRole = (data.user.role as UserRole) || 'student';
           setRole(validRole);
           localStorage.setItem(CURRENT_ROLE_KEY, validRole);
+          localStorage.setItem('hb_unlocked', 'true');
+        } else if (data.expired) {
+          setRole('guest');
+          localStorage.removeItem(CURRENT_ROLE_KEY);
+          localStorage.removeItem('hb_unlocked');
         }
       })
       .catch(() => {});
 
-    // 2. Pobierz postępy z Cloudflare D1 i połącz
+    // Pobierz postępy z Cloudflare D1 i połącz
     fetch('/api/progress')
       .then((res) => res.json())
       .then((data) => {

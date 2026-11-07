@@ -6,14 +6,13 @@ import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/site/logo';
 import { useCourseProgress } from '@/lib/progress';
 import { BuyCourseButton } from '@/components/buy-button';
-import { 
-  Mail, 
-  ArrowRight, 
-  ShieldCheck, 
-  Heart, 
-  Sparkles, 
-  CheckCircle2, 
-  AlertCircle 
+import {
+  Mail,
+  ArrowRight,
+  ShieldCheck,
+  Sparkles,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 
 export default function StrefaLoginPage() {
@@ -59,7 +58,7 @@ export default function StrefaLoginPage() {
           setLoadingProvider(null);
         });
     }
-  }, []);
+  }, [changeRole, router]);
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,23 +89,6 @@ export default function StrefaLoginPage() {
     }
   };
 
-  const handleQuickDemo = async (role: 'student' | 'partner') => {
-    changeRole(role);
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: role === 'partner' ? 'partner@happybirth.pl' : 'mwspace@gmail.com' }),
-      });
-      const data = await res.json();
-      if (data.devMagicLink) {
-        window.location.href = data.devMagicLink;
-        return;
-      }
-    } catch {}
-    router.push('/strefa');
-  };
-
   return (
     <div className="min-h-[85vh] flex flex-col items-center justify-center px-4 sm:px-6 py-12">
       <div className="w-full max-w-md space-y-8">
@@ -119,7 +101,7 @@ export default function StrefaLoginPage() {
             Strefa Rodziców
           </h1>
           <p className="text-sm text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
-            Zaloguj się, aby uzyskać dostęp do 52 lekcji VOD, personalizowanego harmonogramu i Kreatora Planu Porodu.
+            Zaloguj się adresem e-mail z zamówienia, aby otworzyć 52 lekcje VOD, spersonalizowany harmonogram i Kreator Planu Porodu.
           </p>
         </div>
 
@@ -141,16 +123,15 @@ export default function StrefaLoginPage() {
                 Sprawdź swoją skrzynkę!
               </h3>
               <p className="text-xs sm:text-sm text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] leading-relaxed">
-                Wysłaliśmy bezpieczny Magic Link na adres <strong>{email}</strong>. Kliknij w link w mailu, aby natychmiast wejść do kursu bez podawania hasła.
+                Wysłaliśmy bezpieczny jednorazowy link logowania na adres <strong>{email}</strong>. Kliknij w przycisk w wiadomości e-mail, aby wejść do kursu bez podawania hasła.
               </p>
-              <div className="pt-2">
-                <button
-                  onClick={() => handleQuickDemo('student')}
-                  className="w-full py-3 rounded-full bg-[color:var(--hb-mag)] hover:bg-[color:var(--hb-mag-h)] text-[color:var(--hb-cta-ink)] text-xs font-semibold transition-all shadow-md shadow-[color:color-mix(in_srgb,var(--hb-mag)_25%,transparent)]"
-                >
-                  Wejdź od razu do panelu (Demo)
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setSent(false)}
+                className="text-xs font-semibold text-[color:var(--hb-mag-t)] hover:underline"
+              >
+                Wpisz inny adres e-mail
+              </button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -189,32 +170,14 @@ export default function StrefaLoginPage() {
                 </button>
               </form>
 
-              {/* Szybki Dostęp Demo */}
-              <div className="pt-4 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] space-y-2">
-                <div className="text-[11px] text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] text-center relative">
-                  <span className="bg-[color:var(--hb-karta)] dark:bg-[color:var(--hb-karta)] px-2 relative z-10 font-medium uppercase tracking-wider">SZYBKI PODGLĄD DEMO</span>
-                  <div className="absolute inset-0 top-1/2 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickDemo('student')}
-                    className="py-2.5 px-3 rounded-xl bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] hover:bg-[color:var(--hb-mag)] text-[color:var(--hb-mag-t)] hover:text-[color:var(--hb-cta-ink)] border border-[color:color-mix(in_srgb,var(--hb-p1)_40%,transparent)] text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <Heart className="w-3.5 h-3.5" />
-                    <span>Dla Mamy</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickDemo('partner')}
-                    className="py-2.5 px-3 rounded-xl bg-[color:var(--hb-p2l)] dark:bg-[#3A321C] hover:bg-[color:var(--hb-p2)] dark:hover:bg-[color:var(--hb-p2t)] text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] hover:text-[color:var(--hb-ink)] dark:hover:text-[color:var(--hb-ink)] border border-[color:color-mix(in_srgb,var(--hb-p2)_50%,transparent)] dark:border-[color:color-mix(in_srgb,var(--hb-p2t)_50%,transparent)] text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Dla Taty</span>
-                  </button>
-                </div>
+              <div className="pt-3 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-center">
+                <Link
+                  href="/strefa/lekcja/lekcja-01"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] hover:text-[color:var(--hb-mag-t)] transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[color:var(--hb-mag-t)]" />
+                  <span>Obejrzyj bezpłatną lekcję próbną bez logowania &rarr;</span>
+                </Link>
               </div>
             </div>
           )}

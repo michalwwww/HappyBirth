@@ -1,6 +1,7 @@
 interface Env {
   DB?: any;
   RESEND_API_KEY?: string;
+  RESEND_FROM?: string;
 }
 
 export async function onRequestOptions(): Promise<Response> {
@@ -111,6 +112,64 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       }
     }
 
+    // Powiadomienie e-mail do Partnera oraz do Zespołu KLARSOLUTIONS Sp. z o.o.
+    if (env.RESEND_API_KEY) {
+      const fromAddress = env.RESEND_FROM || 'Program Partnerski HappyBirth <kontakt@happybirth.pl>';
+      await Promise.allSettled([
+        fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: fromAddress,
+            to: [email],
+            subject:
+              channel === 'afiliacja'
+                ? `Twoje konto afiliacyjne HappyBirth.pl (${promoCode}) jest gotowe!`
+                : 'Potwierdzenie zgłoszenia współpracy B2B — HappyBirth.pl',
+            html: `
+              <div style="font-family: sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px;">
+                <h2 style="margin-top: 0; color: #20071E;">Dziękujemy za zgłoszenie, ${fullName}!</h2>
+                ${
+                  channel === 'afiliacja'
+                    ? `<p style="font-size: 14px; color: #544A44; line-height: 1.6;">Twoje zgłoszenie do Programu Afiliacyjnego HappyBirth zostało zarejestrowane. Twój indywidualny kod rabatowy (-10% dla przyszłych mam) to: <strong>${promoCode}</strong>, a Twój link polecający (30-dniowe ciasteczko): <strong>https://happybirth.pl/?ref=${refSlug}</strong>.</p>`
+                    : `<p style="font-size: 14px; color: #544A44; line-height: 1.6;">Twoje zapytanie B2B zostało przekazane do opiekuna partnerstw w KLARSOLUTIONS Sp. z o.o. Skontaktujemy się z Tobą w ciągu 1 dnia roboczego.</p>`
+                }
+                <p style="font-size: 11.5px; color: #867A72; margin-top: 20px;">KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań · KRS: 0001268396</p>
+              </div>
+            `,
+          }),
+        }),
+        fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: fromAddress,
+            to: ['kontakt@happybirth.pl'],
+            subject: `[Nowe zgłoszenie ${channel.toUpperCase()}] ${fullName} (${email})`,
+            html: `
+              <div style="font-family: sans-serif; font-size: 13px; color: #1A1512;">
+                <h3>Nowe zgłoszenie partnerskie (${channel})</h3>
+                <p><strong>Imię i nazwisko:</strong> ${fullName}</p>
+                <p><strong>E-mail:</strong> ${email}</p>
+                <p><strong>Firma / Gabinet:</strong> ${companyOrBrand || '-'}</p>
+                <p><strong>Telefon:</strong> ${phone || '-'}</p>
+                <p><strong>Specjalizacja / Obszar:</strong> ${roleOrArea}</p>
+                <p><strong>Profil / WWW:</strong> ${profileUrl || '-'}</p>
+                <p><strong>Kod afiliacyjny:</strong> ${promoCode || '-'}</p>
+                <p><strong>Wiadomość:</strong> ${message || '-'}</p>
+              </div>
+            `,
+          }),
+        }),
+      ]);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -123,7 +182,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         suggestedAffiliateLink: refSlug ? `https://happybirth.pl/?ref=${refSlug}` : null,
         message:
           channel === 'afiliacja'
-            ? 'Twoje zgłoszenie do Programu Afiliacyjnego HappyBirth zostało przyjęte. W ciągu 24h prześlemy aktywny kod rabatowy (-10%) oraz bezpłatny dostęp recenzencki do 52 lekcji.'
+            ? 'Twoje zgłoszenie do Programu Afiliacyjnego HappyBirth zostało przyjęte. Na Twój e-mail wysłaliśmy aktywny kod rabatowy (-10%) oraz link partnerski.'
             : 'Twoje zapytanie B2B zostało zarejestrowane. Opiekun partnerstw KLARSOLUTIONS Sp. z o.o. skontaktuje się z Tobą w ciągu 1 dnia roboczego.',
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }

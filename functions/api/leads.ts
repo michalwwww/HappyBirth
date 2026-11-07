@@ -22,13 +22,6 @@ function buildEmailFooter(): string {
   `;
 }
 
-/**
- * [F4] 4-mailowa sekwencja edukacyjno-sprzedażowa CRM dopasowana do tygodnia ciąży (Etapy I–IV):
- * - Mail #1 (0h): Natychmiastowe dostarczenie narzędzia PDF + wskazówki do trymestru + 4 lekcje demo
- * - Mail #2 (+48h): 21 praw na porodówce 2026 (Dz.U. 2025 poz. 1525) i rola partnera
- * - Mail #3 (+96h): Pierwsze 72 godziny w domu z noworodkiem, laktacja bez bólu i kąpiel 37°C
- * - Mail #4 (+168h): Spokojne podsumowanie 52 lekcji 4K (489,00 zł brutto / 18 miesięcy dostępu)
- */
 function buildFourEmailCrmSequence(params: {
   name: string;
   gestationalWeek: number | null;
@@ -38,10 +31,10 @@ function buildFourEmailCrmSequence(params: {
   const week = params.gestationalWeek || 20;
   const baseTime = params.nowMs ?? Date.now();
 
-  let stageBadge = 'Etap II (Tydz. 14–27 · „Wreszcie lepiej”)';
-  let stageHeadline = 'Twój mikro-poradnik z Modułu 3: Komfort, kręgosłup, bezpieczna aktywność i oddech';
+  let stageBadge = 'Poradnik Położnych Mama Gaja · Część 1 z 4';
+  let stageHeadline = 'Twój mikro-poradnik: Komfort, bezpieczna wyprawka i świadomy poród';
   let stageBody =
-    'W drugim trymestrze warto zadbać o odciążenie miednicy i kręgosłupa oraz spokojny sen. W Module 3 kursu HappyBirth nasze fizjoterapeutki pokazują krok po kroku bezpieczne ćwiczenia na macie i piłce.';
+    'W kursie HappyBirth nasze położne, fizjoterapeutki uroginekologiczne i doradczynie laktacyjne prowadzą Cię krok po kroku przez każdy trymestr, poród oraz pierwszy rok życia maluszka.';
 
   if (week <= 13) {
     stageBadge = 'Etap I (Tydz. 1–13 · „Dwie kreski”)';
@@ -204,8 +197,6 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const {
       email,
       name,
-      dueDate,
-      gestationalWeek,
       rodoConsent = true,
       toolSource = 'plan-porodu',
     } = body;
@@ -226,41 +217,42 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
 
     const cleanEmail = email.trim().toLowerCase();
     const cleanName = typeof name === 'string' && name.trim() ? name.trim() : 'Przyszła Mamo';
-    const cleanDueDate = typeof dueDate === 'string' && dueDate.trim() ? dueDate.trim() : null;
+    const ipAddress = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || null;
     const userId = crypto.randomUUID();
     let isNewLead = true;
 
-    let computedWeek: number | null = typeof gestationalWeek === 'number' ? gestationalWeek : null;
-    if (!computedWeek && cleanDueDate) {
-      const dueTime = new Date(cleanDueDate).getTime();
-      if (!isNaN(dueTime)) {
-        const daysUntilDue = Math.round((dueTime - Date.now()) / (24 * 60 * 60 * 1000));
-        computedWeek = Math.max(1, Math.min(42, Math.round((280 - daysUntilDue) / 7)));
-      }
-    }
-
     if (env.DB) {
       try {
+        // Zapisz dowód zgody marketingowej w dedykowanej tabeli leads (RODO Art. 6 ust. 1 lit. a, zero danych o zdrowiu Art. 9)
+        await env.DB.prepare(
+          `INSERT INTO leads (id, email, first_name, source, consent_marketing, ip_address)
+           VALUES (?, ?, ?, ?, 1, ?)`
+        )
+          .bind(
+            crypto.randomUUID(),
+            cleanEmail,
+            cleanName,
+            toolSource === 'kalkulator-wyprawki' ? 'kalkulator_wyprawki' : 'plan_porodu_pdf',
+            ipAddress
+          )
+          .run();
+
         const existing = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(cleanEmail).first();
         if (!existing) {
           await env.DB.prepare(
-            `INSERT INTO users (id, email, full_name, due_date, role) VALUES (?, ?, ?, ?, 'lead')`
-          ).bind(userId, cleanEmail, cleanName, cleanDueDate).run();
+            `INSERT INTO users (id, email, full_name, role) VALUES (?, ?, ?, 'lead')`
+          ).bind(userId, cleanEmail, cleanName).run();
         } else {
           isNewLead = false;
-          if (cleanDueDate) {
-            await env.DB.prepare('UPDATE users SET due_date = COALESCE(due_date, ?) WHERE id = ?')
-              .bind(cleanDueDate, existing.id).run();
-          }
         }
       } catch (dbErr) {
-        console.error('Błąd zapisu w D1:', dbErr);
+        console.error('Błąd zapisu leada w D1:', dbErr);
       }
     }
 
     const sequence = buildFourEmailCrmSequence({
       name: cleanName,
-      gestationalWeek: computedWeek,
+      gestationalWeek: null,
       toolSource: toolSource === 'kalkulator-wyprawki' ? 'kalkulator-wyprawki' : 'plan-porodu',
     });
 
@@ -296,7 +288,6 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       JSON.stringify({
         success: true,
         userId,
-        computedWeek,
         toolSource,
         scheduledSteps: emailsToSchedule.length,
       }),

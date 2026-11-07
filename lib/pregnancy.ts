@@ -1,5 +1,4 @@
 import { Lesson } from './types';
-import { stages } from './course-data';
 
 export interface PregnancyProfile {
   dueDate: string; // Format YYYY-MM-DD
@@ -147,30 +146,30 @@ export function calculatePregnancyState(dueDateString: string): PregnancyState {
 }
 
 /**
- * Dobiera rekomendowane lekcje z bazy 52 wideo na podstawie tygodnia ciąży
+ * Dobiera rekomendowane lekcje z bazy 52 wideo na podstawie tygodnia ciąży (8 modułów)
  */
 export function getRecommendedLessonsForWeek(state: PregnancyState, allLessons: Lesson[]): Lesson[] {
   if (state.trimester === 'postpartum') {
-    return allLessons.filter(l => l.stageId === 'stage-07' || l.stageId === 'stage-08' || l.stageId === 'stage-09').slice(0, 3);
+    return allLessons.filter(l => l.stageId === 'stage-06' || l.stageId === 'stage-07' || l.stageId === 'stage-08').slice(0, 3);
   }
 
   if (state.currentWeek >= 37) {
     // Tuż przed porodem: skurcze, wody, znieczulenie, partner
-    return allLessons.filter(l => l.stageId === 'stage-05' || l.stageId === 'stage-06').slice(0, 3);
+    return allLessons.filter(l => l.stageId === 'stage-05').slice(0, 3);
   }
 
   if (state.currentWeek >= 28) {
-    // III trymestr: torba, krocze, przygotowanie
+    // III trymestr: wyprawka, torba, przygotowanie do porodu
     return allLessons.filter(l => l.stageId === 'stage-04' || l.stageId === 'stage-05').slice(0, 3);
   }
 
   if (state.currentWeek >= 14) {
     // II trymestr: badania, dno miednicy, sen
-    return allLessons.filter(l => l.stageId === 'stage-03').slice(0, 3);
+    return allLessons.filter(l => l.stageId === 'stage-02' || l.stageId === 'stage-03').slice(0, 3);
   }
 
   // I trymestr
-  return allLessons.filter(l => l.stageId === 'stage-02' || l.stageId === 'stage-01').slice(0, 3);
+  return allLessons.filter(l => l.stageId === 'stage-01' || l.stageId === 'stage-02').slice(0, 3);
 }
 
 // Stała dla klucza w LocalStorage

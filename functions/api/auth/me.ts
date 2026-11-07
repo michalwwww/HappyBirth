@@ -6,6 +6,12 @@ interface Env {
 }
 
 const ACCESS_DURATION_DAYS = 548;
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+]);
 
 export async function onRequestGet(context: { request: Request; env: Env }): Promise<Response> {
   const { request, env } = context;
@@ -26,6 +32,8 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
   let orderRow: any = null;
   let referralRewardRow: any = null;
   let expired = false;
+  let hasActiveCourse = true;
+  const isTeamEmail = TEAM_WHITELIST_EMAILS.has(String(session.email || '').toLowerCase());
 
   if (env.DB) {
     try {
@@ -60,7 +68,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         .first();
 
       orderRow = await env.DB.prepare(
-        `SELECT order_number, amount_total, order_bump_included, promo_code, created_at
+        `SELECT order_number, amount_total, order_bump_included, promo_code, status, created_at
          FROM orders
          WHERE user_id = ? OR customer_email = ?
          ORDER BY created_at DESC LIMIT 1`
@@ -77,8 +85,14 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         .bind(effectiveUserId)
         .first();
 
-      if (enrollmentRow?.expires_at && new Date(enrollmentRow.expires_at).getTime() < Date.now()) {
+      if (enrollmentRow?.status === 'refunded' || orderRow?.status === 'refunded') {
         expired = true;
+        hasActiveCourse = false;
+      } else if (enrollmentRow?.expires_at && new Date(enrollmentRow.expires_at).getTime() < Date.now()) {
+        expired = true;
+        hasActiveCourse = false;
+      } else if (!isTeamEmail && !enrollmentRow && !orderRow) {
+        hasActiveCourse = false;
       }
     } catch (e) {
       console.error('Błąd odczytu /api/auth/me w D1:', e);
@@ -94,7 +108,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
 
   return new Response(
     JSON.stringify({
-      authenticated: !expired,
+      authenticated: !expired && hasActiveCourse,
       expired,
       user: {
         id: userRow?.id || session.userId,
@@ -102,7 +116,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         fullName: userRow?.full_name || '',
         avatarUrl: userRow?.avatar_url || '',
         role: userRow?.role || session.role || 'student',
-        hasActiveCourse: !expired,
+        hasActiveCourse: !expired && hasActiveCourse,
         expiresAt: expiresAtIso,
         daysRemaining,
         firstContentAccessedAt: enrollmentRow?.first_content_accessed_at || null,

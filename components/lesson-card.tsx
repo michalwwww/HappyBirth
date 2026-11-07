@@ -6,7 +6,6 @@ import { Lesson } from '@/lib/types';
 import { Play, CheckCircle2, Clock, Sparkles, Lock } from 'lucide-react';
 import { useCourseProgress } from '@/lib/progress';
 import { isCourseUnlockedLocally } from '@/lib/promo';
-
 import { usePathname } from 'next/navigation';
 
 interface LessonCardProps {
@@ -19,8 +18,12 @@ interface LessonCardProps {
 export function LessonCard({ lesson, isCompleted, isActive = false, autoplay = true }: LessonCardProps) {
   const pathname = usePathname();
   const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
-  // Wolny dostęp zespołu: wszystkie lekcje odblokowane
-  const isCourseUnlocked = true;
+  const { role } = useCourseProgress();
+  const isCourseUnlocked =
+    Boolean(lesson.isFreePreview) ||
+    role === 'student' ||
+    role === 'partner' ||
+    isCourseUnlockedLocally();
 
   return (
     <Link

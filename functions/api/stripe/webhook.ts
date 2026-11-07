@@ -203,12 +203,14 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           }
         }
 
-        // 6. [D1b] + [D2] Rozliczenie prowizji afiliacyjnej (Kod rabatowy nadrzędny wobec ?ref= cookie + blokada self-referral + blokada VIP100/0 PLN)
+        // 6. [D1b] + [D2] Rozliczenie prowizji afiliacyjnej (spójne z ORDER_BUMP_PRICE_MINOR w checkout.ts)
         const bumpMinorByCurrency: Record<string, number> = {
           PLN: 4900,
-          EUR: 1200,
-          USD: 1400,
-          GBP: 1000,
+          GBP: 1500,
+          EUR: 1700,
+          USD: 2700,
+          AUD: 2900,
+          AED: 8900,
         };
         const bumpMinor = orderBumpIncluded
           ? (bumpMinorByCurrency[sessionCurrency] ?? 4900)
@@ -316,7 +318,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     }
   }
 
-  // [A7] + [D2] + [D5a] Obsługa zwrotów (charge.refunded) — rozróżnienie zwrotu częściowego (Order Bump 49 zł) od pełnego zwrotu kursu
+  // [A7] + [D2] + [D5a] Obsługa zwrotów (charge.refunded)
   if (event.type === 'charge.refunded') {
     const charge = event.data?.object || {};
     const customerEmail = String(
@@ -333,7 +335,6 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     if (env.DB) {
       try {
         if (isPartialRefund) {
-          // [D5a] Częściowy zwrot (np. 14-dniowy zwrot Order Bumpa +49 zł) — ZACHOWAJ dostęp do 52 lekcji kursu głównego!
           if (customerEmail) {
             const userRow = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
               .bind(customerEmail)
@@ -358,7 +359,6 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             }
           }
         } else {
-          // Pełny zwrot zamówienia — wycofanie dostępu i anulowanie prowizji afiliacyjnych
           if (customerEmail) {
             const userRow = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
               .bind(customerEmail)

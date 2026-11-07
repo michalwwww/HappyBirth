@@ -71,9 +71,6 @@ function StrefaDashboardContent() {
   const handleBuyStandaloneOrderBump = async () => {
     try {
       setBuyingOrderBump(true);
-      try {
-        localStorage.setItem('hb_order_bump_unlocked', 'true');
-      } catch (_) {}
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -163,13 +160,8 @@ function StrefaDashboardContent() {
       const lessonParam = params.get('lesson') || lekcjaPoZakupie;
       const autoplayParam = params.get('autoplay');
 
-      const isPromoOrSuccess =
-        (sessionId && (sessionId.startsWith('promo_') || sessionId.startsWith('demo_') || sessionId.toLowerCase().includes('test') || sessionId.toLowerCase().includes('promo'))) ||
-        payment === 'success' ||
-        Boolean(promo) ||
-        is100PercentPromo(promo);
+      const isPromoOrSuccess = is100PercentPromo(promo);
 
-      // Natychmiastowe odblokowanie dostępu lokalnie
       if (isPromoOrSuccess) {
         activateStudentAccessLocally(promo || 'TEST100');
         changeRole('student');
@@ -180,9 +172,9 @@ function StrefaDashboardContent() {
         fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`)
           .then((res) => res.json())
           .then((data) => {
-            if (data.success) {
+            if (data?.success) {
               const bumpUnlocked = Boolean(data.orderBumpIncluded || data.user?.orderBumpIncluded);
-              activateStudentAccessLocally(promo || 'TEST100', bumpUnlocked);
+              activateStudentAccessLocally(promo || 'STRIPE_VERIFIED', bumpUnlocked);
               if (bumpUnlocked) setHasOrderBump(true);
               changeRole('student');
               setPaymentSuccess(true);
@@ -191,10 +183,19 @@ function StrefaDashboardContent() {
           })
           .catch((err) => console.error('Błąd weryfikacji płatności:', err));
       } else if (payment === 'success') {
-        activateStudentAccessLocally(promo || 'TEST100');
-        changeRole('student');
-        setPaymentSuccess(true);
-        window.dispatchEvent(new Event('hb_progress_updated'));
+        fetch('/api/auth/me')
+          .then((res) => res.json())
+          .then((data) => {
+            if (data?.authenticated && data?.user?.hasActiveCourse !== false) {
+              const bumpUnlocked = Boolean(data.user?.orderBumpIncluded);
+              activateStudentAccessLocally('MAGIC_LINK_VERIFIED', bumpUnlocked);
+              if (bumpUnlocked) setHasOrderBump(true);
+              changeRole('student');
+              setPaymentSuccess(true);
+              window.dispatchEvent(new Event('hb_progress_updated'));
+            }
+          })
+          .catch(() => {});
       }
 
       // Ustaw aktywną lekcję z parametru lub pierwszą nieukończoną
@@ -441,7 +442,7 @@ function StrefaDashboardContent() {
             <div className="flex items-center justify-between pb-2.5 border-b border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--hb-mag-t)]">
-                  Moduł {parseInt(activeStage?.num || '1', 10)} z 9
+                  Moduł {parseInt(activeStage?.num || '1', 10)} z 8
                 </span>
                 <h3 className="font-brand-display font-bold text-base text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] leading-tight">
                   {getStageDisplayTitle(activeStage)}
@@ -519,7 +520,7 @@ function StrefaDashboardContent() {
               <span className="text-[11px] font-semibold text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] block">
                 Zmień moduł tematyczny:
               </span>
-              <div className="grid grid-cols-3 gap-1.5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                 {stages.map((st) => {
                   const isCurrent = st.id === activeLesson.stageId;
                   return (
@@ -714,7 +715,7 @@ function StrefaDashboardContent() {
         </div>
       </section>
 
-      {/* 5. PRZEJRZYSTA ŚCIEŻKA 9 MODUŁÓW KURSU (Zamiast tajemniczego "etap etap") */}
+      {/* 5. PRZEJRZYSTA ŚCIEŻKA 8 MODUŁÓW KURSU (Zamiast tajemniczego "etap etap") */}
       <section className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5">
           <div>
@@ -722,7 +723,7 @@ function StrefaDashboardContent() {
               Pełny Program Szkoły Rodzenia
             </span>
             <h2 className="font-brand-display font-semibold text-xl sm:text-2xl text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] mt-0.5">
-              9 Tematycznych Modułów Programu
+              8 Tematycznych Modułów Programu
             </h2>
             <p className="text-xs sm:text-sm text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] mt-0.5">
               Kliknięcie modułu ładuje go w odtwarzaczu u góry z pierwszą nieukończoną lekcją.
@@ -738,7 +739,7 @@ function StrefaDashboardContent() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {stages.map((stage) => {
             const stageLessons = getLessonsByStage(stage.id);
             const stageCompleted = stageLessons.filter((l) =>
