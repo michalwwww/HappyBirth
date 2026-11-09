@@ -1058,7 +1058,7 @@ export default function AfiliacjaPage() {
                       Ustaw własny kod rabatowy -10% i identyfikator linku
                     </h3>
                     <p className="text-xs text-[#544A44] mt-1">
-                      Możesz nadać swojemu kodowi łatwą do zapamiętania nazwę (np. <code>STUDENT-KASIA</code>, <code>POLOZNA-ANNA</code>, <code>FIZJO-MARTA10</code>).
+                      Możesz nadać swojemu kodowi łatwą do zapamiętania nazwę (np. <code>STUDENT-KASIA</code>, <code>PARTNER-ANNA</code>, <code>FIZJO-MARTA10</code>).
                     </p>
                   </div>
 
@@ -1660,7 +1660,7 @@ export default function AfiliacjaPage() {
                   <li className="flex items-start gap-2.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                     <span>
-                      <strong>Własny kod rabatowy -10%</strong> (np. <code>STUDENT-KASIA</code>, <code>POLOZNA-ANNA</code>) z edycją na żywo.
+                      <strong>Własny kod rabatowy -10%</strong> (np. <code>STUDENT-KASIA</code>, <code>PARTNER-ANNA</code>) z edycją na żywo.
                     </span>
                   </li>
                   <li className="flex items-start gap-2.5">

@@ -28,11 +28,11 @@ const SLAJDY: Slajd[] = [
 ];
 
 const ALTY = [
-  'Dłonie położnej spoczywają na brzuchu mamy w beżowym swetrze, obok dłonie mamy',
-  'Mama w kremowym swetrze trzyma dłonie na brzuchu, położna kładzie rękę od góry',
-  'Położna w śliwkowym kardiganie kładzie dłoń na brzuchu mamy w lnianej sukience',
-  'Położna z notesem na kolanach kładzie dłoń na brzuchu mamy siedzącej obok',
-  'Dłonie położnej z zegarkiem prowadzą dłonie mamy na brzuchu',
+  'Wspierające dłonie spoczywają na brzuchu przyszłej mamy w beżowym swetrze',
+  'Przyszła mama w kremowym swetrze trzyma dłonie na brzuchu w spokojnym geście wsparcia',
+  'Wspólne spotkanie edukacyjne i wspierająca dłoń na brzuchu mamy w lnianej sukience',
+  'Spokojna rozmowa z notatnikiem na kolanach i wspierająca dłoń obok przyszłej mamy',
+  'Wspierające dłonie prowadzą dłonie przyszłej mamy podczas ćwiczeń oddechowych',
 ];
 
 const LICZBY: LiczbyCopy = {
