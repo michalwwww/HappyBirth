@@ -9,6 +9,9 @@ const TEAM_WHITELIST_EMAILS = new Set([
   'kontakt@happybirth.pl',
   'pomoc@happybirth.pl',
   'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
 ]);
 
 export async function onRequestPost(context: { request: Request; env: Env }): Promise<Response> {

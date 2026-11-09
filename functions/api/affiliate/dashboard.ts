@@ -17,6 +17,9 @@ const TEAM_WHITELIST_EMAILS = new Set([
   'kontakt@happybirth.pl',
   'pomoc@happybirth.pl',
   'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
 ]);
 
 async function ensureAffiliateTables(db: any) {
@@ -158,7 +161,13 @@ async function resolveOrProvisionAffiliate(
       .first();
   }
 
-  return { affiliate, isStudent: Boolean(affiliate), isMotherOnly: !affiliate && isMother, userRow };
+  return {
+    affiliate,
+    isStudent: Boolean(affiliate),
+    isMotherOnly: !affiliate && isMother,
+    isAdmin: Boolean(isTeam || userRow?.role === 'admin'),
+    userRow,
+  };
 }
 
 export async function onRequestOptions(): Promise<Response> {
@@ -303,7 +312,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
 
     await ensureAffiliateTables(env.DB);
 
-    const { affiliate, isStudent, isMotherOnly, userRow } = await resolveOrProvisionAffiliate(
+    const { affiliate, isStudent, isMotherOnly, isAdmin, userRow } = await resolveOrProvisionAffiliate(
       env.DB,
       session.email,
       undefined,
@@ -490,6 +499,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       JSON.stringify({
         authenticated: true,
         isStudent,
+        isAdmin: Boolean(isAdmin),
         affiliate: {
           id: affiliate.id,
           email: affiliate.email,
@@ -555,7 +565,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     }
 
     await ensureAffiliateTables(env.DB);
-    const { affiliate, userRow } = await resolveOrProvisionAffiliate(env.DB, session.email);
+    const { affiliate, isAdmin, userRow } = await resolveOrProvisionAffiliate(env.DB, session.email);
     if (!affiliate) {
       return new Response(JSON.stringify({ error: 'Nie znaleziono konta partnerskiego.' }), {
         status: 404,
@@ -655,14 +665,47 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
 
       let newRate = Number(affiliate.tier1_rate || 0.2);
       let newCategory = affiliate.role_category || 'standard';
-      if (requestedRole === 'midwife_physio') {
-        newCategory = 'midwife_physio';
-        newRate = 0.3;
-      } else if (requestedRole === 'creator_publisher') {
-        newCategory = 'creator_publisher';
-        newRate = Math.max(newRate, 0.25);
-      } else if (requestedRole === 'standard') {
-        newCategory = 'standard';
+      let stage2Notice = '';
+
+      if (isAdmin) {
+        if (requestedRole === 'midwife_physio') {
+          newCategory = 'midwife_physio';
+          newRate = 0.3;
+        } else if (requestedRole === 'creator_publisher') {
+          newCategory = 'creator_publisher';
+          newRate = 0.25;
+        } else if (requestedRole === 'standard') {
+          newCategory = 'standard';
+          newRate = 0.2;
+        }
+      } else if (
+        (requestedRole === 'midwife_physio' || requestedRole === 'creator_publisher') &&
+        requestedRole !== affiliate.role_category
+      ) {
+        // Zapisz wniosek o awans na Etap 2 (25% / 30%) dla Administratora bez samodzielnego podnoszenia stawki przez użytkownika
+        const reqLabel =
+          requestedRole === 'midwife_physio'
+            ? '[WNIOSEK ETAP 2: 30% Położna / Fizjoterapeutka]'
+            : '[WNIOSEK ETAP 2: 25% Mikroinfluencerka / Twórca]';
+        stage2Notice =
+          ' Wniosek o stawkę Etapu 2 został przekazany do akceptacji w Panelu Administratora.';
+        try {
+          await env.DB.prepare(
+            `INSERT INTO partnership_inquiries (
+               id, channel, full_name, company_or_brand, email, phone,
+               role_or_area, profile_url, message, rodo_consent
+             ) VALUES (?, 'afiliacja', ?, ?, ?, '', ?, ?, 'Wniosek z Kokpitu Partnera o zmianę stawki na Etap 2', 1)`
+          )
+            .bind(
+              `inq_${crypto.randomUUID()}`,
+              legalName || affiliate.full_name,
+              nip || null,
+              affiliate.email,
+              `${reqLabel} ${specialization}`,
+              profileUrl || ''
+            )
+            .run();
+        } catch {}
       }
 
       await env.DB.prepare(
@@ -697,7 +740,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           success: true,
           tier1RatePercent: Math.round(newRate * 100),
           roleCategory: newCategory,
-          message: 'Dane rozliczeniowe i profil partnera zostały zapisane.',
+          message: `Dane rozliczeniowe i profil partnera zostały zapisane.${stage2Notice}`,
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       );

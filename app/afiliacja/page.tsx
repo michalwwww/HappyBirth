@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
+import { AffiliateAdminPanel } from '@/components/affiliate-admin-panel';
 import {
   Users,
   CheckCircle2,
@@ -104,9 +105,12 @@ function formatPln(minor: number): string {
 export default function AfiliacjaPage() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isMotherOnly, setIsMotherOnly] = useState(false);
   const [viewMode, setViewMode] = useState<'cockpit' | 'landing'>('landing');
-  const [activeTab, setActiveTab] = useState<'overview' | 'tools' | 'materials' | 'broker' | 'payouts'>('overview');
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'tools' | 'materials' | 'broker' | 'payouts' | 'admin'
+  >('overview');
 
   const [affiliate, setAffiliate] = useState<AffiliateProfile | null>(null);
   const [payoutSettings, setPayoutSettings] = useState<PayoutSettings>({
@@ -184,6 +188,8 @@ export default function AfiliacjaPage() {
 
       if (data?.authenticated && data?.affiliate) {
         setAuthenticated(true);
+        const adminFlag = Boolean(data?.isAdmin);
+        setIsAdmin(adminFlag);
         setIsMotherOnly(false);
         setAffiliate(data.affiliate);
         setCustomPromoInput(data.affiliate.promoCode || '');
@@ -198,6 +204,13 @@ export default function AfiliacjaPage() {
         setSubAffiliates(Array.isArray(data.subAffiliates) ? data.subAffiliates : []);
         setPayouts(Array.isArray(data.payouts) ? data.payouts : []);
         setViewMode('cockpit');
+        if (
+          adminFlag &&
+          typeof window !== 'undefined' &&
+          (window.location.search.includes('admin=1') || window.location.hash === '#admin')
+        ) {
+          setActiveTab('admin');
+        }
 
         if (tokenParam && typeof window !== 'undefined') {
           const cleanUrl = window.location.pathname;
@@ -548,6 +561,19 @@ export default function AfiliacjaPage() {
 
             {authenticated && affiliate ? (
               <div className="flex items-center gap-2">
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setViewMode('cockpit');
+                      setActiveTab('admin');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#1A1512] text-[#FCD705] border border-[#FCD705]/50 text-xs font-bold cursor-pointer shadow-xs"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Panel Administratora</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => setViewMode(viewMode === 'cockpit' ? 'landing' : 'cockpit')}
@@ -773,6 +799,15 @@ export default function AfiliacjaPage() {
               { id: 'materials', label: '3. Gotowe Posty i Wiadomości', icon: FileText },
               { id: 'broker', label: `4. Sieć Broker 5% (${stats.subAffiliatesCount})`, icon: Users },
               { id: 'payouts', label: '5. Wypłaty i Dane Rozliczeniowe', icon: CreditCard },
+              ...(isAdmin
+                ? [
+                    {
+                      id: 'admin',
+                      label: '6. Panel Administratora (Wypłaty i Sieć)',
+                      icon: ShieldCheck,
+                    },
+                  ]
+                : []),
             ].map((tab) => {
               const Icon = tab.icon;
               const active = activeTab === tab.id;
@@ -1576,6 +1611,13 @@ export default function AfiliacjaPage() {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* ====================================================================
+              ZAKŁADKA 6: PANEL ADMINISTRATORA AFILIACJI (TYLKO DLA ADMINA)
+             ==================================================================== */}
+          {activeTab === 'admin' && isAdmin && (
+            <AffiliateAdminPanel onRefreshParent={() => loadDashboard()} />
           )}
         </main>
       ) : (

@@ -38,6 +38,16 @@ async function ensureLocalAffiliateTables() {
   }
 }
 
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
+]);
+
 export async function GET(req: NextRequest) {
   try {
     const validateCode = (req.nextUrl.searchParams.get('validate_code') || '').trim().toUpperCase();
@@ -60,6 +70,7 @@ export async function GET(req: NextRequest) {
 
     await ensureLocalAffiliateTables();
     const cleanEmail = session.email.toLowerCase();
+    const isTeam = TEAM_WHITELIST_EMAILS.has(cleanEmail);
 
     let affiliate = await d1First<any>(
       `SELECT id, email, full_name, role_category, specialization,
@@ -73,6 +84,22 @@ export async function GET(req: NextRequest) {
       `SELECT id, full_name, referral_code, role FROM users WHERE email = ?`,
       [cleanEmail]
     );
+
+    if (!affiliate && isTeam) {
+      const suffix = crypto.randomUUID().slice(0, 4).toUpperCase();
+      const promoCode = `STUDENT-${suffix}10`;
+      const refSlug = promoCode.toLowerCase();
+      await d1Run(
+        `INSERT INTO affiliates (
+           id, email, full_name, role_category, specialization,
+           profile_or_practice_url, promo_code, ref_slug, tier1_rate,
+           referred_by_broker_id, tier2_override_rate, status
+         ) VALUES (?, ?, ?, 'standard', 'Administrator / Ambasador HappyBirth', '', ?, ?, 0.20, NULL, 0.05, 'active')
+         ON CONFLICT(email) DO NOTHING`,
+        [`aff_${crypto.randomUUID()}`, cleanEmail, userRow?.full_name || 'Administrator HappyBirth', promoCode, refSlug]
+      );
+      affiliate = await d1First<any>(`SELECT * FROM affiliates WHERE email = ?`, [cleanEmail]);
+    }
 
     const enrollmentRow = userRow?.id
       ? await d1First<any>(
@@ -143,6 +170,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       authenticated: true,
       isStudent: true,
+      isAdmin: Boolean(isTeam || userRow?.role === 'admin'),
       affiliate: {
         id: affiliate.id,
         email: affiliate.email,

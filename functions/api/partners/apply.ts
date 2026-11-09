@@ -54,12 +54,9 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     let tier1Rate = 0.2;
 
     if (channel === 'afiliacja') {
-      tier1Rate =
-        roleCategory === 'midwife_physio'
-          ? 0.3
-          : roleCategory === 'creator_publisher'
-            ? 0.25
-            : 0.2;
+      // Każde nowe konto startuje bezpiecznie w Etapie 1 ze stawką bazową 20% (0.20).
+      // Jeśli wybrano profil z Etapu 2 (25% lub 30%), wniosek trafia do weryfikacji w Panelu Administratora.
+      tier1Rate = 0.2;
       const suffix = crypto.randomUUID().slice(0, 4).toUpperCase();
       const rawBase = (body.preferredPromoCode || fullName)
         .toUpperCase()
@@ -75,6 +72,13 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
 
     if (env.DB) {
       try {
+        const inquiryRoleLabel =
+          roleCategory === 'midwife_physio'
+            ? `[WNIOSEK ETAP 2: 30% Położna/Fizjo] ${roleOrArea}`
+            : roleCategory === 'creator_publisher'
+              ? `[WNIOSEK ETAP 2: 25% Twórca] ${roleOrArea}`
+              : roleOrArea;
+
         await env.DB.prepare(
           `INSERT INTO partnership_inquiries (
              id, channel, full_name, company_or_brand, email, phone,
@@ -88,7 +92,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             companyOrBrand,
             email,
             phone,
-            roleOrArea,
+            inquiryRoleLabel,
             profileUrl,
             message,
             rodoConsent
@@ -96,10 +100,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           .run();
 
         if (channel === 'afiliacja' && promoCode && refSlug) {
-          const cat =
-            roleCategory === 'midwife_physio' || roleCategory === 'creator_publisher'
-              ? roleCategory
-              : 'standard';
+          const cat = 'standard';
 
           let brokerId: string | null = null;
           if (brokerRef) {
