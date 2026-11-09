@@ -135,6 +135,16 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
     setAktywny(null);
     setRabat(0);
     setOczekujacy(c);
+    fetch(`/api/affiliate/dashboard?validate_code=${encodeURIComponent(c)}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.valid && d?.discountPercent === 10) {
+          setAktywny(c);
+          setRabat(10);
+          setOczekujacy(null);
+        }
+      })
+      .catch(() => {});
     return c;
   }, []);
 
@@ -265,11 +275,11 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
           <figure className="hb-oferta-foto">
             <img
               alt={t.fotoAlt}
-              height={1152}
+              height={543}
               loading="lazy"
               sizes="(max-width: 560px) 116px, 150px"
-              src="/img/polozna-480.webp"
-              srcSet="/img/polozna-480.webp 480w, /img/polozna-720.webp 720w"
+              src="/img/onas-4-notes-640.webp"
+              srcSet="/img/onas-4-notes-640.webp 640w, /img/onas-4-notes-960.webp 960w"
               width={960}
             />
             <figcaption className="hb-od-roku">{t.odRoku}</figcaption>

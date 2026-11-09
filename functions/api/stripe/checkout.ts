@@ -49,9 +49,16 @@ async function isAuthorized10PercentPromo(code: string, db?: any): Promise<boole
   if (
     OFFICIAL_PROMO_ALLOWLIST.has(code) ||
     /^MAMA-[A-Z0-9]{3,12}$/.test(code) ||
-    /^HB-[A-Z0-9]{3,14}$/.test(code) ||
-    /^POLOZNA-[A-Z0-9]{3,14}$/.test(code) ||
-    /^FIZJO-[A-Z0-9]{3,14}$/.test(code)
+    code === 'STUDENT10' ||
+    code === 'STUDENT-2026' ||
+    code === 'AMBASADOR10' ||
+    /^STUDENT-[A-Z0-9_-]{2,16}$/.test(code) ||
+    /^AMBASADOR-[A-Z0-9_-]{2,16}$/.test(code) ||
+    /^PARTNER-[A-Z0-9_-]{2,16}$/.test(code) ||
+    /^HB-[A-Z0-9_-]{2,16}$/.test(code) ||
+    /^POLOZNA-[A-Z0-9_-]{2,16}$/.test(code) ||
+    /^FIZJO-[A-Z0-9_-]{2,16}$/.test(code) ||
+    /^[A-Z0-9]{2,12}-[A-Z0-9]{2,8}10$/.test(code)
   ) {
     return true;
   }

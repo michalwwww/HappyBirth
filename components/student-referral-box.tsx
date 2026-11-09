@@ -4,11 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { Gift, Copy, Check, Download, Sparkles, Heart, Users } from 'lucide-react';
 
 /**
- * [C4] Wbudowany Boks Poleceń w Panelu Kursantki — Model „Prezent za Polecenie” (Przepisy na Obiad PDF)
- * - 0% tarcia podatkowego (prezent cyfrowy zamiast prowizji pieniężnej)
+ * [C4] Wbudowany Boks Poleceń Koleżance w Panelu Mamy (Kursantki)
+ * - Mamy są wyłączone z programu afiliacyjnego (afiliacja.happybirth.pl)
+ * - Program dla Mam opiera się na polecaniu kursu koleżankom wraz ze zniżką (-10%) oraz prezentem (E-book PDF)
  * - Koleżanka otrzymuje 10% zniżki (440,10 zł zamiast 489,00 zł)
- * - Natychmiastowe (0 dni czekania) odblokowanie e-booka PDF po opłaceniu kursu przez koleżankę
- * - Przycisk kopiujący wiadomość zawiera wbudowane oznaczenie #współpraca zgodne z UOKiK ([E4])
+ * - Mama polecająca otrzymuje natychmiastowe (0 dni czekania) odblokowanie prezentu (E-booka PDF) po opłaceniu kursu przez koleżankę
  */
 export function StudentReferralBox() {
   const [referralCode, setReferralCode] = useState('MAMA-2026');
@@ -54,20 +54,20 @@ export function StudentReferralBox() {
         <div className="space-y-1.5">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] dark:text-[color:var(--hb-mag-t)] text-xs font-bold">
             <Gift className="w-3.5 h-3.5" />
-            <span>Prezent za Polecenie</span>
+            <span>Poleć Koleżance: Zniżka -10% + Prezent dla Ciebie</span>
           </div>
           <h3 className="font-brand-display text-xl sm:text-2xl font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
-            Daj koleżance -10% rabatu i odbierz e-book z przepisami PDF
+            Podaruj koleżance 10% zniżki na kurs i odbierz w prezencie E-book PDF
           </h3>
           <p className="text-xs sm:text-sm text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] max-w-3xl leading-relaxed">
-            Koleżanka kupuje kurs za <strong>440,10 zł zamiast 489,00 zł (-10%)</strong>, a Ty od razu odblokowujesz e-book kulinarny PDF.
+            Z Twoim osobistym kodem koleżanka w ciąży kupuje pełny kurs za <strong>440,10 zł zamiast 489,00 zł (-10% zniżki)</strong>, a Ty w podziękowaniu od razu otrzymujesz w prezencie nasz autorski E-book kulinarny PDF dla przyszłej mamy i na czas laktacji.
           </p>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
           <div className="px-4 py-2.5 rounded-2xl bg-white dark:bg-[color:var(--hb-kosc)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] text-center">
             <div className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
-              Twój kod dla koleżanki
+              Twój kod rabatowy (-10%)
             </div>
             <div className="font-mono font-bold text-lg text-[color:var(--hb-mag-t)] tracking-wider">
               {referralCode}
@@ -83,7 +83,7 @@ export function StudentReferralBox() {
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-[color:var(--hb-mag-t)]" />
-                <span>Gotowa wiadomość do wysłania na WhatsApp / Messenger:</span>
+                <span>Gotowa wiadomość ze zniżką -10% na WhatsApp / Messenger:</span>
               </span>
               <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
                 Zgodne z wytycznymi UOKiK (#współpraca)
@@ -104,12 +104,12 @@ export function StudentReferralBox() {
               {copied ? (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>Skopiowano wiadomość z kodem {referralCode}!</span>
+                  <span>Skopiowano wiadomość ze zniżką {referralCode}!</span>
                 </>
               ) : (
                 <>
                   <Copy className="w-4 h-4" />
-                  <span>Kopiuj mój kod dla koleżanki (-10%)</span>
+                  <span>Kopiuj kod ze zniżką -10% dla koleżanki</span>
                 </>
               )}
             </button>
@@ -125,7 +125,7 @@ export function StudentReferralBox() {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[color:var(--hb-zol)]">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Twój Prezent Bonusowy PDF</span>
+              <span>Twój Prezent za Polecenie</span>
             </div>
             <h4 className="font-brand-display text-base sm:text-lg font-bold text-white leading-snug">
               E-book PDF: „Szybkie i Odżywcze Obiady w 15 Minut dla Przyszłej Mamy i w Czasie Laktacji”
@@ -148,13 +148,13 @@ export function StudentReferralBox() {
                 className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[color:var(--hb-zol)] hover:bg-[color:var(--hb-zol)] text-[color:var(--hb-pil-ink)] dark:text-[color:var(--hb-ink)] font-bold text-xs sm:text-sm transition-all"
               >
                 <Download className="w-4 h-4" />
-                <span>Pobierz / Otwórz E-book z Przepisami PDF</span>
+                <span>Pobierz swój Prezent (E-book PDF)</span>
               </a>
             </div>
           ) : (
             <div className="pt-2 space-y-2">
               <div className="p-3 rounded-xl bg-white/10 border border-white/15 text-xs text-[#E8DEF0]">
-                🔒 Odblokowuje się <strong>natychmiast (w 1 sekundę)</strong>, gdy pierwsza koleżanka opłaci kurs z Twoim kodem <strong>{referralCode}</strong>.
+                🎁 Twój prezent odblokowuje się <strong>automatycznie</strong>, gdy pierwsza koleżanka skorzysta ze zniżki -10% z Twoim kodem <strong>{referralCode}</strong>.
               </div>
               <a
                 href="/materialy/szybkie-i-odzywcze-obiady-15-min-happybirth.html"
@@ -163,7 +163,7 @@ export function StudentReferralBox() {
                 className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[color:var(--hb-zol)] hover:underline"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Zobacz podgląd e-booka z przepisami i listą zakupów →</span>
+                <span>Zobacz podgląd prezentu (e-booka z przepisami) →</span>
               </a>
             </div>
           )}

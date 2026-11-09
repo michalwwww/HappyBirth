@@ -621,9 +621,16 @@ export function validatePromoCode(rawCode?: string | null): PromoValidationResul
 
   const isAffiliatePattern =
     knownAffiliateCodes.includes(clean) ||
-    /^HB-[A-Z0-9]{3,14}$/.test(clean) ||
-    /^POLOZNA-[A-Z0-9]{3,14}$/.test(clean) ||
-    /^FIZJO-[A-Z0-9]{3,14}$/.test(clean);
+    clean === 'STUDENT10' ||
+    clean === 'STUDENT-2026' ||
+    clean === 'AMBASADOR10' ||
+    /^STUDENT-[A-Z0-9_-]{2,16}$/.test(clean) ||
+    /^AMBASADOR-[A-Z0-9_-]{2,16}$/.test(clean) ||
+    /^PARTNER-[A-Z0-9_-]{2,16}$/.test(clean) ||
+    /^HB-[A-Z0-9_-]{2,16}$/.test(clean) ||
+    /^POLOZNA-[A-Z0-9_-]{2,16}$/.test(clean) ||
+    /^FIZJO-[A-Z0-9_-]{2,16}$/.test(clean) ||
+    /^[A-Z0-9]{2,12}-[A-Z0-9]{2,8}10$/.test(clean);
 
   if (isAffiliatePattern) {
     return {

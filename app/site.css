@@ -460,7 +460,7 @@ html.dark .hb-os-galka b{background:var(--hb-ink);color:var(--hb-kosc)}html.dark
 .hb-pakiet-lista li>span>span{display:block;margin-top:2px;font:500 13px/1.42 var(--hb-t);color:var(--ok)}
 .hb-dosw{display:grid;grid-template-columns:150px minmax(0,1fr);gap:22px;align-items:center}
 .hb-oferta-foto{position:relative;margin:0 0 12px}
-.hb-oferta-foto img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 18%;border-radius:22px;
+.hb-oferta-foto img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;object-position:58% 55%;border-radius:22px;
   box-shadow:0 0 0 3px var(--hb-zakup),0 18px 30px -20px rgba(0,0,0,.6);filter:var(--hb-foto-filtr)}
 .hb-od-roku{position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);white-space:nowrap;padding:6px 12px;border-radius:999px;
   background:var(--hb-zakup);color:var(--hb-zakup-ink);font:800 11px/1 var(--hb-t);letter-spacing:calc(.08em + var(--hb-trak));text-transform:uppercase}

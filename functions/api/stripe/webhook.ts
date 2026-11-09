@@ -223,7 +223,8 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           promoCode.includes('100');
 
         const lookupKey = promoCode || refCookie;
-        if (!isOnlyOrderBump && !isFreeOrTestCode && lookupKey && !promoCode.startsWith('MAMA-')) {
+        // Mamy są wyłączone z programu afiliacyjnego — kody MAMA-* obsługują wyłącznie zniżkę -10% dla koleżanki i prezent PDF dla Mamy (sekcja 5 powyżej)
+        if (!isOnlyOrderBump && !isFreeOrTestCode && lookupKey && !lookupKey.startsWith('MAMA-')) {
           const affiliate = await env.DB.prepare(
             `SELECT id, email, promo_code, tier1_rate, referred_by_broker_id, tier2_override_rate
              FROM affiliates

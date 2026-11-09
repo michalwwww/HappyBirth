@@ -133,7 +133,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
         },
       });
     }
-    if (cleanPath === '/' || cleanPath === '/afiliacja') {
+    if (cleanPath === '/' || cleanPath === '/afiliacja' || cleanPath === '/panel' || cleanPath === '/kokpit' || cleanPath === '/login') {
       const targetUrl = new URL(url.toString());
       targetUrl.pathname = url.pathname.endsWith('.txt') ? '/afiliacja.txt' : '/afiliacja';
       const res = await context.env.ASSETS.fetch(targetUrl);
