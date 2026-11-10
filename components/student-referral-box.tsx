@@ -11,7 +11,7 @@ import { Gift, Copy, Check, Download, Sparkles, Heart, Users } from 'lucide-reac
  * - Mama polecająca otrzymuje natychmiastowe (0 dni czekania) odblokowanie prezentu (E-booka PDF) po opłaceniu kursu przez koleżankę
  */
 export function StudentReferralBox() {
-  const [referralCode, setReferralCode] = useState('MAMA-2026');
+  const [referralCode, setReferralCode] = useState('MAMA-KASIA');
   const [referralsCount, setReferralsCount] = useState(0);
   const [rewardUnlocked, setRewardUnlocked] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -32,7 +32,7 @@ export function StudentReferralBox() {
     }
   }, []);
 
-  const shareText = `Z moim kodem ${referralCode} masz 10% zniżki (440,10 zł zamiast 489,00 zł) na szkołę rodzenia online HappyBirth.pl, a ja otrzymam w prezencie e-booka z przepisami na szybkie obiady #współpraca https://happybirth.pl/?promo=${referralCode}`;
+  const shareText = `Z moim kodem ${referralCode} masz 10% zniżki (440,10 zł zamiast 489,00 zł) na szkołę rodzenia online HappyBirth.pl, a ja otrzymam w prezencie e-booka z przepisami na szybkie obiady #współpraca https://happybirth.pl/?kod=${referralCode}`;
 
   const handleCopy = async () => {
     try {

@@ -1,4 +1,5 @@
 import { getEdgeSession } from '../_shared/session';
+import { generateMotherReferralCode } from '../../lib/brand-codes';
 
 interface Env {
   DB?: any;
@@ -9,21 +10,28 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
   const { request, env } = context;
   const session = await getEdgeSession(request, env);
 
-  let referralCode = 'MAMA-2026';
+  let referralCode = 'MAMA-POLECA';
   let referralsCount = 0;
   let rewardUnlocked = false;
 
   if (session && env.DB) {
     try {
-      const userRow = await env.DB.prepare('SELECT id, referral_code FROM users WHERE id = ? OR email = ? LIMIT 1')
+      const userRow = await env.DB.prepare('SELECT id, full_name, referral_code FROM users WHERE id = ? OR email = ? LIMIT 1')
         .bind(session.userId, session.email)
         .first();
       const effectiveUserId = userRow?.id || session.userId;
 
-      if (userRow?.referral_code) {
+      if (userRow?.referral_code && !/^MAMA-[A-F0-9]{4}$/i.test(userRow.referral_code)) {
         referralCode = userRow.referral_code;
       } else {
-        referralCode = `MAMA-${session.userId.slice(0, 4).toUpperCase()}`;
+        const baseMotherCode = generateMotherReferralCode(userRow?.full_name, session.email);
+        const taken = await env.DB.prepare('SELECT id FROM users WHERE referral_code = ? AND email != ? LIMIT 1')
+          .bind(baseMotherCode, session.email)
+          .first()
+          .catch(() => null);
+        referralCode = taken?.id
+          ? generateMotherReferralCode(userRow?.full_name, session.email, 10)
+          : baseMotherCode;
         await env.DB.prepare('UPDATE users SET referral_code = ? WHERE id = ? OR email = ?')
           .bind(referralCode, effectiveUserId, session.email)
           .run();

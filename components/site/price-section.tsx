@@ -27,7 +27,7 @@ import {
 } from '@/lib/promo';
 import { IconUsmiech } from './icons';
 
-const UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'ad_id', 'fbclid', 'gclid', 'ref'];
+const UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'ad_id', 'fbclid', 'gclid', 'ref', 'poleca', 'kod'];
 
 function zbierzUtm(): Record<string, string> {
   const wynik: Record<string, string> = {};
@@ -40,6 +40,9 @@ function zbierzUtm(): Record<string, string> {
     UTM.forEach((k) => {
       if (!wynik[k]) { try { const s = sessionStorage.getItem(`hb_${k}`); if (s) wynik[k] = s; } catch { /* brak */ } }
     });
+    if (!wynik.ref && (wynik.poleca || wynik.kod)) {
+      wynik.ref = (wynik.poleca || wynik.kod).toLowerCase();
+    }
   } catch { /* brak window */ }
   return wynik;
 }
@@ -148,14 +151,23 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
     return c;
   }, []);
 
-  // kod z adresu (?promo=KOD), np. z linku położnej
+  // kod z adresu (?kod=SPOKOJ-KASIA, ?promo=KOD lub ?poleca=spokoj-kasia) albo zapamiętany z wizyty na /plan-porodu
   useEffect(() => {
     try {
-      const p = new URLSearchParams(window.location.search).get('promo');
+      const q = new URLSearchParams(window.location.search);
+      const p =
+        q.get('kod') ||
+        q.get('promo') ||
+        q.get('poleca') ||
+        sessionStorage.getItem('hb_active_promo');
       if (!p) return;
-      setKod(p.trim().toUpperCase());
+      const upper = p.trim().toUpperCase();
+      try {
+        sessionStorage.setItem('hb_active_promo', upper);
+      } catch { /* prywatne okno */ }
+      setKod(upper);
       setOtwarty('kod');
-      ocenKod(p);
+      ocenKod(upper);
     } catch { /* brak window */ }
   }, [ocenKod]);
 

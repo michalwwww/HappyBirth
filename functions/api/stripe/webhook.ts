@@ -1,3 +1,5 @@
+import { generateMotherReferralCode } from '../../../lib/brand-codes';
+
 interface Env {
   DB?: any;
   STRIPE_SECRET_KEY?: string;
@@ -129,9 +131,17 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           .bind(customerEmail)
           .first();
         const userId = userRow?.id || crypto.randomUUID();
-        const userReferralCode =
-          userRow?.referral_code ||
-          `MAMA-${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
+        let userReferralCode = userRow?.referral_code || '';
+        if (!userReferralCode) {
+          const baseMotherCode = generateMotherReferralCode(customerName, customerEmail);
+          const conflict = await env.DB.prepare('SELECT id FROM users WHERE referral_code = ? LIMIT 1')
+            .bind(baseMotherCode)
+            .first()
+            .catch(() => null);
+          userReferralCode = conflict?.id
+            ? generateMotherReferralCode(customerName, customerEmail, Math.floor(10 + Math.random() * 89))
+            : baseMotherCode;
+        }
 
         if (!userRow) {
           await env.DB.prepare(
@@ -228,11 +238,16 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           const affiliate = await env.DB.prepare(
             `SELECT id, email, promo_code, tier1_rate, referred_by_broker_id, tier2_override_rate
              FROM affiliates
-             WHERE (promo_code = ? OR ref_slug = ?) AND status = 'active'
-             ORDER BY CASE WHEN promo_code = ? THEN 0 ELSE 1 END
+             WHERE (UPPER(promo_code) = UPPER(?) OR LOWER(ref_slug) = LOWER(?) OR UPPER(promo_code) = UPPER(?)) AND status = 'active'
+             ORDER BY CASE WHEN UPPER(promo_code) = UPPER(?) THEN 0 ELSE 1 END
              LIMIT 1`
           )
-            .bind(promoCode || '__NONE__', refCookie || '__NONE__', promoCode || '__NONE__')
+            .bind(
+              promoCode || '__NONE__',
+              refCookie || '__NONE__',
+              refCookie || '__NONE__',
+              promoCode || '__NONE__'
+            )
             .first();
 
           if (

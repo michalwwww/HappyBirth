@@ -1,4 +1,5 @@
 import { createSignedSessionToken, formatSessionSetCookie } from '../../_shared/session';
+import { generateSmartPartnerCodeCandidates } from '../../../lib/brand-codes';
 
 interface Env {
   DB?: any;
@@ -57,17 +58,39 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       // Każde nowe konto startuje bezpiecznie w Etapie 1 ze stawką bazową 20% (0.20).
       // Jeśli wybrano profil z Etapu 2 (25% lub 30%), wniosek trafia do weryfikacji w Panelu Administratora.
       tier1Rate = 0.2;
-      const suffix = crypto.randomUUID().slice(0, 4).toUpperCase();
-      const rawBase = (body.preferredPromoCode || fullName)
+      const smartCandidates = generateSmartPartnerCodeCandidates(fullName, roleCategory, email);
+      const userPreferred = String(body.preferredPromoCode || '')
+        .trim()
         .toUpperCase()
         .replace(/^MAMA[-_]?/i, '')
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^A-Z0-9]/g, '')
-        .slice(0, 6);
-      const baseCode = rawBase || 'STUDENT';
-      promoCode = `${baseCode}-${suffix}10`;
-      refSlug = `${baseCode.toLowerCase()}-${suffix.toLowerCase()}`;
+        .replace(/[^A-Z0-9_-]/g, '');
+
+      const candidateCodes: string[] = [];
+      if (userPreferred.length >= 4 && userPreferred.length <= 24) {
+        candidateCodes.push(userPreferred.includes('-') ? userPreferred : `SPOKOJ-${userPreferred}`);
+      }
+      for (const s of smartCandidates) {
+        if (!candidateCodes.includes(s.code)) candidateCodes.push(s.code);
+      }
+
+      promoCode = candidateCodes[0] || 'SPOKOJ-PARTNER';
+      if (env.DB) {
+        for (const cand of candidateCodes) {
+          const taken = await env.DB.prepare(
+            `SELECT email FROM affiliates WHERE UPPER(promo_code) = ? LIMIT 1`
+          )
+            .bind(cand)
+            .first()
+            .catch(() => null);
+          if (!taken || String(taken.email).toLowerCase() === email) {
+            promoCode = cand;
+            break;
+          }
+        }
+      }
+      refSlug = promoCode.toLowerCase().replace(/[^a-z0-9_-]/g, '');
     }
 
     if (env.DB) {
@@ -186,7 +209,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
                 ${
                   channel === 'afiliacja'
                     ? `<p style="font-size: 14px; color: #544A44; line-height: 1.6;">Twoje konto w Programie Afiliacyjnym HappyBirth zostało aktywowane (stawka prowizji: <strong>${Math.round(tier1Rate * 100)}%</strong> + 5% Broker Override).</p>
-                       <p style="font-size: 14px; color: #544A44; line-height: 1.6;">Twój indywidualny kod rabatowy (-10% dla przyszłych mam): <strong>${promoCode}</strong><br/>Twój link polecający (30-dniowe ciasteczko): <strong>https://happybirth.pl/?promo=${promoCode}&ref=${refSlug}</strong></p>
+                       <p style="font-size: 14px; color: #544A44; line-height: 1.6;">Twój semantyczny kod rabatowy (-10% dla przyszłych rodziców): <strong>${promoCode}</strong><br/>Twój krótki link polecający: <strong>https://happybirth.pl/poleca/${refSlug}</strong><br/>Link z kodem w koszyku: <strong>https://happybirth.pl/?kod=${promoCode}</strong></p>
                        <div style="margin: 20px 0;">
                          <a href="https://afiliacja.happybirth.pl" style="background: #DA0271; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 9999px; font-weight: bold; font-size: 13px; display: inline-block;">Otwórz Kokpit Biznesowy Partnera &rarr;</a>
                        </div>`
@@ -250,7 +273,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         refSlug,
         tier1RatePercent: Math.round(tier1Rate * 100),
         suggestedPromoCode: promoCode,
-        suggestedAffiliateLink: refSlug ? `https://happybirth.pl/?promo=${promoCode}&ref=${refSlug}` : null,
+        suggestedAffiliateLink: refSlug ? `https://happybirth.pl/poleca/${refSlug}` : null,
         message:
           channel === 'afiliacja'
             ? 'Twoje konto w Programie Afiliacyjnym zostało aktywowane! Zostałaś automatycznie zalogowana do Kokpitu Biznesowego.'

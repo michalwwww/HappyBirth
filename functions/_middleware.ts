@@ -79,7 +79,11 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   const url = new URL(context.request.url);
   const host = (context.request.headers.get('host') || '').toLowerCase();
   const userAgent = context.request.headers.get('user-agent') || '';
-  const refParam = url.searchParams.get('ref');
+  const refParam =
+    url.searchParams.get('ref') ||
+    url.searchParams.get('poleca') ||
+    url.searchParams.get('kod') ||
+    url.searchParams.get('promo');
   const isAdBot = AD_BOT_REGEX.test(userAgent);
 
   // Znormalizowana ścieżka bez przyrostków eksportu statycznego Next.js (.html / .txt RSC)
@@ -184,6 +188,25 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   }
 
   // 5. DOMENA GŁÓWNA PRODUKCYJNA (happybirth.pl / www.happybirth.pl / *.pages.dev):
+  //    Obsługa czystych linków marketingowych /poleca/<slug> oraz /kod/<kod> (np. happybirth.pl/poleca/spokoj-kasia)
+  const vanityMatch = cleanPath.match(/^\/(?:poleca|kod)\/([a-zA-Z0-9_-]{2,40})$/i);
+  if (vanityMatch) {
+    const rawToken = vanityMatch[1];
+    const upperCode = rawToken.toUpperCase();
+    const lowerSlug = rawToken.toLowerCase();
+    const redirectTarget = new URL(url.toString());
+    redirectTarget.pathname = '/';
+    redirectTarget.searchParams.set('kod', upperCode);
+    redirectTarget.searchParams.set('poleca', lowerSlug);
+    const redirectRes = new Response(null, {
+      status: 302,
+      headers: {
+        Location: `${redirectTarget.origin}/?kod=${encodeURIComponent(upperCode)}&poleca=${encodeURIComponent(lowerSlug)}#cena`,
+      },
+    });
+    return withSecurityAndTrackingHeaders(redirectRes, { refParam: lowerSlug, noIndex: true });
+  }
+
   //    Twarda separacja: podstrony /afiliacja, /partnerzy, /marketing, /challenge NIE ISTNIEJĄ na domenie głównej (404 Not Found).
   const isMainProdHost = !host.includes('localhost') && !host.includes('127.0.0.1');
   const studentRoutes = ['/lekcje', '/lekcja', '/apteczka', '/licznik', '/partner', '/login', '/standard-medyczny', '/wiedza'];

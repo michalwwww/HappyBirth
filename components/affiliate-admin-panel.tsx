@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { generateSmartPartnerCodeCandidates } from '@/lib/brand-codes';
 import {
   ShieldCheck,
   Wallet,
@@ -955,7 +956,7 @@ export function AffiliateAdminPanel({ onRefreshParent }: { onRefreshParent?: () 
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-[#544A44] mb-1">
-                    Nadaj Kod Rabatowy -10% (opcjonalnie)
+                    Semantyczny Kod Rabatowy -10% (opcjonalnie)
                   </label>
                   <input
                     type="text"
@@ -963,9 +964,28 @@ export function AffiliateAdminPanel({ onRefreshParent }: { onRefreshParent?: () 
                     onChange={(e) =>
                       setNewPartner({ ...newPartner, preferredPromoCode: e.target.value.toUpperCase() })
                     }
-                    placeholder="np. STUDENT-KASIA10"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#EAE3DB] bg-white text-xs font-mono"
+                    placeholder="np. SPOKOJ-KASIA lub OD-KASI"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#EAE3DB] bg-white text-xs font-mono font-bold"
                   />
+                  <div className="mt-1.5 flex flex-wrap gap-1">
+                    {generateSmartPartnerCodeCandidates(
+                      newPartner.fullName || 'Kasia',
+                      newPartner.roleCategory,
+                      newPartner.email
+                    )
+                      .slice(0, 4)
+                      .map((cand) => (
+                        <button
+                          key={cand.code}
+                          type="button"
+                          onClick={() => setNewPartner({ ...newPartner, preferredPromoCode: cand.code })}
+                          title={cand.categoryLabel}
+                          className="px-2 py-0.5 rounded-md bg-white border border-[#EAE3DB] hover:border-[#DA0271] text-[10px] font-mono font-bold text-[#1A1512] cursor-pointer"
+                        >
+                          {cand.code}
+                        </button>
+                      ))}
+                  </div>
                 </div>
 
                 <div>

@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { AffiliateAdminPanel } from '@/components/affiliate-admin-panel';
 import {
+  generateSmartPartnerCodeCandidates,
+  TEAM_FLAGSHIP_CODES,
+} from '@/lib/brand-codes';
+import {
   Users,
   CheckCircle2,
   ShieldCheck,
@@ -234,10 +238,11 @@ export default function AfiliacjaPage() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       tokenParam = params.get('token');
-      brokerParam = params.get('broker') || localStorage.getItem('hb_broker_ref');
-      if (params.get('broker')) {
+      const incomingBroker = params.get('zaprasza') || params.get('broker');
+      brokerParam = incomingBroker || localStorage.getItem('hb_broker_ref');
+      if (incomingBroker) {
         try {
-          localStorage.setItem('hb_broker_ref', params.get('broker')!);
+          localStorage.setItem('hb_broker_ref', incomingBroker);
         } catch {}
       }
       setBrokerRef(brokerParam);
@@ -489,13 +494,25 @@ export default function AfiliacjaPage() {
   const monthlyTotalPln = monthlyDirectPln + monthlyBrokerPln;
   const yearlyTotalPln = monthlyTotalPln * 12;
 
-  const promoCode = affiliate?.promoCode || 'STUDENT-2026';
-  const refSlug = affiliate?.refSlug || 'student-2026';
-  const mainAffiliateUrl = `https://happybirth.pl/?promo=${promoCode}&ref=${refSlug}`;
-  const birthPlanAffiliateUrl = `https://happybirth.pl/plan-porodu?ref=${refSlug}`;
-  const layetteAffiliateUrl = `https://happybirth.pl/kalkulator-wyprawki?ref=${refSlug}`;
-  const programAffiliateUrl = `https://happybirth.pl/program?promo=${promoCode}&ref=${refSlug}`;
-  const brokerInviteUrl = `https://afiliacja.happybirth.pl/?broker=${refSlug}`;
+  const promoCode = affiliate?.promoCode || 'SPOKOJNYPOROD';
+  const refSlug = affiliate?.refSlug || 'spokojny-porod';
+  const vanityAffiliateUrl = `https://happybirth.pl/poleca/${refSlug}`;
+  const mainAffiliateUrl = `https://happybirth.pl/?kod=${promoCode}`;
+  const birthPlanAffiliateUrl = `https://happybirth.pl/plan-porodu?kod=${promoCode}`;
+  const layetteAffiliateUrl = `https://happybirth.pl/kalkulator-wyprawki?kod=${promoCode}`;
+  const programAffiliateUrl = `https://happybirth.pl/program?kod=${promoCode}`;
+  const brokerInviteUrl = `https://afiliacja.happybirth.pl/?zaprasza=${refSlug}`;
+
+  const smartPartnerCodeSuggestions = generateSmartPartnerCodeCandidates(
+    affiliate?.fullName || 'Kasia',
+    affiliate?.roleCategory || 'standard',
+    affiliate?.email
+  );
+  const registrationCodeSuggestions = generateSmartPartnerCodeCandidates(
+    formData.fullName || 'Kasia Nowak',
+    formData.roleCategory,
+    formData.email
+  );
 
   const marketingTemplates = [
     {
@@ -764,14 +781,14 @@ export default function AfiliacjaPage() {
 
                 <div className="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-2">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-[#EAD5E5]">
-                    Twój główny link (Kod + Cookie 30 dni)
+                    Twój link wizerunkowy (Kod -10% + Cookie 30 dni)
                   </div>
-                  <div className="font-mono text-xs text-white truncate max-w-[210px]">
-                    happybirth.pl/?promo={affiliate.promoCode}
+                  <div className="font-mono text-xs text-white truncate max-w-[230px]">
+                    happybirth.pl/poleca/{refSlug}
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleCopy('top-link', mainAffiliateUrl)}
+                    onClick={() => handleCopy('top-link', vanityAffiliateUrl)}
                     className="w-full py-2 px-3 rounded-xl bg-white text-[#250A24] hover:bg-[#FCD705] text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     {copiedKey === 'top-link' ? (
@@ -782,7 +799,7 @@ export default function AfiliacjaPage() {
                     ) : (
                       <>
                         <Share2 className="w-3.5 h-3.5" />
-                        <span>Kopiuj pełny link</span>
+                        <span>Kopiuj czysty link</span>
                       </>
                     )}
                   </button>
@@ -1093,8 +1110,59 @@ export default function AfiliacjaPage() {
                       Ustaw własny kod rabatowy -10% i identyfikator linku
                     </h3>
                     <p className="text-xs text-[#544A44] mt-1">
-                      Możesz nadać swojemu kodowi łatwą do zapamiętania nazwę (np. <code>STUDENT-KASIA</code>, <code>PARTNER-ANNA</code>, <code>FIZJO-MARTA10</code>).
+                      W HappyBirth nie używamy generycznych ciągów losowych cyfr i znaków. Twój kod i link powinny brzmieć jak ciepła, wiarygodna rekomendacja (np. <code>SPOKOJ-KASIA</code>, <code>POLECA-ANNA</code>, <code>OD-MARTY</code>, <code>DOBRYSTART-OLA</code>).
                     </p>
+                  </div>
+
+                  {/* INTELIGENTNE PROPOZYCJE KODÓW MARKI OSOBISTEJ (1-CLICK) */}
+                  <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EAE3DB] space-y-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#DA0271]">
+                        Gotowe propozycje semantyczne dla Ciebie (kliknij, aby wybrać):
+                      </span>
+                      <span className="text-[11px] text-[#867A72]">
+                        Zero losowych znaków · Wyższa konwersja
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {smartPartnerCodeSuggestions.map((suggestion) => {
+                        const isSelected = customPromoInput.toUpperCase() === suggestion.code;
+                        return (
+                          <button
+                            key={suggestion.code}
+                            type="button"
+                            onClick={() => {
+                              setCustomPromoInput(suggestion.code);
+                              setCustomSlugInput(suggestion.slug);
+                            }}
+                            title={suggestion.marketingPitch}
+                            className={`p-2.5 rounded-xl text-left transition-all cursor-pointer border ${
+                              isSelected
+                                ? 'bg-[#DA0271] text-white border-[#DA0271] shadow-xs'
+                                : 'bg-white text-[#1A1512] border-[#EAE3DB] hover:border-[#DA0271]'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-mono text-xs font-bold">{suggestion.code}</span>
+                              <span
+                                className={`text-[10px] font-semibold truncate ${
+                                  isSelected ? 'text-white/90' : 'text-[#DA0271]'
+                                }`}
+                              >
+                                /poleca/{suggestion.slug}
+                              </span>
+                            </div>
+                            <div
+                              className={`text-[10px] mt-0.5 truncate ${
+                                isSelected ? 'text-white/85' : 'text-[#867A72]'
+                              }`}
+                            >
+                              {suggestion.categoryLabel}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   <form onSubmit={handleSaveCustomCode} className="space-y-4">
@@ -1108,12 +1176,12 @@ export default function AfiliacjaPage() {
                           value={customPromoInput}
                           onChange={(e) => setCustomPromoInput(e.target.value.toUpperCase())}
                           className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] bg-[#FAF7F2] font-mono font-bold text-sm"
-                          placeholder="np. STUDENT-ANNA10"
+                          placeholder="np. SPOKOJ-ANNA lub OD-ANI"
                         />
                       </div>
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1">
-                          Identyfikator w linku (?ref=)
+                          Końcówka czystego linku (/poleca/...)
                         </label>
                         <input
                           type="text"
@@ -1142,24 +1210,29 @@ export default function AfiliacjaPage() {
                       disabled={codeSaving}
                       className="px-6 py-2.5 rounded-full bg-[#250A24] hover:bg-[#DA0271] text-white text-xs font-bold transition-colors cursor-pointer"
                     >
-                      {codeSaving ? 'Zapisywanie...' : 'Zapisz mój własny kod i link'}
+                      {codeSaving ? 'Zapisywanie...' : 'Zapisz mój semantyczny kod i link'}
                     </button>
                   </form>
                 </div>
 
-                {/* 4 DEEP LINKI */}
+                {/* 5 CZYSTYCH LINKÓW MARKETINGOWYCH */}
                 <div className="rounded-3xl bg-white border border-[#EAE3DB] p-6 sm:p-8 shadow-xs space-y-4">
                   <div>
                     <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
-                      Linki Głębokie (30-dniowe ciasteczko hb_aff_ref)
+                      Czyste Linki Marketingowe (30-dniowe ciasteczko + automatyczny rabat -10%)
                     </span>
                     <h3 className="font-brand-display font-bold text-xl text-[#1A1512]">
-                      Kieruj odbiorców bezpośrednio do wybranych narzędzi
+                      Linki, które budują zaufanie już w podglądzie wiadomości i w bio
                     </h3>
                   </div>
 
                   <div className="space-y-3">
                     {[
+                      {
+                        key: 'dl-vanity',
+                        label: 'Krótki link wizerunkowy do bio (Instagram / TikTok / Wizytówka)',
+                        url: vanityAffiliateUrl,
+                      },
                       {
                         key: 'dl-home',
                         label: 'Strona główna z automatycznie włączonym kodem -10%',
@@ -1167,12 +1240,12 @@ export default function AfiliacjaPage() {
                       },
                       {
                         key: 'dl-plan',
-                        label: 'Bezpłatny Plan Porodu PDF (zapisuje Twoje 30-dniowe ciasteczko)',
+                        label: 'Bezpłatny Plan Porodu PDF (zapisuje kod -10% i 30-dniowe ciasteczko)',
                         url: birthPlanAffiliateUrl,
                       },
                       {
                         key: 'dl-layette',
-                        label: 'Bezpłatny Kalkulator Wyprawki PDF (zapisuje Twoje 30-dniowe ciasteczko)',
+                        label: 'Bezpłatny Kalkulator Wyprawki PDF (zapisuje kod -10% i 30-dniowe ciasteczko)',
                         url: layetteAffiliateUrl,
                       },
                       {
@@ -1250,6 +1323,43 @@ export default function AfiliacjaPage() {
                     <Printer className="w-4 h-4" />
                     <span>Drukuj arkusz 6 wizytówek rabatowych (PDF / A4)</span>
                   </button>
+                </div>
+
+                {/* FLAGOWE KODY ZESPOŁU I KAMPANII HAPPYBIRTH */}
+                <div className="rounded-3xl bg-[#250A24] text-white border border-[#DA0271]/40 p-6 space-y-3">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#FCD705]">
+                      Architektura Semantyczna HappyBirth
+                    </span>
+                    <h4 className="font-brand-display font-bold text-base text-white">
+                      Flagowe kody kampanijne naszego zespołu (-10%)
+                    </h4>
+                    <p className="text-[11px] text-[#EAD5E5]/85 leading-relaxed">
+                      Każdy kod w ekosystemie niesie obietnicę emocjonalną dla przyszłych rodziców zamiast sztucznych ciągów znaków:
+                    </p>
+                  </div>
+                  <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                    {TEAM_FLAGSHIP_CODES.slice(0, 6).map((fc) => (
+                      <div
+                        key={fc.code}
+                        className="p-2.5 rounded-xl bg-white/10 border border-white/10 flex items-center justify-between gap-2 text-xs"
+                      >
+                        <div className="min-w-0">
+                          <div className="font-mono font-bold text-[#FCD705]">{fc.code}</div>
+                          <div className="text-[10px] text-[#EAD5E5]/90 truncate">
+                            {fc.owner} · {fc.headline}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(`fc-${fc.code}`, `https://happybirth.pl/?kod=${fc.code}`)}
+                          className="px-2.5 py-1 rounded-lg bg-white/15 hover:bg-[#DA0271] text-white text-[10px] font-bold shrink-0 cursor-pointer"
+                        >
+                          {copiedKey === `fc-${fc.code}` ? 'Skopiowano' : 'Kopiuj link'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1914,7 +2024,7 @@ export default function AfiliacjaPage() {
 
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
-                      Preferowany prefiks kodu -10% (opcjonalnie)
+                      Twój semantyczny kod rabatowy -10% (wybierz lub wpisz)
                     </label>
                     <input
                       type="text"
@@ -1922,9 +2032,29 @@ export default function AfiliacjaPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, preferredPromoCode: e.target.value.toUpperCase() })
                       }
-                      placeholder="np. STUDENT-ANNA lub FIZJO-KASIA"
-                      className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] bg-[#FAF7F2] text-sm font-mono focus:outline-none focus:border-[#DA0271]"
+                      placeholder="np. SPOKOJ-ANNA lub OD-ANI"
+                      className="w-full px-4 py-3 rounded-xl border border-[#EAE3DB] bg-[#FAF7F2] text-sm font-mono font-bold focus:outline-none focus:border-[#DA0271]"
                     />
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#867A72]">
+                        Kliknij gotowy kod:
+                      </span>
+                      {registrationCodeSuggestions.slice(0, 5).map((cand) => (
+                        <button
+                          key={cand.code}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, preferredPromoCode: cand.code })}
+                          title={cand.marketingPitch}
+                          className={`px-2 py-0.5 rounded-lg font-mono text-[11px] font-bold border cursor-pointer transition-all ${
+                            formData.preferredPromoCode === cand.code
+                              ? 'bg-[#DA0271] text-white border-[#DA0271]'
+                              : 'bg-[#FAF7F2] text-[#1A1512] border-[#EAE3DB] hover:border-[#DA0271]'
+                          }`}
+                        >
+                          {cand.code}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

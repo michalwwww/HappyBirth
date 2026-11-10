@@ -1,3 +1,5 @@
+import { isSemanticAffiliateCodePattern } from './brand-codes';
+
 export interface PromoValidationResult {
   valid: boolean;
   code: string;
@@ -592,8 +594,8 @@ export function validatePromoCode(rawCode?: string | null): PromoValidationResul
     };
   }
 
-  // 1. Kody poleceń koleżeńskich z panelu kursantki [C4] (np. MAMA-KASIA, MAMA-2026)
-  if (/^MAMA-[A-Z0-9]{3,12}$/.test(clean)) {
+  // 1. Kody poleceń koleżeńskich z panelu kursantki [C4] (np. MAMA-KASIA, MAMA-KASIA-N, MAMA-2026)
+  if (/^MAMA-[A-Z0-9-]{2,16}$/.test(clean)) {
     return {
       valid: true,
       code: clean,
@@ -605,32 +607,13 @@ export function validatePromoCode(rawCode?: string | null): PromoValidationResul
     };
   }
 
-  // 2. Autoryzowane kody afiliacyjne -10% od położnych, fizjoterapeutek i partnerów [D1b]
-  const knownAffiliateCodes = [
-    'MAMAGAJA10',
-    'MAMAGAJA',
-    'POLOZNA10',
-    'FIZJO10',
-    'LAKTACJA10',
-    'PARTNER10',
-    'HAPPY10',
-    'SPOKOJ10',
-    'KOWALSKA10',
-    'NOWAK10',
-  ];
-
+  // 2. Semantyczne kody flagowe Zespołu HappyBirth, Studentów, Ambasadorów i Partnerów [D1b]
   const isAffiliatePattern =
-    knownAffiliateCodes.includes(clean) ||
-    clean === 'STUDENT10' ||
-    clean === 'STUDENT-2026' ||
-    clean === 'AMBASADOR10' ||
-    /^STUDENT-[A-Z0-9_-]{2,16}$/.test(clean) ||
-    /^AMBASADOR-[A-Z0-9_-]{2,16}$/.test(clean) ||
-    /^PARTNER-[A-Z0-9_-]{2,16}$/.test(clean) ||
-    /^HB-[A-Z0-9_-]{2,16}$/.test(clean) ||
-    /^POLOZNA-[A-Z0-9_-]{2,16}$/.test(clean) ||
-    /^FIZJO-[A-Z0-9_-]{2,16}$/.test(clean) ||
-    /^[A-Z0-9]{2,12}-[A-Z0-9]{2,8}10$/.test(clean);
+    isSemanticAffiliateCodePattern(clean) ||
+    clean === 'POLOZNA10' ||
+    clean === 'KOWALSKA10' ||
+    clean === 'NOWAK10' ||
+    /^POLOZNA-[A-Z0-9_-]{2,16}$/.test(clean);
 
   if (isAffiliatePattern) {
     return {

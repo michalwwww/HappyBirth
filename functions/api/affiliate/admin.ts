@@ -1,4 +1,5 @@
 import { getEdgeSession } from '../../_shared/session';
+import { generateSmartPartnerCodeCandidates } from '../../../lib/brand-codes';
 
 interface Env {
   DB?: any;
@@ -90,6 +91,65 @@ async function ensureAdminAffiliateTables(db: any) {
         )`
       )
       .run();
+
+    // Zadbaj o obecność flagowych kodów Zespołu HappyBirth w bazie D1
+    const teamSeeds = [
+      {
+        id: 'aff_team_michal',
+        email: 'mwspace@gmail.com',
+        name: 'Michał · Zespół HappyBirth',
+        code: 'DOBRYSTART',
+        slug: 'dobry-start',
+        spec: 'Zespół Założycielski · Kampanie i Partnerstwa Akademickie',
+      },
+      {
+        id: 'aff_team_maciej',
+        email: 'maciej@happybirth.pl',
+        name: 'Maciej · Zespół HappyBirth',
+        code: 'GOTOWY-TATA',
+        slug: 'gotowy-tata',
+        spec: 'Zespół Założycielski · Ścieżka Partnera i Produkt',
+      },
+      {
+        id: 'aff_team_redakcja',
+        email: 'kontakt@happybirth.pl',
+        name: 'Redakcja HappyBirth & Mama Gaja',
+        code: 'SPOKOJNYPOROD',
+        slug: 'spokojny-porod',
+        spec: 'Kod Flagowy Marki HappyBirth & Mama Gaja',
+      },
+      {
+        id: 'aff_team_razem',
+        email: 'partner@happybirth.pl',
+        name: 'Zespół Partnerski HappyBirth',
+        code: 'RAZEM-DO-PORODU',
+        slug: 'razem-do-porodu',
+        spec: 'Kampanie dla Par (18 miesięcy dla dwojga)',
+      },
+      {
+        id: 'aff_team_pierwszedni',
+        email: 'pomoc@happybirth.pl',
+        name: 'Wsparcie Rodziców HappyBirth',
+        code: 'PIERWSZEDNI',
+        slug: 'pierwsze-dni',
+        spec: 'Wyprawka, Połóg i Pierwsze Dni z Noworodkiem',
+      },
+    ];
+
+    for (const seed of teamSeeds) {
+      await db
+        .prepare(
+          `INSERT INTO affiliates (
+             id, email, full_name, role_category, specialization,
+             profile_or_practice_url, promo_code, ref_slug, tier1_rate,
+             referred_by_broker_id, tier2_override_rate, status
+           ) VALUES (?, ?, ?, 'standard', ?, 'https://happybirth.pl', ?, ?, 0.20, NULL, 0.05, 'active')
+           ON CONFLICT(email) DO NOTHING`
+        )
+        .bind(seed.id, seed.email, seed.name, seed.spec, seed.code, seed.slug)
+        .run()
+        .catch(() => {});
+    }
   } catch {
     // Best-effort
   }
@@ -864,10 +924,23 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         .replace(/^MAMA[-_]?/i, '')
         .replace(/[^A-Z0-9_-]/g, '');
 
+      const smartCandidates = generateSmartPartnerCodeCandidates(fullName, roleCategory, email);
       if (!promoCode || promoCode.length < 4) {
-        const suffix = crypto.randomUUID().slice(0, 4).toUpperCase();
-        const base = sanitizeCodePart(fullName, 'STUDENT');
-        promoCode = `${base}-${suffix}10`;
+        promoCode = smartCandidates[0]?.code || 'SPOKOJ-PARTNER';
+        for (const cand of smartCandidates) {
+          const taken = await env.DB.prepare(
+            `SELECT email FROM affiliates WHERE UPPER(promo_code) = ? LIMIT 1`
+          )
+            .bind(cand.code)
+            .first()
+            .catch(() => null);
+          if (!taken || String(taken.email).toLowerCase() === email) {
+            promoCode = cand.code;
+            break;
+          }
+        }
+      } else if (!promoCode.includes('-')) {
+        promoCode = `SPOKOJ-${promoCode}`;
       }
 
       const refSlug = promoCode.toLowerCase().replace(/[^a-z0-9_-]/g, '');

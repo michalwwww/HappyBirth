@@ -3,6 +3,10 @@ import {
   createSignedSessionToken,
   formatSessionSetCookie,
 } from '../../_shared/session';
+import {
+  generateSmartPartnerCodeCandidates,
+  isSemanticAffiliateCodePattern,
+} from '../../../lib/brand-codes';
 
 interface Env {
   DB?: any;
@@ -107,16 +111,62 @@ async function resolveOrProvisionAffiliate(
   const isTeam = TEAM_WHITELIST_EMAILS.has(cleanEmail);
 
   // Mamy (kursantki w Strefie Rodziców) są wyłączone z programu afiliacyjnego!
-  // Automatycznie zakładamy konto testowe wyłącznie dla zespołu administracyjnego (TEAM_WHITELIST_EMAILS).
+  // Automatycznie zakładamy konto dla zespołu administracyjnego z semantycznym kodem flagowym (bez losowych znaków hex).
   if (!affiliate && isTeam) {
+    const teamPresetMap: Record<string, { name: string; code: string; slug: string; spec: string }> = {
+      'mwspace@gmail.com': {
+        name: 'Michał · Zespół HappyBirth',
+        code: 'DOBRYSTART',
+        slug: 'dobry-start',
+        spec: 'Zespół Założycielski · Kampanie i Partnerstwa Akademickie',
+      },
+      'michal@happybirth.pl': {
+        name: 'Michał · HappyBirth',
+        code: 'DOBRYPOROD',
+        slug: 'dobry-porod',
+        spec: 'Zespół Założycielski · Kampanie Edukacyjne',
+      },
+      'maciej@happybirth.pl': {
+        name: 'Maciej · HappyBirth',
+        code: 'GOTOWY-TATA',
+        slug: 'gotowy-tata',
+        spec: 'Zespół Założycielski · Ścieżka Partnera i Produkt',
+      },
+      'kontakt@happybirth.pl': {
+        name: 'Redakcja HappyBirth & Mama Gaja',
+        code: 'SPOKOJNYPOROD',
+        slug: 'spokojny-porod',
+        spec: 'Kod Flagowy Marki HappyBirth & Mama Gaja',
+      },
+      'partner@happybirth.pl': {
+        name: 'Zespół Partnerski HappyBirth',
+        code: 'RAZEM-DO-PORODU',
+        slug: 'razem-do-porodu',
+        spec: 'Kampanie dla Par (18 miesięcy dla dwojga)',
+      },
+      'pomoc@happybirth.pl': {
+        name: 'Wsparcie Rodziców HappyBirth',
+        code: 'PIERWSZEDNI',
+        slug: 'pierwsze-dni',
+        spec: 'Wyprawka, Połóg i Pierwsze Dni z Noworodkiem',
+      },
+      'admin@happybirth.pl': {
+        name: 'Koordynacja Akademicka HappyBirth',
+        code: 'AKADEMIA-HB',
+        slug: 'akademia-hb',
+        spec: 'Koła Naukowe i Studenci Kierunków Medycznych',
+      },
+    };
+
+    const preset = teamPresetMap[cleanEmail];
     const fullName =
       preferredName ||
+      preset?.name ||
       userRow?.full_name ||
       cleanEmail.split('@')[0].replace(/[._-]/g, ' ');
-    const suffix = crypto.randomUUID().slice(0, 4).toUpperCase();
-    const basePart = sanitizeCodePart(fullName, 'STUDENT');
-    const promoCode = `${basePart}-${suffix}10`;
-    const refSlug = promoCode.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    const smartCandidates = generateSmartPartnerCodeCandidates(fullName, 'standard', cleanEmail);
+    const promoCode = preset?.code || smartCandidates[0]?.code || 'SPOKOJNYPOROD';
+    const refSlug = preset?.slug || promoCode.toLowerCase().replace(/[^a-z0-9_-]/g, '');
 
     let brokerId: string | null = null;
     if (brokerSlug) {
@@ -144,10 +194,19 @@ async function resolveOrProvisionAffiliate(
            id, email, full_name, role_category, specialization,
            profile_or_practice_url, promo_code, ref_slug, tier1_rate,
            referred_by_broker_id, tier2_override_rate, status
-         ) VALUES (?, ?, ?, 'standard', 'Student / Ambasador Akademicki', '', ?, ?, ?, ?, 0.05, 'active')
+         ) VALUES (?, ?, ?, 'standard', ?, '', ?, ?, ?, ?, 0.05, 'active')
          ON CONFLICT(email) DO NOTHING`
       )
-      .bind(newId, cleanEmail, fullName, promoCode, refSlug, initialRate, brokerId)
+      .bind(
+        newId,
+        cleanEmail,
+        fullName,
+        preset?.spec || 'Student / Ambasador Akademicki',
+        promoCode,
+        refSlug,
+        initialRate,
+        brokerId
+      )
       .run();
 
     affiliate = await db
@@ -159,6 +218,22 @@ async function resolveOrProvisionAffiliate(
       )
       .bind(cleanEmail)
       .first();
+  } else if (affiliate && isTeam && /-[A-F0-9]{4}10$/i.test(String(affiliate.promo_code || ''))) {
+    // Automatyczna migracja dawnego kodu losowego hex na koncie zespołu na czysty kod flagowy
+    const fallbackTeamCode =
+      cleanEmail === 'mwspace@gmail.com'
+        ? 'DOBRYSTART'
+        : cleanEmail === 'maciej@happybirth.pl'
+          ? 'GOTOWY-TATA'
+          : 'SPOKOJNYPOROD';
+    const fallbackSlug = fallbackTeamCode.toLowerCase();
+    await db
+      .prepare(`UPDATE affiliates SET promo_code = ?, ref_slug = ? WHERE id = ?`)
+      .bind(fallbackTeamCode, fallbackSlug, affiliate.id)
+      .run()
+      .catch(() => {});
+    affiliate.promo_code = fallbackTeamCode;
+    affiliate.ref_slug = fallbackSlug;
   }
 
   return {
@@ -188,13 +263,13 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
     const host = request.headers.get('host');
     const validateCode = (url.searchParams.get('validate_code') || '').trim().toUpperCase();
     if (validateCode) {
-      let valid = false;
-      if (env.DB) {
+      let valid = isSemanticAffiliateCodePattern(validateCode) || /^MAMA-[A-Z0-9-]{2,16}$/.test(validateCode);
+      if (!valid && env.DB) {
         try {
           const aff = await env.DB.prepare(
-            "SELECT id FROM affiliates WHERE UPPER(promo_code) = ? AND status = 'active' LIMIT 1"
+            "SELECT id FROM affiliates WHERE (UPPER(promo_code) = ? OR UPPER(ref_slug) = ?) AND status = 'active' LIMIT 1"
           )
-            .bind(validateCode)
+            .bind(validateCode, validateCode)
             .first();
           const usr = await env.DB.prepare(
             "SELECT id FROM users WHERE UPPER(referral_code) = ? LIMIT 1"
@@ -211,7 +286,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
     }
 
     const magicToken = url.searchParams.get('token');
-    const brokerParam = url.searchParams.get('broker');
+    const brokerParam = url.searchParams.get('zaprasza') || url.searchParams.get('broker');
     const secret = env.SESSION_SECRET || DEFAULT_SECRET;
 
     let session = await getEdgeSession(request, env);

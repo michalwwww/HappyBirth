@@ -25,8 +25,31 @@ const EDGE_PRICING_TABLE: Record<
 };
 
 const OFFICIAL_PROMO_ALLOWLIST = new Set([
-  'MAMAGAJA10',
+  'SPOKOJNYPOROD',
+  'SPOKOJNY-POROD',
+  'DOBRYSTART',
+  'DOBRY-START',
+  'GOTOWY-TATA',
+  'GOTOWYTATA',
+  'RAZEM-DO-PORODU',
+  'RAZEMDOPORODU',
+  'PIERWSZEDNI',
+  'PIERWSZE-DNI',
+  'DOBRYPOROD',
+  'DOBRY-POROD',
+  'WSPARCIE-TATY',
+  'WSPARCIETATY',
   'MAMAGAJA',
+  'MAMAGAJA10',
+  'BEZSTRESU',
+  'BEZ-STRESU',
+  'AKADEMIA-HB',
+  'SPOKOJ-W-DOMU',
+  'DOMOWASZKOLA',
+  'SZKOLARODZENIA',
+  'PLANPORODU',
+  'WYPRAWKA10',
+  'TORBA10',
   'POLOZNA10',
   'FIZJO10',
   'LAKTACJA10',
@@ -36,7 +59,13 @@ const OFFICIAL_PROMO_ALLOWLIST = new Set([
   'KOWALSKA10',
   'NOWAK10',
   'MAMA-2026',
+  'STUDENT10',
+  'STUDENT-2026',
+  'AMBASADOR10',
 ]);
+
+const SEMANTIC_PREFIX_REGEX =
+  /^(?:SPOKOJ|SPOKOJNA|SPOKOJNY|POLECA|DOBRYSTART|DOBRYPOROD|BLISKO|Z-SERCA|ZSERCA|OD|RAZEM|GOTOWI|GOTOWY|AKADEMIA|WIEDZA|MED|KAMPUS|KOLO|GABINET|PRAKTYKA|FIZJO|ODDECH|TULIMY|WYPRAWKA|RODZIMY|PARTNER|STUDENT|AMBASADOR|HB|POLOZNA)-[A-Z0-9_-]{2,20}$/;
 
 function parseCookie(cookieHeader: string | null, name: string): string {
   if (!cookieHeader) return '';
@@ -48,17 +77,10 @@ async function isAuthorized10PercentPromo(code: string, db?: any): Promise<boole
   if (!code) return false;
   if (
     OFFICIAL_PROMO_ALLOWLIST.has(code) ||
-    /^MAMA-[A-Z0-9]{3,12}$/.test(code) ||
-    code === 'STUDENT10' ||
-    code === 'STUDENT-2026' ||
-    code === 'AMBASADOR10' ||
-    /^STUDENT-[A-Z0-9_-]{2,16}$/.test(code) ||
-    /^AMBASADOR-[A-Z0-9_-]{2,16}$/.test(code) ||
-    /^PARTNER-[A-Z0-9_-]{2,16}$/.test(code) ||
-    /^HB-[A-Z0-9_-]{2,16}$/.test(code) ||
-    /^POLOZNA-[A-Z0-9_-]{2,16}$/.test(code) ||
-    /^FIZJO-[A-Z0-9_-]{2,16}$/.test(code) ||
-    /^[A-Z0-9]{2,12}-[A-Z0-9]{2,8}10$/.test(code)
+    /^MAMA-[A-Z0-9-]{2,16}$/.test(code) ||
+    SEMANTIC_PREFIX_REGEX.test(code) ||
+    /^[A-Z0-9]{2,14}-[A-Z0-9]{2,10}10$/.test(code) ||
+    /^[A-Z]{3,14}10$/.test(code)
   ) {
     return true;
   }
@@ -66,13 +88,15 @@ async function isAuthorized10PercentPromo(code: string, db?: any): Promise<boole
   if (db) {
     try {
       const aff = await db
-        .prepare(`SELECT id FROM affiliates WHERE promo_code = ? AND status = 'active'`)
-        .bind(code)
+        .prepare(
+          `SELECT id FROM affiliates WHERE (UPPER(promo_code) = ? OR UPPER(ref_slug) = ?) AND status = 'active' LIMIT 1`
+        )
+        .bind(code, code)
         .first();
       if (aff?.id) return true;
 
       const usr = await db
-        .prepare(`SELECT id FROM users WHERE referral_code = ?`)
+        .prepare(`SELECT id FROM users WHERE UPPER(referral_code) = ? LIMIT 1`)
         .bind(code)
         .first();
       if (usr?.id) return true;

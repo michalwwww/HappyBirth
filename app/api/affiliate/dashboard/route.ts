@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { getSession } from '@/lib/auth';
 import { d1All, d1First, d1Run } from '@/lib/d1';
+import { generateSmartPartnerCodeCandidates } from '@/lib/brand-codes';
 
 export const runtime = 'nodejs';
 
@@ -86,17 +87,73 @@ export async function GET(req: NextRequest) {
     );
 
     if (!affiliate && isTeam) {
-      const suffix = crypto.randomUUID().slice(0, 4).toUpperCase();
-      const promoCode = `STUDENT-${suffix}10`;
-      const refSlug = promoCode.toLowerCase();
+      const teamPresetMap: Record<string, { fullName: string; promoCode: string; refSlug: string; specialization: string }> = {
+        'mwspace@gmail.com': {
+          fullName: 'Michał · Zespół HappyBirth',
+          promoCode: 'DOBRYSTART',
+          refSlug: 'dobry-start',
+          specialization: 'Zespół Założycielski · Kampanie i Partnerstwa Akademickie',
+        },
+        'michal@happybirth.pl': {
+          fullName: 'Michał · HappyBirth',
+          promoCode: 'DOBRYPOROD',
+          refSlug: 'dobry-porod',
+          specialization: 'Zespół Założycielski · Kampanie Edukacyjne',
+        },
+        'maciej@happybirth.pl': {
+          fullName: 'Maciej · HappyBirth',
+          promoCode: 'GOTOWY-TATA',
+          refSlug: 'gotowy-tata',
+          specialization: 'Zespół Założycielski · Ścieżka Partnera i Produkt',
+        },
+        'kontakt@happybirth.pl': {
+          fullName: 'Redakcja HappyBirth & Mama Gaja',
+          promoCode: 'SPOKOJNYPOROD',
+          refSlug: 'spokojny-porod',
+          specialization: 'Kod Flagowy Marki HappyBirth & Mama Gaja',
+        },
+        'partner@happybirth.pl': {
+          fullName: 'Zespół Partnerski HappyBirth',
+          promoCode: 'RAZEM-DO-PORODU',
+          refSlug: 'razem-do-porodu',
+          specialization: 'Kampanie dla Par (18 miesięcy dla dwojga)',
+        },
+        'pomoc@happybirth.pl': {
+          fullName: 'Wsparcie Rodziców HappyBirth',
+          promoCode: 'PIERWSZEDNI',
+          refSlug: 'pierwsze-dni',
+          specialization: 'Wyprawka, Połóg i Pierwsze Dni z Noworodkiem',
+        },
+        'admin@happybirth.pl': {
+          fullName: 'Koordynacja Akademicka HappyBirth',
+          promoCode: 'AKADEMIA-HB',
+          refSlug: 'akademia-hb',
+          specialization: 'Koła Naukowe i Studenci Kierunków Medycznych',
+        },
+      };
+      const preset = teamPresetMap[cleanEmail];
+      const fallbackCandidates = generateSmartPartnerCodeCandidates(
+        userRow?.full_name || 'Zespół HappyBirth',
+        'standard',
+        cleanEmail
+      );
+      const promoCode = preset?.promoCode || fallbackCandidates[0]?.code || 'SPOKOJNYPOROD';
+      const refSlug = preset?.refSlug || promoCode.toLowerCase();
       await d1Run(
         `INSERT INTO affiliates (
            id, email, full_name, role_category, specialization,
            profile_or_practice_url, promo_code, ref_slug, tier1_rate,
            referred_by_broker_id, tier2_override_rate, status
-         ) VALUES (?, ?, ?, 'standard', 'Administrator / Ambasador HappyBirth', '', ?, ?, 0.20, NULL, 0.05, 'active')
+         ) VALUES (?, ?, ?, 'standard', ?, '', ?, ?, 0.20, NULL, 0.05, 'active')
          ON CONFLICT(email) DO NOTHING`,
-        [`aff_${crypto.randomUUID()}`, cleanEmail, userRow?.full_name || 'Administrator HappyBirth', promoCode, refSlug]
+        [
+          `aff_${crypto.randomUUID()}`,
+          cleanEmail,
+          preset?.fullName || userRow?.full_name || 'Zespół HappyBirth',
+          preset?.specialization || 'Administrator / Ambasador HappyBirth',
+          promoCode,
+          refSlug,
+        ]
       );
       affiliate = await d1First<any>(`SELECT * FROM affiliates WHERE email = ?`, [cleanEmail]);
     }
