@@ -1,141 +1,119 @@
 import type { Metadata } from 'next';
-import { Bricolage_Grotesque, Instrument_Serif, Inter } from 'next/font/google';
 import './globals.css';
+import './site.css';
+import './palety.css';
 import { CookieBanner } from '@/components/cookie-banner';
 import { I18nProvider } from '@/lib/i18n';
 import { AccessibilityToolbar } from '@/components/accessibility-toolbar';
+import { LogoSprite } from '@/components/site/logo';
+import { StraznikWygladu } from '@/components/site/straznik-wygladu';
+import { SKRYPT_WYGLADU } from '@/lib/wyglad-skrypt';
 
-const bricolage = Bricolage_Grotesque({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-bricolage',
-  display: 'swap',
-});
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: ['400'],
-  style: ['normal', 'italic'],
-  variable: '--font-instrument-serif',
-  display: 'swap',
-});
-
-const inter = Inter({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-inter',
-  display: 'swap',
-});
+// Kroje strony v3 (SOFT & COSY): Besley i Nunito, pliki lokalne w /public/f, bez Google Fonts.
+// Dawny arkusz /assets/hb.e90a1fdd5e.css nie jest już wpinany globalnie: strona główna i podstrony
+// mają własny system w app/site.css, strefa korzysta z Tailwind.
 
 export const metadata: Metadata = {
-  title: 'HAPPYBIRTH · Edukacyjny Kurs Szkoły Rodzenia Online — 52 Lekcje VOD',
+  title: 'Szkoła rodzenia online dla dwojga · HappyBirth',
   description:
-    'Certyfikowany kurs edukacyjny online dla przyszłych mam i ojców. 52 filmowe lekcje e-learning VOD, sprawdzone patenty i edukacja rodzicielska dla dwojga.',
+    '52 lekcje wideo z dyplomowanymi ekspertkami, prawie 5 godzin nagrań. Od pierwszych tygodni ciąży do pierwszego roku z dzieckiem. Dostęp dla dwojga, 489 zł.',
   metadataBase: new URL('https://happybirth.pl'),
   category: 'education',
   keywords: [
-    'kurs edukacyjny',
     'szkoła rodzenia online',
-    'kurs online dla rodziców',
-    'edukacja rodzicielska',
-    'e-learning',
-    'lekcje vod',
-    'przygotowanie do porodu kurs',
+    'kurs online dla przyszłych rodziców',
+    'szkoła rodzenia dla dwojga',
+    'przygotowanie do porodu',
+    'lekcje wideo',
+    'edukacja przedporodowa',
   ],
   openGraph: {
-    title: 'HAPPYBIRTH · Edukacyjny Kurs Szkoły Rodzenia Online — 52 Lekcje VOD',
-    description: 'Certyfikowany program edukacyjny dla mam i ojców. 52 filmowe lekcje e-learning VOD dla dwojga.',
+    title: 'HappyBirth. Szkoła rodzenia online dla dwojga',
+    description: 'Doświadczenie mamy. 52 lekcje wideo dla dwojga, od pierwszych tygodni ciąży do pierwszych urodzin dziecka.',
     url: 'https://happybirth.pl',
-    siteName: 'HappyBirth Edukacja',
+    siteName: 'HappyBirth',
     locale: 'pl_PL',
     type: 'website',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'HappyBirth. Szkoła rodzenia online dla dwojga. Doświadczenie mamy.' }],
   },
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }, { url: '/favicon.ico' }],
+    apple: '/icon-192.png',
+  },
+  manifest: '/site.webmanifest',
   other: {
     classification: 'Education, Parenting Training, E-learning',
-    'target-audience': 'Parents, Expectant Parents',
-    subject: 'Edukacja i kursy online przygotowania do rodzicielstwa',
   },
 };
 
-const educationalJsonLd = {
+// Dane strukturalne: liczby kanoniczne (8 modułów, 52 lekcje, 4 h 48 min, 489 zł).
+const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'EducationalOrganization',
       '@id': 'https://happybirth.pl/#organization',
-      name: 'HappyBirth Edukacja Online',
+      name: 'HappyBirth',
       url: 'https://happybirth.pl',
-      description:
-        'Ogólnopolska platforma edukacyjna e-learning oferująca kursy wideo VOD i materiały szkoleniowe przygotowujące do świadomego rodzicielstwa.',
-      sameAs: ['https://instagram.com/happybirth.pl'],
+      logo: 'https://happybirth.pl/logo.png',
+      slogan: 'Doświadczenie mamy.',
+      description: 'Szkoła rodzenia online dla dwojga. Kurs wideo dla przyszłych rodziców, oparty na doświadczeniu stacjonarnej szkoły rodzenia założonej w 2012 roku.',
+      sameAs: ['https://www.instagram.com/happybirth.pl/', 'https://www.tiktok.com/@happybirth_pl'],
+      email: 'kontakt@happybirth.pl',
+      taxID: '7812118273',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'ul. Śląska 14',
+        postalCode: '60-614',
+        addressLocality: 'Poznań',
+        addressCountry: 'PL',
+      },
     },
     {
       '@type': 'Course',
       '@id': 'https://happybirth.pl/#course',
-      name: 'Edukacyjny Kurs Przygotowania do Porodu i Rodzicielstwa Online',
+      name: 'HappyBirth. Szkoła rodzenia online dla dwojga',
       description:
-        'Kompleksowy program edukacyjny online w formule e-learning VOD dla mam i ojców. 52 filmowe lekcje 4K w 8 modułach tematycznych (288 min) z 18-miesięcznym dostępem.',
-      provider: {
-        '@id': 'https://happybirth.pl/#organization',
-      },
-      educationalCredentialAwarded: 'Certyfikat ukończenia programu edukacyjnego HappyBirth',
-      occupationalCategory: 'Edukacja Rodzicielska / Parenting Education',
+        'Kurs wideo dla przyszłych rodziców: 52 lekcje w 8 modułach, od pierwszych tygodni ciąży, przez poród, do pierwszych urodzin dziecka. Dostęp dla dwojga przez 18 miesięcy od zakupu.',
+      provider: { '@id': 'https://happybirth.pl/#organization' },
+      educationalCredentialAwarded: 'Certyfikat ukończenia kursu HappyBirth',
+      timeRequired: 'PT4H48M',
       inLanguage: 'pl-PL',
+      numberOfLessons: 52,
       hasCourseInstance: {
         '@type': 'CourseInstance',
         courseMode: 'Online',
-        courseWorkload: 'PT15H',
+        courseWorkload: 'PT4H48M',
       },
       offers: {
         '@type': 'Offer',
         price: '489',
         priceCurrency: 'PLN',
         availability: 'https://schema.org/InStock',
-        category: 'Education / E-learning Course',
+        url: 'https://happybirth.pl/#kup',
+        category: 'Paid',
+        description: 'Płatność jednorazowa, bez abonamentu. Dostęp dla dwojga przez 18 miesięcy (548 dni) od zakupu.',
       },
     },
   ],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="pl"
-      data-fonty="a"
-      className={`scroll-smooth ${bricolage.variable} ${instrumentSerif.variable} ${inter.variable}`}
-    >
+    <html lang="pl" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        <link rel="stylesheet" href="/assets/hb.e90a1fdd5e.css" />
-        <link as="font" crossOrigin="" href="/f/hanken-lat.woff2" rel="preload" type="font/woff2" />
-        <link as="font" crossOrigin="" href="/f/instrument-sans-rg-lat.woff2" rel="preload" type="font/woff2" />
-        <link as="font" crossOrigin="" href="/f/instrument-serif-rg-lat.woff2" rel="preload" type="font/woff2" />
-        <link as="font" crossOrigin="" href="/f/instrument-serif-it-lat.woff2" rel="preload" type="font/woff2" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(educationalJsonLd) }}
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){
-              try {
-                var t = localStorage.getItem('hb_theme');
-                if (t === 'dark') {
-                  document.documentElement.classList.add('dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                }
-                var l = localStorage.getItem('hb_lang');
-                if (l && (l === 'pl' || l === 'en' || l === 'ru')) {
-                  document.documentElement.lang = l;
-                }
-              } catch (e) {}
-            })()`,
-          }}
-        />
+        <link as="font" crossOrigin="" href="/f/besley-latin-wght-normal.woff2" rel="preload" type="font/woff2" />
+        <link as="font" crossOrigin="" href="/f/besley-latin-ext-wght-normal.woff2" rel="preload" type="font/woff2" />
+        <link as="font" crossOrigin="" href="/f/nunito-latin-wght-normal.woff2" rel="preload" type="font/woff2" />
+        <link as="font" crossOrigin="" href="/f/nunito-latin-ext-wght-normal.woff2" rel="preload" type="font/woff2" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        {/* paleta i tryb nocny przed pierwszym malowaniem (lib/wyglad-skrypt.ts) */}
+        <script dangerouslySetInnerHTML={{ __html: SKRYPT_WYGLADU }} />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#FBF8F4] dark:bg-[#140513] text-[#1A1512] dark:text-[#FBF8F4] antialiased selection:bg-[#EC008C]/20 transition-colors duration-200">
+      <body className="min-h-screen flex flex-col bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] antialiased transition-colors duration-200">
+        <LogoSprite />
+        {/* przywraca paletę i tryb, gdyby React po błędzie hydracji wyczyścił atrybuty <html> */}
+        <StraznikWygladu />
         <I18nProvider>
           {children}
           <CookieBanner />
@@ -145,4 +123,3 @@ export default function RootLayout({
     </html>
   );
 }
-

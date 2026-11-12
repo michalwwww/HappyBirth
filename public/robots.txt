@@ -1,98 +1,77 @@
-# Sterylna Śluza AdOps & RODO (Art. 9) — Blokada botów reklamowych dla strefy medycznej, B2B i afiliacji
-User-agent: Facebot
-Disallow: /strefa
-Disallow: /strefa/
-Disallow: /afiliacja
-Disallow: /afiliacja/
-Disallow: /partnerzy
-Disallow: /partnerzy/
-Disallow: /lekcje
-Disallow: /lekcja
-Disallow: /licznik
-Disallow: /apteczka
-Disallow: /partner
-Disallow: /login
-Disallow: /api/
-
-User-agent: facebookexternalhit
-Disallow: /strefa
-Disallow: /strefa/
-Disallow: /afiliacja
-Disallow: /afiliacja/
-Disallow: /partnerzy
-Disallow: /partnerzy/
-Disallow: /lekcje
-Disallow: /lekcja
-Disallow: /licznik
-Disallow: /apteczka
-Disallow: /partner
-Disallow: /login
-Disallow: /api/
-
-User-agent: AdsBot-Google
-Disallow: /strefa
-Disallow: /strefa/
-Disallow: /afiliacja
-Disallow: /afiliacja/
-Disallow: /partnerzy
-Disallow: /partnerzy/
-Disallow: /lekcje
-Disallow: /lekcja
-Disallow: /licznik
-Disallow: /apteczka
-Disallow: /partner
-Disallow: /login
-Disallow: /api/
-
-User-agent: AdsBot-Google-Mobile
-Disallow: /strefa
-Disallow: /strefa/
-Disallow: /afiliacja
-Disallow: /afiliacja/
-Disallow: /partnerzy
-Disallow: /partnerzy/
-Disallow: /lekcje
-Disallow: /lekcja
-Disallow: /licznik
-Disallow: /apteczka
-Disallow: /partner
-Disallow: /login
-Disallow: /api/
-
-User-agent: Bytespider
-Disallow: /strefa
-Disallow: /strefa/
-Disallow: /afiliacja
-Disallow: /afiliacja/
-Disallow: /partnerzy
-Disallow: /partnerzy/
-Disallow: /api/
+# robots.txt dla https://happybirth.pl
+# Zoptymalizowany pod SEO (Google, Bing) oraz GEO / AI Search (OpenAI, Perplexity, Claude, Gemini)
+# Ścisła izolacja subdomen operacyjnych (strefa, partnerzy, afiliacja)
 
 User-agent: *
 Allow: /
 Allow: /program
+Allow: /dla-ciebie
 Allow: /o-nas
 Allow: /plan-porodu
 Allow: /kalkulator-wyprawki
 Allow: /regulamin
 Allow: /polityka-prywatnosci
+Allow: /polityka-cookies
 Allow: /odstap-od-umowy
+Allow: /llms.txt
+Allow: /llms-full.txt
 Disallow: /strefa
-Disallow: /strefa/
-Disallow: /strefa/*
-Disallow: /afiliacja
-Disallow: /afiliacja/
-Disallow: /afiliacja/*
-Disallow: /partnerzy
-Disallow: /partnerzy/
-Disallow: /partnerzy/*
-Disallow: /lekcje
-Disallow: /lekcja
-Disallow: /licznik
-Disallow: /apteczka
-Disallow: /partner
-Disallow: /login
 Disallow: /api/
-Disallow: /api/*
+Disallow: /auth/
+Disallow: /marketing
+Disallow: /challenge
+Disallow: /afiliacja
+Disallow: /partnerzy
+Disallow: /materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html
+Disallow: /materialy/szybkie-i-odzywcze-obiady-15-min-happybirth.html
+
+# Jawne zezwolenie dla botów wyszukiwarek AI (Generative Engine Optimization — GEO) wyłącznie na treści konsumenckie E-E-A-T
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /strefa
+Disallow: /afiliacja
+Disallow: /partnerzy
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /strefa
+Disallow: /afiliacja
+Disallow: /partnerzy
+
+User-agent: GPTBot
+Allow: /
+Disallow: /strefa
+Disallow: /afiliacja
+Disallow: /partnerzy
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /strefa
+Disallow: /afiliacja
+Disallow: /partnerzy
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /strefa
+Disallow: /afiliacja
+Disallow: /partnerzy
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /strefa
+Disallow: /afiliacja
+Disallow: /partnerzy
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /strefa
+Disallow: /afiliacja
+Disallow: /partnerzy
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /strefa
+Disallow: /afiliacja
+Disallow: /partnerzy
 
 Sitemap: https://happybirth.pl/sitemap.xml

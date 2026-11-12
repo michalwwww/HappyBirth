@@ -19,7 +19,7 @@ export async function GET() {
         rewardUnlocked: false,
         rewardTitle:
           'E-book PDF: „Szybkie i Odżywcze Obiady w 15 Minut dla Przyszłej Mamy i w Czasie Laktacji (Przepisy + Gotowe Listy Zakupów)”',
-        rewardDownloadUrl: '/materialy/szybkie-i-odzywcze-obiady-15-min-happybirth.html',
+        rewardDownloadUrl: '/materialy/podglad-obiady-15-min-happybirth.html',
       });
     }
 
@@ -39,13 +39,16 @@ export async function GET() {
       [session.userId]
     );
 
+    const rewardUnlocked = referrals.length > 0;
     return NextResponse.json({
       referralCode: code,
       referralsCount: referrals.length,
-      rewardUnlocked: referrals.length > 0,
+      rewardUnlocked,
       rewardTitle:
         'E-book PDF: „Szybkie i Odżywcze Obiady w 15 Minut dla Przyszłej Mamy i w Czasie Laktacji (Przepisy + Gotowe Listy Zakupów)”',
-      rewardDownloadUrl: '/materialy/szybkie-i-odzywcze-obiady-15-min-happybirth.html',
+      rewardDownloadUrl: rewardUnlocked
+        ? '/materialy/szybkie-i-odzywcze-obiady-15-min-happybirth.html'
+        : '/materialy/podglad-obiady-15-min-happybirth.html',
       shareMessage: `Z moim kodem ${code} masz 10% zniżki (440,10 zł zamiast 489,00 zł) na szkołę rodzenia online HappyBirth.pl, a ja otrzymam w prezencie e-booka z przepisami na szybkie obiady #współpraca https://happybirth.pl/?promo=${code}`,
     });
   } catch (err) {

@@ -98,8 +98,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/standard-merytoryczny" className="hover:text-white transition-colors">
-                  Standard merytoryczny (E-E-A-T)
+                <Link href="/dla-ciebie" className="hover:text-white transition-colors">
+                  Dla Ciebie · Prawa i Standard 2026
                 </Link>
               </li>
               <li>
@@ -115,47 +115,46 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href={strefaUrl} className="hover:text-[#EC008C] transition-colors font-semibold text-white">
+                <a href={strefaUrl} rel="nofollow" className="hover:text-[#EC008C] transition-colors font-semibold text-white">
                   {t.nav.zoneBtn}
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Kolumna 3: Współpraca & Afiliacja (Trójpodział) */}
+          {/* Kolumna 3: Wiedza i Prawa Rodziców 2026 (E-E-A-T) */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-white">
-              Współpraca i Afiliacja
+              Prawa Rodziców i Wiedza 2026
             </h4>
             <ul className="space-y-2.5 text-xs text-[#EAD5E5]/80">
               <li>
                 <Link
-                  href="/afiliacja"
+                  href="/dla-ciebie"
                   className="hover:text-[#EC008C] transition-colors flex items-center gap-1 font-semibold text-white"
                 >
                   <Users className="w-3.5 h-3.5 text-[#EC008C]" />
-                  <span>Afiliacja dla Położnych i Twórczyń</span>
+                  <span>21 Praw Rodziców w Szpitalu</span>
                   <ArrowUpRight className="w-3 h-3 text-[#EC008C]" />
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/partnerzy"
+                  href="/dla-ciebie#zmiany-2026"
                   className="hover:text-[#FCD705] transition-colors flex items-center gap-1 font-semibold text-white"
                 >
                   <Building2 className="w-3.5 h-3.5 text-[#FCD705]" />
-                  <span>Współpraca B2B (Marki, Kliniki, HR)</span>
-                  <ArrowUpRight className="w-3 h-3 text-[#FCD705]" />
+                  <span>Zmiany od 7 maja 2026 r. (Dz.U. 2025 poz. 1525)</span>
                 </Link>
               </li>
               <li>
-                <Link href="/afiliacja#kalkulator" className="hover:text-white transition-colors">
-                  Kalkulator Prowizji (20%–30% CPA)
+                <Link href="/program" className="hover:text-white transition-colors">
+                  Spis 52 lekcji w 8 modułach (288 min)
                 </Link>
               </li>
               <li>
-                <Link href="/partnerzy#formularz" className="hover:text-white transition-colors">
-                  Pakiety B2B dla Pracodawców i Klinik
+                <Link href="/o-nas" className="hover:text-white transition-colors">
+                  Kadra Szkoły Rodzenia Mama Gaja (od 2012 r.)
                 </Link>
               </li>
             </ul>
@@ -174,8 +173,8 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="mailto:partnerzy@happybirth.pl" className="hover:text-white transition-colors flex items-center gap-1">
-                  <span>partnerzy@happybirth.pl</span>
+                <a href="mailto:pomoc@happybirth.pl" className="hover:text-white transition-colors flex items-center gap-1">
+                  <span>pomoc@happybirth.pl</span>
                   <ArrowUpRight className="w-3 h-3 text-[#FCD705]" />
                 </a>
               </li>

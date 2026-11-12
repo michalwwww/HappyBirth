@@ -24,7 +24,12 @@ try {
   execSync('npx next build', {
     cwd: projectRoot,
     stdio: 'inherit',
-    env: { ...process.env, NODE_ENV: 'production', NEXT_EXPORT: 'true' },
+    env: {
+      ...process.env,
+      NODE_ENV: 'production',
+      STATIC_EXPORT: 'true',
+      NEXT_EXPORT: 'true',
+    },
   });
 
   console.log('✅ Eksport statyczny zakończony sukcesem!');

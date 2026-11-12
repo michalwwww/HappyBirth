@@ -1,0 +1,146 @@
+/* =====================================================================
+   HappyBirth · palety (runda X1, 05.11.2026; SŁONECZNY i KOLOROWY ocieplone w rundzie X4)
+   Cztery wersje kolorystyczne do wyboru w Ustawieniach, każda w trybie dziennym i nocnym.
+   Domyślna: SŁONECZNY (kontynuacja dotychczasowego wyglądu). Wybór trzyma atrybut
+   html[data-paleta], tryb nocny klasa html.dark. Plik wygenerowany skryptem z kontrolą kontrastu
+   (tekst co najmniej 4,5:1, tytuły na zdjęciach co najmniej 7:1). Logo bierze kolory z --hb-logo-1..4.
+   --hb-zaslona to składowe RGB kurtyny pod tekstem na zdjęciach (rgb(var(--hb-zaslona) / .8)).
+   ===================================================================== */
+
+/* ---------- SŁONECZNY (Soft pastel), domyślna ----------
+   X4: cieplej, mniej fioletu i błękitu: tekst i noc w odcieniach śliwki i jagody zamiast fioletu,
+   pigułka Strefy mamy różowa, kurtyna na zdjęciach w ciepłej jagodzie, zdjęcia odrobinę cieplejsze */
+:root,html[data-paleta="sloneczny"]{
+  --hb-kosc:#FFFAF5;--hb-papier:#FFF2E8;--hb-len:#FBE7DA;--hb-karta:#FFFDFB;--hb-ink:#4A3240;--hb-ink2:#6C5260;--hb-ink3:#7A6270;--hb-noc:#743F62;--hb-noc2:#5E3350;
+  --hb-noc3:#36202E;--hb-linia:#F2E1D4;--hb-linia2:#E6CFC0;--hb-roz:#B8335E;--hb-mag:#D23468;--hb-mag-h:#BF2A5D;--hb-cta-hi:#F27BA0;--hb-cta-lo:#A81E50;--hb-cta-ink:#FFFFFF;
+  --hb-mag-t:#D13065;--hb-zol:#FFD15C;--hb-zol-h:#FFDB7C;--hb-pil-hi:#FFEBAD;--hb-pil-lo:#E5A92A;--hb-pil-ink:#3F2A33;--hb-stf:#F4ACB7;--hb-stf-hi:#FBD3DA;
+  --hb-stf-lo:#D97E92;--hb-stf-ink:#4A2433;--hb-oferta:#D23468;--hb-oferta-lo:#A81E50;--hb-oferta-ink:#FFFFFF;--hb-zakup:#FFD15C;--hb-zakup-hi:#FFEBAD;--hb-zakup-lo:#E5A92A;
+  --hb-zakup-ink:#3F2A33;--hb-pom:#F08A4B;--hb-nie:#4FA3E3;--hb-p1:#EE9BAE;--hb-p1l:#FCEEF1;--hb-p1t:#F7D2DB;--hb-p1g:#D11A44;--hb-p1c:#E86986;--hb-p2:#F4C95D;
+  --hb-p2l:#FDF6E3;--hb-p2t:#FAE7B6;--hb-p2g:#8E6602;--hb-p2c:#BD8905;--hb-p3:#8CCB9F;--hb-p3l:#EBF6EF;--hb-p3t:#CBE8D4;--hb-p3g:#337C49;--hb-p3c:#47A563;
+  --hb-pn:#B59AD6;--hb-pnl:#F2EEF8;--hb-pnt:#DED2ED;--hb-pnc:#8252BD;--hb-p4:#7DB8EA;--hb-p4l:#E9F3FB;--hb-p4t:#C4DFF6;--hb-p4g:#166EB8;--hb-p4c:#4199E4;--hb-zaslona:70,34,48;
+  --hb-hero-t1:#FFFBF7;--hb-hero-t2:#FFC7D4;--hb-serce:#E23D5E;--hb-stopka:#743F62;--hb-stopka-ink:#FFFFFF;--hb-nav-bg:rgba(255,250,245,.78);--hb-logo-1:#D6336C;
+  --hb-logo-2:#3E9BE0;--hb-logo-3:#F0843F;--hb-logo-4:#F5B921;--hb-foto-filtr:sepia(.12) saturate(1.06) hue-rotate(-7deg);
+}
+
+html.dark,html.dark[data-paleta="sloneczny"]{
+  --hb-kosc:#2E1F2B;--hb-papier:#372533;--hb-len:#3D2939;--hb-karta:#442D40;--hb-ink:#FFF8F6;--hb-ink2:#F2DDE5;--hb-ink3:#DCC1CD;--hb-noc:#62385A;--hb-noc2:#55304D;
+  --hb-noc3:#22141E;--hb-linia:#573A52;--hb-linia2:#694762;--hb-roz:#FFB0C8;--hb-mag:#D23468;--hb-mag-h:#BF2A5D;--hb-cta-hi:#F27BA0;--hb-cta-lo:#A81E50;--hb-cta-ink:#FFFFFF;
+  --hb-mag-t:#FFB0C8;--hb-zol:#FFD15C;--hb-zol-h:#FFDB7C;--hb-pil-hi:#FFEBAD;--hb-pil-lo:#E5A92A;--hb-pil-ink:#3F2A33;--hb-stf:#F4ACB7;--hb-stf-hi:#FBD3DA;
+  --hb-stf-lo:#D97E92;--hb-stf-ink:#4A2433;--hb-oferta:#C42C60;--hb-oferta-lo:#951A47;--hb-oferta-ink:#FFFFFF;--hb-zakup:#FFD15C;--hb-zakup-hi:#FFEBAD;--hb-zakup-lo:#E5A92A;
+  --hb-zakup-ink:#3F2A33;--hb-pom:#FF9A5C;--hb-nie:#6CB8F2;--hb-p1:#F2A7B8;--hb-p1l:#714D5F;--hb-p1t:#9B6A7C;--hb-p1g:#F6C2CE;--hb-p1c:#F2A7B8;--hb-p2:#F6D06E;
+  --hb-p2l:#72574C;--hb-p2t:#9D7E57;--hb-p2g:#F7D57C;--hb-p2c:#F6D06E;--hb-p3:#9AD3AB;--hb-p3l:#5A585C;--hb-p3t:#6F8076;--hb-p3g:#AFDCBD;--hb-p3c:#9AD3AB;
+  --hb-pn:#C2A8E4;--hb-pnl:#654D6B;--hb-pnt:#836A92;--hb-pnc:#D8C7EE;--hb-p4:#8CC3F0;--hb-p4l:#57546E;--hb-p4t:#687898;--hb-p4g:#ACD3F4;--hb-p4c:#8CC3F0;--hb-zaslona:46,22,32;
+  --hb-hero-t1:#FFFBF7;--hb-hero-t2:#FFC7D4;--hb-serce:#F0507A;--hb-stopka:#4E2A47;--hb-stopka-ink:#FFF8FD;--hb-nav-bg:rgba(46,31,43,.66);--hb-logo-1:#FF6E9C;
+  --hb-logo-2:#6CB8F2;--hb-logo-3:#FF9A5C;--hb-logo-4:#FFD15C;--hb-foto-filtr:sepia(.12) saturate(1.06) hue-rotate(-7deg);
+}
+
+/* ---------- CIEPŁY (Midnight luxury) ---------- */
+html[data-paleta="cieply"]{
+  --hb-kosc:#FBF8F3;--hb-papier:#F4EEE3;--hb-len:#ECE3D3;--hb-karta:#FFFFFF;--hb-ink:#14213D;--hb-ink2:#39465E;--hb-ink3:#565F6C;--hb-noc:#14213D;--hb-noc2:#0E182E;
+  --hb-noc3:#0A1122;--hb-linia:#E8E0D2;--hb-linia2:#D9CDB9;--hb-roz:#8C5900;--hb-mag:#E8970F;--hb-mag-h:#D38808;--hb-cta-hi:#FFCB66;--hb-cta-lo:#B97600;--hb-cta-ink:#14213D;
+  --hb-mag-t:#9A6306;--hb-zol:#1F3157;--hb-zol-h:#304570;--hb-pil-hi:#4A6296;--hb-pil-lo:#0E182E;--hb-pil-ink:#FFFFFF;--hb-stf:#CB8E7E;--hb-stf-hi:#EBC3B7;
+  --hb-stf-lo:#A06656;--hb-stf-ink:#14213D;--hb-oferta:#14213D;--hb-oferta-lo:#0A1122;--hb-oferta-ink:#FFFFFF;--hb-zakup:#F2A31B;--hb-zakup-hi:#FFD27A;--hb-zakup-lo:#C47F00;
+  --hb-zakup-ink:#14213D;--hb-pom:#D9822B;--hb-nie:#4F6D9A;--hb-p1:#D59A8B;--hb-p1l:#F8EEEB;--hb-p1t:#ECD2CB;--hb-p1g:#AD5039;--hb-p1c:#CB7F6C;--hb-p2:#E9B44C;
+  --hb-p2l:#FBF2E1;--hb-p2t:#F5DDAE;--hb-p2g:#91640B;--hb-p2c:#C28712;--hb-p3:#BFA57A;--hb-p3l:#F4F0E8;--hb-p3t:#E2D6C3;--hb-p3g:#83683B;--hb-p3c:#B08E56;
+  --hb-pn:#7F86B8;--hb-pnl:#E9EAF3;--hb-pnt:#C5C9DF;--hb-pnc:#5A63A5;--hb-p4:#7F9DB8;--hb-p4l:#E9EEF3;--hb-p4t:#C5D3DF;--hb-p4g:#4B6D8C;--hb-p4c:#7898B5;--hb-zaslona:12,22,44;
+  --hb-hero-t1:#FFFFFF;--hb-hero-t2:#FFC85A;--hb-serce:#D62839;--hb-stopka:#14213D;--hb-stopka-ink:#F7F3EA;--hb-nav-bg:rgba(251,248,243,.8);--hb-logo-1:#14213D;
+  --hb-logo-2:#E39A12;--hb-logo-3:#C08070;--hb-logo-4:#14213D;
+}
+
+html.dark[data-paleta="cieply"]{
+  --hb-kosc:#14223F;--hb-papier:#192A4B;--hb-len:#1D2F53;--hb-karta:#213459;--hb-ink:#F8F4EC;--hb-ink2:#DAD5CA;--hb-ink3:#B3BAC6;--hb-noc:#2A3F6E;--hb-noc2:#22355E;
+  --hb-noc3:#0B1426;--hb-linia:#2E4169;--hb-linia2:#3C5180;--hb-roz:#FCC35A;--hb-mag:#F2A31B;--hb-mag-h:#DD930F;--hb-cta-hi:#FFD27A;--hb-cta-lo:#C47F00;--hb-cta-ink:#14213D;
+  --hb-mag-t:#FCC35A;--hb-zol:#2E4372;--hb-zol-h:#3E5588;--hb-pil-hi:#5671AA;--hb-pil-lo:#1A2950;--hb-pil-ink:#FFFFFF;--hb-stf:#D9A090;--hb-stf-hi:#F2C9BC;
+  --hb-stf-lo:#B07565;--hb-stf-ink:#14213D;--hb-oferta:#0E1A33;--hb-oferta-lo:#070E1E;--hb-oferta-ink:#FFFFFF;--hb-zakup:#F2A31B;--hb-zakup-hi:#FFD27A;--hb-zakup-lo:#C47F00;
+  --hb-zakup-ink:#14213D;--hb-pom:#F0A050;--hb-nie:#8FA9D6;--hb-p1:#E2AE9F;--hb-p1l:#53546B;--hb-p1t:#82717C;--hb-p1g:#EAC5BA;--hb-p1c:#E2AE9F;--hb-p2:#F2C467;
+  --hb-p2l:#57595D;--hb-p2t:#8A7C60;--hb-p2g:#F4CD7E;--hb-p2c:#F2C467;--hb-p3:#D2BA8E;--hb-p3l:#4F5767;--hb-p3t:#7A7774;--hb-p3g:#DECCAB;--hb-p3c:#D2BA8E;
+  --hb-pn:#9CA2D6;--hb-pnl:#41517A;--hb-pnt:#5E6B98;--hb-pnc:#C4C7E6;--hb-p4:#95B2CD;--hb-p4l:#3F5577;--hb-p4t:#5B7393;--hb-p4g:#BBCEDF;--hb-p4c:#95B2CD;--hb-zaslona:10,18,36;
+  --hb-hero-t1:#FFFFFF;--hb-hero-t2:#FFC85A;--hb-serce:#F04355;--hb-stopka:#0E1A33;--hb-stopka-ink:#F7F3EA;--hb-nav-bg:rgba(20,34,63,.66);--hb-logo-1:#F7F1E6;
+  --hb-logo-2:#FCB43A;--hb-logo-3:#E3A795;--hb-logo-4:#F7F1E6;
+}
+
+/* ---------- NATURALNY (Earthy natural) ---------- */
+html[data-paleta="naturalny"]{
+  --hb-kosc:#FBF9F0;--hb-papier:#F4F1DE;--hb-len:#ECE7CF;--hb-karta:#FFFEF8;--hb-ink:#22414C;--hb-ink2:#3E5D67;--hb-ink3:#55707A;--hb-noc:#264653;--hb-noc2:#1D3A45;
+  --hb-noc3:#132A33;--hb-linia:#E6E0C8;--hb-linia2:#D6CDAF;--hb-roz:#A8442A;--hb-mag:#C4502F;--hb-mag-h:#B24628;--hb-cta-hi:#F08A6C;--hb-cta-lo:#9C3A1F;--hb-cta-ink:#FFFFFF;
+  --hb-mag-t:#BC4C2D;--hb-zol:#E9C46A;--hb-zol-h:#EFD083;--hb-pil-hi:#F7E3A8;--hb-pil-lo:#C99D3A;--hb-pil-ink:#1E3A44;--hb-stf:#2A9D8F;--hb-stf-hi:#7FD1C6;
+  --hb-stf-lo:#1B7366;--hb-stf-ink:#0D2A2F;--hb-oferta:#264653;--hb-oferta-lo:#132A33;--hb-oferta-ink:#FFFFFF;--hb-zakup:#E9C46A;--hb-zakup-hi:#F7E3A8;--hb-zakup-lo:#C99D3A;
+  --hb-zakup-ink:#1E3A44;--hb-pom:#E76F51;--hb-nie:#2A9D8F;--hb-p1:#E7826A;--hb-p1l:#FBEAE6;--hb-p1t:#F4C7BC;--hb-p1g:#BF3818;--hb-p1c:#E57358;--hb-p2:#E9C46A;
+  --hb-p2l:#FBF5E6;--hb-p2t:#F5E4BC;--hb-p2g:#8E690D;--hb-p2c:#BA8A14;--hb-p3:#8AB17D;--hb-p3l:#EBF2E9;--hb-p3t:#CADCC4;--hb-p3g:#507544;--hb-p3c:#70A15F;
+  --hb-pn:#2A9D8F;--hb-pnl:#DBEEEC;--hb-pnt:#9FD3CD;--hb-pnc:#1D7268;--hb-p4:#5B8FA8;--hb-p4l:#E3ECF0;--hb-p4t:#B5CDD8;--hb-p4g:#436E82;--hb-p4c:#5B8FA8;--hb-zaslona:20,42,50;
+  --hb-hero-t1:#FFFDF5;--hb-hero-t2:#F2D58C;--hb-serce:#D9482B;--hb-stopka:#264653;--hb-stopka-ink:#F4F1DE;--hb-nav-bg:rgba(251,249,240,.8);--hb-logo-1:#E76F51;
+  --hb-logo-2:#2A9D8F;--hb-logo-3:#D9A23A;--hb-logo-4:#264653;
+}
+
+html.dark[data-paleta="naturalny"]{
+  --hb-kosc:#183039;--hb-papier:#1C3640;--hb-len:#203C47;--hb-karta:#23424E;--hb-ink:#F6F3E3;--hb-ink2:#DAD7C3;--hb-ink3:#B6BDAF;--hb-noc:#2D5564;--hb-noc2:#244856;
+  --hb-noc3:#10242B;--hb-linia:#2F5361;--hb-linia2:#3B6372;--hb-roz:#F4A68F;--hb-mag:#C4502F;--hb-mag-h:#B24628;--hb-cta-hi:#F08A6C;--hb-cta-lo:#9C3A1F;--hb-cta-ink:#FFFFFF;
+  --hb-mag-t:#F4A68F;--hb-zol:#E9C46A;--hb-zol-h:#EFD083;--hb-pil-hi:#F7E3A8;--hb-pil-lo:#C99D3A;--hb-pil-ink:#1E3A44;--hb-stf:#3DB3A4;--hb-stf-hi:#8FE0D4;
+  --hb-stf-lo:#21887A;--hb-stf-ink:#0D2A2F;--hb-oferta:#12303A;--hb-oferta-lo:#0A1F26;--hb-oferta-ink:#FFFFFF;--hb-zakup:#E9C46A;--hb-zakup-hi:#F7E3A8;--hb-zakup-lo:#C99D3A;
+  --hb-zakup-ink:#1E3A44;--hb-pom:#F08A6C;--hb-nie:#4FC0B2;--hb-p1:#EE9580;--hb-p1l:#58585B;--hb-p1t:#886C67;--hb-p1g:#F6C6BA;--hb-p1c:#EE9580;--hb-p2:#EDCB7A;
+  --hb-p2l:#586659;--hb-p2t:#888664;--hb-p2g:#F4E0B0;--hb-p2c:#EDCB7A;--hb-p3:#9DC191;--hb-p3l:#43635F;--hb-p3t:#608270;--hb-p3g:#CBDEC5;--hb-p3c:#9DC191;
+  --hb-pn:#45B5A7;--hb-pnl:#2C6065;--hb-pnt:#347C7A;--hb-pnc:#A3DCD5;--hb-p4:#77A8C0;--hb-p4l:#395D6C;--hb-p4t:#4D7587;--hb-p4g:#BDD5E0;--hb-p4c:#77A8C0;--hb-zaslona:14,32,38;
+  --hb-hero-t1:#FFFDF5;--hb-hero-t2:#F2D58C;--hb-serce:#EC6346;--hb-stopka:#12303A;--hb-stopka-ink:#F4F1DE;--hb-nav-bg:rgba(24,48,57,.66);--hb-logo-1:#F08A6C;
+  --hb-logo-2:#4FC0B2;--hb-logo-3:#E9C46A;--hb-logo-4:#F4F1DE;
+}
+
+/* ---------- KOLOROWY (Bold & creative) ----------
+   X4: cieplej: tło kremowe zamiast liliowego, tekst i noc w jagodzie zamiast indygo, zakup na
+   ciemnej malinie zamiast fioletu, Strefa mamy pomarańczowa, kurtyna na zdjęciach w jagodzie */
+html[data-paleta="kolorowy"]{
+  --hb-kosc:#FFFAF7;--hb-papier:#FFF1EC;--hb-len:#FFE6DD;--hb-karta:#FFFFFF;--hb-ink:#3A1530;--hb-ink2:#5A3550;--hb-ink3:#6E4A60;--hb-noc:#7A1257;--hb-noc2:#5E0D45;
+  --hb-noc3:#2E0820;--hb-linia:#F6E1DA;--hb-linia2:#EBCFC6;--hb-roz:#BF1166;--hb-mag:#E0126E;--hb-mag-h:#CA0E63;--hb-cta-hi:#FF6AAE;--hb-cta-lo:#AE0A55;--hb-cta-ink:#FFFFFF;
+  --hb-mag-t:#DC116C;--hb-zol:#FFD60A;--hb-zol-h:#FFE039;--hb-pil-hi:#FFEE80;--hb-pil-lo:#E0B000;--hb-pil-ink:#3A1530;--hb-stf:#FF6B35;--hb-stf-hi:#FFA27E;
+  --hb-stf-lo:#D94A14;--hb-stf-ink:#3A1530;--hb-oferta:#9E1068;--hb-oferta-lo:#6E0A49;--hb-oferta-ink:#FFFFFF;--hb-zakup:#FFD60A;--hb-zakup-hi:#FFEE80;--hb-zakup-lo:#E0B000;
+  --hb-zakup-ink:#3A1530;--hb-pom:#FF6B35;--hb-nie:#4361EE;--hb-p1:#F72585;--hb-p1l:#FEDAEA;--hb-p1t:#FB9DC8;--hb-p1g:#C3025A;--hb-p1c:#F72585;--hb-p2:#FFD60A;
+  --hb-p2l:#FFF8D5;--hb-p2t:#FFED91;--hb-p2g:#846E00;--hb-p2c:#AD9000;--hb-p3:#FF6B35;--hb-p3l:#FFE6DD;--hb-p3t:#FFBCA4;--hb-p3g:#BF3300;--hb-p3c:#FF6026;
+  --hb-pn:#7209B7;--hb-pnl:#E7D5F3;--hb-pnt:#C090DF;--hb-pnc:#7209B7;--hb-p4:#4361EE;--hb-p4l:#DFE4FC;--hb-p4t:#AAB8F7;--hb-p4g:#2F51ED;--hb-p4c:#4361EE;--hb-zaslona:70,12,48;
+  --hb-hero-t1:#FFFFFF;--hb-hero-t2:#FFE45C;--hb-serce:#F0204E;--hb-stopka:#6E0F4C;--hb-stopka-ink:#FFFFFF;--hb-nav-bg:rgba(255,250,247,.8);--hb-logo-1:#F72585;
+  --hb-logo-2:#4361EE;--hb-logo-3:#FF6B35;--hb-logo-4:#FFBE0B;--hb-foto-filtr:sepia(.12) saturate(1.06) hue-rotate(-7deg);
+}
+
+html.dark[data-paleta="kolorowy"]{
+  --hb-kosc:#2A1022;--hb-papier:#33142A;--hb-len:#3A1830;--hb-karta:#431B37;--hb-ink:#FFFFFF;--hb-ink2:#F6DDE8;--hb-ink3:#E0B9CC;--hb-noc:#7E1E63;--hb-noc2:#661952;
+  --hb-noc3:#1C0816;--hb-linia:#57243F;--hb-linia2:#6A2E50;--hb-roz:#FF7AB8;--hb-mag:#E0126E;--hb-mag-h:#CA0E63;--hb-cta-hi:#FF6AAE;--hb-cta-lo:#AE0A55;--hb-cta-ink:#FFFFFF;
+  --hb-mag-t:#FF7AB8;--hb-zol:#FFD60A;--hb-zol-h:#FFE039;--hb-pil-hi:#FFEE80;--hb-pil-lo:#E0B000;--hb-pil-ink:#3A1530;--hb-stf:#FF6B35;--hb-stf-hi:#FFA27E;
+  --hb-stf-lo:#D94A14;--hb-stf-ink:#3A1530;--hb-oferta:#7E0E55;--hb-oferta-lo:#4C0833;--hb-oferta-ink:#FFFFFF;--hb-zakup:#FFD60A;--hb-zakup-hi:#FFEE80;--hb-zakup-lo:#E0B000;
+  --hb-zakup-ink:#3A1530;--hb-pom:#FF8A5C;--hb-nie:#6F86FF;--hb-p1:#FF4F9E;--hb-p1l:#742952;--hb-p1t:#A1356A;--hb-p1g:#FF91C3;--hb-p1c:#FF4F9E;--hb-p2:#FFD93D;
+  --hb-p2l:#744C39;--hb-p2t:#A17A3A;--hb-p2g:#FFD93D;--hb-p2c:#FFD93D;--hb-p3:#FF8456;--hb-p3l:#74363F;--hb-p3t:#A15046;--hb-p3g:#FFA584;--hb-p3c:#FF8456;
+  --hb-pn:#9D4EDD;--hb-pnl:#5A2862;--hb-pnt:#70348A;--hb-pnc:#C597EB;--hb-p4:#6D86FF;--hb-p4l:#4E376B;--hb-p4t:#58509B;--hb-p4g:#9BACFF;--hb-p4c:#6D86FF;--hb-zaslona:52,10,36;
+  --hb-hero-t1:#FFFFFF;--hb-hero-t2:#FFE45C;--hb-serce:#FF3366;--hb-stopka:#4C0A36;--hb-stopka-ink:#FFFFFF;--hb-nav-bg:rgba(42,16,34,.66);--hb-logo-1:#FF4FA0;
+  --hb-logo-2:#6F86FF;--hb-logo-3:#FF8A5C;--hb-logo-4:#FFD60A;--hb-foto-filtr:sepia(.12) saturate(1.06) hue-rotate(-7deg);
+}
+
+/* ---------- wysoki kontrast (ułatwienia dostępu): czerń, biel i żółć ponad każdą paletą ----------
+   Ten sam system tokenów, więc strona i przyciski zostają czytelne; połysk i gradienty wyłączone. */
+html.a11y-high-contrast.a11y-high-contrast.a11y-high-contrast{
+  --hb-kosc:#000;--hb-papier:#000;--hb-len:#000;--hb-karta:#000;--hb-ink:#fff;--hb-ink2:#fff;--hb-ink3:#FFFF00;
+  --hb-noc:#000;--hb-noc2:#000;--hb-noc3:#000;--hb-linia:#fff;--hb-linia2:#fff;--hb-roz:#FFFF00;
+  --hb-mag:#FFFF00;--hb-mag-h:#FFFF00;--hb-mag-t:#FFFF00;--hb-cta-hi:#FFFF00;--hb-cta-lo:#FFFF00;--hb-cta-ink:#000;
+  --hb-zol:#000;--hb-zol-h:#000;--hb-pil-hi:#000;--hb-pil-lo:#fff;--hb-pil-ink:#fff;
+  --hb-stf:#000;--hb-stf-hi:#000;--hb-stf-lo:#FFFF00;--hb-stf-ink:#FFFF00;
+  --hb-oferta:#000;--hb-oferta-lo:#000;--hb-oferta-ink:#fff;--hb-zakup:#FFFF00;--hb-zakup-hi:#FFFF00;--hb-zakup-lo:#FFFF00;--hb-zakup-ink:#000;
+  --hb-pom:#FFFF00;--hb-nie:#FFFF00;
+  --hb-p1:#fff;--hb-p2:#fff;--hb-p3:#fff;--hb-p4:#fff;--hb-pn:#fff;--hb-p1l:#000;--hb-p2l:#000;--hb-p3l:#000;--hb-p4l:#000;--hb-pnl:#000;
+  --hb-p1t:#000;--hb-p2t:#000;--hb-p3t:#000;--hb-p4t:#000;--hb-pnt:#000;--hb-p1g:#FFFF00;--hb-p2g:#FFFF00;--hb-p3g:#FFFF00;--hb-p4g:#FFFF00;--hb-pnc:#FFFF00;
+  --hb-p1c:#FFFF00;--hb-p2c:#FFFF00;--hb-p3c:#FFFF00;--hb-p4c:#FFFF00;
+  --hb-zaslona:0,0,0;--hb-hero-t1:#fff;--hb-hero-t2:#FFFF00;--hb-serce:#FFFF00;--hb-stopka:#000;--hb-stopka-ink:#fff;--hb-nav-bg:#000;
+  --hb-logo-1:#fff;--hb-logo-2:#fff;--hb-logo-3:#fff;--hb-logo-4:#fff;--hb-foto-filtr:none;
+}
+html.a11y-high-contrast .hb-szklo,html.a11y-high-contrast .hb-btn{background:var(--b)!important;box-shadow:0 0 0 2px var(--b-ink),0 0 0 4px var(--b)!important;text-shadow:none!important;filter:none!important}
+html.a11y-high-contrast .hb-szklo::before,html.a11y-high-contrast .hb-btn::before,html.a11y-high-contrast .hb-btn::after,
+html.a11y-high-contrast .hb-oferta::before,html.a11y-high-contrast .hb-oferta::after,html.a11y-high-contrast .hb-modul-tyt::before{display:none}
+html.a11y-high-contrast .hb-pig{--b:#000;--b-ink:#fff}
+html.a11y-high-contrast .hb-pig[aria-current="page"]{--b:#FFFF00;--b-ink:#000}
+html.a11y-high-contrast .hb-oferta{background:#000;box-shadow:0 0 0 3px #fff}
+html.a11y-high-contrast .hb-hero::before{background:rgba(0,0,0,.74)}
+html.a11y-high-contrast .hb-site a:not(.hb-btn):not(.hb-szklo){text-decoration:underline}
+html.a11y-high-contrast .hb-modul-tyt{color:#000;background:#FFFF00;box-shadow:none}
+html.a11y-high-contrast .hb-os-pasek i{background:#fff;box-shadow:none}
+html.a11y-high-contrast .hb-kwota{text-shadow:none}
+html.a11y-high-contrast .hb-oferta-karta,html.a11y-high-contrast .hb-oferta-odznaka,html.a11y-high-contrast .hb-dosw-chipy li{background:#000;box-shadow:inset 0 0 0 2px #fff}
+html.a11y-high-contrast .hb-bump-karta{background:#000;border:2px solid #fff}
+html.a11y-high-contrast .hb-bump-karta:has(input:checked){border-color:#FFFF00}
+html.a11y-high-contrast .hb-oferta-foto img{box-shadow:0 0 0 2px #fff}
+html.a11y-high-contrast .hb-oferta-opcje{border-bottom-color:#fff}
+html.a11y-high-contrast .hb-podsumowanie>.hb-zgody-tyt{border-top-color:#fff}

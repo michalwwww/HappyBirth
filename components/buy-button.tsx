@@ -10,7 +10,7 @@ interface BuyButtonProps {
 }
 
 export function BuyCourseButton({
-  className = 'w-full py-4 rounded-full bg-[#FCD705] hover:bg-[#ffe338] text-[#1A1512] font-bold text-base transition-all shadow-xl hover:scale-105 flex items-center justify-center gap-2',
+  className = 'w-full py-4 rounded-full bg-[color:var(--hb-zol)] hover:bg-[color:var(--hb-p2)] text-[color:var(--hb-pil-ink)] font-bold text-base transition-all shadow-xl hover:scale-105 flex items-center justify-center gap-2',
   children,
 }: BuyButtonProps) {
   const handleNavigateToCheckout = () => {

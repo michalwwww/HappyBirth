@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
+import { getSession } from '@/lib/auth';
+import { d1First } from '@/lib/d1';
 import {
   validatePromoCode,
   is100PercentPromo,
@@ -16,6 +18,16 @@ import { AFFILIATE_COOKIE_NAME } from '@/lib/affiliate';
 
 export const runtime = 'nodejs';
 
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
+]);
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -26,14 +38,14 @@ export async function POST(req: NextRequest) {
       promoCode,
       includeOrderBump = false,
       onlyOrderBump = false,
-      termsAccepted = true,
-      waiverArt38Accepted = true,
+      termsAccepted = false,
+      waiverArt38Accepted = false,
       currency = 'pln',
       locale,
     } = body;
 
     // [E1] Serwerowa walidacja zgód konsumenckich (Regulamin + Art. 38 ust. 1 pkt 13 u.p.k.)
-    if (termsAccepted === false || waiverArt38Accepted === false) {
+    if (termsAccepted !== true || waiverArt38Accepted !== true) {
       return NextResponse.json(
         {
           error:
@@ -41,6 +53,40 @@ export async function POST(req: NextRequest) {
         },
         { status: 400 }
       );
+    }
+
+    const isStandaloneOrderBump = Boolean(onlyOrderBump);
+    let authenticatedEmailOverride = '';
+
+    // [DRM-01] Samodzielny Order Bump (+49 zł) dostępny wyłącznie dla zalogowanych posiadaczek aktywnego kursu
+    if (isStandaloneOrderBump) {
+      const session = await getSession();
+      if (!session?.userId || !session?.email) {
+        return NextResponse.json(
+          { error: 'Zaloguj się do Strefy Kursantki, aby dokupić Pakiet dla Taty (+49 zł).' },
+          { status: 401 }
+        );
+      }
+      authenticatedEmailOverride = session.email.trim().toLowerCase();
+      if (!TEAM_WHITELIST_EMAILS.has(authenticatedEmailOverride)) {
+        const activeEnrollment = await d1First<{ id: string; expires_at: string | null }>(
+          `SELECT id, expires_at FROM enrollments
+           WHERE user_id = ? AND status = 'active'
+           ORDER BY created_at DESC LIMIT 1`,
+          [session.userId]
+        );
+        const notExpired =
+          activeEnrollment?.id &&
+          (!activeEnrollment.expires_at ||
+            isNaN(new Date(activeEnrollment.expires_at).getTime()) ||
+            new Date(activeEnrollment.expires_at).getTime() >= Date.now());
+        if (!notExpired) {
+          return NextResponse.json(
+            { error: 'Pakiet dodatkowy (+49 zł) jest dostępny wyłącznie dla posiadaczek aktywnego kursu głównego HappyBirth.pl.' },
+            { status: 403 }
+          );
+        }
+      }
     }
 
     const cleanPromo = (promoCode || '').toString().trim().toUpperCase();
@@ -66,8 +112,34 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const promoResult = validatePromoCode(cleanPromo);
-    if (cleanPromo && !promoResult.valid) {
+    const isVip100 = cleanPromo === 'VIP100';
+    let promoResult = validatePromoCode(cleanPromo);
+    if (cleanPromo && !isVip100 && !promoResult.valid) {
+      // Weryfikacja imiennych kodów partnerów i poleceń Mam w Cloudflare D1
+      const aff = await d1First<{ id: string }>(
+        `SELECT id FROM affiliates WHERE (UPPER(promo_code) = ? OR UPPER(ref_slug) = ?) AND status = 'active' LIMIT 1`,
+        [cleanPromo, cleanPromo]
+      ).catch(() => null);
+      const usr = !aff?.id
+        ? await d1First<{ id: string }>(
+            `SELECT id FROM users WHERE UPPER(referral_code) = ? LIMIT 1`,
+            [cleanPromo]
+          ).catch(() => null)
+        : null;
+      if (aff?.id || usr?.id) {
+        promoResult = {
+          valid: true,
+          code: cleanPromo,
+          discountPercent: 10,
+          basePricePln: 489,
+          discountedCoursePricePln: 440.1,
+          omnibusNotice: promoResult.omnibusNotice,
+          sourceType: aff?.id ? 'affiliate' : 'student_referral',
+        };
+      }
+    }
+
+    if (cleanPromo && !isVip100 && !promoResult.valid) {
       return NextResponse.json(
         {
           error:
@@ -77,11 +149,11 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const pricing = resolvePricingForCurrency(currency, promoResult.valid);
+    const pricing = resolvePricingForCurrency(currency, promoResult.valid && promoResult.discountPercent === 10);
     const isPln = pricing.currency === 'pln';
     const activeLocale = (locale || pricing.stripeLocale || 'pl').toString();
     const activeCourseAmountGrosze = isPln
-      ? promoResult.valid
+      ? promoResult.valid && promoResult.discountPercent === 10
         ? 44010
         : BASE_COURSE_PRICE_GROSZE // 440,10 zł lub 489,00 zł brutto
       : pricing.activeCourseMinorUnits;
@@ -140,7 +212,6 @@ export async function POST(req: NextRequest) {
             quantity: 1,
           };
 
-    const isStandaloneOrderBump = Boolean(onlyOrderBump);
     const shouldIncludeBumpItem = Boolean(includeOrderBump || isStandaloneOrderBump);
     const lineItems: any[] = isStandaloneOrderBump ? [] : [mainCourseLineItem];
 
@@ -221,7 +292,6 @@ export async function POST(req: NextRequest) {
     const sessionParams: any = {
       mode: 'payment',
       line_items: lineItems,
-      allow_promotion_codes: !promoResult.valid && !isStandaloneOrderBump,
       invoice_creation: { enabled: true },
       tax_id_collection: { enabled: true },
       metadata,
@@ -230,7 +300,36 @@ export async function POST(req: NextRequest) {
       cancel_url: isStandaloneOrderBump ? `${origin}/strefa` : `${origin}/#cena`,
     };
 
-    if (email && typeof email === 'string' && email.includes('@')) {
+    if (isVip100) {
+      const promoLookupRes = await fetch(
+        'https://api.stripe.com/v1/promotion_codes?code=VIP100&active=true&limit=1',
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+            'Stripe-Version': '2024-06-20',
+          },
+        }
+      );
+      const promoLookupData: any = await promoLookupRes.json();
+      const foundPromo = promoLookupData?.data?.[0];
+      if (
+        !foundPromo ||
+        !foundPromo.active ||
+        (foundPromo.max_redemptions && (foundPromo.times_redeemed || 0) >= foundPromo.max_redemptions)
+      ) {
+        return NextResponse.json(
+          { error: 'Kod rabatowy VIP100 wykorzystał już maksymalny limit 10 użyć.' },
+          { status: 400 }
+        );
+      }
+      sessionParams.discounts = [{ promotion_code: foundPromo.id }];
+    } else {
+      sessionParams.allow_promotion_codes = false;
+    }
+
+    if (authenticatedEmailOverride) {
+      sessionParams.customer_email = authenticatedEmailOverride;
+    } else if (email && typeof email === 'string' && email.includes('@')) {
       sessionParams.customer_email = email.trim();
     }
 

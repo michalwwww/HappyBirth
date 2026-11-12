@@ -1,6 +1,6 @@
 import React from 'react';
-import { MarketingNavbar } from '@/components/marketing-navbar';
-import { Footer } from '@/components/footer';
+import { SiteHeader } from '@/components/site/site-header';
+import { SiteFooter } from '@/components/site/site-footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -14,10 +14,10 @@ export default function RegulaminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBF8F4] text-[#1A1512]">
-      <MarketingNavbar />
-      <main className="flex-1">{children}</main>
-      <Footer />
+    <div className="min-h-screen flex flex-col bg-[#FDFAF6] dark:bg-[#1B1424] text-[#4A3A5E] dark:text-[#F4EEF7]">
+      <div className="hb-site"><SiteHeader /></div>
+      <main className="flex-1" id="tresc" style={{ letterSpacing: 'var(--hb-trak)' }}>{children}</main>
+      <div className="hb-site"><SiteFooter /></div>
     </div>
   );
 }

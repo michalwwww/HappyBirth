@@ -484,7 +484,11 @@ export function BirthPlanGenerator() {
     saveData(initial, langMode);
   };
 
+  const [inAppPrintHint, setInAppPrintHint] = useState(false);
   const handlePrint = () => {
+    if (typeof navigator !== 'undefined' && /Instagram|FBAN|FBAV|TikTok|BytedanceWebview|Musical\.ly/i.test(navigator.userAgent)) {
+      setInAppPrintHint(true);
+    }
     saveData(selectedOptions, langMode);
     window.print();
   };
@@ -503,10 +507,10 @@ export function BirthPlanGenerator() {
   return (
     <div className="space-y-6">
       {/* Pasek Wyboru Języka / Kraju Porodu (Smart Bilingual Switcher) */}
-      <div className="bg-white dark:bg-[#1C081A] rounded-2xl border border-[#EAE3DB] dark:border-[#461643] p-4 sm:p-5 space-y-3 shadow-sm print:hidden">
+      <div className="bg-white dark:bg-[color:var(--hb-karta)] rounded-2xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] p-4 sm:p-5 space-y-3 shadow-sm print:hidden">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#250A24] dark:text-[#FBF8F4]">
-            <Globe className="w-4 h-4 text-[#EC008C]" />
+          <div className="flex items-center gap-2 text-xs font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
+            <Globe className="w-4 h-4 text-[color:var(--hb-mag-t)]" />
             <span>Wybierz język wydruku Planu Porodu (Polska lub Dwujęzyczny dla Szpitala za Granicą):</span>
           </div>
 
@@ -519,7 +523,7 @@ export function BirthPlanGenerator() {
             <button
               onClick={resetToDefault}
               type="button"
-              className="px-3 py-2 rounded-xl border border-[#EAE3DB] dark:border-[#461643] text-xs font-semibold text-[#867A72] hover:text-[#1A1512] dark:hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="px-3 py-2 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] text-xs font-semibold text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] hover:text-[color:var(--hb-ink)] dark:hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"
               title="Przywróć rekomendowane opcje położnicze"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -529,7 +533,7 @@ export function BirthPlanGenerator() {
             <button
               onClick={handlePrint}
               type="button"
-              className="px-4 py-2 rounded-xl bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold shadow-md shadow-[#EC008C]/25 hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-[color:var(--hb-mag)] hover:bg-[color:var(--hb-mag-h)] text-[color:var(--hb-cta-ink)] text-xs font-semibold shadow-md shadow-[color:color-mix(in_srgb,var(--hb-mag)_25%,transparent)] hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
             >
               <Printer className="w-4 h-4" />
               <span>Drukuj / Pobierz PDF</span>
@@ -548,8 +552,8 @@ export function BirthPlanGenerator() {
               }}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 langMode === mode.key
-                  ? 'bg-[#EC008C] text-white shadow-sm'
-                  : 'bg-[#FBF8F4] dark:bg-[#250A24] text-[#544A44] dark:text-[#EAD5E5] border border-[#EAE3DB] dark:border-[#461643] hover:border-[#EC008C]'
+                  ? 'bg-[color:var(--hb-mag)] text-[color:var(--hb-cta-ink)] shadow-sm'
+                  : 'bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] hover:border-[color:var(--hb-mag)]'
               }`}
             >
               {mode.badge}
@@ -557,39 +561,44 @@ export function BirthPlanGenerator() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2 text-[11px] text-[#544A44] dark:text-[#EAD5E5]/80 pt-1">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-[color:var(--hb-ink2)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_80%,transparent)] pt-1">
           <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>{activeMeta.legalNote}</span>
+        {inAppPrintHint && (
+          <div className="w-full mt-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-100 text-xs leading-relaxed">
+            <strong>Wskazówka dla przeglądarek w aplikacjach (Instagram / Facebook / TikTok):</strong> Jeśli systemowe okno zapisu PDF nie otworzyło się automatycznie, kliknij ikonę menu <strong>⋯</strong> w prawym górnym rogu ekranu i wybierz <strong>„Otwórz w przeglądarce zewnętrznej” (Safari / Chrome)</strong> — Twoje zaznaczone opcje są bezpiecznie zapisane.
+          </div>
+        )}
         </div>
       </div>
 
       {/* Main Printable Document Card */}
-      <div className="bg-white dark:bg-[#1C081A] rounded-3xl border border-[#EAE3DB] dark:border-[#461643] p-6 sm:p-10 shadow-lg print:shadow-none print:border-none print:p-0">
+      <div className="bg-white dark:bg-[color:var(--hb-karta)] rounded-3xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] p-6 sm:p-10 shadow-lg print:shadow-none print:border-none print:p-0">
         {/* Document Header */}
-        <div className="border-b border-[#EAE3DB] dark:border-[#461643] pb-6 mb-6 text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAE3EB] dark:bg-[#370E35] text-[#EC008C] text-xs font-bold uppercase tracking-wider mb-1">
+        <div className="border-b border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] pb-6 mb-6 text-center space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] text-xs font-bold uppercase tracking-wider mb-1">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{activeMeta.badge}</span>
           </div>
-          <h2 className="font-brand-display font-bold text-2xl sm:text-4xl text-[#1A1512] dark:text-[#FBF8F4]">
+          <h2 className="font-brand-display font-bold text-2xl sm:text-4xl text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
             {activeMeta.docTitle}
           </h2>
-          <p className="text-xs sm:text-sm text-[#867A72] dark:text-[#EAD5E5]/70 max-w-2xl mx-auto">
+          <p className="text-xs sm:text-sm text-[color:var(--hb-ink3)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_70%,transparent)] max-w-2xl mx-auto">
             {activeMeta.docSubtitle}
           </p>
         </div>
 
         {/* Notatka dla zagranicznej położnej w trybie dwujęzycznym */}
         {activeMeta.midwifeNotice && (
-          <div className="mb-6 p-4 rounded-2xl bg-[#FEF3C7] dark:bg-[#3B2608] border border-[#F59E0B] text-[#78350F] dark:text-[#FDE68A] text-xs leading-relaxed font-medium">
+          <div className="mb-6 p-4 rounded-2xl bg-[color:var(--hb-p2l)] dark:bg-[color:var(--hb-noc)] border border-[color:var(--hb-p2)] text-[color:var(--hb-ink)] dark:text-[#FECB22] text-xs leading-relaxed font-medium">
             {activeMeta.midwifeNotice}
           </div>
         )}
 
         {/* Input Details */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 rounded-2xl bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#461643] mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 rounded-2xl bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] mb-8">
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-[#867A72] dark:text-[#EAD5E5]/70 mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-[color:var(--hb-ink3)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_70%,transparent)] mb-1">
               {isBilingual || primaryLang !== 'pl' ? 'Mother / Imię i Nazwisko Mamy:' : 'Imię i Nazwisko Mamy:'}
             </label>
             <input
@@ -600,12 +609,12 @@ export function BirthPlanGenerator() {
                 saveData();
               }}
               placeholder="np. Anna Kowalska"
-              className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-[#EAE3DB] dark:border-[#461643] bg-white dark:bg-[#140513] text-[#1A1512] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+              className="w-full text-base sm:text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-[#867A72] dark:text-[#EAD5E5]/70 mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-[color:var(--hb-ink3)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_70%,transparent)] mb-1">
               {isBilingual || primaryLang !== 'pl' ? 'Birth Partner / Partner:' : 'Osoba Towarzysząca (Tata):'}
             </label>
             <input
@@ -616,12 +625,12 @@ export function BirthPlanGenerator() {
                 saveData();
               }}
               placeholder="np. Piotr Kowalski"
-              className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-[#EAE3DB] dark:border-[#461643] bg-white dark:bg-[#140513] text-[#1A1512] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+              className="w-full text-base sm:text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-[#867A72] dark:text-[#EAD5E5]/70 mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-[color:var(--hb-ink3)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_70%,transparent)] mb-1">
               {isBilingual || primaryLang !== 'pl' ? 'Hospital / Szpital:' : 'Planowany Szpital:'}
             </label>
             <input
@@ -632,12 +641,12 @@ export function BirthPlanGenerator() {
                 saveData();
               }}
               placeholder="np. St Mary's / Kreißsaal / Szpital"
-              className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-[#EAE3DB] dark:border-[#461643] bg-white dark:bg-[#140513] text-[#1A1512] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+              className="w-full text-base sm:text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-[#867A72] dark:text-[#EAD5E5]/70 mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-[color:var(--hb-ink3)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_70%,transparent)] mb-1">
               {isBilingual || primaryLang !== 'pl' ? 'Due Date (EDD) / Termin:' : 'Przewidywany Termin Porodu:'}
             </label>
             <input
@@ -647,7 +656,7 @@ export function BirthPlanGenerator() {
                 setDueDate(e.target.value);
                 saveData();
               }}
-              className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-[#EAE3DB] dark:border-[#461643] bg-white dark:bg-[#140513] text-[#1A1512] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+              className="w-full text-base sm:text-xs font-semibold px-3 py-2 rounded-lg border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
             />
           </div>
         </div>
@@ -656,18 +665,18 @@ export function BirthPlanGenerator() {
         <div className="space-y-8">
           {SECTIONS.map((section) => (
             <div key={section.id} className="space-y-3">
-              <div className="flex items-center justify-between border-b border-[#EAE3DB] dark:border-[#461643] pb-2">
+              <div className="flex items-center justify-between border-b border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] pb-2">
                 <div>
-                  <h3 className="font-brand-display font-bold text-base sm:text-lg text-[#1A1512] dark:text-[#FBF8F4]">
+                  <h3 className="font-brand-display font-bold text-base sm:text-lg text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
                     {section.title[primaryLang]}
                   </h3>
                   {isBilingual && (
-                    <p className="text-[11px] text-[#867A72] dark:text-[#EAD5E5]/65">
+                    <p className="text-[11px] text-[color:var(--hb-ink3)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_65%,transparent)]">
                       🇵🇱 {section.title.pl}
                     </p>
                   )}
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#EC008C] bg-[#FAE3EB] dark:bg-[#370E35] px-2.5 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--hb-mag-t)] bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] px-2.5 py-0.5 rounded-full">
                   {section.category[primaryLang]}
                 </span>
               </div>
@@ -681,15 +690,15 @@ export function BirthPlanGenerator() {
                       onClick={() => toggleOption(option.id)}
                       className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
                         isChecked
-                          ? 'bg-[#FAE3EB]/40 dark:bg-[#EC008C]/10 border-[#EC008C] text-[#1A1512] dark:text-white font-medium'
-                          : 'bg-white dark:bg-[#1C081A] border-[#EAE3DB] dark:border-[#461643] text-[#544A44] dark:text-[#EAD5E5]/70 opacity-75 hover:opacity-100 print:hidden'
+                          ? 'bg-[color:color-mix(in_srgb,var(--hb-p1l)_40%,transparent)] dark:bg-[color:color-mix(in_srgb,var(--hb-mag)_10%,transparent)] border-[color:var(--hb-mag)] text-[color:var(--hb-ink)] dark:text-white font-medium'
+                          : 'bg-white dark:bg-[color:var(--hb-karta)] border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] text-[color:var(--hb-ink2)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_70%,transparent)] opacity-75 hover:opacity-100 print:hidden'
                       }`}
                     >
                       <div
                         className={`w-4 h-4 rounded-md mt-0.5 flex items-center justify-center shrink-0 transition-colors ${
                           isChecked
-                            ? 'bg-[#EC008C] text-white'
-                            : 'border border-stone-300 dark:border-stone-600'
+                            ? 'bg-[color:var(--hb-mag)] text-[color:var(--hb-cta-ink)]'
+                            : 'border border-[color:var(--hb-linia2)] dark:border-[color:var(--hb-linia2)]'
                         }`}
                       >
                         {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
@@ -699,7 +708,7 @@ export function BirthPlanGenerator() {
                           {option[primaryLang]}
                         </span>
                         {isBilingual && (
-                          <span className="text-[11px] leading-snug text-[#544A44] dark:text-[#EAD5E5]/75 block font-normal">
+                          <span className="text-[11px] leading-snug text-[color:var(--hb-ink2)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_75%,transparent)] block font-normal">
                             🇵🇱 {option.pl}
                           </span>
                         )}
@@ -713,7 +722,7 @@ export function BirthPlanGenerator() {
 
           {/* Indywidualne Uwagi Rodziców */}
           <div className="space-y-2 pt-2">
-            <h3 className="font-brand-display font-bold text-base text-[#1A1512] dark:text-[#FBF8F4]">
+            <h3 className="font-brand-display font-bold text-base text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
               {isBilingual
                 ? '6. Additional Medical Notes & Allergies / Dodatkowe uwagi medyczne i alergie:'
                 : primaryLang === 'en'
@@ -730,13 +739,13 @@ export function BirthPlanGenerator() {
               }}
               placeholder="np. GBS ujemny / dodatni; cukrzyca ciążowa (mamy własną siarę w strzykawkach w zamrażarce); soczewki kontaktowe..."
               rows={3}
-              className="w-full text-xs p-3 rounded-xl border border-[#EAE3DB] dark:border-[#461643] bg-white dark:bg-[#140513] text-[#1A1512] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#EC008C]"
+              className="w-full text-xs p-3 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--hb-mag)]"
             />
           </div>
         </div>
 
         {/* Footer of the Document */}
-        <div className="mt-8 pt-6 border-t border-[#EAE3DB] dark:border-[#461643] flex flex-wrap items-center justify-between gap-4 text-[11px] text-[#867A72] dark:text-[#EAD5E5]/60">
+        <div className="mt-8 pt-6 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] flex flex-wrap items-center justify-between gap-4 text-[11px] text-[color:var(--hb-ink3)] dark:text-[color:color-mix(in_srgb,var(--hb-ink2)_60%,transparent)]">
           <div>
             <span>
               Przygotowano w Kreatorze Planu Porodu <strong>HappyBirth.pl</strong>

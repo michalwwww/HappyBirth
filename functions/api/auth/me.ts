@@ -6,6 +6,15 @@ interface Env {
 }
 
 const ACCESS_DURATION_DAYS = 548;
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
+]);
 
 export async function onRequestGet(context: { request: Request; env: Env }): Promise<Response> {
   const { request, env } = context;
@@ -26,6 +35,8 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
   let orderRow: any = null;
   let referralRewardRow: any = null;
   let expired = false;
+  let hasActiveCourse = true;
+  const isTeamEmail = TEAM_WHITELIST_EMAILS.has(String(session.email || '').toLowerCase());
 
   if (env.DB) {
     try {
@@ -60,7 +71,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         .first();
 
       orderRow = await env.DB.prepare(
-        `SELECT order_number, amount_total, order_bump_included, promo_code, created_at
+        `SELECT order_number, amount_total, order_bump_included, promo_code, status, created_at
          FROM orders
          WHERE user_id = ? OR customer_email = ?
          ORDER BY created_at DESC LIMIT 1`
@@ -77,8 +88,22 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         .bind(effectiveUserId)
         .first();
 
-      if (enrollmentRow?.expires_at && new Date(enrollmentRow.expires_at).getTime() < Date.now()) {
+      if (enrollmentRow?.status === 'refunded' || orderRow?.status === 'refunded') {
         expired = true;
+        hasActiveCourse = false;
+      } else if (enrollmentRow?.expires_at && new Date(enrollmentRow.expires_at).getTime() < Date.now()) {
+        expired = true;
+        hasActiveCourse = false;
+      } else if (
+        !isTeamEmail &&
+        !enrollmentRow &&
+        orderRow?.created_at &&
+        new Date(orderRow.created_at).getTime() + ACCESS_DURATION_DAYS * 24 * 60 * 60 * 1000 < Date.now()
+      ) {
+        expired = true;
+        hasActiveCourse = false;
+      } else if (!isTeamEmail && !enrollmentRow && !orderRow) {
+        hasActiveCourse = false;
       }
     } catch (e) {
       console.error('Błąd odczytu /api/auth/me w D1:', e);
@@ -94,7 +119,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
 
   return new Response(
     JSON.stringify({
-      authenticated: !expired,
+      authenticated: !expired && hasActiveCourse,
       expired,
       user: {
         id: userRow?.id || session.userId,
@@ -102,7 +127,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         fullName: userRow?.full_name || '',
         avatarUrl: userRow?.avatar_url || '',
         role: userRow?.role || session.role || 'student',
-        hasActiveCourse: !expired,
+        hasActiveCourse: !expired && hasActiveCourse,
         expiresAt: expiresAtIso,
         daysRemaining,
         firstContentAccessedAt: enrollmentRow?.first_content_accessed_at || null,
@@ -137,7 +162,14 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const { request, env } = context;
     const session = await getEdgeSession(request, env);
 
-    if (!session || !env.DB) {
+    if (!session?.userId || !session?.email) {
+      return new Response(
+        JSON.stringify({ error: 'Brak autoryzacji.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!env.DB) {
       return new Response(
         JSON.stringify({ success: true, mode: 'local_fallback' }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -157,7 +189,16 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       plannedBirthType,
       city,
       hospital,
+      rodoConsent,
     } = body;
+
+    const hasHealthData = Boolean(dueDate || lmpDate || plannedBirthType || parity || hospital);
+    if (hasHealthData && rodoConsent !== true) {
+      return new Response(
+        JSON.stringify({ error: 'Wymagana wyraźna zgoda RODO (Art. 9) na zapis danych dotyczących przebiegu ciąży.' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
     await env.DB.prepare(
       `UPDATE users SET
@@ -172,6 +213,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
          planned_birth_type = ?,
          city = ?,
          hospital = ?,
+         rodo_consent = CASE WHEN ? = 1 THEN 1 ELSE rodo_consent END,
          updated_at = datetime('now')
        WHERE id = ? OR email = ?`
     )
@@ -187,6 +229,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         plannedBirthType || 'natural',
         city || null,
         hospital || null,
+        rodoConsent === true ? 1 : 0,
         session.userId,
         session.email
       )

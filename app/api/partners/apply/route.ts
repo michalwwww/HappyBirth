@@ -1,17 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { d1Run } from '@/lib/d1';
+import { checkRateLimitNodeD1, extractNodeClientIp } from '@/lib/security';
 import { getDefaultTier1Rate, AffiliateRoleCategory } from '@/lib/affiliate';
 
 export const runtime = 'nodejs';
 
 /**
  * [D4a-1] & [D4a-2] Endpoint zgłoszeniowy dla:
- * 1) Programu Afiliacyjnego (/afiliacja) — położne, fizjoterapeutki, doradczynie laktacyjne, twórczynie (model 2-Tier Capped CPA)
- * 2) Współpracy B2B (/partnerzy) — marki wyprawkowe, producenci, dystrybutorzy, kliniki i pracodawcy
+ * 1) Subdomeny Afiliacyjnej (afiliacja.happybirth.pl) — położne, fizjoterapeutki, doradczynie laktacyjne, twórczynie (model 2-Tier Capped CPA)
+ * 2) Subdomeny Współpracy B2B (partnerzy.happybirth.pl) — marki wyprawkowe, producenci, dystrybutorzy, kliniki i pracodawcy
  */
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = extractNodeClientIp(req);
+    const allowed = await checkRateLimitNodeD1(`partners_apply:${clientIp}`, 8, 15);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Zbyt wiele zgłoszeń w krótkim czasie. Spróbuj ponownie za kilka minut.' },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const {
       channel = 'afiliacja', // 'afiliacja' lub 'partnerzy_b2b'
@@ -23,8 +33,8 @@ export async function POST(req: NextRequest) {
       roleCategory = 'midwife_physio',
       profileUrl = '',
       message = '',
-      rodoConsent = true,
     } = body;
+    const rodoConsent = body.rodoConsent === true;
 
     if (!fullName || !email || !email.includes('@') || !rodoConsent) {
       return NextResponse.json(
@@ -55,7 +65,7 @@ export async function POST(req: NextRequest) {
       ]
     );
 
-    // Jeśli to zgłoszenie do programu /afiliacja ([D4a-1]), zarejestruj wstępny profil afilianta z kodem -10%
+    // Jeśli to zgłoszenie z subdomeny afiliacja.happybirth.pl ([D4a-1]), zarejestruj profil afilianta z kodem -10%
     let generatedPromoCode: string | null = null;
     let generatedRefSlug: string | null = null;
     let assignedRate = 0.2;
@@ -74,7 +84,7 @@ export async function POST(req: NextRequest) {
         .slice(0, 6)
         .toUpperCase() || 'PARTNER';
 
-      generatedPromoCode = `${basePrefix}10`;
+      generatedPromoCode = `${basePrefix}-${suffix}10`;
       generatedRefSlug = `${basePrefix.toLowerCase()}-${suffix.toLowerCase()}`;
 
       await d1Run(
@@ -90,7 +100,7 @@ export async function POST(req: NextRequest) {
           cat,
           String(roleOrArea).trim(),
           String(profileUrl).trim(),
-          `${basePrefix}-${suffix}10`,
+          generatedPromoCode,
           generatedRefSlug,
           assignedRate,
         ]

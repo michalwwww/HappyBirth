@@ -6,6 +6,8 @@ import { computeCommissionEligibleDate } from '@/lib/affiliate';
 
 export const runtime = 'nodejs';
 
+const FREE_PREVIEW_LESSONS = new Set(['lekcja-01', 'lekcja-06', 'lekcja-26', 'lekcja-40']);
+
 // GET: Pobierz ukończone lekcje oraz ostatnie pozycje sekundowe (Auto-Resume co 15s [C2])
 export async function GET() {
   const session = await getSession();
@@ -35,30 +37,32 @@ export async function POST(req: NextRequest) {
   const session = await getSession();
 
   if (!session?.userId) {
-    return NextResponse.json({ saved: false, reason: 'unauthenticated' });
+    return NextResponse.json({ error: 'Wymagane zalogowanie.' }, { status: 401 });
   }
 
   try {
     const body = await req.json();
-    const { lessonId, completed, lastPositionSeconds } = body;
+    const { lessonId, completed, lastPositionSeconds, positionSeconds } = body;
 
     if (!lessonId) {
       return NextResponse.json({ error: 'Brak lessonId' }, { status: 400 });
     }
 
+    const cleanLessonId = String(lessonId).trim();
     const progressId = crypto.randomUUID();
-    const posInt = typeof lastPositionSeconds === 'number' && lastPositionSeconds >= 0 ? Math.floor(lastPositionSeconds) : 0;
+    const rawPos = typeof lastPositionSeconds === 'number' ? lastPositionSeconds : positionSeconds;
+    const posInt = typeof rawPos === 'number' && rawPos >= 0 ? Math.floor(rawPos) : 0;
+    const isCompleted = completed === true ? 1 : 0;
 
     if (typeof completed === 'boolean') {
-      const completedInt = completed ? 1 : 0;
       await d1Run(
         `INSERT INTO lesson_progress (id, user_id, lesson_id, completed, last_position_seconds, updated_at)
          VALUES (?, ?, ?, ?, ?, datetime('now'))
          ON CONFLICT(user_id, lesson_id) DO UPDATE SET
-           completed = excluded.completed,
+           completed = CASE WHEN excluded.completed = 1 THEN 1 ELSE lesson_progress.completed END,
            last_position_seconds = CASE WHEN excluded.last_position_seconds > 0 THEN excluded.last_position_seconds ELSE lesson_progress.last_position_seconds END,
            updated_at = datetime('now')`,
-        [progressId, session.userId, lessonId, completedInt, posInt]
+        [progressId, session.userId, cleanLessonId, isCompleted, posInt]
       );
     } else {
       // Aktualizacja samej sekundy oglądania (Auto-Resume co 15s)
@@ -66,38 +70,41 @@ export async function POST(req: NextRequest) {
         `INSERT INTO lesson_progress (id, user_id, lesson_id, completed, last_position_seconds, updated_at)
          VALUES (?, ?, ?, 0, ?, datetime('now'))
          ON CONFLICT(user_id, lesson_id) DO UPDATE SET
-           last_position_seconds = excluded.last_position_seconds,
+           last_position_seconds = CASE WHEN excluded.last_position_seconds > 0 THEN excluded.last_position_seconds ELSE lesson_progress.last_position_seconds END,
            updated_at = datetime('now')`,
-        [progressId, session.userId, lessonId, posInt]
+        [progressId, session.userId, cleanLessonId, posInt]
       );
     }
 
-    // [C1] + [E1] Zarejestruj first_content_accessed_at przy pierwszym otwarciu jakiejkolwiek lekcji
-    const nowIso = new Date().toISOString();
-    await d1Run(
-      `UPDATE enrollments
-       SET first_content_accessed_at = COALESCE(first_content_accessed_at, ?)
-       WHERE user_id = ?`,
-      [nowIso, session.userId]
-    );
+    // [C1] + [E1] Wyłącznie płatne lekcje (>= 15 s lub ukończone) wygaszają prawo odstąpienia i uruchamiają 7-dniowy bufor prowizji (status pozostaje PENDING!)
+    const isPaidConsumption = !FREE_PREVIEW_LESSONS.has(cleanLessonId) && (posInt >= 15 || isCompleted === 1);
+    if (isPaidConsumption) {
+      const nowIso = new Date().toISOString();
+      await d1Run(
+        `UPDATE enrollments
+         SET first_content_accessed_at = COALESCE(first_content_accessed_at, ?)
+         WHERE user_id = ?`,
+        [nowIso, session.userId]
+      );
 
-    await d1Run(
-      `UPDATE orders
-       SET first_content_accessed_at = COALESCE(first_content_accessed_at, ?)
-       WHERE user_id = ?`,
-      [nowIso, session.userId]
-    );
+      await d1Run(
+        `UPDATE orders
+         SET first_content_accessed_at = COALESCE(first_content_accessed_at, ?)
+         WHERE user_id = ? OR LOWER(customer_email) = ?`,
+        [nowIso, session.userId, session.email.toLowerCase()]
+      );
 
-    // [D2a] Synchronizacja prowizji afiliacyjnej z Art. 38 ust. 1 pkt 13 u.p.k. (status ELIGIBLE po buforze 7 dni)
-    const eligibleAtIso = computeCommissionEligibleDate(nowIso);
-    await d1Run(
-      `UPDATE affiliate_commissions
-       SET first_content_accessed_at = COALESCE(first_content_accessed_at, ?),
-           eligible_at = COALESCE(eligible_at, ?),
-           status = CASE WHEN status = 'PENDING' THEN 'ELIGIBLE' ELSE status END
-       WHERE order_id IN (SELECT id FROM orders WHERE user_id = ?)`,
-      [nowIso, eligibleAtIso, session.userId]
-    );
+      // [D2a] Prowizja pozostaje w statusie PENDING aż minie 7-dniowy bufor (eligible_at)
+      const eligibleAtIso = computeCommissionEligibleDate(nowIso);
+      await d1Run(
+        `UPDATE affiliate_commissions
+         SET first_content_accessed_at = COALESCE(first_content_accessed_at, ?),
+             eligible_at = COALESCE(eligible_at, ?)
+         WHERE status = 'PENDING'
+           AND order_id IN (SELECT id FROM orders WHERE user_id = ? OR LOWER(customer_email) = ?)`,
+        [nowIso, eligibleAtIso, session.userId, session.email.toLowerCase()]
+      );
+    }
 
     return NextResponse.json({
       saved: true,

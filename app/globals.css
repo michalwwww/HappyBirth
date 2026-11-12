@@ -3,54 +3,56 @@
 @tailwind utilities;
 
 :root {
-  --paper: #FBF8F4;
-  --ink: #1A1512;
-  --ink2: #544A44;
-  --ink3: #867A72;
-  --line: #EAE3DB;
-  --c: #EC008C;
-  --tint: #FAE3EB;
-  --deep: #C80077;
-  
-  /* Ciemnofioletowa / Purpurowa paleta dla belek i stopki */
-  --plum-night: #1F071D;
-  --plum-deep: #250A24;
-  --plum-card: #2C0C2B;
-  --plum-border: #461643;
-  --plum-tint: #EAD5E5;
-  --plum-glow: rgba(236, 0, 140, 0.18);
+  /* Paleta v3: tokeny naszej wersji v1 (atrament fiołkowy zamiast czerni, magenta z logo) */
+  --paper: #FDFAF6;
+  --ink: #4A3A5E;
+  --ink2: #6E5C7D;
+  --ink3: #7A6786;
+  --line: #EADFD3;
+  --c: #DA0271;
+  --tint: #F9E6EC;
+  --deep: #C00265;
+
+  /* Ciemne powierzchnie (pasek strefy, stopka): noc i noc2 z v1 */
+  --plum-night: #3F3054;
+  --plum-deep: #2E2340;
+  --plum-card: #3A2D50;
+  --plum-border: #4A3D62;
+  --plum-tint: #E8DEF0;
+  --plum-glow: rgba(218, 2, 113, 0.18);
 }
 
+/* Kroje v3 (SOFT & COSY): Nunito w tekście i interfejsie, Besley w tytułach. Deklaracje @font-face w app/site.css. */
 body {
   background-color: var(--paper);
   color: var(--ink);
-  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 18px;
+  font-family: 'Nunito', ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 17px;
   line-height: 1.62;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4 {
-  font-family: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
-  font-weight: 500;
-  letter-spacing: -0.032em;
-  line-height: 1.05;
+  font-family: 'Besley', Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  letter-spacing: -0.016em;
+  line-height: 1.08;
 }
 
 em.se {
-  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+  font-family: 'Besley', Georgia, serif;
   font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.012em;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .font-brand-display {
-  font-family: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
-  letter-spacing: -0.032em;
+  font-family: 'Besley', Georgia, 'Times New Roman', serif;
+  letter-spacing: -0.016em;
 }
 
 .font-brand-serif {
-  font-family: var(--font-instrument-serif), 'Instrument Serif', Georgia, serif;
+  font-family: 'Besley', Georgia, serif;
   font-style: italic;
 }
 
@@ -60,18 +62,18 @@ em.se {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #FBF8F4;
+  background: #FDFAF6;
 }
 ::-webkit-scrollbar-thumb {
-  background: #EAE3DB;
+  background: #DCCDBE;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #867A72;
+  background: #7A6786;
 }
 
 .glass-nav {
-  background: rgba(251, 248, 244, 0.94);
+  background: rgba(239, 229, 216, 0.9);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -107,18 +109,18 @@ em.se {
   width: 13px;
   height: 13px;
   border-radius: 4px;
-  background: #FCD705;
+  background: #FECB22;
 }
 
 /* -------------------------------------------------------------
    KOMPLETNY SYSTEM CIEMNEGO MOTYWU (DARK MODE - PEŁNY KONTRAST)
    ------------------------------------------------------------- */
 html.dark {
-  --paper: #120311;
-  --ink: #FBF8F4;
-  --ink2: #EAD5E5;
-  --ink3: #C4ADC0;
-  --line: #3A1038;
+  --paper: #1B1424;
+  --ink: #F4EEF7;
+  --ink2: #D5CAE0;
+  --ink3: #B9ACC8;
+  --line: #3B3050;
   --kosc: #120311;
   --papier: #1A0619;
   --len: #180517;
@@ -141,8 +143,8 @@ html.dark {
 }
 
 html.dark body {
-  background-color: #120311 !important;
-  color: #FBF8F4 !important;
+  background-color: #1B1424 !important;
+  color: #F4EEF7 !important;
 }
 
 /* Górny pasek biegunkowy (ticker) w dark mode */
@@ -159,6 +161,7 @@ html.dark .pasek b {
 /* Pasek nawigacyjny w dark mode */
 html.dark .nav {
   background: rgba(18, 3, 17, 0.96) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.2) !important;
   backdrop-filter: blur(16px) saturate(1.2) !important;
   border-bottom: 1px solid #3D0E39 !important;
 }
@@ -462,7 +465,9 @@ html.dark .fakty li {
 /* -------------------------------------------------------------
    WCAG 2.1 AA ACCESSIBILITY RULES (WIDOCZNE I NATYCHMIASTOWE ZMIANY)
    ------------------------------------------------------------- */
-/* 1. Skalowanie czcionek (Zoom dla całego dokumentu i elementów) */
+/* 1. Powiększenie: jedna klasa na <html> powiększa całą stronę (runda X1).
+   Wcześniej dodatkowo każdy p, span, li i a dostawał 1.15em z !important, co mnożyło się w zagnieżdżeniach
+   (tekst w span w akapicie rósł o 32% i więcej) i rozbijało układ. Zostaje sam zoom. */
 html.a11y-font-115 {
   zoom: 1.15;
 }
@@ -471,85 +476,64 @@ html.a11y-font-130 {
   zoom: 1.30;
 }
 
-html.a11y-font-115 body,
-html.a11y-font-115 p,
-html.a11y-font-115 li,
-html.a11y-font-115 span,
-html.a11y-font-115 a,
-html.a11y-font-115 button,
-html.a11y-font-115 input,
-html.a11y-font-115 h1,
-html.a11y-font-115 h2,
-html.a11y-font-115 h3 {
-  font-size: 1.15em !important;
+@supports not (zoom: 1.15) {
+  html.a11y-font-115 {
+    font-size: 115%;
+  }
+  html.a11y-font-130 {
+    font-size: 130%;
+  }
 }
 
-html.a11y-font-130 body,
-html.a11y-font-130 p,
-html.a11y-font-130 li,
-html.a11y-font-130 span,
-html.a11y-font-130 a,
-html.a11y-font-130 button,
-html.a11y-font-130 input,
-html.a11y-font-130 h1,
-html.a11y-font-130 h2,
-html.a11y-font-130 h3 {
-  font-size: 1.3em !important;
+/* Zapobieganie automatycznemu przybliżaniu (auto-zoom) na iOS Safari dla pól formularzy < 16px */
+@media (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
-/* 2. Prawdziwy Wysoki Kontrast WCAG (Żółć i biel na czerni) */
+/* 2. Wysoki kontrast (żółć i biel na czerni). Strony w systemie v3 (.hb-site) dostają go z tokenów
+   w app/palety.css, z czytelnymi przyciskami; poniższe reguły na siłę działają tylko na pozostałych stronach. */
 html.a11y-high-contrast,
-html.a11y-high-contrast body,
-html.a11y-high-contrast main,
-html.a11y-high-contrast section,
-html.a11y-high-contrast div:not([data-a11y-modal]):not([data-karuzela]),
-html.a11y-high-contrast header,
-html.a11y-high-contrast nav,
-html.a11y-high-contrast footer,
-html.a11y-high-contrast article,
-html.a11y-high-contrast .nav,
-html.a11y-high-contrast .modul,
-html.a11y-high-contrast .oferta,
-html.a11y-high-contrast .argumenty,
-html.a11y-high-contrast .mapa,
-html.a11y-high-contrast .pasmo,
-html.a11y-high-contrast .se,
-html.a11y-high-contrast .faq,
-html.a11y-high-contrast .stopka {
+html.a11y-high-contrast body {
+  background-color: #000000 !important;
+  color: #FFFF00 !important;
+}
+
+html.a11y-high-contrast body:not(:has(.hb-site)) main,
+html.a11y-high-contrast body:not(:has(.hb-site)) section,
+html.a11y-high-contrast body:not(:has(.hb-site)) div:not([data-a11y-modal]):not([data-karuzela]):not(.hb-a11y-tlo),
+html.a11y-high-contrast body:not(:has(.hb-site)) header,
+html.a11y-high-contrast body:not(:has(.hb-site)) nav,
+html.a11y-high-contrast body:not(:has(.hb-site)) footer,
+html.a11y-high-contrast body:not(:has(.hb-site)) article {
   background-color: #000000 !important;
   color: #FFFF00 !important;
   border-color: #FFFF00 !important;
 }
 
-html.a11y-high-contrast h1,
-html.a11y-high-contrast h2,
-html.a11y-high-contrast h3,
-html.a11y-high-contrast h4,
-html.a11y-high-contrast b,
-html.a11y-high-contrast strong {
+html.a11y-high-contrast body:not(:has(.hb-site)) h1,
+html.a11y-high-contrast body:not(:has(.hb-site)) h2,
+html.a11y-high-contrast body:not(:has(.hb-site)) h3,
+html.a11y-high-contrast body:not(:has(.hb-site)) h4,
+html.a11y-high-contrast body:not(:has(.hb-site)) b,
+html.a11y-high-contrast body:not(:has(.hb-site)) strong {
   color: #FFFFFF !important;
 }
 
-html.a11y-high-contrast p,
-html.a11y-high-contrast span:not([data-a11y-modal] *),
-html.a11y-high-contrast li,
-html.a11y-high-contrast small {
+html.a11y-high-contrast body:not(:has(.hb-site)) p,
+html.a11y-high-contrast body:not(:has(.hb-site)) span:not([data-a11y-modal] *),
+html.a11y-high-contrast body:not(:has(.hb-site)) li,
+html.a11y-high-contrast body:not(:has(.hb-site)) small {
   color: #FFFF00 !important;
 }
 
-html.a11y-high-contrast a,
-html.a11y-high-contrast button:not([data-a11y-modal] *) {
+html.a11y-high-contrast body:not(:has(.hb-site)) a,
+html.a11y-high-contrast body:not(:has(.hb-site)) button:not([data-a11y-modal] *) {
   color: #FFFF00 !important;
   border: 2px solid #FFFF00 !important;
-}
-
-html.a11y-high-contrast .btn.kup,
-html.a11y-high-contrast .btn-oferta-zakup,
-html.a11y-high-contrast .btn.zolty {
-  background-color: #FFFF00 !important;
-  color: #000000 !important;
-  font-weight: 900 !important;
-  border: 2px solid #FFFFFF !important;
 }
 
 /* 3. Podkreślenie odnośników */
@@ -560,12 +544,17 @@ html.a11y-underline-links a {
 }
 
 /* 4. Czytelny krój pisma (dysleksja) */
-html.a11y-readable-font, 
+html.a11y-readable-font,
 html.a11y-readable-font * {
   font-family: Arial, Helvetica, Verdana, sans-serif !important;
-  letter-spacing: 0.04em !important;
-  word-spacing: 0.1em !important;
-  line-height: 1.85 !important;
+  letter-spacing: 0.03em !important;
+  word-spacing: 0.08em !important;
+}
+
+html.a11y-readable-font p,
+html.a11y-readable-font li,
+html.a11y-readable-font dd {
+  line-height: 1.75 !important;
 }
 
 /* 5. Zatrzymanie animacji i paska biegunkowego */
@@ -593,7 +582,7 @@ html.a11y-reduce-motion .pasek-tor {
   text-shadow: none !important;
   text-transform: none !important;
   letter-spacing: -0.01em !important;
-  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-family: 'Nunito', ui-rounded, system-ui, -apple-system, sans-serif !important;
 }
 
 .btn.kup {

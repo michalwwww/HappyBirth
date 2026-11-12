@@ -151,6 +151,7 @@ export function FinalQuizAndCertificate() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fullName: fullName.trim(),
+          answers,
           correctAnswers: correctCount,
           totalQuestions: FINAL_QUIZ_QUESTIONS.length,
         }),
@@ -191,18 +192,18 @@ export function FinalQuizAndCertificate() {
   return (
     <section
       id="certyfikat"
-      className="rounded-3xl border border-[#EAE3DB] dark:border-[#3D0E39] bg-white dark:bg-[#1C081A] p-6 sm:p-8 shadow-sm space-y-6"
+      className="rounded-3xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] bg-white dark:bg-[color:var(--hb-karta)] p-6 sm:p-8 shadow-sm space-y-6"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#EAE3DB] dark:border-[#3D0E39] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] pb-5">
         <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAE3EB] dark:bg-[#3B0D36] text-[#DA0271] dark:text-[#FF4BA8] text-xs font-bold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] dark:text-[color:var(--hb-mag-t)] text-xs font-bold">
             <Award className="w-3.5 h-3.5" />
             <span>Test Końcowy i Certyfikat PDF</span>
           </div>
-          <h3 className="font-brand-display text-xl sm:text-2xl font-bold text-[#1A1512] dark:text-[#FBF8F4]">
+          <h3 className="font-brand-display text-xl sm:text-2xl font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
             Imienny Certyfikat Ukończenia Kursu
           </h3>
-          <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3]">
+          <p className="text-xs sm:text-sm text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
             Rozwiąż test (10 pytań, próg 80%) i pobierz certyfikat PDF do karty ciąży.
           </p>
         </div>
@@ -211,7 +212,7 @@ export function FinalQuizAndCertificate() {
           <button
             type="button"
             onClick={() => setQuizStarted(true)}
-            className="px-6 py-3 rounded-full bg-[#DA0271] hover:bg-[#B8005F] text-white text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 shadow-md"
+            className="px-6 py-3 rounded-full bg-[color:var(--hb-mag)] hover:bg-[color:var(--hb-mag-h)] text-[color:var(--hb-cta-ink)] text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 shadow-md"
           >
             Rozpocznij test końcowy (10 pytań) →
           </button>
@@ -221,35 +222,35 @@ export function FinalQuizAndCertificate() {
       {certificate ? (
         <div className="space-y-6">
           {/* Wygenerowany Certyfikat gotowy do wydruku / zapisu PDF */}
-          <div className="rounded-3xl border-2 border-[#DA0271] bg-[#FFFDFA] text-[#1A1512] p-6 sm:p-10 shadow-xl space-y-6 text-center relative overflow-hidden">
-            <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#FAE3EB] text-[#DA0271] text-xs font-bold uppercase tracking-widest">
+          <div className="rounded-3xl border-2 border-[color:var(--hb-mag)] bg-[color:var(--hb-karta)] dark:bg-[color:var(--hb-karta)] text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)] p-6 sm:p-10 shadow-xl space-y-6 text-center relative overflow-hidden">
+            <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[color:var(--hb-p1l)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-mag-t)] text-xs font-bold uppercase tracking-widest">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Certyfikat Ukończenia Kursu · Wynik: {certificate.scorePercent}%</span>
             </div>
 
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-widest text-[#867A72] font-semibold">
+              <p className="text-xs uppercase tracking-widest text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] font-semibold">
                 Niniejszym zaświadcza się, że
               </p>
-              <h4 className="font-brand-display text-2xl sm:text-4xl font-bold text-[#20071E]">
+              <h4 className="font-brand-display text-2xl sm:text-4xl font-bold text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                 {certificate.fullName}
               </h4>
-              <p className="text-xs sm:text-sm text-[#544A44] max-w-xl mx-auto leading-relaxed pt-1">
+              <p className="text-xs sm:text-sm text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] max-w-xl mx-auto leading-relaxed pt-1">
                 ukończyła/ukończył program edukacyjny <strong>{certificate.courseTitle}</strong> przygotowany z dyplomowanymi położnymi, doradczyniami laktacyjnymi i fizjoterapeutkami ze szkoły rodzenia <strong>Mama Gaja w Poznaniu (działającej od 2012 r.)</strong> zgodnie ze Standardem Organizacyjnym Opieki Okołoporodowej.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-[#EAE3DB] text-xs text-[#544A44]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
               <div>
-                <span className="block text-[10px] uppercase text-[#867A72] font-bold">Numer certyfikatu</span>
+                <span className="block text-[10px] uppercase text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] font-bold">Numer certyfikatu</span>
                 <strong className="font-mono">{certificate.certificateNumber}</strong>
               </div>
               <div>
-                <span className="block text-[10px] uppercase text-[#867A72] font-bold">Data wystawienia</span>
+                <span className="block text-[10px] uppercase text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] font-bold">Data wystawienia</span>
                 <strong>{certificate.issuedDateFormatted}</strong>
               </div>
               <div>
-                <span className="block text-[10px] uppercase text-[#867A72] font-bold">Organizator prawny</span>
+                <span className="block text-[10px] uppercase text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)] font-bold">Organizator prawny</span>
                 <strong>KLARSOLUTIONS Sp. z o.o. (KRS 0001268396)</strong>
               </div>
             </div>
@@ -259,7 +260,7 @@ export function FinalQuizAndCertificate() {
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#DA0271] hover:bg-[#B8005F] text-white text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-md"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[color:var(--hb-mag)] hover:bg-[color:var(--hb-mag-h)] text-[color:var(--hb-cta-ink)] text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-md"
             >
               <Printer className="w-4 h-4" />
               <span>Pobierz / Zapisz Certyfikat jako PDF</span>
@@ -267,7 +268,7 @@ export function FinalQuizAndCertificate() {
             <button
               type="button"
               onClick={() => setCertificate(null)}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-[#EAE3DB] dark:border-[#461643] text-xs font-semibold text-[#544A44] dark:text-[#D7CCC3] hover:border-[#DA0271] cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] text-xs font-semibold text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] hover:border-[color:var(--hb-mag)] cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Wróć do pytań testowych</span>
@@ -280,9 +281,9 @@ export function FinalQuizAndCertificate() {
             {FINAL_QUIZ_QUESTIONS.map((q) => (
               <div
                 key={q.id}
-                className="p-4 sm:p-5 rounded-2xl bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39] space-y-3"
+                className="p-4 sm:p-5 rounded-2xl bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] space-y-3"
               >
-                <div className="font-bold text-xs sm:text-sm text-[#1A1512] dark:text-[#FBF8F4]">
+                <div className="font-bold text-xs sm:text-sm text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
                   {q.id}. {q.question}
                 </div>
                 <div className="space-y-2">
@@ -291,8 +292,8 @@ export function FinalQuizAndCertificate() {
                       key={idx}
                       className={`flex items-start gap-2.5 p-2.5 rounded-xl border text-xs cursor-pointer transition-all ${
                         answers[q.id] === idx
-                          ? 'border-[#DA0271] bg-[#FAE3EB]/50 dark:bg-[#3B0D36] text-[#1A1512] dark:text-white font-semibold'
-                          : 'border-[#EAE3DB] dark:border-[#461643] bg-white dark:bg-[#1A0619] text-[#544A44] dark:text-[#D7CCC3]'
+                          ? 'border-[color:var(--hb-mag)] bg-[color:color-mix(in_srgb,var(--hb-p1l)_50%,transparent)] dark:bg-[color:var(--hb-p1l)] text-[color:var(--hb-ink)] dark:text-white font-semibold'
+                          : 'border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-papier)] text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]'
                       }`}
                     >
                       <input
@@ -300,7 +301,7 @@ export function FinalQuizAndCertificate() {
                         name={`quiz-q-${q.id}`}
                         checked={answers[q.id] === idx}
                         onChange={() => setAnswers((prev) => ({ ...prev, [q.id]: idx }))}
-                        className="mt-0.5 text-[#DA0271] focus:ring-[#DA0271]"
+                        className="mt-0.5 text-[color:var(--hb-mag-t)] focus:ring-[color:var(--hb-mag)]"
                       />
                       <span>{opt}</span>
                     </label>
@@ -310,9 +311,9 @@ export function FinalQuizAndCertificate() {
             ))}
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39] space-y-4">
+          <div className="p-5 rounded-2xl bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] space-y-4">
             <div className="max-w-md space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] dark:text-[#D7CCC3]">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
                 Imię i nazwisko na certyfikacie (lub imiona obojga rodziców)
               </label>
               <input
@@ -321,7 +322,7 @@ export function FinalQuizAndCertificate() {
                 placeholder="np. Anna Kowalska / Anna i Piotr Kowalscy"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] dark:border-[#461643] bg-white dark:bg-[#1A0619] text-sm text-[#1A1512] dark:text-white focus:outline-none focus:border-[#DA0271]"
+                className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia2)] bg-white dark:bg-[color:var(--hb-papier)] text-sm text-[color:var(--hb-ink)] dark:text-white focus:outline-none focus:border-[color:var(--hb-mag)]"
               />
             </div>
 
@@ -330,13 +331,13 @@ export function FinalQuizAndCertificate() {
             )}
 
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="text-xs text-[#867A72] dark:text-[#A2958C]">
+              <span className="text-xs text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
                 Udzielono odpowiedzi: <strong>{answeredCount} z 10</strong> (wymagany próg zaliczenia: 80%)
               </span>
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#DA0271] hover:bg-[#B8005F] text-white text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-md disabled:opacity-60"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[color:var(--hb-mag)] hover:bg-[color:var(--hb-mag-h)] text-[color:var(--hb-cta-ink)] text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-md disabled:opacity-60"
               >
                 <FileText className="w-4 h-4" />
                 <span>{loading ? 'Generowanie certyfikatu...' : 'Sprawdź wynik i wygeneruj Certyfikat PDF'}</span>
@@ -345,16 +346,16 @@ export function FinalQuizAndCertificate() {
           </div>
         </form>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-[#544A44] dark:text-[#D7CCC3]">
-          <div className="p-4 rounded-2xl bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39] flex items-center gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)]">
+          <div className="p-4 rounded-2xl bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] flex items-center gap-2.5">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>10 pytań praktycznych z 8 modułów kursu</span>
           </div>
-          <div className="p-4 rounded-2xl bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39] flex items-center gap-2.5">
+          <div className="p-4 rounded-2xl bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] flex items-center gap-2.5">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>Unikalny numer certyfikatu i dane KLARSOLUTIONS Sp. z o.o.</span>
           </div>
-          <div className="p-4 rounded-2xl bg-[#FBF8F4] dark:bg-[#250A24] border border-[#EAE3DB] dark:border-[#3D0E39] flex items-center gap-2.5">
+          <div className="p-4 rounded-2xl bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-papier)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] flex items-center gap-2.5">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>Gotowy do wydruku PDF i dołączenia do dokumentacji ciąży</span>
           </div>

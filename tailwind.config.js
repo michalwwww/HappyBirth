@@ -10,18 +10,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        paper: "#FBF8F4",
+        paper: "#FDFAF6",
         ink: {
-          DEFAULT: "#1A1512",
-          2: "#544A44",
-          3: "#867A72",
+          DEFAULT: "#4A3A5E",
+          2: "#6E5C7D",
+          3: "#7A6786",
         },
         hb: {
-          primary: "#EC008C",
-          deep: "#C80077",
-          tint: "#FAE3EB",
-          line: "#EAE3DB",
-          dark: "#1A1512",
+          primary: "#DA0271",
+          deep: "#C00265",
+          tint: "#F9E6EC",
+          line: "#EADFD3",
+          dark: "#4A3A5E",
         },
         stage: {
           1: "#867A72",
@@ -36,9 +36,9 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['var(--font-bricolage)', 'Bricolage Grotesque', 'sans-serif'],
-        serif: ['var(--font-instrument)', 'Instrument Serif', 'Georgia', 'serif'],
+        sans: ['Nunito', 'ui-rounded', 'system-ui', 'sans-serif'],
+        display: ['Besley', 'Georgia', 'serif'],
+        serif: ['Besley', 'Georgia', 'serif'],
       },
     },
   },

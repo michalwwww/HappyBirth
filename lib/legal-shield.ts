@@ -1,5 +1,14 @@
 import crypto from 'crypto';
 
+function escapeHtml(input: unknown): string {
+  return String(input ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 /**
  * ============================================================================
  * TARCZA PRAWNA HAPPYBIRTH.PL ([E1] + [E2] + [E5])
@@ -19,18 +28,23 @@ export const OPERATOR_LEGAL_DATA = {
   shareCapital: '5 000,00 PLN',
   contactEmail: 'kontakt@happybirth.pl',
   supportEmail: 'pomoc@happybirth.pl',
+  // Opcjonalny numer telefonu kontaktowego (zostanie automatycznie wyrenderowany w Regulaminie po uzupełnieniu)
+  contactPhone: '',
 };
 
 /**
  * [E1] Dwa osobne, niezaznaczone domyślnie checkboxy w koszyku
  */
+// Teksty zgód dokładnie takie, jak przy polach wyboru na stronie głównej (poprawki z 04.11.2026),
+// żeby zapis dowodowy i e-mail na trwałym nośniku powtarzały to, co klient zaznaczył.
 export const CHECKBOX_1_TERMS_TEXT =
-  'Akceptuję Regulamin i Politykę Prywatności.';
+  'Akceptuję Regulamin oraz Politykę Prywatności';
 
 export const CHECKBOX_2_ART38_WAIVER_TEXT =
-  'Chcę otrzymać dostęp do kursu od razu po opłaceniu i wiem, że tracę wtedy 14-dniowe prawo do odstąpienia od umowy (art. 38 ust. 1 pkt 13 u.p.k.).';
+  'Tak, chcę otrzymać dostęp do kursu natychmiast po opłaceniu i zgodnie z art. 38 ust. 1 pkt 13 u.p.k. zgadzam się na utratę 14-dniowego prawa do odstąpienia od umowy';
 
-export const TERMS_VERSION_ID = '2026-10-27-v2.0-18M';
+// 12.11.2026: Zaktualizowany Regulamin (Order Bump Karty dla Taty + Art. 43a–43q u.p.k. + ADR) — ten sam skrót jest wpisany w functions/api/stripe/*.ts
+export const TERMS_VERSION_ID = '2026-11-12-v2.2-18M';
 
 export function getTermsSha256Hash(): string {
   const canonicalTermsSummary = `${OPERATOR_LEGAL_DATA.fullName}|NIP:${OPERATOR_LEGAL_DATA.nip}|KRS:${OPERATOR_LEGAL_DATA.krs}|PRICE:489.00_PLN_GROSS|ACCESS:18_MONTHS_548_DAYS|MODULES:8_LESSONS:52|WAIVER_ART38:${CHECKBOX_2_ART38_WAIVER_TEXT}|VERSION:${TERMS_VERSION_ID}`;
@@ -47,6 +61,7 @@ export function buildDurableMediumConfirmationEmail(params: {
   orderNumber: string;
   amountGrossGrosze: number;
   orderBumpIncluded: boolean;
+  onlyOrderBump?: boolean;
   waiverTimestampIso: string;
   termsSha256: string;
   accessUrl: string;
@@ -56,30 +71,47 @@ export function buildDurableMediumConfirmationEmail(params: {
   const netPln = (params.amountGrossGrosze / 100 / 1.23).toFixed(2).replace('.', ',');
   const vatPln = (params.amountGrossGrosze / 100 - params.amountGrossGrosze / 100 / 1.23).toFixed(2).replace('.', ',');
   const expiresFormatted = new Date(params.expiresAtIso).toLocaleDateString('pl-PL');
+  const safeCustomerName = escapeHtml(params.customerName || 'Rodzicu');
+  const safeOrderNumber = escapeHtml(params.orderNumber);
+  const safeWaiverTs = escapeHtml(params.waiverTimestampIso);
+  const safeTermsSha = escapeHtml(params.termsSha256.slice(0, 24));
+  const phoneLine = OPERATOR_LEGAL_DATA.contactPhone.trim()
+    ? ` | Tel.: ${escapeHtml(OPERATOR_LEGAL_DATA.contactPhone.trim())}`
+    : '';
+
+  const productRowsHtml = params.onlyOrderBump
+    ? `<div><strong>Produkt:</strong> Pakiet Kart Sytuacyjnych na Porodówkę dla Taty (PDF) — 4 karty krok po kroku na salę porodową, ucisk krzyżowy, matryca B.R.A.I.N., protokół siary i lista 3 reklamówek do szpitala (49,00 zł brutto)</div>`
+    : `
+        <div><strong>Produkt główny:</strong> Kurs Szkoły Rodzenia Online HappyBirth.pl (52 lekcje 4K w 8 modułach, 288 min + Notatnik Rodzica PDF + dostęp dla partnera)</div>
+        ${
+          params.orderBumpIncluded
+            ? '<div><strong>Dodatek do zamówienia (Order Bump):</strong> Pakiet Kart Sytuacyjnych na Porodówkę dla Taty (PDF) — 4 karty krok po kroku na salę porodową, ucisk krzyżowy, matryca B.R.A.I.N., protokół siary i lista 3 reklamówek do szpitala (+49,00 zł brutto)</div>'
+            : ''
+        }
+      `;
 
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 620px; margin: 0 auto; padding: 28px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 18px;">
       <div style="border-bottom: 1px solid #EAE3DB; padding-bottom: 16px; margin-bottom: 20px;">
         <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #DA0271; font-weight: 700;">Potwierdzenie zawarcia umowy na trwałym nośniku</span>
-        <h1 style="color: #1A1512; font-size: 22px; margin: 6px 0 0 0;">Dziękujemy za zakup kursu HappyBirth.pl!</h1>
+        <h1 style="color: #1A1512; font-size: 22px; margin: 6px 0 0 0;">Dziękujemy za zamówienie na HappyBirth.pl!</h1>
       </div>
 
       <p style="font-size: 14px; line-height: 1.6; color: #342D28;">
-        Cześć <strong>${params.customerName}</strong>,<br/>
+        Cześć <strong>${safeCustomerName}</strong>,<br/>
         niniejsza wiadomość stanowi urzędowe potwierdzenie zawarcia umowy o dostarczanie treści cyfrowych na odległość na trwałym nośniku zgodnie z art. 21 ust. 1 oraz art. 38 ust. 1 pkt 13 ustawy z dnia 30 maja 2014 r. o prawach konsumenta.
       </p>
 
       <div style="margin: 24px 0; text-align: center;">
         <a href="${params.accessUrl}" style="background-color: #DA0271; color: #ffffff; padding: 15px 30px; text-decoration: none; border-radius: 9999px; font-weight: 700; display: inline-block; font-size: 15px;">
-          Wejdź do Strefy Kursantki (52 lekcje 4K) &rarr;
+          Wejdź do Strefy Kursantki &rarr;
         </a>
       </div>
 
       <div style="background: #ffffff; border: 1px solid #EAE3DB; border-radius: 14px; padding: 16px; margin-bottom: 18px; font-size: 13px; line-height: 1.6;">
-        <h3 style="margin: 0 0 10px 0; font-size: 14px; color: #1A1512;">1. Specyfikacja zamówienia i faktury VAT (23%)</h3>
-        <div><strong>Numer zamówienia:</strong> ${params.orderNumber}</div>
-        <div><strong>Produkt główny:</strong> Kurs Szkoły Rodzenia Online HappyBirth.pl (52 lekcje 4K w 8 modułach, 288 min + Notatnik Rodzica PDF + dostęp dla partnera)</div>
-        ${params.orderBumpIncluded ? '<div><strong>Dodatek do zamówienia (Order Bump):</strong> Indywidualny Pakiet Dokumentów Szpitalnych i Kreator Planu Porodu + Checklista Wyprawkowa PDF (+49,00 zł brutto)</div>' : ''}
+        <h3 style="margin: 0 0 10px 0; font-size: 14px; color: #1A1512;">1. Specyfikacja zamówienia i rozliczenie VAT (23%)</h3>
+        <div><strong>Numer zamówienia:</strong> ${safeOrderNumber}</div>
+        ${productRowsHtml}
         <div><strong>Okres ważności dostępu:</strong> 18 miesięcy (548 dni) od momentu zakupu — ważny do <strong>${expiresFormatted}</strong></div>
         <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #EAE3DB;">
           <strong>Kwota brutto (z VAT 23%):</strong> ${grossPln} PLN | <strong>Kwota netto:</strong> ${netPln} PLN | <strong>Podatek VAT (23%):</strong> ${vatPln} PLN
@@ -88,20 +120,22 @@ export function buildDurableMediumConfirmationEmail(params: {
 
       <div style="background: #FAE3EB; border: 1px solid #F3CAD9; border-radius: 14px; padding: 16px; margin-bottom: 18px; font-size: 12.5px; line-height: 1.55; color: #541235;">
         <strong>2. Potwierdzenie udzielenia zgody na utratę prawa do odstąpienia od umowy (Art. 38 ust. 1 pkt 13 u.p.k.):</strong><br/>
-        Potwierdzamy, że przed złożeniem zamówienia w dniu <code>${params.waiverTimestampIso}</code> wyraziłaś/eś wyraźną i uprzednią zgodę o treści:<br/>
+        Potwierdzamy, że przed złożeniem zamówienia w dniu <code>${safeWaiverTs}</code> wyraziłaś/eś wyraźną i uprzednią zgodę o treści:<br/>
         <em>„${CHECKBOX_2_ART38_WAIVER_TEXT}”</em><br/>
-        Suma kontrolna zaakceptowanego Regulaminu (SHA-256): <code>${params.termsSha256.slice(0, 24)}...</code>
+        Suma kontrolna zaakceptowanego Regulaminu (SHA-256): <code>${safeTermsSha}...</code>
       </div>
 
       <p style="font-size: 11.5px; color: #867A72; line-height: 1.5; border-top: 1px solid #EAE3DB; padding-top: 14px;">
-        <strong>Sprzedawca i Operator Prawny:</strong> ${OPERATOR_LEGAL_DATA.fullName}, ${OPERATOR_LEGAL_DATA.address}, NIP: ${OPERATOR_LEGAL_DATA.nip}, KRS: ${OPERATOR_LEGAL_DATA.krs}, REGON: ${OPERATOR_LEGAL_DATA.regon}, ${OPERATOR_LEGAL_DATA.court}, kapitał zakładowy: ${OPERATOR_LEGAL_DATA.shareCapital}.<br/>
-        W załączeniu przesyłamy pełną treść Regulaminu Świadczenia Usług na trwałym nośniku. Formularz odstąpienia od umowy dostępny jest pod adresem: https://happybirth.pl/odstap-od-umowy
+        <strong>Sprzedawca i Operator Prawny:</strong> ${OPERATOR_LEGAL_DATA.fullName}, ${OPERATOR_LEGAL_DATA.address}, NIP: ${OPERATOR_LEGAL_DATA.nip}, KRS: ${OPERATOR_LEGAL_DATA.krs}, REGON: ${OPERATOR_LEGAL_DATA.regon}, ${OPERATOR_LEGAL_DATA.court}, kapitał zakładowy: ${OPERATOR_LEGAL_DATA.shareCapital}${phoneLine}.<br/>
+        Pełna treść Regulaminu (w tym pouczenie o zgodności treści cyfrowych z umową i reklamacjach): https://happybirth.pl/regulamin · Formularz odstąpienia od umowy: https://happybirth.pl/odstap-od-umowy
       </p>
     </div>
   `;
 
   return {
-    subject: `Potwierdzenie zawarcia umowy (${params.orderNumber}) i Twój dostęp na 18 miesięcy — HappyBirth.pl`,
+    subject: params.onlyOrderBump
+      ? `Potwierdzenie zawarcia umowy (${params.orderNumber}) — Pakiet Kart dla Taty PDF — HappyBirth.pl`
+      : `Potwierdzenie zawarcia umowy (${params.orderNumber}) i Twój dostęp na 18 miesięcy — HappyBirth.pl`,
     html,
   };
 }
@@ -111,13 +145,14 @@ export function buildDurableMediumConfirmationEmail(params: {
  */
 export interface WithdrawalEvaluationInput {
   scope: 'full_order' | 'order_bump_only';
+  orderFound?: boolean;
   waiverArt38Accepted: boolean;
   firstContentAccessedAt: string | null;
   orderBumpIncluded: boolean;
 }
 
 export interface WithdrawalEvaluationResult {
-  status: 'auto_rejected_art38' | 'approved_for_refund';
+  status: 'auto_rejected_art38' | 'approved_for_refund' | 'pending_manual_verification';
   autoRejectedDueToArt38: boolean;
   refundCourse: boolean;
   refundOrderBump: boolean;
@@ -125,15 +160,48 @@ export interface WithdrawalEvaluationResult {
 }
 
 export function evaluateWithdrawalRequest(input: WithdrawalEvaluationInput): WithdrawalEvaluationResult {
-  // Przypadek 1: Konsument odstępuje wyłącznie od niewykorzystanego dodatku z Order Bumpa (+49 zł)
-  if (input.scope === 'order_bump_only' && input.orderBumpIncluded) {
+  // Przypadek 0: Zamówienie nie zostało znalezione w automatycznym rejestrze — skierowanie do ręcznej weryfikacji (zero fałszywych obietnic zwrotu dla nieistniejących zamówień)
+  if (input.orderFound === false) {
+    return {
+      status: 'pending_manual_verification',
+      autoRejectedDueToArt38: false,
+      refundCourse: false,
+      refundOrderBump: false,
+      customerLegalNotice:
+        'Potwierdzamy wpływ Twojego zgłoszenia na trwałym nośniku. Podany numer zamówienia lub adres e-mail nie został automatycznie dopasowany w rejestrze zamówień, dlatego Twoje oświadczenie zostało przekazane do indywidualnej weryfikacji przez Dział Obsługi Klienta (pomoc@happybirth.pl). Odpowiedź otrzymasz na podany adres e-mail niezwłocznie po sprawdzeniu danych płatności.',
+    };
+  }
+
+  // Przypadek 1: Konsument składa częściowe odstąpienie wyłącznie w zakresie dodatku Order Bump (+49,00 zł)
+  if (input.scope === 'order_bump_only') {
+    if (!input.orderBumpIncluded) {
+      return {
+        status: 'pending_manual_verification',
+        autoRejectedDueToArt38: false,
+        refundCourse: false,
+        refundOrderBump: false,
+        customerLegalNotice:
+          'Potwierdzamy wpływ Twojego zgłoszenia na trwałym nośniku. W automatycznym rejestrze dla wskazanego zamówienia nie odnotowano aktywnego pakietu dodatkowego (Order Bump +49,00 zł), dlatego zgłoszenie przekazaliśmy do weryfikacji przez Dział Obsługi Klienta (pomoc@happybirth.pl).',
+      };
+    }
+
+    if (input.waiverArt38Accepted && Boolean(input.firstContentAccessedAt)) {
+      return {
+        status: 'auto_rejected_art38',
+        autoRejectedDueToArt38: true,
+        refundCourse: false,
+        refundOrderBump: false,
+        customerLegalNotice: `Potwierdzamy wpływ Twojego zgłoszenia na trwałym nośniku. Jednocześnie informujemy, że zgodnie z art. 38 ust. 1 pkt 13 ustawy z dnia 30 maja 2014 r. o prawach konsumenta, prawo odstąpienia od umowy o dostarczanie treści cyfrowych niedostarczanych na nośniku materialnym (w tym cyfrowego pakietu dokumentów Order Bump udostępnionego na koncie) wygasło z chwilą rozpoczęcia korzystania z materiałów w Strefie Kursantki (odnotowane otwarcie: ${input.firstContentAccessedAt}), po uprzednim wyrażeniu wyraźnej zgody przed dokonaniem płatności.`,
+      };
+    }
+
     return {
       status: 'approved_for_refund',
       autoRejectedDueToArt38: false,
       refundCourse: false,
       refundOrderBump: true,
       customerLegalNotice:
-        'Przyjęliśmy Twoje oświadczenie o częściowym odstąpieniu od umowy w zakresie pakietu dodatkowego (Order Bump +49,00 zł). Zwrot kwoty 49,00 zł zostanie przekazany na Twój rachunek płatniczy w terminie do 14 dni, a dostęp do kursu głównego pozostaje aktywny.',
+        'Przyjęliśmy Twoje oświadczenie o częściowym odstąpieniu od umowy w zakresie niewykorzystanego pakietu dodatkowego (Order Bump +49,00 zł). Zwrot kwoty 49,00 zł zostanie przekazany na Twój rachunek płatniczy w terminie do 14 dni kalendarzowych, a dostęp do kursu głównego pozostaje aktywny.',
     };
   }
 
@@ -148,7 +216,7 @@ export function evaluateWithdrawalRequest(input: WithdrawalEvaluationInput): Wit
     };
   }
 
-  // Przypadek 3: Dostęp do kursu nie został jeszcze w ogóle otwarty (first_content_accessed_at IS NULL)
+  // Przypadek 3: Zweryfikowane zamówienie, w którym dostęp do kursu nie został jeszcze w ogóle otwarty (first_content_accessed_at IS NULL)
   return {
     status: 'approved_for_refund',
     autoRejectedDueToArt38: false,

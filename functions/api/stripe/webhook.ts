@@ -1,3 +1,6 @@
+import { generateMotherReferralCode } from '../../../lib/brand-codes';
+import { escapeHtml, timingSafeEqualHex } from '../../_shared/session';
+
 interface Env {
   DB?: any;
   STRIPE_SECRET_KEY?: string;
@@ -7,27 +10,78 @@ interface Env {
 }
 
 const CHECKBOX_2_ART38_WAIVER_TEXT =
-  'Żądam natychmiastowego rozpoczęcia dostarczania treści cyfrowych przed upływem 14-dniowego terminu do odstąpienia od umowy i przyjmuję do wiadomości, że z chwilą uzyskania dostępu do platformy kursowej tracę prawo do odstąpienia od umowy (art. 38 ust. 1 pkt 13 u.p.k.).';
+  'Tak, chcę otrzymać dostęp do kursu natychmiast po opłaceniu i zgodnie z art. 38 ust. 1 pkt 13 u.p.k. zgadzam się na utratę 14-dniowego prawa do odstąpienia od umowy';
 
-const TERMS_VERSION_SHA256 = 'a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447';
+const TERMS_VERSION_SHA256 = 'baac2cea8e6c1d1bbeff5827cbb4eee13414180e36c4730d270821b6f3bad619';
+const WEBHOOK_TOLERANCE_SECONDS = 300; // 5 minut tolerancji na replay
 
-async function verifyStripeSignature(
+async function cancelScheduledCrmEmailsEdge(db: any, email: string, resendApiKey?: string): Promise<void> {
+  if (!db || !email) return;
+  try {
+    const leadRow = await db
+      .prepare('SELECT id, resend_scheduled_ids FROM leads WHERE LOWER(email) = ? ORDER BY id DESC LIMIT 1')
+      .bind(email)
+      .first();
+    if (leadRow?.resend_scheduled_ids && resendApiKey) {
+      let ids: string[] = [];
+      try {
+        const parsed = JSON.parse(String(leadRow.resend_scheduled_ids));
+        if (Array.isArray(parsed)) ids = parsed.map(String).filter(Boolean);
+      } catch {
+        ids = [];
+      }
+      await Promise.allSettled(
+        ids.map((id) =>
+          fetch(`https://api.resend.com/emails/${encodeURIComponent(id)}/cancel`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${resendApiKey}` },
+          })
+        )
+      );
+    }
+    await db
+      .prepare(
+        `UPDATE leads
+         SET unsubscribed_at = COALESCE(unsubscribed_at, datetime('now')),
+             resend_scheduled_ids = '[]'
+         WHERE LOWER(email) = ?`
+      )
+      .bind(email)
+      .run()
+      .catch(() => {});
+  } catch {
+    // Nie przerywaj księgowania zamówienia przy braku tabeli leads w starszej bazie
+  }
+}
+
+export async function verifyStripeSignature(
   rawBody: string,
   sigHeader: string | null,
-  webhookSecret: string
+  webhookSecret: string,
+  nowUnixSeconds: number = Math.floor(Date.now() / 1000)
 ): Promise<boolean> {
   if (!sigHeader || !webhookSecret) return false;
   try {
-    const parts = sigHeader.split(',').reduce<Record<string, string>>((acc, item) => {
-      const [k, v] = item.split('=');
-      if (k && v) acc[k.trim()] = v.trim();
-      return acc;
-    }, {});
-    const timestamp = parts['t'];
-    const signature = parts['v1'];
-    if (!timestamp || !signature) return false;
+    let timestampStr = '';
+    const v1Signatures: string[] = [];
+    for (const part of sigHeader.split(',')) {
+      const idx = part.indexOf('=');
+      if (idx <= 0) continue;
+      const k = part.slice(0, idx).trim();
+      const v = part.slice(idx + 1).trim();
+      if (!v) continue;
+      if (k === 't' && !timestampStr) timestampStr = v;
+      else if (k === 'v1') v1Signatures.push(v);
+    }
+    const timestampNum = Number(timestampStr);
+    if (!timestampStr || !Number.isFinite(timestampNum) || v1Signatures.length === 0) {
+      return false;
+    }
+    if (Math.abs(nowUnixSeconds - timestampNum) > WEBHOOK_TOLERANCE_SECONDS) {
+      return false;
+    }
 
-    const signedPayload = `${timestamp}.${rawBody}`;
+    const signedPayload = `${timestampStr}.${rawBody}`;
     const enc = new TextEncoder();
     const key = await crypto.subtle.importKey(
       'raw',
@@ -40,7 +94,7 @@ async function verifyStripeSignature(
     const expectedSig = Array.from(new Uint8Array(sigBuf))
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('');
-    return expectedSig === signature;
+    return v1Signatures.some((cand) => timingSafeEqualHex(expectedSig, cand));
   } catch {
     return false;
   }
@@ -51,14 +105,21 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
   const rawBody = await request.text();
   const sigHeader = request.headers.get('stripe-signature');
 
-  if (env.STRIPE_WEBHOOK_SECRET) {
-    const valid = await verifyStripeSignature(rawBody, sigHeader, env.STRIPE_WEBHOOK_SECRET);
-    if (!valid) {
-      return new Response(JSON.stringify({ error: 'Invalid Stripe webhook signature' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+  // Fail-closed: brak sekretu webhooka lub podpisu musi odrzucać żądanie
+  if (!env.STRIPE_WEBHOOK_SECRET) {
+    console.error('CRITICAL: Brak STRIPE_WEBHOOK_SECRET w zmiennych środowiskowych Cloudflare.');
+    return new Response(JSON.stringify({ error: 'Webhook secret not configured' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const valid = await verifyStripeSignature(rawBody, sigHeader, env.STRIPE_WEBHOOK_SECRET);
+  if (!valid) {
+    return new Response(JSON.stringify({ error: 'Invalid Stripe webhook signature' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   let event: any;
@@ -76,7 +137,11 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     event.type === 'checkout.session.async_payment_succeeded'
   ) {
     const session = event.data?.object || {};
-    if (session.payment_status && session.payment_status !== 'paid') {
+    if (
+      session.payment_status &&
+      session.payment_status !== 'paid' &&
+      session.payment_status !== 'no_payment_required'
+    ) {
       return new Response(JSON.stringify({ received: true, status: 'awaiting_payment' }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -84,17 +149,24 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     }
 
     const sessionId = String(session.id || '');
+    const paymentIntentId =
+      typeof session.payment_intent === 'string'
+        ? session.payment_intent
+        : session.payment_intent?.id || null;
     const customerEmail = String(
       session.customer_details?.email || session.customer_email || ''
     )
       .trim()
       .toLowerCase();
     const customerName = String(session.customer_details?.name || 'Kursantka HappyBirth').trim();
-    const amountTotal = Number(session.amount_total || 48900);
+    const amountTotal =
+      session.amount_total !== undefined && session.amount_total !== null
+        ? Number(session.amount_total)
+        : 48900;
     const metadata = session.metadata || {};
     const sessionCurrency = String(session.currency || metadata.currency || 'PLN').toUpperCase();
-    const orderBumpIncluded = metadata.order_bump_included === 'true' ? 1 : 0;
     const isOnlyOrderBump = metadata.only_order_bump === 'true';
+    const orderBumpIncluded = metadata.order_bump_included === 'true' || isOnlyOrderBump ? 1 : 0;
     const promoCode = String(metadata.promo_code || '').toUpperCase();
     const refCookie = String(metadata.affiliate_ref_cookie || '');
     const buyerIp = String(metadata.buyer_ip || '0.0.0.0');
@@ -122,9 +194,17 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           .bind(customerEmail)
           .first();
         const userId = userRow?.id || crypto.randomUUID();
-        const userReferralCode =
-          userRow?.referral_code ||
-          `MAMA-${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
+        let userReferralCode = userRow?.referral_code || '';
+        if (!userReferralCode) {
+          const baseMotherCode = generateMotherReferralCode(customerName, customerEmail);
+          const conflict = await env.DB.prepare('SELECT id FROM users WHERE referral_code = ? LIMIT 1')
+            .bind(baseMotherCode)
+            .first()
+            .catch(() => null);
+          userReferralCode = conflict?.id
+            ? generateMotherReferralCode(customerName, customerEmail, Math.floor(10 + Math.random() * 89))
+            : baseMotherCode;
+        }
 
         if (!userRow) {
           await env.DB.prepare(
@@ -134,43 +214,52 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             .run();
         }
 
-        // 3. Dostęp 18 miesięcy (548 dni) w tabeli enrollments ([C1])
-        await env.DB.prepare(
-          `INSERT OR IGNORE INTO enrollments (
-             id, user_id, course_id, stripe_session_id, status, order_bump_included,
-             granted_at, expires_at
-           ) VALUES (?, ?, 'kurs-glowny-happybirth', ?, 'active', ?, datetime('now'), datetime('now', '+548 days'))`
-        )
-          .bind(crypto.randomUUID(), userId, sessionId, orderBumpIncluded)
-          .run();
-
-        if (orderBumpIncluded) {
-          await env.DB.prepare('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?')
+        // 3. Dostęp 18 miesięcy (548 dni) w tabeli enrollments ([C1]) — NIGDY przy samym Order Bumpie!
+        if (isOnlyOrderBump) {
+          await env.DB.prepare(
+            `UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ? AND status = 'active'`
+          )
             .bind(userId)
             .run();
+        } else {
+          await env.DB.prepare(
+            `INSERT OR IGNORE INTO enrollments (
+               id, user_id, course_id, stripe_session_id, status, order_bump_included,
+               granted_at, expires_at
+             ) VALUES (?, ?, 'kurs-glowny-happybirth', ?, 'active', ?, datetime('now'), datetime('now', '+548 days'))`
+          )
+            .bind(crypto.randomUUID(), userId, sessionId, orderBumpIncluded)
+            .run();
+
+          if (orderBumpIncluded) {
+            await env.DB.prepare('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?')
+              .bind(userId)
+              .run();
+          }
         }
 
         // 4. Dowodowy rejestr zamówienia i tarczy prawnej Art. 38 ust. 1 pkt 13 ([E1] & [TECH-03])
         const orderId = crypto.randomUUID();
         await env.DB.prepare(
           `INSERT INTO orders (
-             id, order_number, stripe_session_id, user_id, customer_email, customer_name,
+             id, order_number, stripe_session_id, stripe_payment_intent, user_id, customer_email, customer_name,
              amount_total, currency, order_bump_included, promo_code,
              waiver_art38_accepted, waiver_art38_timestamp, buyer_ip,
              waiver_checkbox_text, terms_sha256, durable_medium_sent_at, status
-           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, datetime('now'), 'paid')`
+           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, datetime('now'), 'paid')`
         )
           .bind(
             orderId,
             orderNumber,
             sessionId,
+            paymentIntentId,
             userId,
             customerEmail,
             customerName,
             amountTotal,
             sessionCurrency,
             orderBumpIncluded,
-            promoCode || null,
+            isOnlyOrderBump ? null : promoCode || null,
             waiverTimestamp,
             buyerIp,
             CHECKBOX_2_ART38_WAIVER_TEXT,
@@ -178,14 +267,19 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           )
           .run();
 
-        // 5. [C4] Jeśli użyto kodu polecającego innej kursantki (MAMA-XXXX) -> natychmiast odblokuj jej e-book PDF
-        if (promoCode.startsWith('MAMA-')) {
+        // 4b. Zatrzymaj ewentualną sekwencję CRM dla leada, który właśnie kupił kurs główny
+        if (!isOnlyOrderBump) {
+          await cancelScheduledCrmEmailsEdge(env.DB, customerEmail, env.RESEND_API_KEY);
+        }
+
+        // 5. [C4] Jeśli użyto kodu polecającego innej kursantki (MAMA-XXXX) -> natychmiast odblokuj jej e-book PDF (tylko dla kursu głównego)
+        if (!isOnlyOrderBump && promoCode.startsWith('MAMA-')) {
           const referrerUser = await env.DB.prepare(
-            'SELECT id FROM users WHERE referral_code = ?'
+            'SELECT id, email FROM users WHERE referral_code = ?'
           )
             .bind(promoCode)
             .first();
-          if (referrerUser?.id) {
+          if (referrerUser?.id && String(referrerUser.email || '').toLowerCase() !== customerEmail) {
             await env.DB.prepare(
               `INSERT OR IGNORE INTO student_referrals (
                  id, referrer_user_id, referrer_code, referred_email, stripe_session_id, reward_unlocked
@@ -196,17 +290,41 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           }
         }
 
-        // 6. [D1b] + [D2] Rozliczenie prowizji afiliacyjnej (Kod rabatowy nadrzędny wobec ?ref= cookie + blokada self-referral)
+        // 6. [D1b] + [D2] Rozliczenie prowizji afiliacyjnej (spójne z ORDER_BUMP_PRICE_MINOR w checkout.ts)
+        const bumpMinorByCurrency: Record<string, number> = {
+          PLN: 4900,
+          GBP: 1500,
+          EUR: 1700,
+          USD: 2700,
+          AUD: 2900,
+          AED: 8900,
+        };
+        const bumpMinor = orderBumpIncluded
+          ? (bumpMinorByCurrency[sessionCurrency] ?? 4900)
+          : 0;
+        const courseNetBase = Math.max(0, amountTotal - bumpMinor);
+        const isFreeOrTestCode =
+          courseNetBase <= 0 ||
+          promoCode === 'TEST' ||
+          promoCode === 'TEST100' ||
+          promoCode.includes('100');
+
         const lookupKey = promoCode || refCookie;
-        if (!isOnlyOrderBump && lookupKey && !promoCode.startsWith('MAMA-')) {
+        // Mamy są wyłączone z programu afiliacyjnego — kody MAMA-* obsługują wyłącznie zniżkę -10% dla koleżanki i prezent PDF dla Mamy (sekcja 5 powyżej)
+        if (!isOnlyOrderBump && !isFreeOrTestCode && lookupKey && !lookupKey.startsWith('MAMA-')) {
           const affiliate = await env.DB.prepare(
             `SELECT id, email, promo_code, tier1_rate, referred_by_broker_id, tier2_override_rate
              FROM affiliates
-             WHERE (promo_code = ? OR ref_slug = ?) AND status = 'active'
-             ORDER BY CASE WHEN promo_code = ? THEN 0 ELSE 1 END
+             WHERE (UPPER(promo_code) = UPPER(?) OR LOWER(ref_slug) = LOWER(?) OR UPPER(promo_code) = UPPER(?)) AND status = 'active'
+             ORDER BY CASE WHEN UPPER(promo_code) = UPPER(?) THEN 0 ELSE 1 END
              LIMIT 1`
           )
-            .bind(promoCode || '__NONE__', refCookie || '__NONE__', promoCode || '__NONE__')
+            .bind(
+              promoCode || '__NONE__',
+              refCookie || '__NONE__',
+              refCookie || '__NONE__',
+              promoCode || '__NONE__'
+            )
             .first();
 
           if (
@@ -216,19 +334,19 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             const matchedByPromo =
               Boolean(promoCode) &&
               String(affiliate.promo_code || '').toUpperCase() === promoCode;
-            const courseNetBase = promoCode ? 44010 : 48900;
-            const tier1Rate = Number(affiliate.tier1_rate || 0.2);
+            const tier1Rate = Math.min(0.3, Math.max(0.2, Number(affiliate.tier1_rate || 0.2)));
             const tier1Comm = Math.round(courseNetBase * tier1Rate);
             const tier2Comm = affiliate.referred_by_broker_id
               ? Math.round(courseNetBase * Number(affiliate.tier2_override_rate || 0.05))
               : 0;
 
+            const tier2Status = affiliate.referred_by_broker_id && tier2Comm > 0 ? 'PENDING' : 'CANCELLED';
             await env.DB.prepare(
               `INSERT OR IGNORE INTO affiliate_commissions (
                  id, order_id, stripe_session_id, affiliate_id, broker_id,
                  attribution_source, paid_amount_gross, tier1_rate,
-                 tier1_commission_gross, tier2_commission_gross, status
-               ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING')`
+                 tier1_commission_gross, tier2_commission_gross, status, tier1_status, tier2_status
+               ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 'PENDING', ?)`
             )
               .bind(
                 crypto.randomUUID(),
@@ -240,7 +358,8 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
                 courseNetBase,
                 tier1Rate,
                 tier1Comm,
-                tier2Comm
+                tier2Comm,
+                tier2Status
               )
               .run();
           }
@@ -257,6 +376,18 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
 
         if (env.RESEND_API_KEY) {
           const loginUrl = `https://strefa.happybirth.pl/login?token=${magicToken}&email=${encodeURIComponent(customerEmail)}`;
+          const safeOrderNo = escapeHtml(orderNumber);
+          const safeWaiverTs = escapeHtml(waiverTimestamp);
+          const emailSubject = isOnlyOrderBump
+            ? `Potwierdzenie zamówienia ${orderNumber} (Pakiet Kart dla Taty PDF) — HappyBirth.pl`
+            : `Potwierdzenie zamówienia ${orderNumber} (Trwały Nośnik) i dostęp do kursu HappyBirth.pl`;
+          const emailHeadline = isOnlyOrderBump
+            ? 'Twój Pakiet Kart na Porodówkę dla Taty (PDF) jest gotowy!'
+            : 'Dziękujemy za zakup kursu HappyBirth.pl!';
+          const emailIntro = isOnlyOrderBump
+            ? `Twoje zamówienie <strong>${safeOrderNo}</strong> na dodatek <strong>Pakiet Kart Sytuacyjnych na Porodówkę dla Taty (PDF)</strong> zostało opłacone i odblokowane na Twoim koncie.`
+            : `Twoje zamówienie <strong>${safeOrderNo}</strong> zostało opłacone. Twój dostęp do wszystkich 52 lekcji 4K jest aktywny przez <strong>18 miesięcy (548 dni)</strong>.`;
+
           await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -266,11 +397,11 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             body: JSON.stringify({
               from: env.RESEND_FROM || 'Szkoła Rodzenia HappyBirth <kontakt@happybirth.pl>',
               to: [customerEmail],
-              subject: `Potwierdzenie zamówienia ${orderNumber} (Trwały Nośnik) i dostęp do kursu HappyBirth.pl`,
+              subject: emailSubject,
               html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px;">
-                  <h1 style="font-size: 20px; color: #20071E;">Dziękujemy za zakup kursu HappyBirth.pl!</h1>
-                  <p style="font-size: 14px; color: #544A44;">Twoje zamówienie <strong>${orderNumber}</strong> zostało opłacone. Twój dostęp do wszystkich 52 lekcji 4K jest aktywny przez <strong>18 miesięcy (548 dni)</strong>.</p>
+                  <h1 style="font-size: 20px; color: #20071E;">${emailHeadline}</h1>
+                  <p style="font-size: 14px; color: #544A44;">${emailIntro}</p>
                   <div style="margin: 20px 0; text-align: center;">
                     <a href="${loginUrl}" style="background: #DA0271; color: #ffffff; text-decoration: none; padding: 13px 26px; border-radius: 9999px; font-weight: bold; font-size: 14px; display: inline-block;">
                       Wejdź do Strefy Rodziców (1 kliknięcie) &rarr;
@@ -278,7 +409,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
                   </div>
                   <div style="background: #ffffff; border: 1px solid #EAE3DB; border-radius: 12px; padding: 14px; font-size: 12px; color: #544A44;">
                     <strong>Potwierdzenie zawarcia umowy na trwałym nośniku (art. 38 ust. 1 pkt 13 u.p.k.):</strong><br/>
-                    • Data i czas zgody UTC: ${waiverTimestamp}<br/>
+                    • Data i czas zgody UTC: ${safeWaiverTs}<br/>
                     • Treść zgody: „${CHECKBOX_2_ART38_WAIVER_TEXT}”<br/>
                     • Suma kontrolna Regulaminu SHA-256: ${TERMS_VERSION_SHA256}<br/>
                     • Operator: KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań (KRS 0001268396, NIP 7812118273)
@@ -289,45 +420,111 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           }).catch(() => {});
         }
       } catch (dbErr) {
-        console.error('Błąd zapisu webhooka Stripe w D1:', dbErr);
+        console.error('CRITICAL: Błąd zapisu webhooka Stripe w D1:', dbErr);
+        return new Response(
+          JSON.stringify({ error: 'Database persistence failed; retry requested' }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
       }
     }
   }
 
-  // [A7] + [D2] Obsługa zwrotów (charge.refunded) — wycofanie dostępu i anulowanie prowizji afiliacyjnych
+  // [A7] + [D2] + [D5a] Obsługa zwrotów (charge.refunded) dopasowana po payment_intent
   if (event.type === 'charge.refunded') {
     const charge = event.data?.object || {};
+    const paymentIntentId =
+      typeof charge.payment_intent === 'string'
+        ? charge.payment_intent
+        : charge.payment_intent?.id || null;
     const customerEmail = String(
       charge.billing_details?.email || charge.receipt_email || ''
     )
       .trim()
       .toLowerCase();
+    const chargeAmount = Number(charge.amount || 0);
+    const amountRefunded = Number(charge.amount_refunded || 0);
+    const isPartialRefund =
+      charge.refunded === false ||
+      (chargeAmount > 0 && amountRefunded > 0 && amountRefunded < chargeAmount);
 
     if (env.DB) {
       try {
-        if (customerEmail) {
-          const userRow = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
+        let matchedOrder: any = null;
+        if (paymentIntentId) {
+          matchedOrder = await env.DB.prepare(
+            `SELECT id, user_id, stripe_session_id, amount_total, order_bump_included
+             FROM orders WHERE stripe_payment_intent = ? LIMIT 1`
+          )
+            .bind(paymentIntentId)
+            .first();
+        }
+        if (!matchedOrder && customerEmail) {
+          matchedOrder = await env.DB.prepare(
+            `SELECT id, user_id, stripe_session_id, amount_total, order_bump_included
+             FROM orders WHERE LOWER(customer_email) = ? ORDER BY created_at DESC LIMIT 1`
+          )
             .bind(customerEmail)
             .first();
-          if (userRow?.id) {
-            await env.DB.prepare("UPDATE enrollments SET status = 'refunded' WHERE user_id = ?")
-              .bind(userRow.id)
+        }
+
+        if (matchedOrder?.id) {
+          const isStandaloneBumpOrder = Number(matchedOrder.amount_total || 0) <= 6000;
+          if (isPartialRefund || isStandaloneBumpOrder) {
+            await env.DB.prepare(
+              `UPDATE orders SET order_bump_included = 0, status = ? WHERE id = ?`
+            )
+              .bind(isPartialRefund ? 'partially_refunded' : 'refunded', matchedOrder.id)
               .run();
-            await env.DB.prepare("UPDATE orders SET status = 'refunded' WHERE user_id = ? OR customer_email = ?")
-              .bind(userRow.id, customerEmail)
-              .run();
+            if (matchedOrder.user_id) {
+              await env.DB.prepare(
+                `UPDATE enrollments SET order_bump_included = 0 WHERE user_id = ?`
+              )
+                .bind(matchedOrder.user_id)
+                .run();
+            }
           } else {
-            await env.DB.prepare("UPDATE orders SET status = 'refunded' WHERE customer_email = ?")
-              .bind(customerEmail)
+            await env.DB.prepare(
+              `UPDATE orders SET status = 'refunded' WHERE id = ?`
+            )
+              .bind(matchedOrder.id)
+              .run();
+            if (matchedOrder.stripe_session_id) {
+              const res = await env.DB.prepare(
+                `UPDATE enrollments SET status = 'refunded' WHERE stripe_session_id = ?`
+              )
+                .bind(matchedOrder.stripe_session_id)
+                .run();
+              if (!res?.meta?.changes && matchedOrder.user_id) {
+                await env.DB.prepare(
+                  `UPDATE enrollments SET status = 'refunded' WHERE user_id = ? AND course_id = 'kurs-glowny-happybirth'`
+                )
+                  .bind(matchedOrder.user_id)
+                  .run();
+              }
+            } else if (matchedOrder.user_id) {
+              await env.DB.prepare(
+                `UPDATE enrollments SET status = 'refunded' WHERE user_id = ? AND course_id = 'kurs-glowny-happybirth'`
+              )
+                .bind(matchedOrder.user_id)
+                .run();
+            }
+            await env.DB.prepare(
+              `UPDATE affiliate_commissions
+               SET status = CASE WHEN status != 'PAID' THEN 'CANCELLED' ELSE status END,
+                   tier1_status = CASE WHEN tier1_status != 'PAID' THEN 'CANCELLED' ELSE tier1_status END,
+                   tier2_status = CASE WHEN tier2_status != 'PAID' THEN 'CANCELLED' ELSE tier2_status END
+               WHERE order_id = ?`
+            )
+              .bind(matchedOrder.id)
               .run();
           }
         }
-        await env.DB.prepare(
-          `UPDATE affiliate_commissions SET status = 'CANCELLED'
-           WHERE order_id IN (SELECT id FROM orders WHERE status = 'refunded')`
-        ).run();
       } catch (refundErr) {
-        console.error('Błąd aktualizacji statusu zwrotu w D1:', refundErr);
+        console.error('CRITICAL: Błąd aktualizacji statusu zwrotu w D1:', refundErr);
+        return new Response(
+          JSON.stringify({ error: 'Refund persistence failed; retry requested' }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
       }
     }
   }

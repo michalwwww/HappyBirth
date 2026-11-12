@@ -53,11 +53,19 @@ export function CloudflarePlayer({
 
   // [C2] Auto-Resume state & Signed Token
   const [savedPositionSeconds, setSavedPositionSeconds] = useState<number>(0);
-  const [signedTokenOrUid, setSignedTokenOrUid] = useState<string>(lesson.cloudflareUid || '');
+  const [signedTokenOrUid, setSignedTokenOrUid] = useState<string>(
+    lesson.isFreePreview ? lesson.cloudflareUid || '' : ''
+  );
   const lastSavedSecRef = useRef<number>(0);
 
-  const isUnlockedLocally =
+  const isLocalDevHost =
     typeof window !== 'undefined' &&
+    ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
+
+  // Odblokowanie czysto lokalne (localStorage) działa wyłącznie w środowisku developerskim (localhost),
+  // natomiast na domenach produkcyjnych dostęp do płatnych lekcji zawsze weryfikuje serwer (/api/auth/me).
+  const isUnlockedLocally =
+    isLocalDevHost &&
     (localStorage.getItem('hb_unlocked') === 'true' ||
       localStorage.getItem('hb_current_role') === 'student' ||
       localStorage.getItem('hb_current_role') === 'partner' ||
@@ -71,7 +79,7 @@ export function CloudflarePlayer({
 
   // Wczytaj zapisaną sekundę odtwarzania z localStorage oraz serwera ([C2] Auto-Resume)
   useEffect(() => {
-    setSignedTokenOrUid(lesson.cloudflareUid || '');
+    setSignedTokenOrUid(lesson.isFreePreview ? lesson.cloudflareUid || '' : '');
     if (typeof window === 'undefined') return;
     const localPos = parseInt(localStorage.getItem(`hb_pos_${lesson.id}`) || '0', 10);
     if (localPos > 5) {
@@ -93,10 +101,16 @@ export function CloudflarePlayer({
         }
       })
       .catch(() => {});
-  }, [lesson.id, lesson.cloudflareUid]);
+  }, [lesson.id, lesson.cloudflareUid, lesson.isFreePreview]);
 
   useEffect(() => {
-    if (lesson.isFreePreview || role === 'student' || role === 'partner' || isUnlockedLocally) {
+    if (lesson.isFreePreview) {
+      setHasServerAccess(true);
+      setLoadingAccess(false);
+      return;
+    }
+
+    if (isLocalDevHost && (role === 'student' || role === 'partner' || isUnlockedLocally)) {
       setHasServerAccess(true);
       setLoadingAccess(false);
       return;
@@ -124,23 +138,38 @@ export function CloudflarePlayer({
         if (
           data.authenticated &&
           (data.user?.hasActiveCourse ||
+            data.user?.role === 'admin' ||
             data.user?.role === 'student' ||
             data.user?.role === 'partner')
         ) {
           setHasServerAccess(true);
+        } else {
+          setHasServerAccess(false);
+          if (!isLocalDevHost) {
+            try {
+              localStorage.removeItem('hb_unlocked');
+            } catch {}
+          }
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        setHasServerAccess(false);
+      })
       .finally(() => setLoadingAccess(false));
-  }, [lesson.isFreePreview, role, searchParams, isUnlockedLocally]);
+  }, [lesson.isFreePreview, isLocalDevHost, role, searchParams, isUnlockedLocally]);
 
   const isUnlocked = Boolean(
-    lesson.isFreePreview || hasServerAccess || role === 'student' || role === 'partner' || isUnlockedLocally
+    lesson.isFreePreview ||
+      hasServerAccess ||
+      (isLocalDevHost && (role === 'student' || role === 'partner' || isUnlockedLocally))
   );
 
   // [C2] Pobierz 120-minutowy Signed Token URL oraz zarejestruj first_content_accessed_at ([E1])
   useEffect(() => {
     if (!isUnlocked || !lesson.cloudflareUid) return;
+
+    let cancelled = false;
+    setSignedTokenOrUid(lesson.isFreePreview ? lesson.cloudflareUid : '');
 
     fetch('/api/stream/token', {
       method: 'POST',
@@ -152,13 +181,24 @@ export function CloudflarePlayer({
         lang,
       }),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.token) {
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (res.ok && data?.token) {
           setSignedTokenOrUid(data.token);
+        } else if (!lesson.isFreePreview && !isLocalDevHost && (res.status === 401 || res.status === 403)) {
+          setHasServerAccess(false);
+          setSignedTokenOrUid('');
+        } else if (isLocalDevHost && lesson.cloudflareUid) {
+          setSignedTokenOrUid(lesson.cloudflareUid);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (cancelled) return;
+        if (isLocalDevHost && lesson.cloudflareUid) {
+          setSignedTokenOrUid(lesson.cloudflareUid);
+        }
+      });
 
     // Zapisz znacznik pierwszego dostępu do treści cyfrowej (Art. 38 ust. 1 pkt 13 u.p.k.)
     if (!lesson.isFreePreview) {
@@ -168,6 +208,10 @@ export function CloudflarePlayer({
         body: JSON.stringify({ action: 'access', lessonId: lesson.id }),
       }).catch(() => {});
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [isUnlocked, lesson.id, lesson.cloudflareUid, lesson.isFreePreview, lang]);
 
   // Dołącz skrypt Cloudflare Stream SDK do nasłuchiwania zdarzeń odtwarzacza
@@ -288,9 +332,13 @@ export function CloudflarePlayer({
     return () => clearTimeout(timer);
   }, [autoNextCountdown, nextLesson, prefix, router, onSelectLesson]);
 
+  const activeStreamUid = lesson.isFreePreview
+    ? signedTokenOrUid || lesson.cloudflareUid
+    : signedTokenOrUid;
+
   // Budowa URL do iframe Cloudflare Stream z uwzględnieniem autoplay i Auto-Resume (startTime)
   const streamParams = new URLSearchParams({
-    poster: `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${lesson.cloudflareUid}/thumbnails/thumbnail.jpg`,
+    poster: `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${activeStreamUid || lesson.cloudflareUid}/thumbnails/thumbnail.jpg`,
     preload: shouldAutoplay ? 'auto' : 'metadata',
   });
 
@@ -304,8 +352,9 @@ export function CloudflarePlayer({
     streamParams.set('defaultTextTrack', lang);
   }
 
-  const activeStreamUid = signedTokenOrUid || lesson.cloudflareUid;
-  const streamUrl = `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${activeStreamUid}/iframe?${streamParams.toString()}`;
+  const streamUrl = activeStreamUid
+    ? `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${activeStreamUid}/iframe?${streamParams.toString()}`
+    : '';
 
   const formatMmSs = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -314,28 +363,28 @@ export function CloudflarePlayer({
   };
 
   return (
-    <div className="w-full bg-[#20071F] rounded-[18px] overflow-hidden shadow-2xl border border-[#461643] text-white">
+    <div className="w-full bg-[color:var(--hb-noc2)] rounded-[18px] overflow-hidden shadow-2xl border border-[color:var(--hb-ink2)] text-white">
       {/* Top Video Header Bar */}
-      <div className="px-5 py-3 bg-[#250A24] border-b border-[#461643] flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="px-5 py-3 bg-[color:var(--hb-noc2)] border-b border-[color:var(--hb-ink2)] flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center space-x-2">
           <span
             className="w-2.5 h-2.5 rounded-full"
             style={{ backgroundColor: lesson.stageColor }}
           />
-          <span className="font-semibold text-[#EAD5E5] uppercase tracking-wider">
+          <span className="font-semibold text-[#E8DEF0] uppercase tracking-wider">
             Lekcja {lesson.lessonNumber} · {lesson.stageTitle}
           </span>
         </div>
 
-        <div className="flex items-center space-x-3 text-[#EAD5E5]/70">
+        <div className="flex items-center space-x-3 text-[#E8DEF0]/70">
           {savedPositionSeconds > 5 && (
-            <span className="inline-flex items-center gap-1 text-[#FCD705] font-semibold">
+            <span className="inline-flex items-center gap-1 text-[color:var(--hb-zol)] font-semibold">
               <Clock className="w-3.5 h-3.5" />
               Auto-Resume: {formatMmSs(savedPositionSeconds)}
             </span>
           )}
           <span className="flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#EC008C]" /> Jakość 4K · HappyBirth VOD
+            <ShieldCheck className="w-3.5 h-3.5 text-[color:var(--hb-mag-t)]" /> Jakość 4K · HappyBirth VOD
           </span>
           <span>·</span>
           <span>Czas trwania: {lesson.durationFormatted} min</span>
@@ -346,11 +395,11 @@ export function CloudflarePlayer({
       <div className="relative aspect-video w-full bg-black flex items-center justify-center overflow-hidden">
         {loadingAccess ? (
           <div className="flex flex-col items-center justify-center p-8 text-center text-neutral-400">
-            <div className="w-10 h-10 border-4 border-[#EC008C]/30 border-t-[#EC008C] rounded-full animate-spin mb-3" />
-            <p className="text-xs text-[#EAD5E5]/80">Weryfikacja dostępu do lekcji...</p>
+            <div className="w-10 h-10 border-4 border-[color:color-mix(in_srgb,var(--hb-mag)_30%,transparent)] border-t-[color:var(--hb-mag)] rounded-full animate-spin mb-3" />
+            <p className="text-xs text-[#E8DEF0]/80">Weryfikacja dostępu do lekcji...</p>
           </div>
         ) : isUnlocked ? (
-          lesson.cloudflareUid ? (
+          lesson.cloudflareUid && activeStreamUid ? (
             <>
               <iframe
                 key={`${lesson.id}-${shouldAutoplay}`}
@@ -365,13 +414,13 @@ export function CloudflarePlayer({
               {/* Overlay odliczania do kolejnej lekcji po zakończeniu filmu */}
               {autoNextCountdown !== null && nextLesson && (
                 <div className="absolute inset-0 z-20 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-white">
-                  <div className="w-14 h-14 rounded-full bg-[#EC008C]/20 border border-[#EC008C] flex items-center justify-center mb-3 text-2xl font-bold font-mono text-[#EC008C] animate-pulse">
+                  <div className="w-14 h-14 rounded-full bg-[color:color-mix(in_srgb,var(--hb-mag)_20%,transparent)] border border-[color:var(--hb-mag)] flex items-center justify-center mb-3 text-2xl font-bold font-mono text-[color:var(--hb-mag-t)] animate-pulse">
                     {autoNextCountdown}
                   </div>
                   <h4 className="font-brand-display text-lg sm:text-xl font-bold">
                     Lekcja {lesson.lessonNumber} ukończona!
                   </h4>
-                  <p className="text-xs sm:text-sm text-[#EAD5E5]/80 mt-1 max-w-sm leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#E8DEF0]/80 mt-1 max-w-sm leading-relaxed">
                     Za chwilę automatycznie włączy się kolejna lekcja: <br />
                     <strong className="text-white font-semibold">
                       Lekcja {nextLesson.lessonNumber}: {nextLesson.title}
@@ -380,14 +429,14 @@ export function CloudflarePlayer({
                   <div className="flex items-center gap-3 mt-4">
                     <button
                       onClick={() => router.push(`${prefix}/lekcja/${nextLesson.id}?autoplay=true`)}
-                      className="px-5 py-2 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-bold transition-all shadow-md shadow-[#EC008C]/30 flex items-center gap-1.5 cursor-pointer"
+                      className="px-5 py-2 rounded-full bg-[color:var(--hb-mag)] hover:bg-[color:var(--hb-mag-h)] text-[color:var(--hb-cta-ink)] text-xs font-bold transition-all shadow-md shadow-[color:color-mix(in_srgb,var(--hb-mag)_30%,transparent)] flex items-center gap-1.5 cursor-pointer"
                     >
                       <span>Odtwórz teraz</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setAutoNextCountdown(null)}
-                      className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-[#EAD5E5] text-xs font-medium border border-white/20 transition-colors cursor-pointer"
+                      className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-[#E8DEF0] text-xs font-medium border border-white/20 transition-colors cursor-pointer"
                     >
                       Zostań tutaj
                     </button>
@@ -397,34 +446,34 @@ export function CloudflarePlayer({
             </>
           ) : (
             <div className="flex flex-col items-center justify-center p-8 text-center text-neutral-400">
-              <PlayCircle className="w-12 h-12 text-[#EC008C] mb-3 animate-pulse" />
-              <p className="text-sm font-medium text-[#EAD5E5]">Ładowanie lekcji wideo HappyBirth...</p>
+              <PlayCircle className="w-12 h-12 text-[color:var(--hb-mag-t)] mb-3 animate-pulse" />
+              <p className="text-sm font-medium text-[#E8DEF0]">Ładowanie lekcji wideo HappyBirth...</p>
             </div>
           )
         ) : (
           /* EKRAN BLOKADY / PAYWALL DLA PŁATNYCH LEKCJI */
-          <div className="absolute inset-0 bg-gradient-to-b from-[#20071F]/95 via-[#180517]/95 to-black/95 flex flex-col items-center justify-center p-6 text-center backdrop-blur-md">
+          <div className="absolute inset-0 bg-gradient-to-b from-[color:color-mix(in_srgb,var(--hb-noc2)_95%,transparent)] via-[color:color-mix(in_srgb,var(--hb-noc3)_95%,transparent)] to-black/95 flex flex-col items-center justify-center p-6 text-center backdrop-blur-md">
             <div className="max-w-lg space-y-4">
               {/* Ikona kłódki */}
-              <div className="w-16 h-16 rounded-3xl bg-[#EC008C]/20 border border-[#EC008C]/40 text-[#EC008C] flex items-center justify-center mx-auto shadow-lg shadow-[#EC008C]/20">
+              <div className="w-16 h-16 rounded-3xl bg-[color:color-mix(in_srgb,var(--hb-mag)_20%,transparent)] border border-[color:color-mix(in_srgb,var(--hb-mag)_40%,transparent)] text-[color:var(--hb-mag-t)] flex items-center justify-center mx-auto shadow-lg shadow-[color:color-mix(in_srgb,var(--hb-mag)_20%,transparent)]">
                 <Lock className="w-8 h-8" />
               </div>
 
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold uppercase tracking-widest text-[#EC008C]">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[color:var(--hb-mag-t)]">
                   Dostęp chroniony
                 </span>
                 <h3 className="font-brand-display font-bold text-xl sm:text-2xl text-white">
                   Ta lekcja jest dostępna w pełnym pakiecie
                 </h3>
-                <p className="text-xs sm:text-sm text-[#EAD5E5]/80 max-w-md mx-auto leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#E8DEF0]/80 max-w-md mx-auto leading-relaxed">
                   Lekcja {lesson.lessonNumber}: <strong>„{lesson.title}”</strong> oraz pozostałe 51 filmów VOD, apteczka i plan porodu są dostępne przez 18 miesięcy (548 dni) od zakupu w Szkole Rodzenia HappyBirth.
                 </p>
               </div>
 
               {/* Przycisk zakupu przez Stripe */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <BuyCourseButton className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white font-bold text-sm transition-all shadow-xl shadow-[#EC008C]/30 hover:scale-105 flex items-center justify-center gap-2 cursor-pointer">
+                <BuyCourseButton className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[color:var(--hb-mag)] hover:bg-[color:var(--hb-mag-h)] text-[color:var(--hb-cta-ink)] font-bold text-sm transition-all shadow-xl shadow-[color:color-mix(in_srgb,var(--hb-mag)_30%,transparent)] hover:scale-105 flex items-center justify-center gap-2 cursor-pointer">
                   <span>Kup dostęp · 489,00 zł (BLIK / Karta)</span>
                   <ArrowRight className="w-4 h-4" />
                 </BuyCourseButton>
@@ -441,7 +490,7 @@ export function CloudflarePlayer({
               <div className="pt-1">
                 <Link
                   href={`${prefix}/lekcja/lekcja-01`}
-                  className="inline-flex items-center gap-1.5 text-xs text-[#FCD705] hover:underline font-medium"
+                  className="inline-flex items-center gap-1.5 text-xs text-[color:var(--hb-zol)] hover:underline font-medium"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Możesz bezpłatnie obejrzeć Lekcję 1 bez logowania &rarr;</span>
@@ -453,7 +502,7 @@ export function CloudflarePlayer({
       </div>
 
       {/* Player Control Bar & Progress Action */}
-      <div className="p-4 sm:p-5 bg-[#250A24] flex flex-wrap items-center justify-between gap-4 border-t border-[#461643]">
+      <div className="p-4 sm:p-5 bg-[color:var(--hb-noc2)] flex flex-wrap items-center justify-between gap-4 border-t border-[color:var(--hb-ink2)]">
         <div className="flex items-center space-x-3">
           {isUnlocked ? (
             <button
@@ -461,7 +510,7 @@ export function CloudflarePlayer({
               className={`inline-flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 isCompleted
                   ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-600 hover:bg-emerald-900/80'
-                  : 'bg-[#3A1238] text-[#EAD5E5] hover:bg-[#EC008C] hover:text-white border border-[#461643]'
+                  : 'bg-[color:var(--hb-noc)] text-[#E8DEF0] hover:bg-[color:var(--hb-mag)] hover:text-[color:var(--hb-cta-ink)] border border-[color:var(--hb-ink2)]'
               }`}
             >
               <CheckCircle2 className={`w-4 h-4 ${isCompleted ? 'text-emerald-400' : 'text-neutral-400'}`} />
@@ -469,7 +518,7 @@ export function CloudflarePlayer({
             </button>
           ) : (
             <div className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-stone-900/80 text-stone-400 border border-stone-800 text-xs font-medium">
-              <Lock className="w-3.5 h-3.5 text-[#EC008C]" />
+              <Lock className="w-3.5 h-3.5 text-[color:var(--hb-mag-t)]" />
               <span>Wymagany pełny dostęp</span>
             </div>
           )}
@@ -486,7 +535,7 @@ export function CloudflarePlayer({
           {prevLesson ? (
             <Link
               href={`${prefix}/lekcja/${prevLesson.id}?autoplay=true`}
-              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-[#351034] hover:bg-[#461643] text-[#EAD5E5] text-xs font-medium transition-colors border border-[#461643]"
+              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-[color:var(--hb-noc)] hover:bg-[color:var(--hb-noc2)] text-[#E8DEF0] text-xs font-medium transition-colors border border-[color:var(--hb-ink2)]"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Poprzednia lekcja</span>
@@ -496,7 +545,7 @@ export function CloudflarePlayer({
           {nextLesson ? (
             <Link
               href={`${prefix}/lekcja/${nextLesson.id}?autoplay=true`}
-              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-[#EC008C] hover:bg-[#D0007A] text-white text-xs font-semibold transition-all shadow-sm shadow-[#EC008C]/25 group"
+              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-[color:var(--hb-mag)] hover:bg-[color:var(--hb-mag-h)] text-[color:var(--hb-cta-ink)] text-xs font-semibold transition-all shadow-sm shadow-[color:color-mix(in_srgb,var(--hb-mag)_25%,transparent)] group"
             >
               <span className="hidden sm:inline">Następna lekcja</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />

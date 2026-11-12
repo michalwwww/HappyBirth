@@ -1,3 +1,5 @@
+import { isOfficialSemanticPromo } from './brand-codes';
+
 export interface PromoValidationResult {
   valid: boolean;
   code: string;
@@ -531,23 +533,22 @@ export function is10PercentAffiliatePromo(code?: string | null): boolean {
 }
 
 /**
- * [A4] Kody 100% (TEST) są bezwzględnie wyłączone na produkcji.
- * Działają wyłącznie lokalnie w środowisku deweloperskim (NODE_ENV === 'development').
+ * Kody testowe 100% są wyłączone na kliencie i w produkcji.
+ * Lokalny tryb deweloperski obsługuje wyłącznie jawnie skonfigurowany kod DEVTEST100.
  */
 export function is100PercentPromo(code?: string | null): boolean {
   if (!code) return false;
-  if (process.env.NODE_ENV === 'production') {
-    return false;
-  }
   const clean = code.trim().toUpperCase();
-  return clean === 'DEV100_LOCAL';
+  if (process.env.NODE_ENV === 'development' && clean === 'DEVTEST100') {
+    return true;
+  }
+  return false;
 }
 
 /**
- * Walidacja kodów rabatowych -10% (489,00 zł -> 440,10 zł brutto)
- * Obsługuje:
- * 1) Kody koleżeńskie kursantek [C4]: MAMA-XXXX (np. MAMA-ANNA, MAMA-2026)
- * 2) Kody położnych, fizjoterapeutek i twórców [D1b]: POLOZNA10, MAMAGAJA10, FIZJO10, PARTNER10, HB-*, POLOZNA-*, itp.
+ * Synchroniczna walidacja wbudowanych kodów kampanijnych -10% (489,00 zł -> 440,10 zł brutto).
+ * Wszystkie kody imienne partnerów (np. SPOKOJ-KASIA) oraz polecenia Mam (MAMA-XXXX)
+ * są weryfikowane asynchronicznie przez bazę D1 w /api/affiliate/dashboard i /api/stripe/checkout.
  */
 export function validatePromoCode(rawCode?: string | null): PromoValidationResult {
   const clean = (rawCode || '').trim().toUpperCase();
@@ -578,40 +579,8 @@ export function validatePromoCode(rawCode?: string | null): PromoValidationResul
     };
   }
 
-  // 1. Kody poleceń koleżeńskich z panelu kursantki [C4] (np. MAMA-KASIA, MAMA-2026)
-  if (/^MAMA-[A-Z0-9]{3,12}$/.test(clean)) {
-    return {
-      valid: true,
-      code: clean,
-      discountPercent: 10,
-      basePricePln: BASE_COURSE_PRICE_PLN,
-      discountedCoursePricePln: 440.1,
-      omnibusNotice: OMNIBUS_LOWEST_30_DAYS_TEXT,
-      sourceType: 'student_referral',
-    };
-  }
-
-  // 2. Autoryzowane kody afiliacyjne -10% od położnych, fizjoterapeutek i partnerów [D1b]
-  const knownAffiliateCodes = [
-    'MAMAGAJA10',
-    'MAMAGAJA',
-    'POLOZNA10',
-    'FIZJO10',
-    'LAKTACJA10',
-    'PARTNER10',
-    'HAPPY10',
-    'SPOKOJ10',
-    'KOWALSKA10',
-    'NOWAK10',
-  ];
-
-  const isAffiliatePattern =
-    knownAffiliateCodes.includes(clean) ||
-    /^HB-[A-Z0-9]{3,14}$/.test(clean) ||
-    /^POLOZNA-[A-Z0-9]{3,14}$/.test(clean) ||
-    /^FIZJO-[A-Z0-9]{3,14}$/.test(clean);
-
-  if (isAffiliatePattern) {
+  // Wyłącznie autoryzowane, statyczne kody flagowe kampanii HappyBirth (-10%)
+  if (isOfficialSemanticPromo(clean) || clean === 'POLOZNA10') {
     return {
       valid: true,
       code: clean,

@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS orders (
     id TEXT PRIMARY KEY,
     order_number TEXT UNIQUE NOT NULL,
     stripe_session_id TEXT UNIQUE NOT NULL,
+    stripe_payment_intent TEXT,
     user_id TEXT,
     customer_email TEXT NOT NULL,
     customer_name TEXT,
@@ -89,6 +90,7 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE INDEX IF NOT EXISTS idx_orders_stripe_session ON orders(stripe_session_id);
 CREATE INDEX IF NOT EXISTS idx_orders_email ON orders(customer_email);
 CREATE INDEX IF NOT EXISTS idx_orders_number ON orders(order_number);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_intent ON orders(stripe_payment_intent);
 
 -- 4. ZGŁOSZENIA ODSTĄPIENIA OD UMOWY ([E2] Wymóg od 19.06.2026 r. zsynchronizowany z [E1])
 CREATE TABLE IF NOT EXISTS withdrawal_requests (
@@ -99,7 +101,7 @@ CREATE TABLE IF NOT EXISTS withdrawal_requests (
     order_number TEXT NOT NULL,
     scope TEXT NOT NULL DEFAULT 'full_order', -- 'full_order' lub 'order_bump_only'
     reason TEXT,
-    status TEXT NOT NULL DEFAULT 'received', -- 'received', 'auto_rejected_art38', 'approved_for_refund'
+    status TEXT NOT NULL DEFAULT 'received', -- 'received', 'pending_manual_verification', 'auto_rejected_art38', 'approved_for_refund'
     auto_rejected_due_to_art38 INTEGER NOT NULL DEFAULT 0,
     decision_explanation TEXT,
     confirmation_email_sent_at TEXT,
@@ -190,6 +192,10 @@ CREATE TABLE IF NOT EXISTS affiliate_commissions (
     tier1_commission_gross INTEGER NOT NULL, -- np. 8802 gr (88,02 zł), 11003 gr (110,03 zł) lub 13203 gr (132,03 zł)
     tier2_commission_gross INTEGER NOT NULL DEFAULT 0, -- np. 2200 gr (22,00 zł) lub 2445 gr (24,45 zł)
     status TEXT NOT NULL DEFAULT 'PENDING', -- 'PENDING' -> 'ELIGIBLE' (po otwarciu lekcji + bufor) -> 'PAID' / 'CANCELLED'
+    tier1_status TEXT NOT NULL DEFAULT 'PENDING', -- 'PENDING' | 'ELIGIBLE' | 'PROCESSING' | 'PAID' | 'CANCELLED'
+    tier1_payout_id TEXT,
+    tier2_status TEXT NOT NULL DEFAULT 'PENDING', -- 'PENDING' | 'ELIGIBLE' | 'PROCESSING' | 'PAID' | 'CANCELLED'
+    tier2_payout_id TEXT,
     first_content_accessed_at TEXT,
     eligible_at TEXT,
     paid_at TEXT,
@@ -200,6 +206,8 @@ CREATE TABLE IF NOT EXISTS affiliate_commissions (
 CREATE INDEX IF NOT EXISTS idx_commissions_affiliate ON affiliate_commissions(affiliate_id);
 CREATE INDEX IF NOT EXISTS idx_commissions_broker ON affiliate_commissions(broker_id);
 CREATE INDEX IF NOT EXISTS idx_commissions_status ON affiliate_commissions(status);
+CREATE INDEX IF NOT EXISTS idx_aff_comm_t1_payout ON affiliate_commissions(tier1_payout_id);
+CREATE INDEX IF NOT EXISTS idx_aff_comm_t2_payout ON affiliate_commissions(tier2_payout_id);
 
 -- 10. ZGŁOSZENIA WSPÓŁPRACY Z PODSTRON /AFILIACJA ORAZ /PARTNERZY ([D4a-1] & [D4a-2])
 CREATE TABLE IF NOT EXISTS partnership_inquiries (
@@ -247,7 +255,50 @@ CREATE TABLE IF NOT EXISTS leads (
     source TEXT DEFAULT 'plan_porodu',
     rodo_consent INTEGER DEFAULT 1,
     marketing_consent INTEGER DEFAULT 0,
+    ip_address TEXT,
+    unsubscribed_at TEXT,
+    resend_scheduled_ids TEXT,
     created_at TEXT DEFAULT (datetime('now'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_leads_email ON leads(email);
+
+-- 14. USTAWIENIA ROZLICZENIOWE PARTNERÓW AFILIACYJNYCH (B2B / Działalność Nierejestrowana / Osoba Prywatna)
+CREATE TABLE IF NOT EXISTS affiliate_settings (
+    affiliate_id TEXT PRIMARY KEY,
+    settlement_type TEXT NOT NULL DEFAULT 'private_person', -- 'b2b_invoice', 'unregistered_business', 'private_person'
+    legal_name TEXT,
+    nip TEXT,
+    iban TEXT,
+    address TEXT,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (affiliate_id) REFERENCES affiliates(id) ON DELETE CASCADE
+);
+
+-- 15. HISTORIA WYPŁAT PROWIZJI AFILIACYJNYCH
+CREATE TABLE IF NOT EXISTS affiliate_payouts (
+    id TEXT PRIMARY KEY,
+    affiliate_id TEXT NOT NULL,
+    amount_gross_minor INTEGER NOT NULL,
+    settlement_type TEXT NOT NULL,
+    legal_name TEXT NOT NULL,
+    nip TEXT,
+    iban TEXT NOT NULL,
+    invoice_number TEXT,
+    status TEXT NOT NULL DEFAULT 'PROCESSING', -- 'PROCESSING', 'PAID', 'REJECTED'
+    requested_at TEXT NOT NULL DEFAULT (datetime('now')),
+    paid_at TEXT,
+    FOREIGN KEY (affiliate_id) REFERENCES affiliates(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_affiliate_payouts_affiliate ON affiliate_payouts(affiliate_id);
+CREATE INDEX IF NOT EXISTS idx_affiliate_payouts_status ON affiliate_payouts(status);
+
+-- 16. OCHRONA PRZED SPAMEM / BRUTE-FORCE (RATE LIMITING API W D1)
+CREATE TABLE IF NOT EXISTS rate_limits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bucket_key TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_rate_limits_key_time ON rate_limits(bucket_key, created_at);

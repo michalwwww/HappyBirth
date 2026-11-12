@@ -1,14 +1,30 @@
+import {
+  buildEdgeCorsHeaders,
+  getEdgeSession,
+} from '../../_shared/session';
+
 interface Env {
   DB?: any;
   STRIPE_SECRET_KEY?: string;
+  SESSION_SECRET?: string;
   NEXT_PUBLIC_STRIPE_PRICE_ID?: string;
   NEXT_PUBLIC_APP_URL?: string;
 }
 
 const CHECKBOX_2_ART38_WAIVER_TEXT =
-  'Żądam natychmiastowego rozpoczęcia dostarczania treści cyfrowych przed upływem 14-dniowego terminu do odstąpienia od umowy i przyjmuję do wiadomości, że z chwilą uzyskania dostępu do platformy kursowej tracę prawo do odstąpienia od umowy (art. 38 ust. 1 pkt 13 u.p.k.).';
+  'Tak, chcę otrzymać dostęp do kursu natychmiast po opłaceniu i zgodnie z art. 38 ust. 1 pkt 13 u.p.k. zgadzam się na utratę 14-dniowego prawa do odstąpienia od umowy';
 
-const TERMS_VERSION_SHA256 = 'a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447';
+const TERMS_VERSION_SHA256 = 'baac2cea8e6c1d1bbeff5827cbb4eee13414180e36c4730d270821b6f3bad619';
+
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
+]);
 
 type EdgeCurrency = 'pln' | 'gbp' | 'eur' | 'usd' | 'aud' | 'aed';
 
@@ -25,8 +41,31 @@ const EDGE_PRICING_TABLE: Record<
 };
 
 const OFFICIAL_PROMO_ALLOWLIST = new Set([
-  'MAMAGAJA10',
+  'SPOKOJNYPOROD',
+  'SPOKOJNY-POROD',
+  'DOBRYSTART',
+  'DOBRY-START',
+  'GOTOWY-TATA',
+  'GOTOWYTATA',
+  'RAZEM-DO-PORODU',
+  'RAZEMDOPORODU',
+  'PIERWSZEDNI',
+  'PIERWSZE-DNI',
+  'DOBRYPOROD',
+  'DOBRY-POROD',
+  'WSPARCIE-TATY',
+  'WSPARCIETATY',
   'MAMAGAJA',
+  'MAMAGAJA10',
+  'BEZSTRESU',
+  'BEZ-STRESU',
+  'AKADEMIA-HB',
+  'SPOKOJ-W-DOMU',
+  'DOMOWASZKOLA',
+  'SZKOLARODZENIA',
+  'PLANPORODU',
+  'WYPRAWKA10',
+  'TORBA10',
   'POLOZNA10',
   'FIZJO10',
   'LAKTACJA10',
@@ -36,7 +75,13 @@ const OFFICIAL_PROMO_ALLOWLIST = new Set([
   'KOWALSKA10',
   'NOWAK10',
   'MAMA-2026',
+  'STUDENT10',
+  'STUDENT-2026',
+  'AMBASADOR10',
 ]);
+
+const SEMANTIC_PREFIX_REGEX =
+  /^(?:SPOKOJ|SPOKOJNA|SPOKOJNY|POLECA|DOBRYSTART|DOBRYPOROD|BLISKO|Z-SERCA|ZSERCA|OD|RAZEM|GOTOWI|GOTOWY|AKADEMIA|WIEDZA|MED|KAMPUS|KOLO|GABINET|PRAKTYKA|FIZJO|ODDECH|TULIMY|WYPRAWKA|RODZIMY|PARTNER|STUDENT|AMBASADOR|HB|POLOZNA)-[A-Z0-9_-]{2,20}$/;
 
 function parseCookie(cookieHeader: string | null, name: string): string {
   if (!cookieHeader) return '';
@@ -46,48 +91,41 @@ function parseCookie(cookieHeader: string | null, name: string): string {
 
 async function isAuthorized10PercentPromo(code: string, db?: any): Promise<boolean> {
   if (!code) return false;
-  if (
-    OFFICIAL_PROMO_ALLOWLIST.has(code) ||
-    /^MAMA-[A-Z0-9]{3,12}$/.test(code) ||
-    /^HB-[A-Z0-9]{3,14}$/.test(code) ||
-    /^POLOZNA-[A-Z0-9]{3,14}$/.test(code) ||
-    /^FIZJO-[A-Z0-9]{3,14}$/.test(code)
-  ) {
+  if (OFFICIAL_PROMO_ALLOWLIST.has(code)) {
     return true;
   }
 
   if (db) {
     try {
       const aff = await db
-        .prepare(`SELECT id FROM affiliates WHERE promo_code = ? AND status = 'active'`)
-        .bind(code)
+        .prepare(
+          `SELECT id FROM affiliates WHERE (UPPER(promo_code) = ? OR UPPER(ref_slug) = ?) AND status = 'active' LIMIT 1`
+        )
+        .bind(code, code)
         .first();
       if (aff?.id) return true;
 
       const usr = await db
-        .prepare(`SELECT id FROM users WHERE referral_code = ?`)
+        .prepare(`SELECT id FROM users WHERE UPPER(referral_code) = ? LIMIT 1`)
         .bind(code)
         .first();
       if (usr?.id) return true;
     } catch {
-      // Fallback do oficjalnej listy
+      return false;
     }
   }
   return false;
 }
 
-export async function onRequestOptions(): Promise<Response> {
+export async function onRequestOptions(context: { request: Request }): Promise<Response> {
   return new Response(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
+    headers: buildEdgeCorsHeaders(context.request, 'POST, OPTIONS'),
   });
 }
 
 export async function onRequestPost(context: { request: Request; env: Env }): Promise<Response> {
+  const corsHeaders = buildEdgeCorsHeaders(context.request, 'POST, OPTIONS');
   try {
     const { request, env } = context;
 
@@ -105,21 +143,67 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       promoCode,
       includeOrderBump = false,
       onlyOrderBump = false,
-      termsAccepted = true,
-      waiverArt38Accepted = true,
+      termsAccepted = false,
+      waiverArt38Accepted = false,
       currency = 'pln',
       locale,
     } = body;
 
-    // [E1] Walidacja zgód konsumenckich
-    if (termsAccepted === false || waiverArt38Accepted === false) {
+    // [E1] Walidacja zgód konsumenckich (obydwie zgody muszą zostać wyraźnie przekazane jako true)
+    if (termsAccepted !== true || waiverArt38Accepted !== true) {
       return new Response(
         JSON.stringify({
           error:
             'Aby przejść do płatności, zaznacz akceptację Regulaminu oraz zgodę na natychmiastowe dostarczenie treści cyfrowych (art. 38 ust. 1 pkt 13 u.p.k.).',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
+    }
+
+    const isStandaloneOrderBump = Boolean(onlyOrderBump);
+    let authenticatedEmailOverride = '';
+
+    // [DRM-01] Samodzielny zakup Order Bumpa (+49 zł) dozwolony wyłącznie dla zalogowanych posiadaczek aktywnego kursu
+    if (isStandaloneOrderBump) {
+      const session = await getEdgeSession(request, env);
+      if (!session?.userId || !session?.email) {
+        return new Response(
+          JSON.stringify({
+            error: 'Zaloguj się do Strefy Kursantki, aby dokupić Pakiet Kart na Porodówkę dla Taty (+49 zł).',
+          }),
+          { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        );
+      }
+      authenticatedEmailOverride = session.email.trim().toLowerCase();
+      const isTeam = TEAM_WHITELIST_EMAILS.has(authenticatedEmailOverride);
+      if (!isTeam) {
+        if (!env.DB) {
+          return new Response(
+            JSON.stringify({ error: 'Brak dostępu do bazy uprawnień.' }),
+            { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+          );
+        }
+        const activeEnrollment = await env.DB.prepare(
+          `SELECT id, expires_at FROM enrollments
+           WHERE user_id = ? AND status = 'active'
+           ORDER BY created_at DESC LIMIT 1`
+        )
+          .bind(session.userId)
+          .first();
+        const notExpired =
+          activeEnrollment?.id &&
+          (!activeEnrollment.expires_at ||
+            isNaN(new Date(activeEnrollment.expires_at).getTime()) ||
+            new Date(activeEnrollment.expires_at).getTime() >= Date.now());
+        if (!notExpired) {
+          return new Response(
+            JSON.stringify({
+              error: 'Pakiet dodatkowy (+49 zł) jest dostępny wyłącznie dla posiadaczek aktywnego kursu głównego HappyBirth.pl.',
+            }),
+            { status: 403, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+          );
+        }
+      }
     }
 
     const cleanPromo = (promoCode || '').toString().trim().toUpperCase();
@@ -133,17 +217,18 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           error:
             'Kod testowy jest wyłączony. Możesz skorzystać z autoryzowanego kodu rabatowego (-10%) od swojej położnej, partnera lub koleżanki.',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
-    const has10Discount = cleanPromo ? await isAuthorized10PercentPromo(cleanPromo, env.DB) : false;
-    if (cleanPromo && !has10Discount) {
+    const isVip100 = cleanPromo === 'VIP100';
+    const has10Discount = cleanPromo && !isVip100 ? await isAuthorized10PercentPromo(cleanPromo, env.DB) : false;
+    if (cleanPromo && !has10Discount && !isVip100) {
       return new Response(
         JSON.stringify({
           error: 'Podany kod rabatowy jest nieaktywny lub nieprawidłowy. Sprawdź pisownię kodu.',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
@@ -151,8 +236,36 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     if (!stripeSecretKey) {
       return new Response(JSON.stringify({ error: 'Brak skonfigurowanego STRIPE_SECRET_KEY na serwerze.' }), {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
+    }
+
+    let vipPromoStripeId = '';
+    if (isVip100) {
+      const promoLookupRes = await fetch(
+        'https://api.stripe.com/v1/promotion_codes?code=VIP100&active=true&limit=1',
+        {
+          headers: {
+            Authorization: `Bearer ${stripeSecretKey}`,
+            'Stripe-Version': '2024-06-20',
+          },
+        }
+      );
+      const promoLookupData: any = await promoLookupRes.json();
+      const foundPromo = promoLookupData?.data?.[0];
+      if (
+        !foundPromo ||
+        !foundPromo.active ||
+        (foundPromo.max_redemptions && (foundPromo.times_redeemed || 0) >= foundPromo.max_redemptions)
+      ) {
+        return new Response(
+          JSON.stringify({
+            error: 'Kod rabatowy VIP100 wykorzystał już maksymalny limit 10 użyć.',
+          }),
+          { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        );
+      }
+      vipPromoStripeId = foundPromo.id;
     }
 
     const normCurrency = (String(currency || 'pln').trim().toLowerCase() as EdgeCurrency);
@@ -171,13 +284,17 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const cookieRef = parseCookie(request.headers.get('cookie'), 'hb_aff_ref') || utm?.ref || '';
     const waiverTimestamp = new Date().toISOString();
 
-    const isStandaloneOrderBump = Boolean(onlyOrderBump);
     const shouldIncludeBumpItem = Boolean(includeOrderBump || isStandaloneOrderBump);
 
     const params = new URLSearchParams();
     params.append('mode', 'payment');
     params.append('locale', activeLocale);
-    params.append('allow_promotion_codes', has10Discount || isStandaloneOrderBump ? 'false' : 'true');
+    if (vipPromoStripeId) {
+      params.append('discounts[0][promotion_code]', vipPromoStripeId);
+    } else {
+      // Kody rabatowe walidujemy wyłącznie przez nasz walidator Omnibus / D1 przed startem sesji Stripe
+      params.append('allow_promotion_codes', 'false');
+    }
     params.append('invoice_creation[enabled]', 'true');
     params.append('tax_id_collection[enabled]', 'true');
     params.append(
@@ -255,7 +372,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('metadata[order_bump_included]', shouldIncludeBumpItem ? 'true' : 'false');
     params.append('metadata[only_order_bump]', isStandaloneOrderBump ? 'true' : 'false');
     params.append('metadata[order_bump_edition]', requestedEditionKey);
-    params.append('metadata[promo_code]', has10Discount && !isStandaloneOrderBump ? cleanPromo : '');
+    params.append('metadata[promo_code]', (has10Discount || isVip100) && !isStandaloneOrderBump ? cleanPromo : '');
     params.append('metadata[affiliate_ref_cookie]', isStandaloneOrderBump ? '' : String(cookieRef).slice(0, 80));
     params.append(
       'metadata[attribution_priority]',
@@ -273,7 +390,9 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('metadata[terms_sha256]', TERMS_VERSION_SHA256);
     params.append('metadata[waiver_checkbox_text]', CHECKBOX_2_ART38_WAIVER_TEXT.slice(0, 480));
 
-    if (email && typeof email === 'string' && email.includes('@')) {
+    if (authenticatedEmailOverride) {
+      params.append('customer_email', authenticatedEmailOverride);
+    } else if (email && typeof email === 'string' && email.includes('@')) {
       params.append('customer_email', email.trim());
     }
 
@@ -293,19 +412,19 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         JSON.stringify({ error: sessionData.error?.message || 'Błąd inicjalizacji Stripe' }),
         {
           status: stripeRes.status,
-          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
         }
       );
     }
 
     return new Response(JSON.stringify({ url: sessionData.url, sessionId: sessionData.id }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message || 'Wewnętrzny błąd serwera płatności.' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
 }

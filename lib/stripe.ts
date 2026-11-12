@@ -4,6 +4,6 @@ if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('⚠️ STRIPE_SECRET_KEY nie jest zdefiniowany w zmiennych środowiskowych.');
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_build_placeholder', {
   typescript: true,
 });
