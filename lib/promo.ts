@@ -1,4 +1,4 @@
-import { isSemanticAffiliateCodePattern } from './brand-codes';
+import { isOfficialSemanticPromo } from './brand-codes';
 
 export interface PromoValidationResult {
   valid: boolean;
@@ -533,24 +533,22 @@ export function is10PercentAffiliatePromo(code?: string | null): boolean {
 }
 
 /**
- * Autoryzowany kod VIP100 (-100%, limit 10 sztuk weryfikowany w Stripe Live).
- * Publiczne kody testowe (TEST, TEST100, FREE) pozostają bezwzględnie wyłączone.
+ * Kody testowe 100% są wyłączone na kliencie i w produkcji.
+ * Lokalny tryb deweloperski obsługuje wyłącznie jawnie skonfigurowany kod DEVTEST100.
  */
 export function is100PercentPromo(code?: string | null): boolean {
   if (!code) return false;
   const clean = code.trim().toUpperCase();
-  if (clean === 'VIP100') return true;
-  if (process.env.NODE_ENV !== 'production' && clean === 'DEV100_LOCAL') {
+  if (process.env.NODE_ENV === 'development' && clean === 'DEVTEST100') {
     return true;
   }
   return false;
 }
 
 /**
- * Walidacja kodów rabatowych -10% (489,00 zł -> 440,10 zł brutto)
- * Obsługuje:
- * 1) Kody koleżeńskie kursantek [C4]: MAMA-XXXX (np. MAMA-ANNA, MAMA-2026)
- * 2) Kody położnych, fizjoterapeutek i twórców [D1b]: POLOZNA10, MAMAGAJA10, FIZJO10, PARTNER10, HB-*, POLOZNA-*, itp.
+ * Synchroniczna walidacja wbudowanych kodów kampanijnych -10% (489,00 zł -> 440,10 zł brutto).
+ * Wszystkie kody imienne partnerów (np. SPOKOJ-KASIA) oraz polecenia Mam (MAMA-XXXX)
+ * są weryfikowane asynchronicznie przez bazę D1 w /api/affiliate/dashboard i /api/stripe/checkout.
  */
 export function validatePromoCode(rawCode?: string | null): PromoValidationResult {
   const clean = (rawCode || '').trim().toUpperCase();
@@ -581,41 +579,8 @@ export function validatePromoCode(rawCode?: string | null): PromoValidationResul
     };
   }
 
-  // 0. Autoryzowany kod VIP100 (-100%, limit 10 szt. w Stripe Checkout)
-  if (clean === 'VIP100') {
-    return {
-      valid: true,
-      code: clean,
-      discountPercent: 100,
-      basePricePln: BASE_COURSE_PRICE_PLN,
-      discountedCoursePricePln: 0,
-      omnibusNotice: OMNIBUS_LOWEST_30_DAYS_TEXT,
-      sourceType: 'affiliate',
-    };
-  }
-
-  // 1. Kody poleceń koleżeńskich z panelu kursantki [C4] (np. MAMA-KASIA, MAMA-KASIA-N, MAMA-2026)
-  if (/^MAMA-[A-Z0-9-]{2,16}$/.test(clean)) {
-    return {
-      valid: true,
-      code: clean,
-      discountPercent: 10,
-      basePricePln: BASE_COURSE_PRICE_PLN,
-      discountedCoursePricePln: 440.1,
-      omnibusNotice: OMNIBUS_LOWEST_30_DAYS_TEXT,
-      sourceType: 'student_referral',
-    };
-  }
-
-  // 2. Semantyczne kody flagowe Zespołu HappyBirth, Studentów, Ambasadorów i Partnerów [D1b]
-  const isAffiliatePattern =
-    isSemanticAffiliateCodePattern(clean) ||
-    clean === 'POLOZNA10' ||
-    clean === 'KOWALSKA10' ||
-    clean === 'NOWAK10' ||
-    /^POLOZNA-[A-Z0-9_-]{2,16}$/.test(clean);
-
-  if (isAffiliatePattern) {
+  // Wyłącznie autoryzowane, statyczne kody flagowe kampanii HappyBirth (-10%)
+  if (isOfficialSemanticPromo(clean) || clean === 'POLOZNA10') {
     return {
       valid: true,
       code: clean,

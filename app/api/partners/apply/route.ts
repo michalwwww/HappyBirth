@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { d1Run } from '@/lib/d1';
+import { checkRateLimitNodeD1, extractNodeClientIp } from '@/lib/security';
 import { getDefaultTier1Rate, AffiliateRoleCategory } from '@/lib/affiliate';
 
 export const runtime = 'nodejs';
@@ -12,6 +13,15 @@ export const runtime = 'nodejs';
  */
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = extractNodeClientIp(req);
+    const allowed = await checkRateLimitNodeD1(`partners_apply:${clientIp}`, 8, 15);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Zbyt wiele zgłoszeń w krótkim czasie. Spróbuj ponownie za kilka minut.' },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const {
       channel = 'afiliacja', // 'afiliacja' lub 'partnerzy_b2b'
@@ -23,8 +33,8 @@ export async function POST(req: NextRequest) {
       roleCategory = 'midwife_physio',
       profileUrl = '',
       message = '',
-      rodoConsent = true,
     } = body;
+    const rodoConsent = body.rodoConsent === true;
 
     if (!fullName || !email || !email.includes('@') || !rodoConsent) {
       return NextResponse.json(

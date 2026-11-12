@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { d1First, d1Run } from '@/lib/d1';
 import { evaluateWithdrawalRequest, OPERATOR_LEGAL_DATA } from '@/lib/legal-shield';
+import { checkRateLimitNodeD1, escapeHtml, extractNodeClientIp } from '@/lib/security';
 
 export const runtime = 'nodejs';
 
@@ -11,6 +12,15 @@ export const runtime = 'nodejs';
  */
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = extractNodeClientIp(req);
+    const allowed = await checkRateLimitNodeD1(`withdrawal:${clientIp}`, 6, 15);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Zbyt wiele zgłoszeń z tego adresu IP. Odczekaj kilka minut i spróbuj ponownie.' },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const {
       fullName,
@@ -99,6 +109,16 @@ export async function POST(req: NextRequest) {
 
     // 3. Natychmiast wyślij potwierdzenie wpływu oświadczenia na trwałym nośniku (wymóg z 19.06.2026 r.) oraz alert operacyjny dla zespołu
     if (process.env.RESEND_API_KEY) {
+      const safeFullName = escapeHtml(String(fullName).trim());
+      const safeOrderNum = escapeHtml(cleanOrderNum);
+      const safeNowIso = escapeHtml(nowIso);
+      const safeNotice = escapeHtml(evaluation.customerLegalNotice);
+      const safeEmail = escapeHtml(cleanEmail);
+      const safeReason = escapeHtml(String(reason).slice(0, 500) || '-');
+      const phonePart = OPERATOR_LEGAL_DATA.contactPhone.trim()
+        ? ` | Tel.: ${escapeHtml(OPERATOR_LEGAL_DATA.contactPhone.trim())}`
+        : '';
+
       const emailTasks: Promise<any>[] = [
         fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -114,15 +134,15 @@ export async function POST(req: NextRequest) {
               <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px;">
                 <h2 style="color: #1A1512; margin-top: 0;">Potwierdzenie otrzymania oświadczenia o odstąpieniu od umowy</h2>
                 <p style="font-size: 14px; line-height: 1.6;">
-                  Dzień dobry <strong>${String(fullName).trim()}</strong>,<br/>
-                  zgodnie z wymogami ustawy o prawach konsumenta obowiązującymi od 19.06.2026 r. potwierdzamy na trwałym nośniku wpływ Twojego zgłoszenia z dnia <code>${nowIso}</code> dotyczącego zamówienia <strong>${cleanOrderNum}</strong>.
+                  Dzień dobry <strong>${safeFullName}</strong>,<br/>
+                  zgodnie z wymogami ustawy o prawach konsumenta obowiązującymi od 19.06.2026 r. potwierdzamy na trwałym nośniku wpływ Twojego zgłoszenia z dnia <code>${safeNowIso}</code> dotyczącego zamówienia <strong>${safeOrderNum}</strong>.
                 </p>
                 <div style="background: #ffffff; border: 1px solid #EAE3DB; border-radius: 12px; padding: 16px; margin: 18px 0; font-size: 13.5px; line-height: 1.6;">
                   <strong>Status weryfikacji zamówienia:</strong><br/>
-                  ${evaluation.customerLegalNotice}
+                  ${safeNotice}
                 </div>
                 <p style="font-size: 11.5px; color: #867A72;">
-                  ${OPERATOR_LEGAL_DATA.fullName}, ${OPERATOR_LEGAL_DATA.address}, ${OPERATOR_LEGAL_DATA.court}, NIP: ${OPERATOR_LEGAL_DATA.nip}, KRS: ${OPERATOR_LEGAL_DATA.krs}, kapitał zakładowy: ${OPERATOR_LEGAL_DATA.shareCapital}. Kontakt: ${OPERATOR_LEGAL_DATA.supportEmail}
+                  ${OPERATOR_LEGAL_DATA.fullName}, ${OPERATOR_LEGAL_DATA.address}, ${OPERATOR_LEGAL_DATA.court}, NIP: ${OPERATOR_LEGAL_DATA.nip}, KRS: ${OPERATOR_LEGAL_DATA.krs}, kapitał zakładowy: ${OPERATOR_LEGAL_DATA.shareCapital}. Kontakt: ${OPERATOR_LEGAL_DATA.supportEmail}${phonePart}
                 </p>
               </div>
             `,
@@ -145,14 +165,14 @@ export async function POST(req: NextRequest) {
               html: `
                 <div style="font-family: sans-serif; font-size: 13px; color: #1A1512;">
                   <h3>Nowe zgłoszenie w formularzu /odstap-od-umowy</h3>
-                  <p><strong>Status automatyczny:</strong> ${evaluation.status}</p>
-                  <p><strong>Dopasowano w bazie orders:</strong> ${order ? `TAK (ID: ${order.id})` : 'NIE — wymagana ręczna weryfikacja'}</p>
-                  <p><strong>Imię i nazwisko:</strong> ${String(fullName).trim()}</p>
-                  <p><strong>E-mail klienta:</strong> ${cleanEmail}</p>
-                  <p><strong>Podany numer zamówienia:</strong> ${cleanOrderNum}</p>
-                  <p><strong>Zakres:</strong> ${cleanScope}</p>
-                  <p><strong>Uwagi klienta:</strong> ${String(reason).slice(0, 500) || '-'}</p>
-                  <p><strong>Znacznik czasu UTC:</strong> ${nowIso}</p>
+                  <p><strong>Status automatyczny:</strong> ${escapeHtml(evaluation.status)}</p>
+                  <p><strong>Dopasowano w bazie orders:</strong> ${order ? `TAK (ID: ${escapeHtml(order.id)})` : 'NIE — wymagana ręczna weryfikacja'}</p>
+                  <p><strong>Imię i nazwisko:</strong> ${safeFullName}</p>
+                  <p><strong>E-mail klienta:</strong> ${safeEmail}</p>
+                  <p><strong>Podany numer zamówienia:</strong> ${safeOrderNum}</p>
+                  <p><strong>Zakres:</strong> ${escapeHtml(cleanScope)}</p>
+                  <p><strong>Uwagi klienta:</strong> ${safeReason}</p>
+                  <p><strong>Znacznik czasu UTC:</strong> ${safeNowIso}</p>
                 </div>
               `,
             }),

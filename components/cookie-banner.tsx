@@ -26,6 +26,11 @@ export function CookieBanner() {
         level,
         timestamp: new Date().toISOString(),
       }));
+      const secureFlag = window.location.protocol === 'https:' ? '; Secure' : '';
+      document.cookie = `hb_cookie_consent=${level}; Max-Age=31536000; Path=/; SameSite=Lax${secureFlag}`;
+      if (level === 'essential') {
+        document.cookie = `hb_aff_ref=; Max-Age=0; Path=/; SameSite=Lax${secureFlag}`;
+      }
     } catch {
       // ignore
     }
@@ -59,7 +64,14 @@ export function CookieBanner() {
                 href="/polityka-prywatnosci"
                 className="underline hover:text-white transition-colors"
               >
-                Dowiedz się więcej w Polityce Prywatności
+                Polityka Prywatności
+              </Link>{' '}
+              ·{' '}
+              <Link
+                href="/polityka-cookies"
+                className="underline hover:text-white transition-colors"
+              >
+                Polityka Cookies
               </Link>
               .
             </p>

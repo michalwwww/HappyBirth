@@ -25,11 +25,6 @@ export function StudentReferralBox() {
         if (typeof data.rewardUnlocked === 'boolean') setRewardUnlocked(data.rewardUnlocked);
       })
       .catch(() => {});
-
-    // Sprawdź lokalne odblokowanie prezentu w przeglądarce
-    if (typeof window !== 'undefined' && localStorage.getItem('hb_referral_reward_unlocked') === 'true') {
-      setRewardUnlocked(true);
-    }
   }, []);
 
   const shareText = `Z moim kodem ${referralCode} masz 10% zniżki (440,10 zł zamiast 489,00 zł) na szkołę rodzenia online HappyBirth.pl, a ja otrzymam w prezencie e-booka z przepisami na szybkie obiady #współpraca https://happybirth.pl/?kod=${referralCode}`;
@@ -157,13 +152,13 @@ export function StudentReferralBox() {
                 🎁 Twój prezent odblokowuje się <strong>automatycznie</strong>, gdy pierwsza koleżanka skorzysta ze zniżki -10% z Twoim kodem <strong>{referralCode}</strong>.
               </div>
               <a
-                href="/materialy/szybkie-i-odzywcze-obiady-15-min-happybirth.html"
+                href="/materialy/podglad-obiady-15-min-happybirth.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[color:var(--hb-zol)] hover:underline"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Zobacz podgląd prezentu (e-booka z przepisami) →</span>
+                <span>Zobacz bezpłatny podgląd prezentu (fragment 1/5) →</span>
               </a>
             </div>
           )}

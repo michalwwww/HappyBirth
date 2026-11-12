@@ -159,7 +159,7 @@ export default function AfiliacjaPage() {
     preferredPromoCode: '',
     profileUrl: '',
     message: '',
-    rodoConsent: true,
+    rodoConsent: false,
   });
 
   // Cockpit actions state

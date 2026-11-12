@@ -63,7 +63,8 @@ export async function GET(req: NextRequest) {
       .toLowerCase();
     const customerName = session.customer_details?.name || 'Mama HappyBirth';
     const courseId = session.metadata?.courseId || 'kurs-glowny-happybirth';
-    const orderBumpIncluded = session.metadata?.order_bump_included === 'true' ? 1 : 0;
+    const isOnlyOrderBump = session.metadata?.only_order_bump === 'true';
+    const orderBumpIncluded = session.metadata?.order_bump_included === 'true' || isOnlyOrderBump ? 1 : 0;
 
     if (!customerEmail) {
       return NextResponse.json(
@@ -94,20 +95,34 @@ export async function GET(req: NextRequest) {
       ]);
     }
 
-    // 2. [C1] Dodaj lub zaktualizuj 18-miesięczny (548 dni) dostęp w tabeli enrollments
+    // 2. [C1] Dodaj lub zaktualizuj 18-miesięczny (548 dni) dostęp w tabeli enrollments (NIGDY przy samym Order Bumpie!)
     const enrollmentId = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + ACCESS_DURATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
     const stripeCustomerId = typeof session.customer === 'string' ? session.customer : null;
+    let hasActiveCourse = true;
 
-    await d1Run(
-      `INSERT INTO enrollments (id, user_id, course_id, stripe_session_id, stripe_customer_id, status, order_bump_included, granted_at, expires_at)
-       VALUES (?, ?, ?, ?, ?, 'active', ?, datetime('now'), ?)
-       ON CONFLICT(stripe_session_id) DO UPDATE SET status = 'active', order_bump_included = excluded.order_bump_included, expires_at = excluded.expires_at`,
-      [enrollmentId, userId, courseId, session.id, stripeCustomerId, orderBumpIncluded, expiresAt]
-    );
+    if (isOnlyOrderBump) {
+      const activeEnr = await d1First<{ id: string }>(
+        `SELECT id FROM enrollments WHERE user_id = ? AND status = 'active' LIMIT 1`,
+        [userId]
+      );
+      hasActiveCourse = Boolean(activeEnr?.id);
+      if (hasActiveCourse) {
+        await d1Run(`UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ? AND status = 'active'`, [
+          userId,
+        ]);
+      }
+    } else {
+      await d1Run(
+        `INSERT INTO enrollments (id, user_id, course_id, stripe_session_id, stripe_customer_id, status, order_bump_included, granted_at, expires_at)
+         VALUES (?, ?, ?, ?, ?, 'active', ?, datetime('now'), ?)
+         ON CONFLICT(stripe_session_id) DO UPDATE SET status = 'active', order_bump_included = excluded.order_bump_included, expires_at = excluded.expires_at`,
+        [enrollmentId, userId, courseId, session.id, stripeCustomerId, orderBumpIncluded, expiresAt]
+      );
 
-    if (orderBumpIncluded) {
-      await d1Run('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?', [userId]);
+      if (orderBumpIncluded) {
+        await d1Run('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?', [userId]);
+      }
     }
 
     // 3. Utwórz kryptograficzne ciasteczko sesyjne HMAC
@@ -127,7 +142,7 @@ export async function GET(req: NextRequest) {
         id: userId,
         email: customerEmail,
         role: 'student',
-        hasActiveCourse: true,
+        hasActiveCourse,
         orderBumpIncluded: Boolean(orderBumpIncluded),
       },
     });

@@ -162,7 +162,14 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const { request, env } = context;
     const session = await getEdgeSession(request, env);
 
-    if (!session || !env.DB) {
+    if (!session?.userId || !session?.email) {
+      return new Response(
+        JSON.stringify({ error: 'Brak autoryzacji.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!env.DB) {
       return new Response(
         JSON.stringify({ success: true, mode: 'local_fallback' }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -182,7 +189,16 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       plannedBirthType,
       city,
       hospital,
+      rodoConsent,
     } = body;
+
+    const hasHealthData = Boolean(dueDate || lmpDate || plannedBirthType || parity || hospital);
+    if (hasHealthData && rodoConsent !== true) {
+      return new Response(
+        JSON.stringify({ error: 'Wymagana wyraźna zgoda RODO (Art. 9) na zapis danych dotyczących przebiegu ciąży.' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
     await env.DB.prepare(
       `UPDATE users SET
@@ -197,6 +213,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
          planned_birth_type = ?,
          city = ?,
          hospital = ?,
+         rodo_consent = CASE WHEN ? = 1 THEN 1 ELSE rodo_consent END,
          updated_at = datetime('now')
        WHERE id = ? OR email = ?`
     )
@@ -212,6 +229,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         plannedBirthType || 'natural',
         city || null,
         hospital || null,
+        rodoConsent === true ? 1 : 0,
         session.userId,
         session.email
       )

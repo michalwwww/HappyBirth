@@ -134,7 +134,16 @@ export async function POST(req: NextRequest) {
       plannedBirthType,
       city,
       hospital,
+      rodoConsent,
     } = body;
+
+    const hasHealthData = Boolean(dueDate || lmpDate || plannedBirthType || parity || hospital);
+    if (hasHealthData && rodoConsent !== true) {
+      return NextResponse.json(
+        { error: 'Wymagana wyraźna zgoda RODO (Art. 9) na zapis danych dotyczących przebiegu ciąży.' },
+        { status: 400 }
+      );
+    }
 
     await d1Run(
       `UPDATE users SET 
@@ -148,6 +157,7 @@ export async function POST(req: NextRequest) {
         planned_birth_type = ?,
         city = ?,
         hospital = ?,
+        rodo_consent = CASE WHEN ? = 1 THEN 1 ELSE rodo_consent END,
         updated_at = datetime('now')
        WHERE id = ?`,
       [
@@ -161,6 +171,7 @@ export async function POST(req: NextRequest) {
         plannedBirthType || 'natural',
         city || null,
         hospital || null,
+        rodoConsent === true ? 1 : 0,
         session.userId,
       ]
     );

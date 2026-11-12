@@ -1,6 +1,12 @@
+import {
+  buildEdgeCorsHeaders,
+  getEdgeSession,
+} from '../../_shared/session';
+
 interface Env {
   DB?: any;
   STRIPE_SECRET_KEY?: string;
+  SESSION_SECRET?: string;
   NEXT_PUBLIC_STRIPE_PRICE_ID?: string;
   NEXT_PUBLIC_APP_URL?: string;
 }
@@ -8,7 +14,17 @@ interface Env {
 const CHECKBOX_2_ART38_WAIVER_TEXT =
   'Tak, chcę otrzymać dostęp do kursu natychmiast po opłaceniu i zgodnie z art. 38 ust. 1 pkt 13 u.p.k. zgadzam się na utratę 14-dniowego prawa do odstąpienia od umowy';
 
-const TERMS_VERSION_SHA256 = '1da20a6fc847c3defb74abfc35ce5c67e92288c80e42becb8debbf33549cbe51';
+const TERMS_VERSION_SHA256 = 'baac2cea8e6c1d1bbeff5827cbb4eee13414180e36c4730d270821b6f3bad619';
+
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
+]);
 
 type EdgeCurrency = 'pln' | 'gbp' | 'eur' | 'usd' | 'aud' | 'aed';
 
@@ -75,13 +91,7 @@ function parseCookie(cookieHeader: string | null, name: string): string {
 
 async function isAuthorized10PercentPromo(code: string, db?: any): Promise<boolean> {
   if (!code) return false;
-  if (
-    OFFICIAL_PROMO_ALLOWLIST.has(code) ||
-    /^MAMA-[A-Z0-9-]{2,16}$/.test(code) ||
-    SEMANTIC_PREFIX_REGEX.test(code) ||
-    /^[A-Z0-9]{2,14}-[A-Z0-9]{2,10}10$/.test(code) ||
-    /^[A-Z]{3,14}10$/.test(code)
-  ) {
+  if (OFFICIAL_PROMO_ALLOWLIST.has(code)) {
     return true;
   }
 
@@ -101,24 +111,21 @@ async function isAuthorized10PercentPromo(code: string, db?: any): Promise<boole
         .first();
       if (usr?.id) return true;
     } catch {
-      // Fallback do oficjalnej listy
+      return false;
     }
   }
   return false;
 }
 
-export async function onRequestOptions(): Promise<Response> {
+export async function onRequestOptions(context: { request: Request }): Promise<Response> {
   return new Response(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
+    headers: buildEdgeCorsHeaders(context.request, 'POST, OPTIONS'),
   });
 }
 
 export async function onRequestPost(context: { request: Request; env: Env }): Promise<Response> {
+  const corsHeaders = buildEdgeCorsHeaders(context.request, 'POST, OPTIONS');
   try {
     const { request, env } = context;
 
@@ -136,21 +143,67 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       promoCode,
       includeOrderBump = false,
       onlyOrderBump = false,
-      termsAccepted = true,
-      waiverArt38Accepted = true,
+      termsAccepted = false,
+      waiverArt38Accepted = false,
       currency = 'pln',
       locale,
     } = body;
 
-    // [E1] Walidacja zgód konsumenckich
-    if (termsAccepted === false || waiverArt38Accepted === false) {
+    // [E1] Walidacja zgód konsumenckich (obydwie zgody muszą zostać wyraźnie przekazane jako true)
+    if (termsAccepted !== true || waiverArt38Accepted !== true) {
       return new Response(
         JSON.stringify({
           error:
             'Aby przejść do płatności, zaznacz akceptację Regulaminu oraz zgodę na natychmiastowe dostarczenie treści cyfrowych (art. 38 ust. 1 pkt 13 u.p.k.).',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
+    }
+
+    const isStandaloneOrderBump = Boolean(onlyOrderBump);
+    let authenticatedEmailOverride = '';
+
+    // [DRM-01] Samodzielny zakup Order Bumpa (+49 zł) dozwolony wyłącznie dla zalogowanych posiadaczek aktywnego kursu
+    if (isStandaloneOrderBump) {
+      const session = await getEdgeSession(request, env);
+      if (!session?.userId || !session?.email) {
+        return new Response(
+          JSON.stringify({
+            error: 'Zaloguj się do Strefy Kursantki, aby dokupić Pakiet Kart na Porodówkę dla Taty (+49 zł).',
+          }),
+          { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        );
+      }
+      authenticatedEmailOverride = session.email.trim().toLowerCase();
+      const isTeam = TEAM_WHITELIST_EMAILS.has(authenticatedEmailOverride);
+      if (!isTeam) {
+        if (!env.DB) {
+          return new Response(
+            JSON.stringify({ error: 'Brak dostępu do bazy uprawnień.' }),
+            { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+          );
+        }
+        const activeEnrollment = await env.DB.prepare(
+          `SELECT id, expires_at FROM enrollments
+           WHERE user_id = ? AND status = 'active'
+           ORDER BY created_at DESC LIMIT 1`
+        )
+          .bind(session.userId)
+          .first();
+        const notExpired =
+          activeEnrollment?.id &&
+          (!activeEnrollment.expires_at ||
+            isNaN(new Date(activeEnrollment.expires_at).getTime()) ||
+            new Date(activeEnrollment.expires_at).getTime() >= Date.now());
+        if (!notExpired) {
+          return new Response(
+            JSON.stringify({
+              error: 'Pakiet dodatkowy (+49 zł) jest dostępny wyłącznie dla posiadaczek aktywnego kursu głównego HappyBirth.pl.',
+            }),
+            { status: 403, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+          );
+        }
+      }
     }
 
     const cleanPromo = (promoCode || '').toString().trim().toUpperCase();
@@ -164,7 +217,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           error:
             'Kod testowy jest wyłączony. Możesz skorzystać z autoryzowanego kodu rabatowego (-10%) od swojej położnej, partnera lub koleżanki.',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
@@ -175,7 +228,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         JSON.stringify({
           error: 'Podany kod rabatowy jest nieaktywny lub nieprawidłowy. Sprawdź pisownię kodu.',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
@@ -183,7 +236,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     if (!stripeSecretKey) {
       return new Response(JSON.stringify({ error: 'Brak skonfigurowanego STRIPE_SECRET_KEY na serwerze.' }), {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
 
@@ -209,7 +262,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           JSON.stringify({
             error: 'Kod rabatowy VIP100 wykorzystał już maksymalny limit 10 użyć.',
           }),
-          { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+          { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
         );
       }
       vipPromoStripeId = foundPromo.id;
@@ -231,7 +284,6 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const cookieRef = parseCookie(request.headers.get('cookie'), 'hb_aff_ref') || utm?.ref || '';
     const waiverTimestamp = new Date().toISOString();
 
-    const isStandaloneOrderBump = Boolean(onlyOrderBump);
     const shouldIncludeBumpItem = Boolean(includeOrderBump || isStandaloneOrderBump);
 
     const params = new URLSearchParams();
@@ -240,7 +292,8 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     if (vipPromoStripeId) {
       params.append('discounts[0][promotion_code]', vipPromoStripeId);
     } else {
-      params.append('allow_promotion_codes', has10Discount || isStandaloneOrderBump ? 'false' : 'true');
+      // Kody rabatowe walidujemy wyłącznie przez nasz walidator Omnibus / D1 przed startem sesji Stripe
+      params.append('allow_promotion_codes', 'false');
     }
     params.append('invoice_creation[enabled]', 'true');
     params.append('tax_id_collection[enabled]', 'true');
@@ -337,7 +390,9 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('metadata[terms_sha256]', TERMS_VERSION_SHA256);
     params.append('metadata[waiver_checkbox_text]', CHECKBOX_2_ART38_WAIVER_TEXT.slice(0, 480));
 
-    if (email && typeof email === 'string' && email.includes('@')) {
+    if (authenticatedEmailOverride) {
+      params.append('customer_email', authenticatedEmailOverride);
+    } else if (email && typeof email === 'string' && email.includes('@')) {
       params.append('customer_email', email.trim());
     }
 
@@ -357,19 +412,19 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         JSON.stringify({ error: sessionData.error?.message || 'Błąd inicjalizacji Stripe' }),
         {
           status: stripeRes.status,
-          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
         }
       );
     }
 
     return new Response(JSON.stringify({ url: sessionData.url, sessionId: sessionData.id }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message || 'Wewnętrzny błąd serwera płatności.' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
 }

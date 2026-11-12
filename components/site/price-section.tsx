@@ -17,9 +17,7 @@ import type { Language } from '@/lib/i18n';
 import type { HomeCopy } from '@/lib/site-copy';
 import { fill } from '@/lib/site-copy';
 import {
-  is100PercentPromo,
   is10PercentAffiliatePromo,
-  activateStudentAccessLocally,
   detectClientOrderBumpEdition,
   GLOBAL_PRICING_CONFIG,
   ORDER_BUMP_GLOBAL_CATALOG,
@@ -129,27 +127,47 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
   // Kod: wzorce z lib/promo.ts dają od razu cenę z rabatem (10%, a w trybie deweloperskim 100%).
   // Inny kod nie jest odrzucany, bo serwer zna też kody z bazy (afiliacja, polecenia): idzie do
   // sprawdzenia przy płatności. Zwraca kod, który trafi do /api/stripe/checkout.
-  const ocenKod = useCallback((surowy: string): string => {
-    const c = surowy.trim().toUpperCase();
-    setKodBlad(null);
-    if (!c) { setAktywny(null); setRabat(0); setOczekujacy(null); return ''; }
-    if (is10PercentAffiliatePromo(c)) { setAktywny(c); setRabat(10); setOczekujacy(null); return c; }
-    if (is100PercentPromo(c)) { setAktywny(c); setRabat(100); setOczekujacy(null); return c; }
-    setAktywny(null);
-    setRabat(0);
-    setOczekujacy(c);
-    fetch(`/api/affiliate/dashboard?validate_code=${encodeURIComponent(c)}`)
-      .then((r) => r.json())
-      .then((d) => {
-        if (d?.valid && d?.discountPercent === 10) {
-          setAktywny(c);
-          setRabat(10);
-          setOczekujacy(null);
-        }
-      })
-      .catch(() => {});
-    return c;
-  }, []);
+  const ocenKod = useCallback(
+    (surowy: string, fromManualApply = false): string => {
+      const c = surowy.trim().toUpperCase();
+      setKodBlad(null);
+      if (!c) {
+        setAktywny(null);
+        setRabat(0);
+        setOczekujacy(null);
+        return '';
+      }
+      if (is10PercentAffiliatePromo(c)) {
+        setAktywny(c);
+        setRabat(10);
+        setOczekujacy(null);
+        return c;
+      }
+      setAktywny(null);
+      setRabat(0);
+      setOczekujacy(c);
+      fetch(`/api/affiliate/dashboard?validate_code=${encodeURIComponent(c)}`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d?.valid && d?.discountPercent === 10) {
+            setAktywny(c);
+            setRabat(10);
+            setOczekujacy(null);
+            setKodBlad(null);
+          } else if (fromManualApply) {
+            setOczekujacy(null);
+            setKodBlad(t.kod.blad);
+          }
+        })
+        .catch(() => {
+          if (fromManualApply) {
+            setKodBlad(t.kod.blad);
+          }
+        });
+      return c;
+    },
+    [t.kod.blad]
+  );
 
   // kod z adresu (?kod=SPOKOJ-KASIA, ?promo=KOD lub ?poleca=spokoj-kasia) albo zapamiętany z wizyty na /plan-porodu
   useEffect(() => {
@@ -193,7 +211,7 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
 
   const zastosuj = () => {
     if (!kod.trim()) { setKodBlad(t.kod.pusty); return; }
-    ocenKod(kod);
+    ocenKod(kod, true);
   };
 
   const usunKod = () => { setAktywny(null); setRabat(0); setOczekujacy(null); setKod(''); setKodBlad(null); };
@@ -218,11 +236,6 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
     setBrakZgod(false);
     // kod wpisany, ale niezastosowany, oceniamy teraz; wysyłamy tylko kod widoczny w polu
     const c = aktywny || oczekujacy || ocenKod(kod);
-    if (is100PercentPromo(c) && c !== 'VIP100') {
-      activateStudentAccessLocally(c, bump);
-      window.location.href = `/strefa?session_id=promo_test_100&payment=success&promo=${encodeURIComponent(c)}`;
-      return;
-    }
     // dostęp do Niezbędnika odblokowuje strefa po potwierdzeniu płatności (verify-session, /api/auth/me)
     try {
       setLadowanie(true);

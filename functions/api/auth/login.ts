@@ -1,3 +1,5 @@
+import { checkRateLimitD1, extractClientIp } from '../../_shared/session';
+
 interface Env {
   DB?: any;
   RESEND_API_KEY?: string;
@@ -17,6 +19,19 @@ const TEAM_WHITELIST_EMAILS = new Set([
 export async function onRequestPost(context: { request: Request; env: Env }): Promise<Response> {
   try {
     const { request, env } = context;
+    const clientIp = extractClientIp(request);
+    if (env.DB) {
+      const allowed = await checkRateLimitD1(env.DB, `auth_login:${clientIp}`, 6, 15);
+      if (!allowed) {
+        return new Response(
+          JSON.stringify({
+            error: 'Zbyt wiele prób logowania. Odczekaj kilka minut i spróbuj ponownie.',
+          }),
+          { status: 429, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     const body: any = await request.json().catch(() => ({}));
     const email = String(body.email || '')
       .trim()

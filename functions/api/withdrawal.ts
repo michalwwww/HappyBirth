@@ -1,3 +1,5 @@
+import { checkRateLimitD1, escapeHtml, extractClientIp } from '../_shared/session';
+
 interface Env {
   DB?: any;
   RESEND_API_KEY?: string;
@@ -7,6 +9,19 @@ interface Env {
 export async function onRequestPost(context: { request: Request; env: Env }): Promise<Response> {
   try {
     const { request, env } = context;
+    const clientIp = extractClientIp(request);
+    if (env.DB) {
+      const allowed = await checkRateLimitD1(env.DB, `withdrawal:${clientIp}`, 6, 15);
+      if (!allowed) {
+        return new Response(
+          JSON.stringify({
+            error: 'Zbyt wiele zgłoszeń z tego adresu IP. Odczekaj kilka minut i spróbuj ponownie.',
+          }),
+          { status: 429, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     const body: any = await request.json().catch(() => ({}));
     const fullName = String(body.fullName || '').trim();
     const email = String(body.email || '')
@@ -134,6 +149,15 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
 
     if (env.RESEND_API_KEY) {
       const fromAddress = env.RESEND_FROM || 'Szkoła Rodzenia HappyBirth <kontakt@happybirth.pl>';
+      const safeFullName = escapeHtml(fullName);
+      const safeOrderNumber = escapeHtml(orderNumber);
+      const safeNowIso = escapeHtml(nowIso);
+      const safeMessage = escapeHtml(message);
+      const safeEmail = escapeHtml(email);
+      const safeScope = escapeHtml(scope);
+      const safeReason = escapeHtml(reason || '-');
+      const safeStatus = escapeHtml(decisionStatus);
+
       const emailTasks: Promise<any>[] = [
         fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -148,9 +172,9 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             html: `
               <div style="font-family: sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px;">
                 <h2 style="margin-top: 0; color: #20071E;">Potwierdzenie otrzymania oświadczenia (Trwały Nośnik)</h2>
-                <p style="font-size: 13.5px; color: #544A44;"><strong>Imię i nazwisko:</strong> ${fullName}<br/><strong>Zamówienie:</strong> ${orderNumber}<br/><strong>Data i godzina złożenia:</strong> ${nowIso}</p>
+                <p style="font-size: 13.5px; color: #544A44;"><strong>Imię i nazwisko:</strong> ${safeFullName}<br/><strong>Zamówienie:</strong> ${safeOrderNumber}<br/><strong>Data i godzina złożenia:</strong> ${safeNowIso}</p>
                 <div style="background: #ffffff; border: 1px solid #EAE3DB; border-radius: 12px; padding: 14px; font-size: 13px; color: #1A1512; line-height: 1.6;">
-                  ${message}
+                  ${safeMessage}
                 </div>
                 <p style="font-size: 11px; color: #867A72; margin-top: 18px;">KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań · Sąd Rejonowy Poznań – Nowe Miasto i Wilda w Poznaniu, VIII Wydział Gospodarczy KRS · KRS: 0001268396 · NIP: 7812118273 · REGON: 545782779 · kapitał zakładowy: 5 000,00 PLN</p>
               </div>
@@ -175,14 +199,14 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
               html: `
                 <div style="font-family: sans-serif; font-size: 13px; color: #1A1512;">
                   <h3>Nowe zgłoszenie w formularzu /odstap-od-umowy</h3>
-                  <p><strong>Status automatyczny:</strong> ${decisionStatus}</p>
-                  <p><strong>Dopasowano w bazie orders:</strong> ${orderFound ? `TAK (ID: ${orderId})` : 'NIE — wymagana ręczna weryfikacja'}</p>
-                  <p><strong>Imię i nazwisko:</strong> ${fullName}</p>
-                  <p><strong>E-mail klienta:</strong> ${email}</p>
-                  <p><strong>Podany numer zamówienia:</strong> ${orderNumber}</p>
-                  <p><strong>Zakres:</strong> ${scope}</p>
-                  <p><strong>Uwagi klienta:</strong> ${reason || '-'}</p>
-                  <p><strong>Znacznik czasu UTC:</strong> ${nowIso}</p>
+                  <p><strong>Status automatyczny:</strong> ${safeStatus}</p>
+                  <p><strong>Dopasowano w bazie orders:</strong> ${orderFound ? `TAK (ID: ${escapeHtml(orderId || '')})` : 'NIE — wymagana ręczna weryfikacja'}</p>
+                  <p><strong>Imię i nazwisko:</strong> ${safeFullName}</p>
+                  <p><strong>E-mail klienta:</strong> ${safeEmail}</p>
+                  <p><strong>Podany numer zamówienia:</strong> ${safeOrderNumber}</p>
+                  <p><strong>Zakres:</strong> ${safeScope}</p>
+                  <p><strong>Uwagi klienta:</strong> ${safeReason}</p>
+                  <p><strong>Znacznik czasu UTC:</strong> ${safeNowIso}</p>
                 </div>
               `,
             }),

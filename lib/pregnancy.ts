@@ -198,12 +198,14 @@ export function savePregnancyProfile(profile: PregnancyProfile): void {
     profile.updatedAt = new Date().toISOString();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
 
-    // Opcjonalna cicha synchronizacja z Cloudflare D1, jeśli sesja jest aktywna
-    fetch('/api/auth/me', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(profile),
-    }).catch(() => {});
+    // Opcjonalna cicha synchronizacja z Cloudflare D1 wyłącznie przy aktywnej sesji i wyraźnej zgodzie RODO (Art. 9)
+    if (profile.rodoConsent === true) {
+      fetch('/api/auth/me', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profile),
+      }).catch(() => {});
+    }
   } catch (err) {
     console.error('Błąd zapisu profilu ciąży w localStorage:', err);
   }

@@ -11,6 +11,7 @@ Allow: /plan-porodu
 Allow: /kalkulator-wyprawki
 Allow: /regulamin
 Allow: /polityka-prywatnosci
+Allow: /polityka-cookies
 Allow: /odstap-od-umowy
 Allow: /llms.txt
 Allow: /llms-full.txt
@@ -21,6 +22,8 @@ Disallow: /marketing
 Disallow: /challenge
 Disallow: /afiliacja
 Disallow: /partnerzy
+Disallow: /materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html
+Disallow: /materialy/szybkie-i-odzywcze-obiady-15-min-happybirth.html
 
 # Jawne zezwolenie dla botów wyszukiwarek AI (Generative Engine Optimization — GEO) wyłącznie na treści konsumenckie E-E-A-T
 User-agent: OAI-SearchBot

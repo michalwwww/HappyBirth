@@ -147,3 +147,144 @@ export function formatClearSessionCookie(host?: string): string {
   const secureAttr = cleanHost === 'localhost' || cleanHost === '127.0.0.1' ? '' : '; Secure';
   return `${COOKIE_NAME}=; Max-Age=0; Path=/${domainAttr}; HttpOnly${secureAttr}; SameSite=Lax`;
 }
+
+export function escapeHtml(input: unknown): string {
+  return String(input ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export function timingSafeEqualHex(aHex: string, bHex: string): boolean {
+  const a = String(aHex || '').trim().toLowerCase();
+  const b = String(bHex || '').trim().toLowerCase();
+  if (!a || !b || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+const ALLOWED_STATIC_ORIGINS = new Set([
+  'https://happybirth.pl',
+  'https://www.happybirth.pl',
+  'https://strefa.happybirth.pl',
+  'https://afiliacja.happybirth.pl',
+  'https://partnerzy.happybirth.pl',
+]);
+
+export function resolveAllowedCorsOrigin(request?: Request | null): string {
+  const origin = (request?.headers?.get('origin') || '').trim();
+  if (!origin) return 'https://happybirth.pl';
+  if (ALLOWED_STATIC_ORIGINS.has(origin)) return origin;
+  if (/^https:\/\/[a-z0-9-]+\.happybirth(-pl)?\.pages\.dev$/i.test(origin)) {
+    return origin;
+  }
+  if (isLocalDevRequest(request ?? undefined, origin.replace(/^https?:\/\//i, ''))) {
+    return origin;
+  }
+  return 'https://happybirth.pl';
+}
+
+export function buildEdgeCorsHeaders(
+  request?: Request | null,
+  methods = 'GET, POST, OPTIONS'
+): Record<string, string> {
+  return {
+    'Access-Control-Allow-Origin': resolveAllowedCorsOrigin(request),
+    'Access-Control-Allow-Methods': methods,
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Vary': 'Origin',
+  };
+}
+
+export function extractClientIp(request?: Request | null): string {
+  if (!request) return '0.0.0.0';
+  return (
+    request.headers.get('cf-connecting-ip') ||
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    '0.0.0.0'
+  ).slice(0, 64);
+}
+
+export function resolveUnsubscribeSecret(
+  env?: { SESSION_SECRET?: string; AUTH_SECRET?: string; STRIPE_WEBHOOK_SECRET?: string },
+  request?: Request
+): string | null {
+  const secret =
+    env?.SESSION_SECRET?.trim() ||
+    env?.AUTH_SECRET?.trim() ||
+    env?.STRIPE_WEBHOOK_SECRET?.trim();
+  if (secret) return secret;
+  if (isLocalDevRequest(request)) return LOCAL_DEV_FALLBACK_SECRET;
+  return null;
+}
+
+export async function signUnsubscribeToken(
+  email: string,
+  env?: { SESSION_SECRET?: string; AUTH_SECRET?: string; STRIPE_WEBHOOK_SECRET?: string },
+  request?: Request
+): Promise<string> {
+  const secret = resolveUnsubscribeSecret(env, request) || LOCAL_DEV_FALLBACK_SECRET;
+  const cleanEmail = String(email || '').trim().toLowerCase();
+  return signHmac(`unsub:${cleanEmail}`, secret);
+}
+
+export async function verifyUnsubscribeToken(
+  email: string,
+  sig: string,
+  env?: { SESSION_SECRET?: string; AUTH_SECRET?: string; STRIPE_WEBHOOK_SECRET?: string },
+  request?: Request
+): Promise<boolean> {
+  const cleanEmail = String(email || '').trim().toLowerCase();
+  const cleanSig = String(sig || '').trim();
+  if (!cleanEmail || !cleanSig) return false;
+  const secret = resolveUnsubscribeSecret(env, request);
+  if (!secret) return false;
+  const expected = await signHmac(`unsub:${cleanEmail}`, secret);
+  return timingSafeEqualHex(expected, cleanSig);
+}
+
+export async function checkRateLimitD1(
+  db: any,
+  bucketKey: string,
+  maxRequests: number,
+  windowMinutes: number
+): Promise<boolean> {
+  if (!db) return true;
+  try {
+    await db
+      .prepare(
+        `CREATE TABLE IF NOT EXISTS rate_limits (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          bucket_key TEXT NOT NULL,
+          created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )`
+      )
+      .run();
+    await db
+      .prepare("DELETE FROM rate_limits WHERE created_at < datetime('now', '-1 day')")
+      .run()
+      .catch(() => {});
+    const modifier = `-${Math.max(1, Math.floor(windowMinutes))} minutes`;
+    const row = (await db
+      .prepare(
+        'SELECT COUNT(*) AS cnt FROM rate_limits WHERE bucket_key = ? AND created_at >= datetime(\'now\', ?)'
+      )
+      .bind(bucketKey, modifier)
+      .first()) as { cnt?: number } | null;
+    if (Number(row?.cnt || 0) >= maxRequests) {
+      return false;
+    }
+    await db
+      .prepare('INSERT INTO rate_limits (bucket_key) VALUES (?)')
+      .bind(bucketKey)
+      .run();
+    return true;
+  } catch {
+    return true;
+  }
+}

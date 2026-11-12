@@ -32,14 +32,18 @@ export default function PartnerzyB2BPage() {
     phone: '',
     roleOrArea: 'Producent wyprawki / Ekspozycja w Module 4 i Kalkulatorze Wyprawki PDF',
     message: '',
-    rodoConsent: true,
+    rodoConsent: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.rodoConsent) {
+      alert('Zaznacz wymaganą zgodę RODO przed wysłaniem zgłoszenia.');
+      return;
+    }
     try {
       setLoading(true);
-      await fetch('/api/partners/apply', {
+      const res = await fetch('/api/partners/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -47,9 +51,14 @@ export default function PartnerzyB2BPage() {
           ...formData,
         }),
       });
-      setSubmitted(true);
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Nie udało się wysłać zgłoszenia. Sprawdź dane formularza.');
+      }
     } catch {
-      setSubmitted(true);
+      alert('Błąd połączenia. Spróbuj ponownie za chwilę.');
     } finally {
       setLoading(false);
     }

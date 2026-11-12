@@ -1,4 +1,4 @@
-import { getEdgeSession } from '../../_shared/session';
+import { getEdgeSession, escapeHtml, buildEdgeCorsHeaders } from '../../_shared/session';
 import { generateSmartPartnerCodeCandidates } from '../../../lib/brand-codes';
 
 interface Env {
@@ -92,6 +92,25 @@ async function ensureAdminAffiliateTables(db: any) {
       )
       .run();
 
+    const alterCols = [
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier1_status TEXT DEFAULT 'PENDING'`,
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier1_payout_id TEXT`,
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier2_status TEXT DEFAULT 'PENDING'`,
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier2_payout_id TEXT`,
+    ];
+    for (const stmt of alterCols) {
+      await db.prepare(stmt).run().catch(() => {});
+    }
+    await db
+      .prepare(
+        `UPDATE affiliate_commissions
+         SET tier1_status = COALESCE(NULLIF(tier1_status, ''), status, 'PENDING'),
+             tier2_status = CASE WHEN broker_id IS NOT NULL THEN COALESCE(NULLIF(tier2_status, ''), status, 'PENDING') ELSE NULL END
+         WHERE tier1_status IS NULL OR (broker_id IS NOT NULL AND tier2_status IS NULL)`
+      )
+      .run()
+      .catch(() => {});
+
     // Zadbaj o obecność flagowych kodów Zespołu HappyBirth w bazie D1
     const teamSeeds = [
       {
@@ -166,14 +185,10 @@ function sanitizeCodePart(input: string, fallback = 'STUDENT'): string {
   return cleaned || fallback;
 }
 
-export async function onRequestOptions(): Promise<Response> {
+export async function onRequestOptions(context: { request: Request }): Promise<Response> {
   return new Response(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
+    headers: buildEdgeCorsHeaders(context.request, 'GET, POST, OPTIONS'),
   });
 }
 
@@ -317,22 +332,20 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       const t1 = Number(c.tier1_commission_gross || 0);
       const t2 = Number(c.tier2_commission_gross || 0);
       const paidGross = Number(c.paid_amount_gross || 0);
-      const st = String(c.status || 'PENDING');
+      const rowCancelled = String(c.status || 'PENDING') === 'CANCELLED';
+      const t1St = rowCancelled ? 'CANCELLED' : String(c.tier1_status || c.status || 'PENDING');
+      const t2St = rowCancelled ? 'CANCELLED' : String(c.tier2_status || c.status || 'PENDING');
 
-      if (st !== 'CANCELLED') {
+      if (!rowCancelled) {
         totalOrdersCount += 1;
         totalRevenueMinor += paidGross;
       }
 
-      if (st === 'ELIGIBLE') {
-        totalCommissionsEligibleMinor += t1 + t2;
-      } else if (st === 'PENDING') {
-        totalCommissionsPendingMinor += t1 + t2;
-      } else if (st === 'PAID') {
-        totalCommissionsPaidMinor += t1 + t2;
-      }
-
       if (affId) {
+        if (t1St === 'ELIGIBLE') totalCommissionsEligibleMinor += t1;
+        else if (t1St === 'PENDING' || t1St === 'PROCESSING') totalCommissionsPendingMinor += t1;
+        else if (t1St === 'PAID') totalCommissionsPaidMinor += t1;
+
         const cur = perAffiliateStats.get(affId) || {
           directSalesCount: 0,
           brokerSalesCount: 0,
@@ -341,15 +354,19 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
           paidMinor: 0,
           totalEarnedMinor: 0,
         };
-        if (st !== 'CANCELLED') cur.directSalesCount += 1;
-        if (st === 'ELIGIBLE') cur.eligibleMinor += t1;
-        else if (st === 'PENDING') cur.pendingMinor += t1;
-        else if (st === 'PAID') cur.paidMinor += t1;
+        if (t1St !== 'CANCELLED') cur.directSalesCount += 1;
+        if (t1St === 'ELIGIBLE') cur.eligibleMinor += t1;
+        else if (t1St === 'PENDING') cur.pendingMinor += t1;
+        else if (t1St === 'PAID') cur.paidMinor += t1;
         cur.totalEarnedMinor = cur.eligibleMinor + cur.pendingMinor + cur.paidMinor;
         perAffiliateStats.set(affId, cur);
       }
 
       if (brokId && t2 > 0) {
+        if (t2St === 'ELIGIBLE') totalCommissionsEligibleMinor += t2;
+        else if (t2St === 'PENDING' || t2St === 'PROCESSING') totalCommissionsPendingMinor += t2;
+        else if (t2St === 'PAID') totalCommissionsPaidMinor += t2;
+
         const curB = perAffiliateStats.get(brokId) || {
           directSalesCount: 0,
           brokerSalesCount: 0,
@@ -358,10 +375,10 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
           paidMinor: 0,
           totalEarnedMinor: 0,
         };
-        if (st !== 'CANCELLED') curB.brokerSalesCount += 1;
-        if (st === 'ELIGIBLE') curB.eligibleMinor += t2;
-        else if (st === 'PENDING') curB.pendingMinor += t2;
-        else if (st === 'PAID') curB.paidMinor += t2;
+        if (t2St !== 'CANCELLED') curB.brokerSalesCount += 1;
+        if (t2St === 'ELIGIBLE') curB.eligibleMinor += t2;
+        else if (t2St === 'PENDING') curB.pendingMinor += t2;
+        else if (t2St === 'PAID') curB.paidMinor += t2;
         curB.totalEarnedMinor = curB.eligibleMinor + curB.pendingMinor + curB.paidMinor;
         perAffiliateStats.set(brokId, curB);
       }
@@ -496,6 +513,8 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       tier1CommissionGrossMinor: Number(c.tier1_commission_gross || 0),
       tier2CommissionGrossMinor: Number(c.tier2_commission_gross || 0),
       status: c.status || 'PENDING',
+      tier1Status: c.tier1_status || c.status || 'PENDING',
+      tier2Status: c.broker_id ? (c.tier2_status || c.status || 'PENDING') : null,
       firstContentAccessedAt: c.first_content_accessed_at || null,
       eligibleAt: c.eligible_at || null,
       paidAt: c.paid_at || null,
@@ -668,10 +687,37 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         });
       }
 
+      if (payoutRow.status !== 'PROCESSING') {
+        return new Response(
+          JSON.stringify({ error: `Zlecenie ma już status ${payoutRow.status} i nie może zostać ponownie zatwierdzone.` }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+
       await env.DB.prepare(
         `UPDATE affiliate_payouts
          SET status = 'PAID', paid_at = datetime('now')
-         WHERE id = ?`
+         WHERE id = ? AND status = 'PROCESSING'`
+      )
+        .bind(payoutId)
+        .run();
+
+      await env.DB.prepare(
+        `UPDATE affiliate_commissions
+         SET tier1_status = 'PAID',
+             paid_at = COALESCE(paid_at, datetime('now')),
+             status = CASE WHEN broker_id IS NULL OR tier2_status = 'PAID' THEN 'PAID' ELSE status END
+         WHERE tier1_payout_id = ?`
+      )
+        .bind(payoutId)
+        .run();
+
+      await env.DB.prepare(
+        `UPDATE affiliate_commissions
+         SET tier2_status = 'PAID',
+             paid_at = COALESCE(paid_at, datetime('now')),
+             status = CASE WHEN tier1_status = 'PAID' THEN 'PAID' ELSE status END
+         WHERE tier2_payout_id = ?`
       )
         .bind(payoutId)
         .run();
@@ -742,17 +788,35 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         });
       }
 
-      await env.DB.prepare(`UPDATE affiliate_payouts SET status = 'REJECTED' WHERE id = ?`)
+      if (payoutRow.status !== 'PROCESSING') {
+        return new Response(
+          JSON.stringify({ error: `Można odrzucić wyłącznie zlecenie ze statusem PROCESSING (obecny: ${payoutRow.status}).` }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+
+      await env.DB.prepare(`UPDATE affiliate_payouts SET status = 'REJECTED' WHERE id = ? AND status = 'PROCESSING'`)
         .bind(payoutId)
         .run();
 
-      // Przywróć prowizje partnera oznaczone jako PAID z powrotem na ELIGIBLE
+      // Przywróć WYŁĄCZNIE prowizje powiązane z tym konkretnym zleceniem wypłaty (bez naruszania historycznych PAID)
       await env.DB.prepare(
         `UPDATE affiliate_commissions
-         SET status = 'ELIGIBLE', paid_at = NULL
-         WHERE (affiliate_id = ? OR broker_id = ?) AND status = 'PAID'`
+         SET tier1_status = 'ELIGIBLE',
+             tier1_payout_id = NULL,
+             status = CASE WHEN status = 'CANCELLED' THEN 'CANCELLED' ELSE 'ELIGIBLE' END
+         WHERE tier1_payout_id = ?`
       )
-        .bind(payoutRow.affiliate_id, payoutRow.affiliate_id)
+        .bind(payoutId)
+        .run();
+
+      await env.DB.prepare(
+        `UPDATE affiliate_commissions
+         SET tier2_status = 'ELIGIBLE',
+             tier2_payout_id = NULL
+         WHERE tier2_payout_id = ?`
+      )
+        .bind(payoutId)
         .run();
 
       return new Response(
@@ -861,9 +925,9 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             subject: `Twoja stawka prowizyjna w HappyBirth.pl została podniesiona do ${ratePct}%!`,
             html: `
               <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px; color: #1A1512;">
-                <h2 style="margin-top: 0; color: #20071E;">Gratulacje, ${existing.full_name}!</h2>
+                <h2 style="margin-top: 0; color: #20071E;">Gratulacje, ${escapeHtml(existing.full_name)}!</h2>
                 <p style="font-size: 14px; color: #544A44; line-height: 1.6;">
-                  Administrator Programu Partnerskiego HappyBirth.pl zaktualizował Twoją stawkę prowizyjną Poziomu 1 do <strong>${ratePct}%</strong> (<strong>${((440.1 * tier1Rate)).toFixed(2).replace('.', ',')} zł</strong> za każdy kurs sprzedany z Twoim kodem <strong>${newPromo}</strong> + 5% Broker Override).
+                  Administrator Programu Partnerskiego HappyBirth.pl zaktualizował Twoją stawkę prowizyjną Poziomu 1 do <strong>${ratePct}%</strong> (<strong>${((440.1 * tier1Rate)).toFixed(2).replace('.', ',')} zł</strong> za każdy kurs sprzedany z Twoim kodem <strong>${escapeHtml(newPromo)}</strong> + 5% Broker Override).
                 </p>
                 <div style="margin: 20px 0;">
                   <a href="https://afiliacja.happybirth.pl" style="background: #DA0271; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 9999px; font-weight: bold; font-size: 13px; display: inline-block;">Przejdź do Kokpitu Partnera &rarr;</a>
@@ -1018,12 +1082,12 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             subject: `Zaproszenie do Kokpitu Partnerskiego HappyBirth.pl (Kod: ${finalPromo}, Stawka: ${finalRatePct}%)`,
             html: `
               <div style="font-family: sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px; color: #1A1512;">
-                <h2 style="margin-top: 0; color: #20071E;">Witaj w zespole partnerskim HappyBirth, ${fullName}!</h2>
+                <h2 style="margin-top: 0; color: #20071E;">Witaj w zespole partnerskim HappyBirth, ${escapeHtml(fullName)}!</h2>
                 <p style="font-size: 14px; color: #544A44; line-height: 1.6;">
                   Twoje konto w Programie Partnerskim zostało utworzone z indywidualną stawką prowizji <strong>${finalRatePct}%</strong> (+ 5% Broker Override).
                 </p>
                 <p style="font-size: 14px; color: #544A44; line-height: 1.6;">
-                  Twój kod rabatowy (-10% dla przyszłych rodziców): <strong>${finalPromo}</strong>
+                  Twój kod rabatowy (-10% dla przyszłych rodziców): <strong>${escapeHtml(finalPromo)}</strong>
                 </p>
                 <div style="margin: 22px 0;">
                   <a href="${directCockpitUrl}" style="background: #DA0271; color: #ffffff; text-decoration: none; padding: 13px 26px; border-radius: 9999px; font-weight: bold; font-size: 13px; display: inline-block;">
@@ -1063,11 +1127,13 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       await env.DB.prepare(
         `UPDATE affiliate_commissions
          SET status = ?,
-             eligible_at = CASE WHEN ? = 'ELIGIBLE' THEN COALESCE(eligible_at, datetime('now')) ELSE eligible_at END,
+             tier1_status = ?,
+             tier2_status = CASE WHEN broker_id IS NOT NULL THEN ? ELSE tier2_status END,
+             eligible_at = CASE WHEN ? = 'ELIGIBLE' THEN datetime('now') ELSE eligible_at END,
              paid_at = CASE WHEN ? = 'PAID' THEN COALESCE(paid_at, datetime('now')) ELSE paid_at END
          WHERE id = ?`
       )
-        .bind(newStatus, newStatus, newStatus, commissionId)
+        .bind(newStatus, newStatus, newStatus, newStatus, newStatus, commissionId)
         .run();
 
       return new Response(
@@ -1126,8 +1192,8 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
            id, order_id, stripe_session_id, affiliate_id, broker_id,
            attribution_source, paid_amount_gross, tier1_rate,
            tier1_commission_gross, tier2_commission_gross,
-           status, eligible_at
-         ) VALUES (?, ?, ?, ?, ?, 'promo_code', ?, ?, ?, ?, ?, CASE WHEN ? = 'ELIGIBLE' THEN datetime('now') ELSE NULL END)`
+           status, tier1_status, tier2_status, eligible_at
+         ) VALUES (?, ?, ?, ?, ?, 'promo_code', ?, ?, ?, ?, ?, ?, CASE WHEN ? IS NOT NULL THEN ? ELSE NULL END, CASE WHEN ? = 'ELIGIBLE' THEN datetime('now') ELSE NULL END)`
       )
         .bind(
           commId,
@@ -1139,6 +1205,9 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           t1Rate,
           t1CommMinor,
           t2CommMinor,
+          initialStatus,
+          initialStatus,
+          brokerId,
           initialStatus,
           initialStatus
         )

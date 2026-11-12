@@ -43,10 +43,28 @@ export default function PolitykaCookiesPage() {
                     <td>nie, są niezbędne do działania i bezpieczeństwa strony</td>
                   </tr>
                   <tr>
-                    <td>Plik cookie sesji logowania (hb_session)</td>
+                    <td>Plik cookie sesji logowania (<code>hb_session</code>)</td>
                     <td>HappyBirth (KLARSOLUTIONS Sp. z o.o.)</td>
-                    <td>utrzymanie bezpiecznego zalogowania w strefie kursu (podpis HMAC-SHA256)</td>
+                    <td>utrzymanie bezpiecznego zalogowania w strefie kursu i panelu partnera (podpis HMAC-SHA256, HttpOnly)</td>
                     <td>nie, jest niezbędny do korzystania ze strefy kursu</td>
+                  </tr>
+                  <tr>
+                    <td>Plik cookie decyzji cookies (<code>hb_cookie_consent</code>)</td>
+                    <td>HappyBirth (KLARSOLUTIONS Sp. z o.o.)</td>
+                    <td>zapamiętanie wyboru z banera cookies (np. „Tylko niezbędne” wyłącza zapis <code>hb_aff_ref</code>)</td>
+                    <td>nie, służy do egzekwowania Twoich preferencji prywatności</td>
+                  </tr>
+                  <tr>
+                    <td>Pliki cookie lokalizacji walutowej (<code>hb_geo_country</code>)</td>
+                    <td>HappyBirth / Cloudflare Edge</td>
+                    <td>2-literowy kod kraju ISO do wyświetlenia właściwej waluty (PLN/EUR/GBP/USD) bez śledzenia użytkownika</td>
+                    <td>nie, służy do technicznego dopasowania cennika</td>
+                  </tr>
+                  <tr>
+                    <td>Plik cookie atrybucji polecenia (<code>hb_aff_ref</code>)</td>
+                    <td>HappyBirth (KLARSOLUTIONS Sp. z o.o.)</td>
+                    <td>opcjonalne zapamiętanie kodu polecającego partnera/położnej przez 30 dni (HttpOnly)</td>
+                    <td>nie jest zapisywane, gdy w banerze wybierzesz „Tylko niezbędne”</td>
                   </tr>
                   <tr>
                     <td>Pamięć przeglądarki (localStorage)</td>

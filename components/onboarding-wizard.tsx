@@ -58,7 +58,7 @@ export function OnboardingWizard({
     initialProfile?.plannedBirthType || 'natural'
   );
   const [city, setCity] = useState(initialProfile?.city || '');
-  const [rodoConsent, setRodoConsent] = useState(initialProfile ? initialProfile.rodoConsent : true);
+  const [rodoConsent, setRodoConsent] = useState(initialProfile ? Boolean(initialProfile.rodoConsent) : false);
 
   if (!isOpen) return null;
 
@@ -98,6 +98,11 @@ export function OnboardingWizard({
     if (!dueDate) {
       alert('Termin porodu jest wymagany.');
       setStep(1);
+      return;
+    }
+
+    if (!rodoConsent) {
+      alert('Zaznacz zgodę RODO na przetwarzanie danych dotyczących przebiegu ciąży, aby zapisać personalizację (lub kliknij „Uzupełnię później”).');
       return;
     }
 

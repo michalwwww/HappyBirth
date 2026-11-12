@@ -190,6 +190,10 @@ CREATE TABLE IF NOT EXISTS affiliate_commissions (
     tier1_commission_gross INTEGER NOT NULL, -- np. 8802 gr (88,02 zł), 11003 gr (110,03 zł) lub 13203 gr (132,03 zł)
     tier2_commission_gross INTEGER NOT NULL DEFAULT 0, -- np. 2200 gr (22,00 zł) lub 2445 gr (24,45 zł)
     status TEXT NOT NULL DEFAULT 'PENDING', -- 'PENDING' -> 'ELIGIBLE' (po otwarciu lekcji + bufor) -> 'PAID' / 'CANCELLED'
+    tier1_status TEXT NOT NULL DEFAULT 'PENDING', -- 'PENDING' | 'ELIGIBLE' | 'PROCESSING' | 'PAID' | 'CANCELLED'
+    tier1_payout_id TEXT,
+    tier2_status TEXT NOT NULL DEFAULT 'PENDING', -- 'PENDING' | 'ELIGIBLE' | 'PROCESSING' | 'PAID' | 'CANCELLED'
+    tier2_payout_id TEXT,
     first_content_accessed_at TEXT,
     eligible_at TEXT,
     paid_at TEXT,
@@ -200,6 +204,8 @@ CREATE TABLE IF NOT EXISTS affiliate_commissions (
 CREATE INDEX IF NOT EXISTS idx_commissions_affiliate ON affiliate_commissions(affiliate_id);
 CREATE INDEX IF NOT EXISTS idx_commissions_broker ON affiliate_commissions(broker_id);
 CREATE INDEX IF NOT EXISTS idx_commissions_status ON affiliate_commissions(status);
+CREATE INDEX IF NOT EXISTS idx_aff_comm_t1_payout ON affiliate_commissions(tier1_payout_id);
+CREATE INDEX IF NOT EXISTS idx_aff_comm_t2_payout ON affiliate_commissions(tier2_payout_id);
 
 -- 10. ZGŁOSZENIA WSPÓŁPRACY Z PODSTRON /AFILIACJA ORAZ /PARTNERZY ([D4a-1] & [D4a-2])
 CREATE TABLE IF NOT EXISTS partnership_inquiries (
@@ -247,6 +253,9 @@ CREATE TABLE IF NOT EXISTS leads (
     source TEXT DEFAULT 'plan_porodu',
     rodo_consent INTEGER DEFAULT 1,
     marketing_consent INTEGER DEFAULT 0,
+    ip_address TEXT,
+    unsubscribed_at TEXT,
+    resend_scheduled_ids TEXT,
     created_at TEXT DEFAULT (datetime('now'))
 );
 
@@ -282,3 +291,12 @@ CREATE TABLE IF NOT EXISTS affiliate_payouts (
 
 CREATE INDEX IF NOT EXISTS idx_affiliate_payouts_affiliate ON affiliate_payouts(affiliate_id);
 CREATE INDEX IF NOT EXISTS idx_affiliate_payouts_status ON affiliate_payouts(status);
+
+-- 16. OCHRONA PRZED SPAMEM / BRUTE-FORCE (RATE LIMITING API W D1)
+CREATE TABLE IF NOT EXISTS rate_limits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bucket_key TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_rate_limits_key_time ON rate_limits(bucket_key, created_at);

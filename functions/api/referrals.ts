@@ -61,7 +61,9 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       rewardUnlocked,
       bonusUnlocked: rewardUnlocked,
       referralsCount,
-      bonusPdfUrl: '/materialy/szybkie-i-odzywcze-obiady-15-min-happybirth.html',
+      bonusPdfUrl: rewardUnlocked
+        ? '/materialy/szybkie-i-odzywcze-obiady-15-min-happybirth.html'
+        : '/materialy/podglad-obiady-15-min-happybirth.html',
       bonusTitle:
         'Szybkie i Odżywcze Obiady w 15 Minut dla Przyszłej Mamy i w Czasie Laktacji (E-book PDF)',
     }),

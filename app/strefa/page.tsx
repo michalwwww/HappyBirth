@@ -26,7 +26,6 @@ import { FinalQuizAndCertificate } from '@/components/final-quiz-certificate';
 import { openPrintableLessonWorksheet } from '@/lib/printable-worksheets';
 import {
   activateStudentAccessLocally,
-  is100PercentPromo,
   detectClientOrderBumpEdition,
   isOrderBumpUnlockedLocally,
 } from '@/lib/promo';
@@ -140,7 +139,9 @@ function StrefaDashboardContent() {
           }
           if (data.user.pregnancy?.dueDate && !localProfile?.dueDate) {
             setPregnancyProfile(data.user.pregnancy);
-            savePregnancyProfile(data.user.pregnancy);
+            try {
+              localStorage.setItem('hb_pregnancy_profile', JSON.stringify(data.user.pregnancy));
+            } catch {}
           }
         }
       })
@@ -159,14 +160,6 @@ function StrefaDashboardContent() {
       }
       const lessonParam = params.get('lesson') || lekcjaPoZakupie;
       const autoplayParam = params.get('autoplay');
-
-      const isPromoOrSuccess = is100PercentPromo(promo);
-
-      if (isPromoOrSuccess) {
-        activateStudentAccessLocally(promo || 'TEST100');
-        changeRole('student');
-        setPaymentSuccess(true);
-      }
 
       if (sessionId) {
         fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`)
@@ -208,13 +201,13 @@ function StrefaDashboardContent() {
         }
       }
 
-      // Autoplay po płatności lub parametrze
-      if (isPromoOrSuccess || autoplayParam === 'true') {
+      // Autoplay wyłącznie przy jawnym parametrze spoza przekierowania ze Stripe
+      if (autoplayParam === 'true' && !sessionId && payment !== 'success') {
         setShouldAutoplay(true);
       }
 
-      // Automatyczne płynne wycentrowanie ekranu na filmie po zapłaceniu / zniżce
-      if (isPromoOrSuccess || payment === 'success' || sessionId) {
+      // Automatyczne płynne wycentrowanie ekranu na filmie po zapłaceniu
+      if (payment === 'success' || sessionId) {
         const timer = setTimeout(() => {
           if (playerSectionRef.current) {
             playerSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });

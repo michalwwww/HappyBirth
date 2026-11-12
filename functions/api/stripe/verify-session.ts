@@ -1,4 +1,5 @@
 import {
+  buildEdgeCorsHeaders,
   createSignedSessionToken,
   formatSessionSetCookie,
   resolveEdgeSessionSecret,
@@ -10,14 +11,10 @@ interface Env {
   SESSION_SECRET?: string;
 }
 
-export async function onRequestOptions(): Promise<Response> {
+export async function onRequestOptions(context: { request: Request }): Promise<Response> {
   return new Response(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
+    headers: buildEdgeCorsHeaders(context.request, 'GET, OPTIONS'),
   });
 }
 
@@ -97,9 +94,11 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       .trim()
       .toLowerCase();
     const fullName = String(sessionData.customer_details?.name || 'Kursantka HappyBirth').trim();
-    const orderBumpIncluded = sessionData.metadata?.order_bump_included === 'true' ? 1 : 0;
+    const isOnlyOrderBump = sessionData.metadata?.only_order_bump === 'true';
+    const orderBumpIncluded = sessionData.metadata?.order_bump_included === 'true' || isOnlyOrderBump ? 1 : 0;
     let userId = `usr_${sessionId.slice(-10)}`;
     let userRole = 'student';
+    let hasActiveCourse = true;
 
     if (env.DB && email) {
       try {
@@ -119,18 +118,34 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
             .run();
         }
 
-        await env.DB.prepare(
-          `INSERT OR IGNORE INTO enrollments (
-             id, user_id, course_id, stripe_session_id, status, order_bump_included, granted_at, expires_at
-           ) VALUES (?, ?, 'kurs-glowny-happybirth', ?, 'active', ?, datetime('now'), datetime('now', '+548 days'))`
-        )
-          .bind(crypto.randomUUID(), userId, sessionId, orderBumpIncluded)
-          .run();
-
-        if (orderBumpIncluded) {
-          await env.DB.prepare('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?')
+        if (isOnlyOrderBump) {
+          const activeEnr = await env.DB.prepare(
+            `SELECT id FROM enrollments WHERE user_id = ? AND status = 'active' LIMIT 1`
+          )
             .bind(userId)
+            .first();
+          hasActiveCourse = Boolean(activeEnr?.id);
+          if (hasActiveCourse) {
+            await env.DB.prepare(
+              `UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ? AND status = 'active'`
+            )
+              .bind(userId)
+              .run();
+          }
+        } else {
+          await env.DB.prepare(
+            `INSERT OR IGNORE INTO enrollments (
+               id, user_id, course_id, stripe_session_id, status, order_bump_included, granted_at, expires_at
+             ) VALUES (?, ?, 'kurs-glowny-happybirth', ?, 'active', ?, datetime('now'), datetime('now', '+548 days'))`
+          )
+            .bind(crypto.randomUUID(), userId, sessionId, orderBumpIncluded)
             .run();
+
+          if (orderBumpIncluded) {
+            await env.DB.prepare('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?')
+              .bind(userId)
+              .run();
+          }
         }
       } catch (e) {
         console.error('Błąd zapisu verify-session w D1:', e);
@@ -159,15 +174,19 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         success: true,
         paid: true,
         email,
+        hasActiveCourse,
         orderBumpIncluded: Boolean(orderBumpIncluded),
         expiresInDays: 548,
-        message: 'Płatność zweryfikowana w Stripe. Dostęp na 18 miesięcy (548 dni) został aktywowany.',
+        message: isOnlyOrderBump
+          ? 'Płatność za Pakiet Kart dla Taty (+49 zł) zweryfikowana.'
+          : 'Płatność zweryfikowana w Stripe. Dostęp na 18 miesięcy (548 dni) został aktywowany.',
       }),
       {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
           'Set-Cookie': formatSessionSetCookie(signedCookieToken, host),
+          ...buildEdgeCorsHeaders(request, 'GET, OPTIONS'),
         },
       }
     );

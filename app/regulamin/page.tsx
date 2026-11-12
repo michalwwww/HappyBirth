@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ShieldCheck, FileText } from 'lucide-react';
 import { PageShell, Okruszki } from '@/components/site/page-shell';
+import { OPERATOR_LEGAL_DATA } from '@/lib/legal-shield';
 
 /**
  * [A5] + [E1] + [E2] Ujednolicony Regulamin Świadczenia Usług i Sprzedaży Kursu Online:
@@ -56,11 +57,16 @@ export default function RegulaminPage() {
               </p>
               <p>Kapitał zakładowy: 5 000,00 PLN (opłacony w całości)</p>
               <p>
-                Adres poczty elektronicznej (e-mail): <strong>kontakt@happybirth.pl</strong>
+                Adres poczty elektronicznej (e-mail): <strong>{OPERATOR_LEGAL_DATA.contactEmail}</strong>
               </p>
               <p>
-                Adres e-mail ds. reklamacji i obsługi kursantek: <strong>pomoc@happybirth.pl</strong>
+                Adres e-mail ds. reklamacji i obsługi kursantek: <strong>{OPERATOR_LEGAL_DATA.supportEmail}</strong>
               </p>
+              {OPERATOR_LEGAL_DATA.contactPhone.trim() ? (
+                <p>
+                  Telefon kontaktowy: <strong>{OPERATOR_LEGAL_DATA.contactPhone.trim()}</strong>
+                </p>
+              ) : null}
             </div>
             <p>
               2. Niniejszy Regulamin skierowany jest zarówno do Konsumentów, Przedsiębiorców na prawach konsumenta, jak i Przedsiębiorców korzystających z Serwisu.
@@ -83,7 +89,7 @@ export default function RegulaminPage() {
                 <strong>Kurs / Treść Cyfrowa</strong> – kompleksowy program szkoły rodzenia online nagrany z położnymi i ekspertkami ze szkoły rodzenia Mama Gaja (od 2012 r.), obejmujący <strong>52 lekcje wideo 4K (288 minut / ~5h) w 8 modułach tematycznych (podzielonych na 4 etapy fizjologiczne)</strong> oraz Notatnik Rodzica PDF i checklisty.
               </li>
               <li>
-                <strong>Dodatek Komplementarny (Order Bump)</strong> – opcjonalny pakiet dodatkowy dostępny w koszyku za <strong>+49,00 zł brutto</strong> (Indywidualny Pakiet Dokumentów Szpitalnych i Kreator Planu Porodu + Checklista Wyprawkowa PDF).
+                <strong>Dodatek Komplementarny (Order Bump)</strong> – opcjonalny pakiet dodatkowy dostępny w koszyku za <strong>+49,00 zł brutto</strong> (Pakiet Kart Sytuacyjnych na Porodówkę dla Taty (PDF) — 4 karty krok po kroku na salę porodową, ucisk krzyżowy, matryca decyzyjna B.R.A.I.N., protokół siary oraz lista 3 reklamówek do szpitala).
               </li>
             </ul>
           </section>
@@ -184,7 +190,45 @@ export default function RegulaminPage() {
               § 7. Reklamacje i Wsparcie Techniczne
             </h2>
             <p>
-              1. Reklamacje dotyczące działania Platformy należy kierować na adres e-mail: <strong>pomoc@happybirth.pl</strong>. Usługodawca rozpatruje reklamację w terminie do 14 dni kalendarzowych.
+              1. Reklamacje dotyczące działania Platformy lub jakości treści cyfrowych należy kierować na adres e-mail: <strong>pomoc@happybirth.pl</strong>. Usługodawca rozpatruje reklamację i udziela odpowiedzi na trwałym nośniku w terminie do 14 dni kalendarzowych od dnia jej otrzymania (art. 7a u.p.k.).
+            </p>
+          </section>
+
+          {/* § 7a */}
+          <section className="space-y-3">
+            <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[color:var(--hb-ink)]">
+              § 7a. Zgodność Treści Cyfrowych z Umową i Aktualizacje (Art. 43a–43q u.p.k.)
+            </h2>
+            <p>
+              1. Usługodawca odpowiada za zgodność dostarczanych Treści Cyfrowych (kursu wideo VOD oraz materiałów PDF) z Umową w momencie ich dostarczenia oraz przez cały 18-miesięczny (548 dni) okres dostarczania usługi na zasadach określonych w rozdziale 5b ustawy z dnia 30 maja 2014 r. o prawach konsumenta (art. 43h–43q u.p.k.).
+            </p>
+            <p>
+              2. W okresie trwania dostępu Usługodawca zapewnia niezbędne aktualizacje techniczne i merytoryczne (w tym aktualizacje dotyczące zmian w Rozporządzeniu Ministra Zdrowia w sprawie standardu organizacyjnego opieki okołoporodowej), o których Konsument informowany jest w Strefie Kursantki.
+            </p>
+            <p>
+              3. Jeżeli Treść Cyfrowa jest niezgodna z Umową, Konsument może żądać doprowadzenia jej do zgodności z Umową, a w przypadkach wskazanych w art. 43n u.p.k. (m.in. gdy doprowadzenie do zgodności jest niemożliwe lub nie nastąpiło w rozsądnym czasie) — złożyć oświadczenie o obniżeniu ceny albo odstąpieniu od umowy.
+            </p>
+          </section>
+
+          {/* § 7b */}
+          <section className="space-y-3">
+            <h2 className="font-brand-display font-bold text-xl sm:text-2xl text-[color:var(--hb-ink)]">
+              § 7b. Pozasądowe Rozwiązywanie Sporów Konsumenckich (ADR — Art. 12 ust. 1 pkt 21 u.p.k.)
+            </h2>
+            <p>
+              1. Konsument posiada możliwość skorzystania z pozasądowych sposobów rozpatrywania reklamacji i dochodzenia roszczeń, w tym zwrócenia się do stałego polubownego sądu konsumenckiego działającego przy Inspekcji Handlowej, złożenia wniosku o wszczęcie postępowania mediacyjnego do wojewódzkiego inspektora Inspekcji Handlowej lub skorzystania z bezpłatnej pomocy powiatowego (miejskiego) rzecznika konsumentów.
+            </p>
+            <p>
+              2. Szczegółowe informacje na temat pozasądowych sposobów rozpatrywania sporów oraz wykaz podmiotów uprawnionych dostępne są na stronie Urzędu Ochrony Konkurencji i Konsumentów pod adresem:{' '}
+              <a
+                href="https://polubowne.uokik.gov.pl"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[color:var(--hb-mag-t)] underline"
+              >
+                https://polubowne.uokik.gov.pl
+              </a>
+              .
             </p>
           </section>
 

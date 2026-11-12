@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { getSession } from '@/lib/auth';
 import { d1All, d1First, d1Run } from '@/lib/d1';
-import { generateSmartPartnerCodeCandidates } from '@/lib/brand-codes';
+import { generateSmartPartnerCodeCandidates, isOfficialSemanticPromo } from '@/lib/brand-codes';
 
 export const runtime = 'nodejs';
 
@@ -34,6 +34,21 @@ async function ensureLocalAffiliateTables() {
         paid_at TEXT
       )`
     );
+    const alterCols = [
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier1_status TEXT DEFAULT 'PENDING'`,
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier1_payout_id TEXT`,
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier2_status TEXT DEFAULT 'PENDING'`,
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier2_payout_id TEXT`,
+    ];
+    for (const stmt of alterCols) {
+      await d1Run(stmt).catch(() => {});
+    }
+    await d1Run(
+      `UPDATE affiliate_commissions
+       SET tier1_status = COALESCE(NULLIF(tier1_status, ''), status, 'PENDING'),
+           tier2_status = CASE WHEN broker_id IS NOT NULL THEN COALESCE(NULLIF(tier2_status, ''), status, 'PENDING') ELSE NULL END
+       WHERE tier1_status IS NULL OR (broker_id IS NOT NULL AND tier2_status IS NULL)`
+    ).catch(() => {});
   } catch {
     // Ignore
   }
@@ -53,15 +68,18 @@ export async function GET(req: NextRequest) {
   try {
     const validateCode = (req.nextUrl.searchParams.get('validate_code') || '').trim().toUpperCase();
     if (validateCode) {
-      const aff = await d1First<any>(
-        "SELECT id FROM affiliates WHERE UPPER(promo_code) = ? AND status = 'active' LIMIT 1",
-        [validateCode]
-      );
-      const usr = await d1First<any>(
-        "SELECT id FROM users WHERE UPPER(referral_code) = ? LIMIT 1",
-        [validateCode]
-      );
-      const valid = Boolean(aff?.id || usr?.id);
+      let valid = isOfficialSemanticPromo(validateCode);
+      if (!valid) {
+        const aff = await d1First<any>(
+          "SELECT id FROM affiliates WHERE (UPPER(promo_code) = ? OR UPPER(ref_slug) = ?) AND status = 'active' LIMIT 1",
+          [validateCode, validateCode]
+        );
+        const usr = await d1First<any>(
+          "SELECT id FROM users WHERE UPPER(referral_code) = ? LIMIT 1",
+          [validateCode]
+        );
+        valid = Boolean(aff?.id || usr?.id);
+      }
       return NextResponse.json({ valid, code: validateCode, discountPercent: valid ? 10 : 0 });
     }
     const session = await getSession();
@@ -178,13 +196,33 @@ export async function GET(req: NextRequest) {
       [affiliate.id]
     );
 
+    try {
+      await d1Run(
+        `UPDATE affiliate_commissions
+         SET status = CASE WHEN status = 'PENDING' THEN 'ELIGIBLE' ELSE status END,
+             tier1_status = CASE WHEN COALESCE(tier1_status, status) = 'PENDING' THEN 'ELIGIBLE' ELSE COALESCE(tier1_status, status) END,
+             tier2_status = CASE WHEN broker_id IS NOT NULL AND COALESCE(tier2_status, status) = 'PENDING' THEN 'ELIGIBLE' ELSE tier2_status END
+         WHERE (affiliate_id = ? OR broker_id = ?)
+           AND status != 'CANCELLED'
+           AND first_content_accessed_at IS NOT NULL
+           AND eligible_at IS NOT NULL
+           AND datetime(eligible_at) <= datetime('now')
+           AND (status = 'PENDING' OR tier1_status = 'PENDING' OR tier2_status = 'PENDING')`,
+        [affiliate.id, affiliate.id]
+      );
+    } catch {
+      // Non-fatal
+    }
+
     const rawComms = await d1All<any>(
       `SELECT * FROM affiliate_commissions WHERE affiliate_id = ? OR broker_id = ? ORDER BY created_at DESC LIMIT 100`,
       [affiliate.id, affiliate.id]
     );
 
+    const nowMs = Date.now();
     let eligibleMinor = 0;
     let pendingMinor = 0;
+    let processingMinor = 0;
     let paidMinor = 0;
     let directSalesCount = 0;
     let brokerSalesCount = 0;
@@ -194,13 +232,27 @@ export async function GET(req: NextRequest) {
       const commMinor = isDirect
         ? Number(row.tier1_commission_gross || 0)
         : Number(row.tier2_commission_gross || 0);
-      if (row.status !== 'CANCELLED') {
+      let effectiveStatus = isDirect
+        ? String(row.tier1_status || row.status || 'PENDING')
+        : String(row.tier2_status || row.status || 'PENDING');
+
+      if (row.status === 'CANCELLED') {
+        effectiveStatus = 'CANCELLED';
+      } else if (effectiveStatus === 'ELIGIBLE' && row.eligible_at) {
+        const eligMs = Date.parse(String(row.eligible_at).replace(' ', 'T') + (String(row.eligible_at).includes('T') || String(row.eligible_at).endsWith('Z') ? '' : 'Z'));
+        if (!Number.isNaN(eligMs) && eligMs > nowMs) {
+          effectiveStatus = 'PENDING';
+        }
+      }
+
+      if (effectiveStatus !== 'CANCELLED') {
         if (isDirect) directSalesCount += 1;
         else brokerSalesCount += 1;
       }
-      if (row.status === 'ELIGIBLE') eligibleMinor += commMinor;
-      else if (row.status === 'PENDING') pendingMinor += commMinor;
-      else if (row.status === 'PAID') paidMinor += commMinor;
+      if (effectiveStatus === 'ELIGIBLE') eligibleMinor += commMinor;
+      else if (effectiveStatus === 'PENDING') pendingMinor += commMinor;
+      else if (effectiveStatus === 'PROCESSING') processingMinor += commMinor;
+      else if (effectiveStatus === 'PAID') paidMinor += commMinor;
 
       return {
         id: row.id,
@@ -210,7 +262,7 @@ export async function GET(req: NextRequest) {
         paidAmountGrossMinor: Number(row.paid_amount_gross || 44010),
         commissionGrossMinor: commMinor,
         ratePercent: isDirect ? Math.round(Number(row.tier1_rate || 0.2) * 100) : 5,
-        status: row.status || 'PENDING',
+        status: effectiveStatus,
         createdAt: row.created_at,
       };
     });
@@ -253,8 +305,9 @@ export async function GET(req: NextRequest) {
       stats: {
         eligibleMinor,
         pendingMinor,
+        processingMinor,
         paidMinor,
-        totalEarnedMinor: eligibleMinor + pendingMinor + paidMinor,
+        totalEarnedMinor: eligibleMinor + pendingMinor + processingMinor + paidMinor,
         directSalesCount,
         brokerSalesCount,
         subAffiliatesCount: subAffRows.length,
@@ -347,6 +400,92 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Dane rozliczeniowe zostały zapisane.',
+      });
+    }
+
+    if (action === 'request_payout') {
+      const settingsRow = await d1First<any>(
+        `SELECT settlement_type, legal_name, nip, iban FROM affiliate_settings WHERE affiliate_id = ?`,
+        [affiliate.id]
+      );
+      const iban = String(body.iban || settingsRow?.iban || '').replace(/\s+/g, '').toUpperCase().trim();
+      const legalName = String(body.legalName || settingsRow?.legal_name || affiliate.full_name || '').trim();
+      const settlementType = body.settlementType || settingsRow?.settlement_type || 'private_person';
+      const nip = String(body.nip || settingsRow?.nip || '').trim();
+      const invoiceNumber = String(body.invoiceNumber || '').trim() || null;
+
+      if (!iban || iban.length < 15 || !legalName) {
+        return NextResponse.json(
+          { error: 'Uzupełnij imię i nazwisko / nazwę firmy oraz poprawny numer konta IBAN.' },
+          { status: 400 }
+        );
+      }
+
+      const tier1Rows = await d1All<any>(
+        `SELECT id, tier1_commission_gross
+         FROM affiliate_commissions
+         WHERE affiliate_id = ?
+           AND status != 'CANCELLED'
+           AND COALESCE(tier1_status, status) = 'ELIGIBLE'
+           AND (eligible_at IS NULL OR datetime(eligible_at) <= datetime('now'))`,
+        [affiliate.id]
+      );
+      const tier2Rows = await d1All<any>(
+        `SELECT id, tier2_commission_gross
+         FROM affiliate_commissions
+         WHERE broker_id = ?
+           AND status != 'CANCELLED'
+           AND COALESCE(tier2_status, status) = 'ELIGIBLE'
+           AND (eligible_at IS NULL OR datetime(eligible_at) <= datetime('now'))`,
+        [affiliate.id]
+      );
+
+      let totalEligibleMinor = 0;
+      for (const r of tier1Rows) totalEligibleMinor += Number(r.tier1_commission_gross || 0);
+      for (const r of tier2Rows) totalEligibleMinor += Number(r.tier2_commission_gross || 0);
+
+      if (totalEligibleMinor <= 0) {
+        return NextResponse.json(
+          { error: 'Brak zatwierdzonych środków (ELIGIBLE po 7-dniowym buforze) do wypłaty.' },
+          { status: 400 }
+        );
+      }
+
+      const payoutId = `pay_${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+      await d1Run(
+        `INSERT INTO affiliate_payouts (id, affiliate_id, amount_gross_minor, settlement_type, legal_name, nip, iban, invoice_number, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PROCESSING')`,
+        [payoutId, affiliate.id, totalEligibleMinor, settlementType, legalName, nip || null, iban, invoiceNumber]
+      );
+
+      if (tier1Rows.length > 0) {
+        await d1Run(
+          `UPDATE affiliate_commissions
+           SET tier1_status = 'PROCESSING', tier1_payout_id = ?
+           WHERE affiliate_id = ?
+             AND status != 'CANCELLED'
+             AND COALESCE(tier1_status, status) = 'ELIGIBLE'
+             AND (eligible_at IS NULL OR datetime(eligible_at) <= datetime('now'))`,
+          [payoutId, affiliate.id]
+        );
+      }
+      if (tier2Rows.length > 0) {
+        await d1Run(
+          `UPDATE affiliate_commissions
+           SET tier2_status = 'PROCESSING', tier2_payout_id = ?
+           WHERE broker_id = ?
+             AND status != 'CANCELLED'
+             AND COALESCE(tier2_status, status) = 'ELIGIBLE'
+             AND (eligible_at IS NULL OR datetime(eligible_at) <= datetime('now'))`,
+          [payoutId, affiliate.id]
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        payoutId,
+        amountGrossMinor: totalEligibleMinor,
+        message: `Zlecenie wypłaty (${payoutId}) zostało przekazane do realizacji.`,
       });
     }
 

@@ -401,7 +401,19 @@ export function generateSmartPartnerCodeCandidates(
 }
 
 /**
- * Sprawdza, czy kod pasuje do naszego systemu semantycznych kodów partnerskich (-10%)
+ * Sprawdza, czy kod należy do oficjalnych, wbudowanych kodów flagowych marki (-10%).
+ * Uwaga: imienne kody partnerów/ambasadorów (np. SPOKOJ-KASIA) muszą być weryfikowane w bazie D1,
+ * a nie na podstawie samego prefiksu po stronie klienta.
+ */
+export function isOfficialSemanticPromo(rawCode: string): boolean {
+  const clean = (rawCode || '').trim().toUpperCase();
+  if (!clean || clean.length < 4 || clean.length > 26) return false;
+  return OFFICIAL_SEMANTIC_CODES.has(clean);
+}
+
+/**
+ * Sprawdza format kodu partnerskiego (używane do walidacji składni w panelu partnera przy wyborze kodu,
+ * NIE jako dowód przyznania rabatu — przyznanie rabatu zawsze weryfikujemy w D1 lub OFFICIAL_SEMANTIC_CODES).
  */
 export function isSemanticAffiliateCodePattern(rawCode: string): boolean {
   const clean = (rawCode || '').trim().toUpperCase();
@@ -415,11 +427,6 @@ export function isSemanticAffiliateCodePattern(rawCode: string): boolean {
     if (clean.startsWith(`${prefix}-`) && clean.length >= prefix.length + 3) {
       return true;
     }
-  }
-
-  // Kompatybilność wsteczna dla wcześniejszych kodów zakończonych na "10" (np. KOWALSKA10, ANNA-10)
-  if (/^[A-Z0-9]{2,14}-[A-Z0-9]{2,10}10$/.test(clean) || /^[A-Z]{3,14}10$/.test(clean)) {
-    return true;
   }
 
   return false;

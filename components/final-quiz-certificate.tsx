@@ -151,6 +151,7 @@ export function FinalQuizAndCertificate() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fullName: fullName.trim(),
+          answers,
           correctAnswers: correctCount,
           totalQuestions: FINAL_QUIZ_QUESTIONS.length,
         }),

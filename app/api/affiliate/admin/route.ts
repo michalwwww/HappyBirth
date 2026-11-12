@@ -99,18 +99,20 @@ export async function GET() {
       const t1 = Number(c.tier1_commission_gross || 0);
       const t2 = Number(c.tier2_commission_gross || 0);
       const paidGross = Number(c.paid_amount_gross || 0);
-      const st = String(c.status || 'PENDING');
+      const rowCancelled = String(c.status || 'PENDING') === 'CANCELLED';
+      const t1St = rowCancelled ? 'CANCELLED' : String(c.tier1_status || c.status || 'PENDING');
+      const t2St = rowCancelled ? 'CANCELLED' : String(c.tier2_status || c.status || 'PENDING');
 
-      if (st !== 'CANCELLED') {
+      if (!rowCancelled) {
         totalOrdersCount += 1;
         totalRevenueMinor += paidGross;
       }
 
-      if (st === 'ELIGIBLE') totalCommissionsEligibleMinor += t1 + t2;
-      else if (st === 'PENDING') totalCommissionsPendingMinor += t1 + t2;
-      else if (st === 'PAID') totalCommissionsPaidMinor += t1 + t2;
-
       if (affId) {
+        if (t1St === 'ELIGIBLE') totalCommissionsEligibleMinor += t1;
+        else if (t1St === 'PENDING' || t1St === 'PROCESSING') totalCommissionsPendingMinor += t1;
+        else if (t1St === 'PAID') totalCommissionsPaidMinor += t1;
+
         const cur = perAffiliateStats.get(affId) || {
           directSalesCount: 0,
           brokerSalesCount: 0,
@@ -119,15 +121,19 @@ export async function GET() {
           paidMinor: 0,
           totalEarnedMinor: 0,
         };
-        if (st !== 'CANCELLED') cur.directSalesCount += 1;
-        if (st === 'ELIGIBLE') cur.eligibleMinor += t1;
-        else if (st === 'PENDING') cur.pendingMinor += t1;
-        else if (st === 'PAID') cur.paidMinor += t1;
+        if (t1St !== 'CANCELLED') cur.directSalesCount += 1;
+        if (t1St === 'ELIGIBLE') cur.eligibleMinor += t1;
+        else if (t1St === 'PENDING') cur.pendingMinor += t1;
+        else if (t1St === 'PAID') cur.paidMinor += t1;
         cur.totalEarnedMinor = cur.eligibleMinor + cur.pendingMinor + cur.paidMinor;
         perAffiliateStats.set(affId, cur);
       }
 
       if (brokId && t2 > 0) {
+        if (t2St === 'ELIGIBLE') totalCommissionsEligibleMinor += t2;
+        else if (t2St === 'PENDING' || t2St === 'PROCESSING') totalCommissionsPendingMinor += t2;
+        else if (t2St === 'PAID') totalCommissionsPaidMinor += t2;
+
         const curB = perAffiliateStats.get(brokId) || {
           directSalesCount: 0,
           brokerSalesCount: 0,
@@ -136,10 +142,10 @@ export async function GET() {
           paidMinor: 0,
           totalEarnedMinor: 0,
         };
-        if (st !== 'CANCELLED') curB.brokerSalesCount += 1;
-        if (st === 'ELIGIBLE') curB.eligibleMinor += t2;
-        else if (st === 'PENDING') curB.pendingMinor += t2;
-        else if (st === 'PAID') curB.paidMinor += t2;
+        if (t2St !== 'CANCELLED') curB.brokerSalesCount += 1;
+        if (t2St === 'ELIGIBLE') curB.eligibleMinor += t2;
+        else if (t2St === 'PENDING') curB.pendingMinor += t2;
+        else if (t2St === 'PAID') curB.paidMinor += t2;
         curB.totalEarnedMinor = curB.eligibleMinor + curB.pendingMinor + curB.paidMinor;
         perAffiliateStats.set(brokId, curB);
       }
@@ -367,9 +373,35 @@ export async function POST(req: NextRequest) {
 
     if (action === 'mark_payout_paid') {
       const payoutId = String(body.payoutId || '').trim();
-      await d1Run(`UPDATE affiliate_payouts SET status = 'PAID', paid_at = datetime('now') WHERE id = ?`, [
+      const row = await d1First<any>(`SELECT status FROM affiliate_payouts WHERE id = ?`, [payoutId]);
+      if (!row) {
+        return NextResponse.json({ error: 'Nie znaleziono wypłaty.' }, { status: 404 });
+      }
+      if (row.status !== 'PROCESSING') {
+        return NextResponse.json(
+          { error: `Wypłata ma już status ${row.status}.` },
+          { status: 400 }
+        );
+      }
+      await d1Run(`UPDATE affiliate_payouts SET status = 'PAID', paid_at = datetime('now') WHERE id = ? AND status = 'PROCESSING'`, [
         payoutId,
       ]);
+      await d1Run(
+        `UPDATE affiliate_commissions
+         SET tier1_status = 'PAID',
+             paid_at = COALESCE(paid_at, datetime('now')),
+             status = CASE WHEN broker_id IS NULL OR tier2_status = 'PAID' THEN 'PAID' ELSE status END
+         WHERE tier1_payout_id = ?`,
+        [payoutId]
+      );
+      await d1Run(
+        `UPDATE affiliate_commissions
+         SET tier2_status = 'PAID',
+             paid_at = COALESCE(paid_at, datetime('now')),
+             status = CASE WHEN tier1_status = 'PAID' THEN 'PAID' ELSE status END
+         WHERE tier2_payout_id = ?`,
+        [payoutId]
+      );
       return NextResponse.json({
         success: true,
         message: `Wypłata ${payoutId} została oznaczona jako WYPŁACONA.`,
@@ -378,14 +410,30 @@ export async function POST(req: NextRequest) {
 
     if (action === 'reject_payout') {
       const payoutId = String(body.payoutId || '').trim();
-      const row = await d1First<any>(`SELECT affiliate_id FROM affiliate_payouts WHERE id = ?`, [payoutId]);
-      await d1Run(`UPDATE affiliate_payouts SET status = 'REJECTED' WHERE id = ?`, [payoutId]);
-      if (row?.affiliate_id) {
-        await d1Run(
-          `UPDATE affiliate_commissions SET status = 'ELIGIBLE', paid_at = NULL WHERE (affiliate_id = ? OR broker_id = ?) AND status = 'PAID'`,
-          [row.affiliate_id, row.affiliate_id]
+      const row = await d1First<any>(`SELECT affiliate_id, status FROM affiliate_payouts WHERE id = ?`, [payoutId]);
+      if (!row) {
+        return NextResponse.json({ error: 'Nie znaleziono wypłaty.' }, { status: 404 });
+      }
+      if (row.status !== 'PROCESSING') {
+        return NextResponse.json(
+          { error: `Można odrzucić wyłącznie wypłatę ze statusem PROCESSING (obecny: ${row.status}).` },
+          { status: 400 }
         );
       }
+      await d1Run(`UPDATE affiliate_payouts SET status = 'REJECTED' WHERE id = ? AND status = 'PROCESSING'`, [payoutId]);
+      await d1Run(
+        `UPDATE affiliate_commissions
+         SET tier1_status = 'ELIGIBLE', tier1_payout_id = NULL,
+             status = CASE WHEN status = 'CANCELLED' THEN 'CANCELLED' ELSE 'ELIGIBLE' END
+         WHERE tier1_payout_id = ?`,
+        [payoutId]
+      );
+      await d1Run(
+        `UPDATE affiliate_commissions
+         SET tier2_status = 'ELIGIBLE', tier2_payout_id = NULL
+         WHERE tier2_payout_id = ?`,
+        [payoutId]
+      );
       return NextResponse.json({
         success: true,
         message: `Zlecenie wypłaty ${payoutId} zostało odrzucone, a środki wróciły na saldo ELIGIBLE.`,
@@ -490,7 +538,19 @@ export async function POST(req: NextRequest) {
     if (action === 'update_commission_status') {
       const commissionId = String(body.commissionId || '').trim();
       const newStatus = String(body.newStatus || '').trim().toUpperCase();
-      await d1Run(`UPDATE affiliate_commissions SET status = ? WHERE id = ?`, [newStatus, commissionId]);
+      if (!commissionId || !['PENDING', 'ELIGIBLE', 'PAID', 'CANCELLED'].includes(newStatus)) {
+        return NextResponse.json({ error: 'Podaj poprawne ID prowizji oraz docelowy status.' }, { status: 400 });
+      }
+      await d1Run(
+        `UPDATE affiliate_commissions
+         SET status = ?,
+             tier1_status = ?,
+             tier2_status = CASE WHEN broker_id IS NOT NULL THEN ? ELSE tier2_status END,
+             eligible_at = CASE WHEN ? = 'ELIGIBLE' THEN datetime('now') ELSE eligible_at END,
+             paid_at = CASE WHEN ? = 'PAID' THEN COALESCE(paid_at, datetime('now')) ELSE paid_at END
+         WHERE id = ?`,
+        [newStatus, newStatus, newStatus, newStatus, newStatus, commissionId]
+      );
       return NextResponse.json({
         success: true,
         message: `Status prowizji ${commissionId} zmieniony na ${newStatus}.`,

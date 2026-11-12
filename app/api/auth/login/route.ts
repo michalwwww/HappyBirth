@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { d1First, d1Run } from '@/lib/d1';
+import { checkRateLimitNodeD1, extractNodeClientIp } from '@/lib/security';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = extractNodeClientIp(req);
+    const allowed = await checkRateLimitNodeD1(`auth_login:${clientIp}`, 6, 15);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Zbyt wiele prób logowania. Odczekaj kilka minut i spróbuj ponownie.' },
+        { status: 429 }
+      );
+    }
+
     const { email } = await req.json();
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {

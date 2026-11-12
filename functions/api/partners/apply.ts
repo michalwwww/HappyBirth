@@ -2,6 +2,10 @@ import {
   createSignedSessionToken,
   formatSessionSetCookie,
   resolveEdgeSessionSecret,
+  buildEdgeCorsHeaders,
+  escapeHtml,
+  checkRateLimitD1,
+  extractClientIp,
 } from '../../_shared/session';
 import { generateSmartPartnerCodeCandidates } from '../../../lib/brand-codes';
 
@@ -12,20 +16,26 @@ interface Env {
   RESEND_FROM?: string;
 }
 
-export async function onRequestOptions(): Promise<Response> {
+export async function onRequestOptions(context: { request: Request }): Promise<Response> {
   return new Response(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
+    headers: buildEdgeCorsHeaders(context.request, 'POST, OPTIONS'),
   });
 }
 
 export async function onRequestPost(context: { request: Request; env: Env }): Promise<Response> {
   try {
     const { request, env } = context;
+    const clientIp = extractClientIp(request);
+    if (env.DB) {
+      const allowed = await checkRateLimitD1(env.DB, `partners_apply:${clientIp}`, 8, 15);
+      if (!allowed) {
+        return new Response(
+          JSON.stringify({ error: 'Zbyt wiele zgłoszeń w krótkim czasie. Spróbuj ponownie za kilka minut.' }),
+          { status: 429, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
     const host = request.headers.get('host');
     const body: any = await request.json().catch(() => ({}));
     const fullName = (body.fullName || body.contactName || '').trim();
@@ -42,7 +52,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const profileUrl = (body.profileUrl || body.websiteOrSocial || '').trim() || null;
     const message = (body.message || '').trim() || null;
     const brokerRef = (body.brokerRef || '').trim() || null;
-    const rodoConsent = body.rodoConsent === false ? 0 : 1;
+    const rodoConsent = body.rodoConsent === true ? 1 : 0;
 
     if (!fullName || !email || !email.includes('@') || !rodoConsent) {
       return new Response(
@@ -191,6 +201,16 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     // Powiadomienie e-mail do Partnera oraz do Zespołu KLARSOLUTIONS Sp. z o.o.
     if (env.RESEND_API_KEY) {
       const fromAddress = env.RESEND_FROM || 'Program Partnerski HappyBirth <kontakt@happybirth.pl>';
+      const safeFullName = escapeHtml(fullName);
+      const safeEmail = escapeHtml(email);
+      const safePromoCode = escapeHtml(promoCode || '');
+      const safeRefSlug = escapeHtml(refSlug || '');
+      const safeCompany = escapeHtml(companyOrBrand || '-');
+      const safePhone = escapeHtml(phone || '-');
+      const safeRoleOrArea = escapeHtml(roleOrArea);
+      const safeProfileUrl = escapeHtml(profileUrl || '-');
+      const safeMessage = escapeHtml(message || '-');
+
       await Promise.allSettled([
         fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -207,11 +227,11 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
                 : 'Potwierdzenie zgłoszenia współpracy B2B — HappyBirth.pl',
             html: `
               <div style="font-family: sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px;">
-                <h2 style="margin-top: 0; color: #20071E;">Witamy w Programie Partnerskim, ${fullName}!</h2>
+                <h2 style="margin-top: 0; color: #20071E;">Witamy w Programie Partnerskim, ${safeFullName}!</h2>
                 ${
                   channel === 'afiliacja'
                     ? `<p style="font-size: 14px; color: #544A44; line-height: 1.6;">Twoje konto w Programie Afiliacyjnym HappyBirth zostało aktywowane (stawka prowizji: <strong>${Math.round(tier1Rate * 100)}%</strong> + 5% Broker Override).</p>
-                       <p style="font-size: 14px; color: #544A44; line-height: 1.6;">Twój semantyczny kod rabatowy (-10% dla przyszłych rodziców): <strong>${promoCode}</strong><br/>Twój krótki link polecający: <strong>https://happybirth.pl/poleca/${refSlug}</strong><br/>Link z kodem w koszyku: <strong>https://happybirth.pl/?kod=${promoCode}</strong></p>
+                       <p style="font-size: 14px; color: #544A44; line-height: 1.6;">Twój semantyczny kod rabatowy (-10% dla przyszłych rodziców): <strong>${safePromoCode}</strong><br/>Twój krótki link polecający: <strong>https://happybirth.pl/poleca/${safeRefSlug}</strong><br/>Link z kodem w koszyku: <strong>https://happybirth.pl/?kod=${safePromoCode}</strong></p>
                        <div style="margin: 20px 0;">
                          <a href="https://afiliacja.happybirth.pl" style="background: #DA0271; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 9999px; font-weight: bold; font-size: 13px; display: inline-block;">Otwórz Kokpit Biznesowy Partnera &rarr;</a>
                        </div>`
@@ -234,15 +254,15 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             subject: `[Nowe zgłoszenie ${channel.toUpperCase()}] ${fullName} (${email})`,
             html: `
               <div style="font-family: sans-serif; font-size: 13px; color: #1A1512;">
-                <h3>Nowe zgłoszenie partnerskie (${channel})</h3>
-                <p><strong>Imię i nazwisko:</strong> ${fullName}</p>
-                <p><strong>E-mail:</strong> ${email}</p>
-                <p><strong>Firma / Gabinet:</strong> ${companyOrBrand || '-'}</p>
-                <p><strong>Telefon:</strong> ${phone || '-'}</p>
-                <p><strong>Specjalizacja / Obszar:</strong> ${roleOrArea}</p>
-                <p><strong>Profil / WWW:</strong> ${profileUrl || '-'}</p>
-                <p><strong>Kod afiliacyjny:</strong> ${promoCode || '-'}</p>
-                <p><strong>Wiadomość:</strong> ${message || '-'}</p>
+                <h3>Nowe zgłoszenie partnerskie (${escapeHtml(channel)})</h3>
+                <p><strong>Imię i nazwisko:</strong> ${safeFullName}</p>
+                <p><strong>E-mail:</strong> ${safeEmail}</p>
+                <p><strong>Firma / Gabinet:</strong> ${safeCompany}</p>
+                <p><strong>Telefon:</strong> ${safePhone}</p>
+                <p><strong>Specjalizacja / Obszar:</strong> ${safeRoleOrArea}</p>
+                <p><strong>Profil / WWW:</strong> ${safeProfileUrl}</p>
+                <p><strong>Kod afiliacyjny:</strong> ${safePromoCode || '-'}</p>
+                <p><strong>Wiadomość:</strong> ${safeMessage}</p>
               </div>
             `,
           }),

@@ -10,6 +10,7 @@ interface PagesContext {
   request: Request;
   next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
   env: {
+    DB?: any;
     SESSION_SECRET?: string;
     ASSETS: {
       fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
@@ -17,13 +18,23 @@ interface PagesContext {
   };
 }
 
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
+]);
+
 const AFFILIATE_COOKIE_MAX_AGE = 30 * 24 * 60 * 60; // 30 dni
 const AD_BOT_REGEX = /Facebot|facebookexternalhit|Meta-ExternalAgent|AdsBot-Google|Mediapartners-Google|Bytespider|TikTok/i;
 const FREE_PREVIEW_LESSONS = new Set(['lekcja-01', 'lekcja-06', 'lekcja-26', 'lekcja-40']);
 
 function withSecurityAndTrackingHeaders(
   response: Response,
-  options: { refParam?: string | null; noIndex?: boolean }
+  options: { refParam?: string | null; noIndex?: boolean; allowAffiliateCookie?: boolean }
 ): Response {
   const newHeaders = new Headers(response.headers);
 
@@ -38,7 +49,11 @@ function withSecurityAndTrackingHeaders(
     newHeaders.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
   }
 
-  if (options.refParam && /^[a-zA-Z0-9_-]{2,40}$/.test(options.refParam)) {
+  if (
+    options.allowAffiliateCookie !== false &&
+    options.refParam &&
+    /^[a-zA-Z0-9_-]{2,40}$/.test(options.refParam)
+  ) {
     newHeaders.append(
       'Set-Cookie',
       `hb_aff_ref=${encodeURIComponent(options.refParam.trim())}; Max-Age=${AFFILIATE_COOKIE_MAX_AGE}; Path=/; HttpOnly; Secure; SameSite=Lax`
@@ -79,6 +94,8 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   const url = new URL(context.request.url);
   const host = (context.request.headers.get('host') || '').toLowerCase();
   const userAgent = context.request.headers.get('user-agent') || '';
+  const cookieHeader = context.request.headers.get('cookie') || '';
+  const allowAffiliateCookie = !/(?:^|;\s*)hb_cookie_consent=essential(?:;|$)/.test(cookieHeader);
   const refParam =
     url.searchParams.get('ref') ||
     url.searchParams.get('poleca') ||
@@ -89,11 +106,97 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   // Znormalizowana ścieżka bez przyrostków eksportu statycznego Next.js (.html / .txt RSC)
   const cleanPath = (url.pathname.replace(/\.(html|txt)$/i, '') || '/').replace(/\/+$/, '') || '/';
 
-  // 1. Przepuść bez zmian wyłącznie prawdziwe zasoby statyczne (CSS/JS/obrazy/fonty), arkusze /materialy/*, SEO/GEO txt oraz endpointy API
+  // 0. DRM Gate dla płatnych materiałów HTML w /materialy/*
+  if (url.pathname.startsWith('/materialy/')) {
+    const lowerMatPath = url.pathname.toLowerCase();
+
+    if (lowerMatPath === '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html') {
+      const session = await getEdgeSession(context.request, context.env);
+      let authorized = false;
+      if (session?.email) {
+        const cleanEmail = session.email.trim().toLowerCase();
+        if (TEAM_WHITELIST_EMAILS.has(cleanEmail)) {
+          authorized = true;
+        } else if (context.env.DB) {
+          try {
+            const row = await context.env.DB.prepare(
+              `SELECT e.id
+               FROM enrollments e
+               LEFT JOIN users u ON u.id = e.user_id
+               WHERE (e.user_id = ? OR LOWER(u.email) = ?)
+                 AND e.status = 'active'
+                 AND (e.expires_at IS NULL OR datetime(e.expires_at) > datetime('now'))
+                 AND e.order_bump_included = 1
+               LIMIT 1`
+            )
+              .bind(session.userId, cleanEmail)
+              .first();
+            authorized = Boolean(row?.id);
+          } catch {
+            authorized = false;
+          }
+        }
+      }
+      if (!authorized) {
+        return new Response(
+          `<!DOCTYPE html><html lang="pl"><head><meta charset="utf-8"/><meta name="robots" content="noindex,nofollow"/><title>Brak dostępu · HappyBirth.pl</title></head><body style="font-family:sans-serif;background:#FBF8F4;color:#1A1512;padding:48px 20px;text-align:center;"><h2>Materiał wyłącznie dla posiadaczy Pakietu Kart Sytuacyjnych dla Taty</h2><p style="color:#544A44;max-width:480px;margin:12px auto 24px;">Zaloguj się do Strefy Kursantki na koncie z aktywnym Order Bumpem (+49 zł), aby pobrać karty.</p><a href="https://strefa.happybirth.pl/partner" style="display:inline-block;background:#DA0271;color:#fff;padding:12px 24px;border-radius:999px;text-decoration:none;font-weight:bold;">Przejdź do Strefy Partnera →</a></body></html>`,
+          {
+            status: 403,
+            headers: {
+              'Content-Type': 'text/html; charset=utf-8',
+              'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+              'Cache-Control': 'no-store',
+            },
+          }
+        );
+      }
+    }
+
+    if (lowerMatPath === '/materialy/szybkie-i-odzywcze-obiady-15-min-happybirth.html') {
+      const session = await getEdgeSession(context.request, context.env);
+      let unlocked = false;
+      if (session?.email) {
+        const cleanEmail = session.email.trim().toLowerCase();
+        if (TEAM_WHITELIST_EMAILS.has(cleanEmail)) {
+          unlocked = true;
+        } else if (context.env.DB) {
+          try {
+            const refRow = await context.env.DB.prepare(
+              `SELECT sr.id
+               FROM student_referrals sr
+               LEFT JOIN users u ON u.id = sr.referrer_user_id
+               WHERE (sr.referrer_user_id = ? OR LOWER(u.email) = ?)
+                 AND sr.reward_unlocked = 1
+               LIMIT 1`
+            )
+              .bind(session.userId, cleanEmail)
+              .first();
+            unlocked = Boolean(refRow?.id);
+          } catch {
+            unlocked = false;
+          }
+        }
+      }
+      if (!unlocked) {
+        return new Response(null, {
+          status: 302,
+          headers: {
+            Location: `${url.origin}/materialy/podglad-obiady-15-min-happybirth.html`,
+            'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+            'Cache-Control': 'no-store',
+          },
+        });
+      }
+    }
+
+    const res = await context.next();
+    return withSecurityAndTrackingHeaders(res, { noIndex: true, allowAffiliateCookie });
+  }
+
+  // 1. Przepuść bez zmian wyłącznie prawdziwe zasoby statyczne (CSS/JS/obrazy/fonty), SEO/GEO txt oraz endpointy API
   if (
     url.pathname.startsWith('/api') ||
     url.pathname.startsWith('/_next') ||
-    url.pathname.startsWith('/materialy') ||
     url.pathname.startsWith('/favicon') ||
     url.pathname === '/robots.txt' ||
     url.pathname === '/llms.txt' ||
@@ -101,7 +204,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     STATIC_ASSET_EXT_REGEX.test(url.pathname)
   ) {
     const res = await context.next();
-    return withSecurityAndTrackingHeaders(res, { noIndex: false });
+    return withSecurityAndTrackingHeaders(res, { noIndex: false, allowAffiliateCookie });
   }
 
   // 2. SUBDOMENA B2B: partnerzy.happybirth.pl (wyłącznie strona B2B na root '/', zero podstron /afiliacja lub /strefa)
@@ -120,7 +223,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       const targetUrl = new URL(url.toString());
       targetUrl.pathname = url.pathname.endsWith('.txt') ? '/partnerzy.txt' : '/partnerzy';
       const res = await context.env.ASSETS.fetch(targetUrl);
-      return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
+      return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true, allowAffiliateCookie });
     }
     return notFoundResponse();
   }
@@ -141,7 +244,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       const targetUrl = new URL(url.toString());
       targetUrl.pathname = url.pathname.endsWith('.txt') ? '/afiliacja.txt' : '/afiliacja';
       const res = await context.env.ASSETS.fetch(targetUrl);
-      return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
+      return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true, allowAffiliateCookie });
     }
     return notFoundResponse();
   }
@@ -204,7 +307,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
         Location: `${redirectTarget.origin}/?kod=${encodeURIComponent(upperCode)}&poleca=${encodeURIComponent(lowerSlug)}#cena`,
       },
     });
-    return withSecurityAndTrackingHeaders(redirectRes, { refParam: lowerSlug, noIndex: true });
+    return withSecurityAndTrackingHeaders(redirectRes, { refParam: lowerSlug, noIndex: true, allowAffiliateCookie });
   }
 
   //    Twarda separacja: podstrony /afiliacja, /partnerzy, /marketing, /challenge NIE ISTNIEJĄ na domenie głównej (404 Not Found).
@@ -261,9 +364,9 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       return withSecurityAndTrackingHeaders(res, { noIndex: true });
     }
     const res = await context.next();
-    return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true });
+    return withSecurityAndTrackingHeaders(res, { refParam, noIndex: true, allowAffiliateCookie });
   }
 
   const res = await context.next();
-  return withSecurityAndTrackingHeaders(res, { refParam, noIndex: false });
+  return withSecurityAndTrackingHeaders(res, { refParam, noIndex: false, allowAffiliateCookie });
 }

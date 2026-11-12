@@ -5,6 +5,29 @@ interface Env {
   SESSION_SECRET?: string;
 }
 
+const QUIZ_ANSWER_KEY: Record<string, number> = {
+  '1': 0,
+  '2': 1,
+  '3': 1,
+  '4': 0,
+  '5': 1,
+  '6': 0,
+  '7': 0,
+  '8': 1,
+  '9': 0,
+  '10': 1,
+};
+
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
+]);
+
 export async function onRequestGet(context: { request: Request; env: Env }): Promise<Response> {
   const { request, env } = context;
   const session = await getEdgeSession(request, env);
@@ -58,17 +81,56 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
   try {
     const { request, env } = context;
     const session = await getEdgeSession(request, env);
+    if (!session?.userId || !session?.email) {
+      return new Response(
+        JSON.stringify({
+          passed: false,
+          error: 'Zaloguj się do Strefy Kursantki, aby wygenerować imienny certyfikat.',
+        }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const cleanEmail = session.email.trim().toLowerCase();
+    const isTeam = TEAM_WHITELIST_EMAILS.has(cleanEmail);
+    let effectiveUserId = session.userId;
+
+    if (env.DB) {
+      const userByEmail = await env.DB.prepare('SELECT id FROM users WHERE LOWER(email) = ? LIMIT 1')
+        .bind(cleanEmail)
+        .first()
+        .catch(() => null);
+      if (userByEmail?.id) effectiveUserId = userByEmail.id;
+
+      if (!isTeam) {
+        const activeEnroll = await env.DB.prepare(
+          `SELECT id FROM enrollments
+           WHERE user_id = ?
+             AND status = 'active'
+             AND (expires_at IS NULL OR datetime(expires_at) > datetime('now'))
+           LIMIT 1`
+        )
+          .bind(effectiveUserId)
+          .first()
+          .catch(() => null);
+
+        if (!activeEnroll?.id) {
+          return new Response(
+            JSON.stringify({
+              passed: false,
+              error: 'Certyfikat ukończenia jest dostępny wyłącznie dla kursantek z aktywnym dostępem do kursu.',
+            }),
+            { status: 403, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+    }
+
     const body: any = await request.json().catch(() => ({}));
-    const fullName = (body.fullName || '').trim();
-    const totalQuestions = Number(body.totalQuestions || 10);
-    const correctAnswers =
-      typeof body.correctAnswers === 'number'
-        ? Number(body.correctAnswers)
-        : Math.round((Number(body.scorePercent || 0) / 100) * totalQuestions);
-    const scorePercent =
-      typeof body.scorePercent === 'number'
-        ? Number(body.scorePercent)
-        : Math.round((correctAnswers / Math.max(1, totalQuestions)) * 100);
+    const fullName = String(body.fullName || '')
+      .replace(/[<>]/g, '')
+      .trim()
+      .slice(0, 120);
 
     if (!fullName || fullName.length < 2) {
       return new Response(
@@ -79,6 +141,26 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
+
+    const submittedAnswers = body.answers;
+    if (!submittedAnswers || typeof submittedAnswers !== 'object' || Array.isArray(submittedAnswers)) {
+      return new Response(
+        JSON.stringify({
+          passed: false,
+          error: 'Brak odpowiedzi z testu końcowego do weryfikacji.',
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const totalQuestions = 10;
+    let correctAnswers = 0;
+    for (const [qId, expectedIdx] of Object.entries(QUIZ_ANSWER_KEY)) {
+      if (Number(submittedAnswers[qId]) === expectedIdx) {
+        correctAnswers += 1;
+      }
+    }
+    const scorePercent = Math.round((correctAnswers / totalQuestions) * 100);
 
     if (scorePercent < 80) {
       return new Response(
@@ -99,43 +181,16 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
 
     if (env.DB) {
       try {
-        let effectiveUserId = session?.userId || null;
-        if (effectiveUserId) {
-          const existingUser = await env.DB.prepare('SELECT id FROM users WHERE id = ?')
-            .bind(effectiveUserId)
-            .first();
-          if (!existingUser) {
-            effectiveUserId = null;
-          }
-        }
-        if (!effectiveUserId && session?.email) {
-          const byEmail = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
-            .bind(session.email)
-            .first();
-          if (byEmail?.id) {
-            effectiveUserId = byEmail.id;
-          }
-        }
-        if (!effectiveUserId) {
-          // Upewnij się, że techniczny rekord użytkownika istnieje, aby zachować spójność klucza obcego w D1
-          effectiveUserId = 'usr_cert_guest';
-          await env.DB.prepare(
-            `INSERT OR IGNORE INTO users (id, email, full_name, role)
-             VALUES ('usr_cert_guest', 'certyfikat@happybirth.pl', ?, 'student')`
-          )
-            .bind(fullName)
-            .run();
-        }
-
         await env.DB.prepare(
-          `INSERT INTO certificates (id, certificate_number, user_id, full_name, quiz_score, correct_answers, issued_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`
+          `INSERT INTO certificates (id, certificate_number, user_id, full_name, email, quiz_score, correct_answers, issued_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
         )
           .bind(
             crypto.randomUUID(),
             certificateNumber,
             effectiveUserId,
             fullName,
+            cleanEmail,
             scorePercent,
             correctAnswers,
             issuedAt

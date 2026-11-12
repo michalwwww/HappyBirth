@@ -3,10 +3,11 @@ import {
   createSignedSessionToken,
   formatSessionSetCookie,
   resolveEdgeSessionSecret,
+  escapeHtml,
 } from '../../_shared/session';
 import {
   generateSmartPartnerCodeCandidates,
-  isSemanticAffiliateCodePattern,
+  isOfficialSemanticPromo,
 } from '../../../lib/brand-codes';
 
 interface Env {
@@ -60,6 +61,25 @@ async function ensureAffiliateTables(db: any) {
         )`
       )
       .run();
+
+    const alterCols = [
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier1_status TEXT DEFAULT 'PENDING'`,
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier1_payout_id TEXT`,
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier2_status TEXT DEFAULT 'PENDING'`,
+      `ALTER TABLE affiliate_commissions ADD COLUMN tier2_payout_id TEXT`,
+    ];
+    for (const stmt of alterCols) {
+      await db.prepare(stmt).run().catch(() => {});
+    }
+    await db
+      .prepare(
+        `UPDATE affiliate_commissions
+         SET tier1_status = COALESCE(NULLIF(tier1_status, ''), status, 'PENDING'),
+             tier2_status = CASE WHEN broker_id IS NOT NULL THEN COALESCE(NULLIF(tier2_status, ''), status, 'PENDING') ELSE NULL END
+         WHERE tier1_status IS NULL OR (broker_id IS NOT NULL AND tier2_status IS NULL)`
+      )
+      .run()
+      .catch(() => {});
   } catch {
     // Table creation best-effort
   }
@@ -263,7 +283,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
     const host = request.headers.get('host');
     const validateCode = (url.searchParams.get('validate_code') || '').trim().toUpperCase();
     if (validateCode) {
-      let valid = isSemanticAffiliateCodePattern(validateCode) || /^MAMA-[A-Z0-9-]{2,16}$/.test(validateCode);
+      let valid = isOfficialSemanticPromo(validateCode);
       if (!valid && env.DB) {
         try {
           const aff = await env.DB.prepare(
@@ -416,26 +436,20 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       );
     }
 
-    // [D2a] Automatyczna aktualizacja statusu prowizji z PENDING -> ELIGIBLE,
-    // gdy klientka rozpoczęła korzystanie z kursu (wygaszenie prawa odstąpienia z Art. 38 ust. 1 pkt 13 u.p.k.)
+    // [D2a] Automatyczna aktualizacja statusu prowizji z PENDING -> ELIGIBLE
+    // Dopiero po upływie 7-dniowego bufora od pierwszego dostępu do płatnej treści (eligible_at <= now)
     try {
       await env.DB.prepare(
         `UPDATE affiliate_commissions
-         SET status = 'ELIGIBLE',
-             eligible_at = COALESCE(eligible_at, datetime('now'))
+         SET status = CASE WHEN status = 'PENDING' THEN 'ELIGIBLE' ELSE status END,
+             tier1_status = CASE WHEN COALESCE(tier1_status, status) = 'PENDING' THEN 'ELIGIBLE' ELSE COALESCE(tier1_status, status) END,
+             tier2_status = CASE WHEN broker_id IS NOT NULL AND COALESCE(tier2_status, status) = 'PENDING' THEN 'ELIGIBLE' ELSE tier2_status END
          WHERE (affiliate_id = ? OR broker_id = ?)
-           AND status = 'PENDING'
-           AND (
-             first_content_accessed_at IS NOT NULL
-             OR stripe_session_id IN (
-               SELECT stripe_session_id FROM orders
-               WHERE first_content_accessed_at IS NOT NULL AND status = 'paid'
-             )
-             OR stripe_session_id IN (
-               SELECT stripe_session_id FROM enrollments
-               WHERE first_content_accessed_at IS NOT NULL AND status = 'active'
-             )
-           )`
+           AND status != 'CANCELLED'
+           AND first_content_accessed_at IS NOT NULL
+           AND eligible_at IS NOT NULL
+           AND datetime(eligible_at) <= datetime('now')
+           AND (status = 'PENDING' OR tier1_status = 'PENDING' OR tier2_status = 'PENDING')`
       )
         .bind(affiliate.id, affiliate.id)
         .run();
@@ -457,7 +471,8 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       `SELECT id, order_id, stripe_session_id, affiliate_id, broker_id,
               attribution_source, paid_amount_gross, tier1_rate,
               tier1_commission_gross, tier2_commission_gross,
-              status, first_content_accessed_at, eligible_at, paid_at, created_at
+              status, tier1_status, tier1_payout_id, tier2_status, tier2_payout_id,
+              first_content_accessed_at, eligible_at, paid_at, created_at
        FROM affiliate_commissions
        WHERE affiliate_id = ? OR broker_id = ?
        ORDER BY created_at DESC
@@ -468,9 +483,11 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       .catch(() => ({ results: [] }));
 
     const rawComms: any[] = commRowsResult?.results || [];
+    const nowMs = Date.now();
 
     let eligibleMinor = 0;
     let pendingMinor = 0;
+    let processingMinor = 0;
     let paidMinor = 0;
     let directSalesCount = 0;
     let brokerSalesCount = 0;
@@ -481,14 +498,28 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         ? Number(row.tier1_commission_gross || 0)
         : Number(row.tier2_commission_gross || 0);
 
-      if (row.status !== 'CANCELLED') {
+      let effectiveStatus = isDirect
+        ? String(row.tier1_status || row.status || 'PENDING')
+        : String(row.tier2_status || row.status || 'PENDING');
+
+      if (row.status === 'CANCELLED') {
+        effectiveStatus = 'CANCELLED';
+      } else if (effectiveStatus === 'ELIGIBLE' && row.eligible_at) {
+        const eligMs = Date.parse(String(row.eligible_at).replace(' ', 'T') + (String(row.eligible_at).includes('T') || String(row.eligible_at).endsWith('Z') ? '' : 'Z'));
+        if (!Number.isNaN(eligMs) && eligMs > nowMs) {
+          effectiveStatus = 'PENDING';
+        }
+      }
+
+      if (effectiveStatus !== 'CANCELLED') {
         if (isDirect) directSalesCount += 1;
         else brokerSalesCount += 1;
       }
 
-      if (row.status === 'ELIGIBLE') eligibleMinor += commMinor;
-      else if (row.status === 'PENDING') pendingMinor += commMinor;
-      else if (row.status === 'PAID') paidMinor += commMinor;
+      if (effectiveStatus === 'ELIGIBLE') eligibleMinor += commMinor;
+      else if (effectiveStatus === 'PENDING') pendingMinor += commMinor;
+      else if (effectiveStatus === 'PROCESSING') processingMinor += commMinor;
+      else if (effectiveStatus === 'PAID') paidMinor += commMinor;
 
       const tail = String(row.stripe_session_id || row.order_id || '0000')
         .slice(-4)
@@ -502,7 +533,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         paidAmountGrossMinor: Number(row.paid_amount_gross || 44010),
         commissionGrossMinor: commMinor,
         ratePercent: isDirect ? Math.round(Number(row.tier1_rate || 0.2) * 100) : 5,
-        status: row.status || 'PENDING',
+        status: effectiveStatus,
         createdAt: row.created_at,
         eligibleAt: row.eligible_at,
         paidAt: row.paid_at,
@@ -608,8 +639,9 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         stats: {
           eligibleMinor,
           pendingMinor,
+          processingMinor,
           paidMinor,
-          totalEarnedMinor: eligibleMinor + pendingMinor + paidMinor,
+          totalEarnedMinor: eligibleMinor + pendingMinor + processingMinor + paidMinor,
           directSalesCount,
           brokerSalesCount,
           subAffiliatesCount: subAffiliates.length,
@@ -856,27 +888,42 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         );
       }
 
-      const commRowsResult = await env.DB.prepare(
-        `SELECT id, affiliate_id, broker_id, tier1_commission_gross, tier2_commission_gross
+      const tier1RowsRes = await env.DB.prepare(
+        `SELECT id, tier1_commission_gross
          FROM affiliate_commissions
-         WHERE (affiliate_id = ? OR broker_id = ?) AND status = 'ELIGIBLE'`
+         WHERE affiliate_id = ?
+           AND status != 'CANCELLED'
+           AND COALESCE(tier1_status, status) = 'ELIGIBLE'
+           AND (eligible_at IS NULL OR datetime(eligible_at) <= datetime('now'))`
       )
-        .bind(affiliate.id, affiliate.id)
+        .bind(affiliate.id)
         .all();
 
-      const eligibleRows: any[] = commRowsResult?.results || [];
+      const tier2RowsRes = await env.DB.prepare(
+        `SELECT id, tier2_commission_gross
+         FROM affiliate_commissions
+         WHERE broker_id = ?
+           AND status != 'CANCELLED'
+           AND COALESCE(tier2_status, status) = 'ELIGIBLE'
+           AND (eligible_at IS NULL OR datetime(eligible_at) <= datetime('now'))`
+      )
+        .bind(affiliate.id)
+        .all();
+
+      const tier1Rows: any[] = tier1RowsRes?.results || [];
+      const tier2Rows: any[] = tier2RowsRes?.results || [];
       let totalEligibleMinor = 0;
-      for (const r of eligibleRows) {
-        totalEligibleMinor +=
-          r.affiliate_id === affiliate.id
-            ? Number(r.tier1_commission_gross || 0)
-            : Number(r.tier2_commission_gross || 0);
+      for (const r of tier1Rows) {
+        totalEligibleMinor += Number(r.tier1_commission_gross || 0);
+      }
+      for (const r of tier2Rows) {
+        totalEligibleMinor += Number(r.tier2_commission_gross || 0);
       }
 
       if (totalEligibleMinor <= 0) {
         return new Response(
           JSON.stringify({
-            error: 'Brak zatwierdzonych środków (ELIGIBLE) dostępnych obecnie do wypłaty.',
+            error: 'Brak zatwierdzonych środków (ELIGIBLE po 7-dniowym buforze) dostępnych obecnie do wypłaty.',
           }),
           { status: 400, headers: { 'Content-Type': 'application/json' } }
         );
@@ -901,15 +948,42 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         )
         .run();
 
-      await env.DB.prepare(
-        `UPDATE affiliate_commissions
-         SET status = 'PAID', paid_at = datetime('now')
-         WHERE (affiliate_id = ? OR broker_id = ?) AND status = 'ELIGIBLE'`
-      )
-        .bind(affiliate.id, affiliate.id)
-        .run();
+      if (tier1Rows.length > 0) {
+        await env.DB.prepare(
+          `UPDATE affiliate_commissions
+           SET tier1_status = 'PROCESSING',
+               tier1_payout_id = ?
+           WHERE affiliate_id = ?
+             AND status != 'CANCELLED'
+             AND COALESCE(tier1_status, status) = 'ELIGIBLE'
+             AND (eligible_at IS NULL OR datetime(eligible_at) <= datetime('now'))`
+        )
+          .bind(payoutId, affiliate.id)
+          .run();
+      }
+
+      if (tier2Rows.length > 0) {
+        await env.DB.prepare(
+          `UPDATE affiliate_commissions
+           SET tier2_status = 'PROCESSING',
+               tier2_payout_id = ?
+           WHERE broker_id = ?
+             AND status != 'CANCELLED'
+             AND COALESCE(tier2_status, status) = 'ELIGIBLE'
+             AND (eligible_at IS NULL OR datetime(eligible_at) <= datetime('now'))`
+        )
+          .bind(payoutId, affiliate.id)
+          .run();
+      }
 
       const formattedPln = `${(totalEligibleMinor / 100).toFixed(2).replace('.', ',')} zł`;
+      const safeLegalName = escapeHtml(legalName);
+      const safeEmail = escapeHtml(affiliate.email);
+      const safeSettlement = escapeHtml(settlementType);
+      const safeNip = escapeHtml(nip || '-');
+      const safeInvoice = escapeHtml(invoiceNumber || '-');
+      const safeIban = escapeHtml(iban);
+      const safeIbanMasked = escapeHtml(`${iban.slice(0, 6)}...${iban.slice(-4)}`);
 
       if (env.RESEND_API_KEY) {
         const fromAddress = env.RESEND_FROM || 'Program Partnerski HappyBirth <kontakt@happybirth.pl>';
@@ -928,7 +1002,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
                 <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px; color: #1A1512;">
                   <h2 style="margin-top: 0; color: #20071E;">Zlecenie wypłaty przyjęte (${payoutId})</h2>
                   <p style="font-size: 14px; color: #544A44; line-height: 1.6;">
-                    Przyjęliśmy Twoje dyspozycję wypłaty prowizji partnerskiej w kwocie <strong>${formattedPln}</strong> na rachunek <strong>${iban.slice(0, 6)}...${iban.slice(-4)}</strong>.
+                    Przyjęliśmy Twoją dyspozycję wypłaty prowizji partnerskiej w kwocie <strong>${formattedPln}</strong> na rachunek <strong>${safeIbanMasked}</strong>.
                   </p>
                   <p style="font-size: 12px; color: #867A72;">Dział rozliczeń KLARSOLUTIONS Sp. z o.o. realizuje przelewy w ciągu 3–5 dni roboczych.</p>
                 </div>
@@ -948,12 +1022,12 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
               html: `
                 <div style="font-family: sans-serif; font-size: 13px; color: #1A1512;">
                   <h3>Nowe zlecenie wypłaty prowizji (${payoutId})</h3>
-                  <p><strong>Partner:</strong> ${legalName} (${affiliate.email})</p>
+                  <p><strong>Partner:</strong> ${safeLegalName} (${safeEmail})</p>
                   <p><strong>Kwota brutto:</strong> ${formattedPln}</p>
-                  <p><strong>Typ rozliczenia:</strong> ${settlementType}</p>
-                  <p><strong>NIP:</strong> ${nip || '-'}</p>
-                  <p><strong>Nr faktury/rachunku:</strong> ${invoiceNumber || '-'}</p>
-                  <p><strong>IBAN:</strong> ${iban}</p>
+                  <p><strong>Typ rozliczenia:</strong> ${safeSettlement}</p>
+                  <p><strong>NIP:</strong> ${safeNip}</p>
+                  <p><strong>Nr faktury/rachunku:</strong> ${safeInvoice}</p>
+                  <p><strong>IBAN:</strong> ${safeIban}</p>
                 </div>
               `,
             }),

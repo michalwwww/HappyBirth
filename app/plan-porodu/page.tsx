@@ -61,7 +61,7 @@ const STERILE_BIRTH_PLAN_SECTIONS = [
 export default function PublicPlanPoroduLeadPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [rodoConsent, setRodoConsent] = useState(true);
+  const [rodoConsent, setRodoConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -81,6 +81,10 @@ export default function PublicPlanPoroduLeadPage() {
 
     if (!email || !email.includes('@')) {
       setErrorMsg('Wprowadź prawidłowy adres e-mail.');
+      return;
+    }
+    if (!rodoConsent) {
+      setErrorMsg('Zaznacz wymaganą zgodę RODO, aby wygenerować i otrzymać Plan Porodu PDF.');
       return;
     }
 
@@ -116,7 +120,7 @@ export default function PublicPlanPoroduLeadPage() {
       }
     } catch (err) {
       console.error('Błąd zapisu leada:', err);
-      setUnlocked(true);
+      setErrorMsg('Wystąpił błąd połączenia. Spróbuj ponownie za chwilę.');
     } finally {
       setLoading(false);
     }

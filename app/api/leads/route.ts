@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { d1First, d1Run } from '@/lib/d1';
+import {
+  checkRateLimitNodeD1,
+  escapeHtml,
+  extractNodeClientIp,
+  signUnsubscribeTokenNode,
+} from '@/lib/security';
 
 export const runtime = 'nodejs';
 
@@ -11,12 +17,12 @@ interface CrmSequenceEmail {
   scheduledAt?: string;
 }
 
-function buildEmailFooter(): string {
+function buildEmailFooter(unsubscribeUrl: string): string {
   return `
     <p style="font-size: 11.5px; color: #867A72; text-align: center; margin-top: 24px; line-height: 1.5;">
       KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań · KRS: 0001268396 · NIP: 7812118273 · REGON: 545782779<br/>
       Otrzymujesz tę wiadomość, ponieważ pobrałaś materiały edukacyjne na HappyBirth.pl.<br/>
-      <a href="mailto:kontakt@happybirth.pl?subject=Wypisz" style="color: #867A72; text-decoration: underline;">Wypisz się z poradnika e-mail (1 kliknięcie)</a> · <a href="https://happybirth.pl/polityka-prywatnosci" style="color: #867A72; text-decoration: underline;">Polityka prywatności RODO</a>
+      <a href="${unsubscribeUrl}" style="color: #867A72; text-decoration: underline;">Wypisz się jednym kliknięciem</a> · <a href="https://happybirth.pl/polityka-prywatnosci" style="color: #867A72; text-decoration: underline;">Polityka prywatności RODO</a>
     </p>
   `;
 }
@@ -25,15 +31,17 @@ function buildEmailFooter(): string {
  * [F4] 4-mailowa sekwencja edukacyjno-sprzedażowa CRM dopasowana do tygodnia ciąży (Etapy I–IV):
  * - Mail #1 (0h): Natychmiastowe dostarczenie narzędzia PDF + wskazówki do trymestru + 4 lekcje demo
  * - Mail #2 (+48h): 21 praw na porodówce 2026 (Dz.U. 2025 poz. 1525) i rola partnera
- * - Mail #3 (+96h): Pierwsze 72 godziny w domu z noworodkiem, laktacja bez bólu i kąpiel 37°C
+ * - Mail #3 (+96h): Pierwsze 72 godziny w domu z noworodkiem, spokojny start laktacji i kąpiel 37°C
  * - Mail #4 (+168h): Spokojne podsumowanie 52 lekcji 4K (489,00 zł brutto / 18 miesięcy dostępu)
  */
 function buildFourEmailCrmSequence(params: {
   name: string;
   gestationalWeek: number | null;
   toolSource: 'plan-porodu' | 'kalkulator-wyprawki';
+  unsubscribeUrl: string;
   nowMs?: number;
 }): CrmSequenceEmail[] {
+  const safeName = escapeHtml(params.name || 'Przyszła Mamo');
   const week = params.gestationalWeek || 20;
   const baseTime = params.nowMs ?? Date.now();
 
@@ -67,7 +75,7 @@ function buildFourEmailCrmSequence(params: {
   const mail1Html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 26px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px;">
       <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #DA0271; font-weight: 700;">${stageBadge}</span>
-      <h1 style="color: #1A1512; font-size: 22px; margin: 8px 0 12px 0;">Cześć ${params.name}! Twój dokument i wskazówki są gotowe</h1>
+      <h1 style="color: #1A1512; font-size: 22px; margin: 8px 0 12px 0;">Cześć ${safeName}! Twój dokument i wskazówki są gotowe</h1>
       <p style="font-size: 14px; line-height: 1.6; color: #544A44;">
         Dziękujemy za skorzystanie z bezpłatnego narzędzia <strong>${toolTitle}</strong> na HappyBirth.pl.
       </p>
@@ -85,14 +93,14 @@ function buildFourEmailCrmSequence(params: {
           </a>
         </div>
       </div>
-      ${buildEmailFooter()}
+      ${buildEmailFooter(params.unsubscribeUrl)}
     </div>
   `;
 
   const mail2Html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 26px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px;">
       <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #DA0271; font-weight: 700;">Poradnik Położnej · Część 2 z 4</span>
-      <h1 style="color: #1A1512; font-size: 21px; margin: 8px 0 12px 0;">${params.name}, poznaj swoje 21 praw na porodówce (Nowy Standard MZ 2026)</h1>
+      <h1 style="color: #1A1512; font-size: 21px; margin: 8px 0 12px 0;">${safeName}, poznaj swoje 21 praw na porodówce (Nowy Standard MZ 2026)</h1>
       <p style="font-size: 14px; line-height: 1.6; color: #544A44;">
         Od 7 maja 2026 r. w każdym szpitalu w Polsce wchodzi w życie nowy <strong>Standard Organizacyjny Opieki Okołoporodowej Ministra Zdrowia (Dz.U. 2025 poz. 1525)</strong>. Przygotowaliśmy dla Ciebie podsumowanie 3 zmian, o których warto wiedzieć przed porodem:
       </p>
@@ -106,7 +114,7 @@ function buildFourEmailCrmSequence(params: {
           Sprawdź wszystkie 21 praw w bazie /dla-ciebie &rarr;
         </a>
       </div>
-      ${buildEmailFooter()}
+      ${buildEmailFooter(params.unsubscribeUrl)}
     </div>
   `;
 
@@ -118,7 +126,7 @@ function buildFourEmailCrmSequence(params: {
         Większość szkół rodzenia kończy się na porodzie, a prawdziwe pytania zaczynają się pierwszą nocą w domu. Właśnie dlatego w HappyBirth.pl dajemy Wam aż <strong>18 miesięcy (548 dni) dostępu od zakupu</strong>:
       </p>
       <div style="background: #ffffff; border: 1px solid #EAE3DB; border-radius: 14px; padding: 18px; margin: 18px 0; font-size: 13.5px; color: #544A44; line-height: 1.6;">
-        <p style="margin-top: 0;"><strong>• Laktacja bez bólu (Lekcje 49–50):</strong> Asymetryczny chwyt brodawki, pozycja spod pachy po cięciu cesarskim i spokojne postępowanie w nawale pokarmowym w 3.–4. dobie.</p>
+        <p style="margin-top: 0;"><strong>• Spokojny start laktacji (Lekcje 49–50):</strong> Asymetryczny chwyt brodawki, wygodna pozycja spod pachy po cięciu cesarskim i spokojne postępowanie w nawale pokarmowym w 3.–4. dobie.</p>
         <p><strong>• Pierwsza kąpiel krok po kroku (Lekcja 44):</strong> Temperatura 37°C, pewny chwyt na przedramieniu i sucha pielęgnacja pępka bez alkoholu.</p>
         <p style="margin-bottom: 0;"><strong>• Pierwsza pomoc i bezpieczny sen (Lekcje 42–43):</strong> Praktyczny instruktaż na fantomie i zasady spokojnej nocy dla obojga rodziców.</p>
       </div>
@@ -127,14 +135,14 @@ function buildFourEmailCrmSequence(params: {
           Zobacz pełny program 52 lekcji wideo &rarr;
         </a>
       </div>
-      ${buildEmailFooter()}
+      ${buildEmailFooter(params.unsubscribeUrl)}
     </div>
   `;
 
   const mail4Html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 26px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px;">
       <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #DA0271; font-weight: 700;">Poradnik Położnej · Część 4 z 4</span>
-      <h1 style="color: #1A1512; font-size: 21px; margin: 8px 0 12px 0;">${params.name}, przygotujcie się do narodzin we własnym tempie (18 miesięcy dostępu)</h1>
+      <h1 style="color: #1A1512; font-size: 21px; margin: 8px 0 12px 0;">${safeName}, przygotujcie się do narodzin we własnym tempie (18 miesięcy dostępu)</h1>
       <p style="font-size: 14px; line-height: 1.6; color: #544A44;">
         Niezależnie od tego, na którym etapie ciąży jesteś dzisiaj, cały zespół położnych, fizjoterapeutek uroginekologicznych i doradczyń laktacyjnych ze szkoły <strong>Mama Gaja (od 2012 r.)</strong> jest gotowy towarzyszyć Wam przez kolejne 548 dni.
       </p>
@@ -154,7 +162,7 @@ function buildFourEmailCrmSequence(params: {
           Odbierz 18 miesięcy dostępu do kursu (489,00 zł) &rarr;
         </a>
       </div>
-      ${buildEmailFooter()}
+      ${buildEmailFooter(params.unsubscribeUrl)}
     </div>
   `;
 
@@ -193,7 +201,7 @@ export async function POST(req: NextRequest) {
       name,
       dueDate,
       gestationalWeek,
-      rodoConsent = true,
+      rodoConsent = false,
       toolSource = 'plan-porodu',
     } = body;
 
@@ -204,18 +212,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!rodoConsent) {
+    if (rodoConsent !== true) {
       return NextResponse.json(
         { error: 'Wymagana jest zgoda RODO na wygenerowanie i przesłanie materiałów edukacyjnych.' },
         { status: 400 }
       );
     }
 
+    const clientIp = extractNodeClientIp(req);
+    const allowed = await checkRateLimitNodeD1(`leads:${clientIp}`, 10, 15);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Zbyt wiele zgłoszeń w krótkim czasie. Spróbuj ponownie za kilkanaście minut.' },
+        { status: 429 }
+      );
+    }
+
     const cleanEmail = email.trim().toLowerCase();
-    const cleanName = typeof name === 'string' && name.trim() ? name.trim() : 'Przyszła Mamo';
+    const cleanName = typeof name === 'string' && name.trim() ? name.trim().slice(0, 80) : 'Przyszła Mamo';
     const cleanDueDate = typeof dueDate === 'string' && dueDate.trim() ? dueDate.trim() : null;
 
-    // Wylicz tydzień ciąży na podstawie dueDate lub podanego gestationalWeek ([F4])
     let computedWeek: number | null = typeof gestationalWeek === 'number' ? gestationalWeek : null;
     if (!computedWeek && cleanDueDate) {
       const dueTime = new Date(cleanDueDate).getTime();
@@ -225,41 +241,64 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const existingEnrollment = await d1First<{ id: string }>(
+      `SELECT e.id FROM enrollments e JOIN users u ON u.id = e.user_id
+       WHERE LOWER(u.email) = ? AND e.status = 'active' LIMIT 1`,
+      [cleanEmail]
+    ).catch(() => null);
+    const existingLead = await d1First<{ id: number; unsubscribed_at?: string | null }>(
+      `SELECT id, unsubscribed_at FROM leads WHERE LOWER(email) = ? ORDER BY id DESC LIMIT 1`,
+      [cleanEmail]
+    ).catch(() => null);
+
     const user = await d1First<{ id: string; email: string }>(
-      'SELECT id, email FROM users WHERE email = ?',
+      'SELECT id, email FROM users WHERE LOWER(email) = ? LIMIT 1',
       [cleanEmail]
     );
 
     let userId = user?.id;
-    let isNewLead = false;
+    let shouldScheduleCrmSequence = !existingEnrollment?.id && !existingLead?.id && !userId;
 
     if (!userId) {
       userId = crypto.randomUUID();
-      isNewLead = true;
       await d1Run(
         `INSERT INTO users (id, email, full_name, due_date, rodo_consent, marketing_consent, role)
-         VALUES (?, ?, ?, ?, 1, 1, 'lead')`,
-        [userId, cleanEmail, cleanName, cleanDueDate]
+         VALUES (?, ?, ?, ?, 1, ?, 'lead')`,
+        [userId, cleanEmail, cleanName, cleanDueDate, existingLead?.unsubscribed_at ? 0 : 1]
       );
-    } else if (cleanDueDate) {
-      await d1Run('UPDATE users SET due_date = COALESCE(due_date, ?) WHERE id = ?', [
-        cleanDueDate,
-        userId,
-      ]);
     }
+
+    await d1Run(
+      `INSERT INTO leads (email, first_name, due_date, pregnancy_week, source, rodo_consent, marketing_consent, ip_address, resend_scheduled_ids)
+       VALUES (?, ?, ?, ?, ?, 1, ?, ?, '[]')`,
+      [
+        cleanEmail,
+        cleanName,
+        cleanDueDate,
+        computedWeek,
+        toolSource === 'kalkulator-wyprawki' ? 'kalkulator_wyprawki' : 'plan_porodu_pdf',
+        existingLead?.unsubscribed_at ? 0 : 1,
+        clientIp,
+      ]
+    ).catch(() => null);
+
+    const sig = signUnsubscribeTokenNode(cleanEmail);
+    const unsubscribeUrl = `https://happybirth.pl/api/unsubscribe?email=${encodeURIComponent(cleanEmail)}&sig=${sig}`;
 
     const sequence = buildFourEmailCrmSequence({
       name: cleanName,
       gestationalWeek: computedWeek,
       toolSource: toolSource === 'kalkulator-wyprawki' ? 'kalkulator-wyprawki' : 'plan-porodu',
+      unsubscribeUrl,
     });
 
-    const emailsToSchedule = isNewLead ? sequence : [sequence[0]];
+    const emailsToSchedule = shouldScheduleCrmSequence ? sequence : [sequence[0]];
+    const scheduledIds: string[] = [];
 
     if (process.env.RESEND_API_KEY) {
       await Promise.allSettled(
-        emailsToSchedule.map((item) =>
-          fetch('https://api.resend.com/emails', {
+        emailsToSchedule.map(async (item) => {
+          const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
@@ -272,13 +311,23 @@ export async function POST(req: NextRequest) {
               html: item.html,
               ...(item.scheduledAt ? { scheduled_at: item.scheduledAt } : {}),
               headers: {
-                'List-Unsubscribe': '<mailto:kontakt@happybirth.pl?subject=Wypisz>, <https://happybirth.pl/polityka-prywatnosci>',
+                'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:kontakt@happybirth.pl?subject=unsubscribe>`,
                 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
               },
             }),
-          })
-        )
+          });
+          const data: any = await res.json().catch(() => null);
+          if (item.scheduledAt && data?.id) {
+            scheduledIds.push(String(data.id));
+          }
+        })
       );
+      if (scheduledIds.length > 0) {
+        await d1Run(
+          `UPDATE leads SET resend_scheduled_ids = ? WHERE id = (SELECT id FROM leads WHERE LOWER(email) = ? ORDER BY id DESC LIMIT 1)`,
+          [JSON.stringify(scheduledIds), cleanEmail]
+        ).catch(() => {});
+      }
     }
 
     return NextResponse.json({

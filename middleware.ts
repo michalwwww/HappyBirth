@@ -20,8 +20,14 @@ export function middleware(request: NextRequest) {
       res.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
     }
 
-    const refParam = url.searchParams.get('ref');
-    if (refParam && /^[a-zA-Z0-9_-]{2,40}$/.test(refParam)) {
+    const consentCookie = request.cookies.get('hb_cookie_consent')?.value;
+    const allowAffiliateCookie = consentCookie !== 'essential';
+    const refParam =
+      url.searchParams.get('ref') ||
+      url.searchParams.get('poleca') ||
+      url.searchParams.get('kod') ||
+      url.searchParams.get('promo');
+    if (allowAffiliateCookie && refParam && /^[a-zA-Z0-9_-]{2,40}$/.test(refParam)) {
       res.cookies.set(AFFILIATE_COOKIE_NAME, refParam.trim(), {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -54,11 +60,32 @@ export function middleware(request: NextRequest) {
   const STATIC_ASSET_EXT_REGEX =
     /\.(css|js|mjs|map|png|jpg|jpeg|gif|webp|avif|svg|ico|woff|woff2|ttf|otf|eot|mp4|webm|pdf|xml|json|webmanifest)$/i;
 
-  // 1. Bypass wyłącznie prawdziwych zasobów statycznych (CSS/JS/obrazy/fonty), arkuszy /materialy/*, SEO/GEO txt oraz API
+  // 0. DRM Gate dla płatnych materiałów /materialy/*
+  if (url.pathname.startsWith('/materialy/')) {
+    const lowerMatPath = url.pathname.toLowerCase();
+    const hasSessionCookie = Boolean(request.cookies.get('hb_session')?.value);
+    if (lowerMatPath === '/materialy/pakiet-kart-sytuacyjnych-dla-taty-happybirth.html' && !hasSessionCookie) {
+      return new NextResponse(
+        'Brak dostępu — ten materiał jest częścią Pakietu Kart Sytuacyjnych dla Taty. Zaloguj się do Strefy Kursantki.',
+        {
+          status: 403,
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+          },
+        }
+      );
+    }
+    if (lowerMatPath === '/materialy/szybkie-i-odzywcze-obiady-15-min-happybirth.html' && !hasSessionCookie) {
+      return NextResponse.redirect(`${url.origin}/materialy/podglad-obiady-15-min-happybirth.html`, 302);
+    }
+    return attachSecurityAndTracking(NextResponse.next(), true);
+  }
+
+  // 1. Bypass wyłącznie prawdziwych zasobów statycznych (CSS/JS/obrazy/fonty), SEO/GEO txt oraz API
   if (
     url.pathname.startsWith('/_next') ||
     url.pathname.startsWith('/api') ||
-    url.pathname.startsWith('/materialy') ||
     url.pathname.startsWith('/favicon') ||
     url.pathname === '/robots.txt' ||
     url.pathname === '/llms.txt' ||
@@ -191,6 +218,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/materialy/:path*',
     '/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)',
   ],
 };

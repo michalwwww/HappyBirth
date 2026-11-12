@@ -1,5 +1,7 @@
 import { getEdgeSession } from '../_shared/session';
 
+const FREE_PREVIEW_LESSONS = new Set(['lekcja-01', 'lekcja-06', 'lekcja-26', 'lekcja-40']);
+
 interface Env {
   DB?: any;
   SESSION_SECRET?: string;
@@ -98,16 +100,31 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
   try {
     const { request, env } = context;
     const session = await getEdgeSession(request, env);
+    if (!session?.userId) {
+      return new Response(JSON.stringify({ error: 'Wymagane zalogowanie.' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const body: any = await request.json().catch(() => ({}));
     const { lessonId, completed, positionSeconds, lastPositionSeconds } = body;
 
-    if (!session || !env.DB || !lessonId) {
+    if (!lessonId) {
+      return new Response(JSON.stringify({ error: 'Brak identyfikatora lekcji (lessonId).' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!env.DB) {
       return new Response(JSON.stringify({ success: true, saved: true, mode: 'local_fallback' }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
+    const cleanLessonId = String(lessonId).trim();
     const isCompleted = completed ? 1 : 0;
     const rawPos = typeof lastPositionSeconds === 'number' ? lastPositionSeconds : positionSeconds;
     const pos = typeof rawPos === 'number' ? Math.max(0, Math.floor(rawPos)) : 0;
@@ -120,36 +137,38 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
          last_position_seconds = CASE WHEN excluded.last_position_seconds > 0 THEN excluded.last_position_seconds ELSE lesson_progress.last_position_seconds END,
          updated_at = datetime('now')`
     )
-      .bind(crypto.randomUUID(), session.userId, String(lessonId), isCompleted, pos)
+      .bind(crypto.randomUUID(), session.userId, cleanLessonId, isCompleted, pos)
       .run();
 
-    // [C1] + [E1] + [D2a] Zapisz pierwsze otwarcie lekcji (wygaszenie prawa do odstąpienia Art. 38 pkt 13 + odblokowanie prowizji ELIGIBLE)
-    await env.DB.prepare(
-      `UPDATE enrollments
-       SET first_content_accessed_at = COALESCE(first_content_accessed_at, datetime('now'))
-       WHERE user_id = ?`
-    )
-      .bind(session.userId)
-      .run();
+    // [C1] + [E1] + [D2a] Wyłącznie płatne lekcje (>= 15 s lub ukończone) wygaszają prawo odstąpienia i uruchamiają 7-dniowy bufor prowizji (status pozostaje PENDING!)
+    const isPaidConsumption = !FREE_PREVIEW_LESSONS.has(cleanLessonId) && (pos >= 15 || isCompleted === 1);
+    if (isPaidConsumption) {
+      await env.DB.prepare(
+        `UPDATE enrollments
+         SET first_content_accessed_at = COALESCE(first_content_accessed_at, datetime('now'))
+         WHERE user_id = ?`
+      )
+        .bind(session.userId)
+        .run();
 
-    await env.DB.prepare(
-      `UPDATE orders
-       SET first_content_accessed_at = COALESCE(first_content_accessed_at, datetime('now'))
-       WHERE user_id = ? OR customer_email = ?`
-    )
-      .bind(session.userId, session.email)
-      .run();
+      await env.DB.prepare(
+        `UPDATE orders
+         SET first_content_accessed_at = COALESCE(first_content_accessed_at, datetime('now'))
+         WHERE user_id = ? OR LOWER(customer_email) = ?`
+      )
+        .bind(session.userId, session.email.toLowerCase())
+        .run();
 
-    await env.DB.prepare(
-      `UPDATE affiliate_commissions
-       SET status = 'ELIGIBLE',
-           first_content_accessed_at = COALESCE(first_content_accessed_at, datetime('now')),
-           eligible_at = COALESCE(eligible_at, datetime('now', '+7 days'))
-       WHERE status = 'PENDING'
-         AND order_id IN (SELECT id FROM orders WHERE user_id = ? OR customer_email = ?)`
-    )
-      .bind(session.userId, session.email)
-      .run();
+      await env.DB.prepare(
+        `UPDATE affiliate_commissions
+         SET first_content_accessed_at = COALESCE(first_content_accessed_at, datetime('now')),
+             eligible_at = COALESCE(eligible_at, datetime('now', '+7 days'))
+         WHERE status = 'PENDING'
+           AND order_id IN (SELECT id FROM orders WHERE user_id = ? OR LOWER(customer_email) = ?)`
+      )
+        .bind(session.userId, session.email.toLowerCase())
+        .run();
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
