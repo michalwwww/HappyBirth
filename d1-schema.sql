@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS orders (
     id TEXT PRIMARY KEY,
     order_number TEXT UNIQUE NOT NULL,
     stripe_session_id TEXT UNIQUE NOT NULL,
+    stripe_payment_intent TEXT,
     user_id TEXT,
     customer_email TEXT NOT NULL,
     customer_name TEXT,
@@ -89,6 +90,7 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE INDEX IF NOT EXISTS idx_orders_stripe_session ON orders(stripe_session_id);
 CREATE INDEX IF NOT EXISTS idx_orders_email ON orders(customer_email);
 CREATE INDEX IF NOT EXISTS idx_orders_number ON orders(order_number);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_intent ON orders(stripe_payment_intent);
 
 -- 4. ZGŁOSZENIA ODSTĄPIENIA OD UMOWY ([E2] Wymóg od 19.06.2026 r. zsynchronizowany z [E1])
 CREATE TABLE IF NOT EXISTS withdrawal_requests (

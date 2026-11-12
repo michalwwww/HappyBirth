@@ -13,6 +13,7 @@ const FREE_PREVIEW_VIDEO_UIDS = new Set([
   'ab0d90bf8a42fcf4d7e4debf10509f73', // Lekcja 6 (free preview)
   'ea898b3a4f5e4b7e23d212d595b13f47', // Lekcja 26 (free preview)
   '21baa2cafef2f7731b4a36c6464ee6e8', // Lekcja 40 (free preview)
+  '623626ec3109eb70565d790c97e9a980', // Lekcja pokazowa (/wariant-1)
 ]);
 
 const TEAM_WHITELIST_EMAILS = new Set([

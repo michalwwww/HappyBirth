@@ -463,12 +463,16 @@ function StrefaDashboardContent() {
                     }`}
                   >
                     <div className="relative w-12 h-9 rounded-md overflow-hidden shrink-0 bg-black/20 flex items-center justify-center">
-                      <Image
-                        src={l.thumbnailUrl}
-                        alt={l.title}
-                        fill
-                        className="object-cover"
-                      />
+                      {l.isFreePreview ? (
+                        <Image
+                          src={l.thumbnailUrl}
+                          alt={l.title}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#2B1028] to-[#1A1512]" />
+                      )}
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                         {isActive ? (
                           <span className="w-2 h-2 rounded-full bg-[color:var(--hb-zol)] animate-ping" />

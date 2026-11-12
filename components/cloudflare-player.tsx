@@ -168,6 +168,9 @@ export function CloudflarePlayer({
   useEffect(() => {
     if (!isUnlocked || !lesson.cloudflareUid) return;
 
+    let cancelled = false;
+    setSignedTokenOrUid(lesson.isFreePreview ? lesson.cloudflareUid : '');
+
     fetch('/api/stream/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -180,6 +183,7 @@ export function CloudflarePlayer({
     })
       .then(async (res) => {
         const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
         if (res.ok && data?.token) {
           setSignedTokenOrUid(data.token);
         } else if (!lesson.isFreePreview && !isLocalDevHost && (res.status === 401 || res.status === 403)) {
@@ -190,6 +194,7 @@ export function CloudflarePlayer({
         }
       })
       .catch(() => {
+        if (cancelled) return;
         if (isLocalDevHost && lesson.cloudflareUid) {
           setSignedTokenOrUid(lesson.cloudflareUid);
         }
@@ -203,6 +208,10 @@ export function CloudflarePlayer({
         body: JSON.stringify({ action: 'access', lessonId: lesson.id }),
       }).catch(() => {});
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [isUnlocked, lesson.id, lesson.cloudflareUid, lesson.isFreePreview, lang]);
 
   // Dołącz skrypt Cloudflare Stream SDK do nasłuchiwania zdarzeń odtwarzacza
@@ -323,9 +332,13 @@ export function CloudflarePlayer({
     return () => clearTimeout(timer);
   }, [autoNextCountdown, nextLesson, prefix, router, onSelectLesson]);
 
+  const activeStreamUid = lesson.isFreePreview
+    ? signedTokenOrUid || lesson.cloudflareUid
+    : signedTokenOrUid;
+
   // Budowa URL do iframe Cloudflare Stream z uwzględnieniem autoplay i Auto-Resume (startTime)
   const streamParams = new URLSearchParams({
-    poster: `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${lesson.cloudflareUid}/thumbnails/thumbnail.jpg`,
+    poster: `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${activeStreamUid || lesson.cloudflareUid}/thumbnails/thumbnail.jpg`,
     preload: shouldAutoplay ? 'auto' : 'metadata',
   });
 
@@ -339,9 +352,6 @@ export function CloudflarePlayer({
     streamParams.set('defaultTextTrack', lang);
   }
 
-  const activeStreamUid = lesson.isFreePreview
-    ? signedTokenOrUid || lesson.cloudflareUid
-    : signedTokenOrUid;
   const streamUrl = activeStreamUid
     ? `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${activeStreamUid}/iframe?${streamParams.toString()}`
     : '';
