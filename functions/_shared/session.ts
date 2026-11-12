@@ -10,6 +10,38 @@ export interface EdgeSessionPayload {
 
 const COOKIE_NAME = 'hb_session';
 const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60; // 30 dni
+const LOCAL_DEV_FALLBACK_SECRET = 'happybirth-local-dev-only-secret-2026';
+
+export function isLocalDevRequest(request?: Request, hostOverride?: string): boolean {
+  let rawHost = hostOverride || request?.headers.get('host') || '';
+  if (!rawHost && request?.url) {
+    try {
+      rawHost = new URL(request.url).hostname;
+    } catch {
+      rawHost = '';
+    }
+  }
+  const cleanHost = rawHost.toLowerCase().trim().split(':')[0];
+  return (
+    cleanHost === 'localhost' ||
+    cleanHost === '127.0.0.1' ||
+    cleanHost === '[::1]' ||
+    cleanHost.endsWith('.localhost')
+  );
+}
+
+export function resolveEdgeSessionSecret(
+  env?: { SESSION_SECRET?: string },
+  request?: Request,
+  hostOverride?: string
+): string | null {
+  const configured = env?.SESSION_SECRET?.trim();
+  if (configured) return configured;
+  if (isLocalDevRequest(request, hostOverride)) {
+    return LOCAL_DEV_FALLBACK_SECRET;
+  }
+  return null;
+}
 
 function base64UrlEncode(str: string): string {
   return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16))))
@@ -45,8 +77,11 @@ async function signHmac(data: string, secret: string): Promise<string> {
 
 export async function createSignedSessionToken(
   payload: Omit<EdgeSessionPayload, 'exp'>,
-  secret = 'happybirth-edge-secret-2026'
+  secret: string
 ): Promise<string> {
+  if (!secret) {
+    throw new Error('Brak skonfigurowanego klucza kryptograficznego SESSION_SECRET.');
+  }
   const fullPayload: EdgeSessionPayload = {
     ...payload,
     exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
@@ -58,10 +93,10 @@ export async function createSignedSessionToken(
 
 export async function verifySignedSessionToken(
   token: string,
-  secret = 'happybirth-edge-secret-2026'
+  secret: string
 ): Promise<EdgeSessionPayload | null> {
   try {
-    if (!token || !token.includes('.')) return null;
+    if (!secret || !token || !token.includes('.')) return null;
     const [encoded, sig] = token.split('.');
     if (!encoded || !sig) return null;
     const expectedSig = await signHmac(encoded, secret);
@@ -88,7 +123,9 @@ export async function getEdgeSession(
 ): Promise<EdgeSessionPayload | null> {
   const rawToken = parseCookieValue(request.headers.get('cookie'), COOKIE_NAME);
   if (!rawToken) return null;
-  return verifySignedSessionToken(rawToken, env?.SESSION_SECRET || 'happybirth-edge-secret-2026');
+  const secret = resolveEdgeSessionSecret(env, request);
+  if (!secret) return null;
+  return verifySignedSessionToken(rawToken, secret);
 }
 
 export function formatSessionSetCookie(token: string, host?: string): string {
@@ -97,7 +134,8 @@ export function formatSessionSetCookie(token: string, host?: string): string {
     cleanHost === 'happybirth.pl' || cleanHost.endsWith('.happybirth.pl')
       ? '; Domain=.happybirth.pl'
       : '';
-  return `${COOKIE_NAME}=${encodeURIComponent(token)}; Max-Age=${SESSION_TTL_SECONDS}; Path=/${domainAttr}; HttpOnly; Secure; SameSite=Lax`;
+  const secureAttr = cleanHost === 'localhost' || cleanHost === '127.0.0.1' ? '' : '; Secure';
+  return `${COOKIE_NAME}=${encodeURIComponent(token)}; Max-Age=${SESSION_TTL_SECONDS}; Path=/${domainAttr}; HttpOnly${secureAttr}; SameSite=Lax`;
 }
 
 export function formatClearSessionCookie(host?: string): string {
@@ -106,5 +144,6 @@ export function formatClearSessionCookie(host?: string): string {
     cleanHost === 'happybirth.pl' || cleanHost.endsWith('.happybirth.pl')
       ? '; Domain=.happybirth.pl'
       : '';
-  return `${COOKIE_NAME}=; Max-Age=0; Path=/${domainAttr}; HttpOnly; Secure; SameSite=Lax`;
+  const secureAttr = cleanHost === 'localhost' || cleanHost === '127.0.0.1' ? '' : '; Secure';
+  return `${COOKIE_NAME}=; Max-Age=0; Path=/${domainAttr}; HttpOnly${secureAttr}; SameSite=Lax`;
 }

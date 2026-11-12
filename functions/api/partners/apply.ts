@@ -1,4 +1,8 @@
-import { createSignedSessionToken, formatSessionSetCookie } from '../../_shared/session';
+import {
+  createSignedSessionToken,
+  formatSessionSetCookie,
+  resolveEdgeSessionSecret,
+} from '../../_shared/session';
 import { generateSmartPartnerCodeCandidates } from '../../../lib/brand-codes';
 
 interface Env {
@@ -7,8 +11,6 @@ interface Env {
   RESEND_API_KEY?: string;
   RESEND_FROM?: string;
 }
-
-const DEFAULT_SECRET = 'happybirth-edge-secret-key-2026-klarsolutions-production';
 
 export async function onRequestOptions(): Promise<Response> {
   return new Response(null, {
@@ -252,16 +254,18 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
 
     // Natychmiastowe zalogowanie partnera do Kokpitu Afiliacyjnego po rejestracji
     if (channel === 'afiliacja') {
-      const secret = env.SESSION_SECRET || DEFAULT_SECRET;
-      const token = await createSignedSessionToken(
-        {
-          userId: `usr_${email.replace(/[^a-z0-9]/g, '')}`,
-          email,
-          role: 'student',
-        },
-        secret
-      );
-      headers['Set-Cookie'] = formatSessionSetCookie(token, host || undefined);
+      const secret = resolveEdgeSessionSecret(env, request, host || undefined);
+      if (secret) {
+        const token = await createSignedSessionToken(
+          {
+            userId: `usr_${email.replace(/[^a-z0-9]/g, '')}`,
+            email,
+            role: 'student',
+          },
+          secret
+        );
+        headers['Set-Cookie'] = formatSessionSetCookie(token, host || undefined);
+      }
     }
 
     return new Response(

@@ -155,7 +155,7 @@ const SHELL_PL: ShellCopy = {
       odstap: 'Odstąp od umowy',
     },
     firma:
-      'KLAR SOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań · KRS: 0001268396 · NIP: 7812118273 · REGON: 545782779 · kapitał zakładowy: 5 000,00 PLN · kontakt@happybirth.pl',
+      'KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań · Sąd Rejonowy Poznań – Nowe Miasto i Wilda w Poznaniu, VIII Wydział Gospodarczy KRS · KRS: 0001268396 · NIP: 7812118273 · REGON: 545782779 · kapitał zakładowy: 5 000,00 PLN · kontakt@happybirth.pl',
     uwaga:
       'Na stronie wykorzystujemy wizualizacje wytworzone z pomocą narzędzi AI. Materiały mają charakter edukacyjny i nie zastępują porady lekarskiej. W nagłych wypadkach zawsze dzwoń na numer 112.',
   },
@@ -188,7 +188,7 @@ const SHELL_EN: ShellCopy = {
       odstap: 'Withdraw from the contract',
     },
     firma:
-      'KLAR SOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań, Poland · KRS: 0001268396 · NIP: 7812118273 · REGON: 545782779 · share capital: PLN 5,000.00 · kontakt@happybirth.pl',
+      'KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań, Poland · District Court Poznań – Nowe Miasto and Wilda in Poznań, 8th Commercial Division of KRS · KRS: 0001268396 · NIP: 7812118273 · REGON: 545782779 · share capital: PLN 5,000.00 · kontakt@happybirth.pl',
     uwaga:
       'This website uses visualisations created with AI tools. The materials are educational and do not replace medical advice. In an emergency, always call 112.',
   },
@@ -221,7 +221,7 @@ const SHELL_RU: ShellCopy = {
       odstap: 'Отказ от договора',
     },
     firma:
-      'KLAR SOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Познань, Польша · KRS: 0001268396 · NIP: 7812118273 · REGON: 545782779 · уставный капитал: 5 000,00 PLN · kontakt@happybirth.pl',
+      'KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Познань, Польша · Районный суд Познань – Нове-Място и Вильда в Познани, VIII хозяйственный отдел KRS · KRS: 0001268396 · NIP: 7812118273 · REGON: 545782779 · уставный капитал: 5 000,00 PLN · kontakt@happybirth.pl',
     uwaga:
       'На сайте используются визуализации, созданные с помощью инструментов ИИ. Материалы носят образовательный характер и не заменяют консультацию врача. В экстренных случаях всегда звоните 112.',
   },

@@ -77,7 +77,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
                WHERE u.email = ?
                  AND (
                    (e.status = 'active' AND (e.expires_at IS NULL OR datetime(e.expires_at) > datetime('now')))
-                   OR o.status IN ('paid', 'partially_refunded')
+                   OR (e.id IS NULL AND o.status IN ('paid', 'partially_refunded') AND datetime(o.created_at, '+548 days') > datetime('now'))
                    OR u.role IN ('admin', 'partner')
                  )
                LIMIT 1`

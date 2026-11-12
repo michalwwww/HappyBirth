@@ -7,17 +7,39 @@ export const runtime = 'nodejs';
 
 const JWT_TTL_SECONDS = 120 * 60; // [C2] Kryptograficzny token JWT ważny przez 120 minut (7200 s)
 
+const FREE_PREVIEW_VIDEO_UIDS = new Set([
+  '5964ee4fb4fe81cd9adcd1b74d5aa05c', // Zwiastun główny
+  'f8d8d8f24b917a32961efea785c9324b', // Lekcja 1 (free preview)
+  'ab0d90bf8a42fcf4d7e4debf10509f73', // Lekcja 6 (free preview)
+  'ea898b3a4f5e4b7e23d212d595b13f47', // Lekcja 26 (free preview)
+  '21baa2cafef2f7731b4a36c6464ee6e8', // Lekcja 40 (free preview)
+]);
+
+function isLocalHostRequest(req: NextRequest): boolean {
+  const host = (req.headers.get('host') || '').toLowerCase().split(':')[0];
+  return host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
+}
+
 function base64UrlEncode(input: Buffer | string): string {
   const buf = typeof input === 'string' ? Buffer.from(input, 'utf8') : input;
   return buf.toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
 }
 
-async function issueStreamTokenResponse(uid: string, lang: string = 'pl') {
+async function issueStreamTokenResponse(req: NextRequest, uid: string, lang: string = 'pl') {
   if (!uid || !/^[a-f0-9]{20,40}$/i.test(uid)) {
     return NextResponse.json({ error: 'Nieprawidłowy identyfikator wideo (uid).' }, { status: 400 });
   }
 
   const session = await getSession();
+  const isFreeVideo = FREE_PREVIEW_VIDEO_UIDS.has(uid);
+  const isLocalDev = process.env.NODE_ENV !== 'production' || isLocalHostRequest(req);
+
+  if (!isFreeVideo && !session && !isLocalDev) {
+    return NextResponse.json(
+      { error: 'Wymagana autoryzacja sesji kursantki do odtworzenia pełnej lekcji.' },
+      { status: 401 }
+    );
+  }
   const signingKeyId = process.env.CLOUDFLARE_STREAM_SIGNING_KEY_ID;
   const signingKeySecret = process.env.CLOUDFLARE_STREAM_SIGNING_KEY_SECRET;
   const cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID;
@@ -94,13 +116,16 @@ async function issueStreamTokenResponse(uid: string, lang: string = 'pl') {
 
   // 3. Bezpieczny fallback do bezpośredniego UID Cloudflare Stream (gdy requireSignedURLs = false)
   // Uwaga [TECH-01]: pole `token` MUSI zwracać `uid`, aby iframe Cloudflare Stream nie podstawiał lokalnego HMAC w ścieżce URL.
-  const appSecret = process.env.AUTH_SECRET || 'happybirth-stream-jwt-secret-2026';
-  const header = { alg: 'HS256', typ: 'JWT' };
-  const payload = { sub: uid, exp: expSec, iat: nowSec, ttlMinutes: 120 };
-  const encodedHeader = base64UrlEncode(JSON.stringify(header));
-  const encodedPayload = base64UrlEncode(JSON.stringify(payload));
-  const sig = crypto.createHmac('sha256', appSecret).update(`${encodedHeader}.${encodedPayload}`).digest();
-  const appJwt = `${encodedHeader}.${encodedPayload}.${base64UrlEncode(sig)}`;
+  const appSecret = process.env.SESSION_SECRET || process.env.AUTH_SECRET || (isLocalDev ? 'happybirth-local-dev-stream-secret' : '');
+  let appJwt: string | undefined;
+  if (appSecret) {
+    const header = { alg: 'HS256', typ: 'JWT' };
+    const payload = { sub: uid, exp: expSec, iat: nowSec, ttlMinutes: 120 };
+    const encodedHeader = base64UrlEncode(JSON.stringify(header));
+    const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+    const sig = crypto.createHmac('sha256', appSecret).update(`${encodedHeader}.${encodedPayload}`).digest();
+    appJwt = `${encodedHeader}.${encodedPayload}.${base64UrlEncode(sig)}`;
+  }
 
   return NextResponse.json({
     uid,
@@ -122,7 +147,7 @@ async function issueStreamTokenResponse(uid: string, lang: string = 'pl') {
 export async function GET(req: NextRequest) {
   const uid = (req.nextUrl.searchParams.get('uid') || req.nextUrl.searchParams.get('videoUid') || '').trim();
   const lang = (req.nextUrl.searchParams.get('lang') || 'pl').trim().toLowerCase();
-  return issueStreamTokenResponse(uid, lang);
+  return issueStreamTokenResponse(req, uid, lang);
 }
 
 export async function POST(req: NextRequest) {
@@ -130,7 +155,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const uid = String(body.videoUid || body.uid || '').trim();
     const lang = String(body.lang || 'pl').trim().toLowerCase();
-    return issueStreamTokenResponse(uid, lang);
+    return issueStreamTokenResponse(req, uid, lang);
   } catch (err: any) {
     return NextResponse.json(
       { error: err.message || 'Błąd generowania tokenu strumienia wideo.' },

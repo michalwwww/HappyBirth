@@ -18,13 +18,13 @@ export default function StrefaLicznikPage() {
             <span>Wróć do kokpitu</span>
           </Link>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[color:color-mix(in_srgb,var(--hb-mag)_10%,transparent)] text-[color:var(--hb-mag-t)]">
-            <Clock className="w-3.5 h-3.5" /> Reguła szpitalna 5-1-1
+            <Clock className="w-3.5 h-3.5" /> Cyfrowy notatnik czasu · Reguła edukacyjna 5-1-1
           </div>
           <h1 className="font-brand-display font-semibold text-3xl sm:text-4xl text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">
             Licznik Skurczów Porodowych
           </h1>
           <p className="text-xs sm:text-sm text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] max-w-xl leading-relaxed">
-            Mierz czas trwania skurczu oraz odstępy między kolejnymi falami. Narzędzie automatycznie powiadomi Was, gdy zostanie spełniona reguła 5-1-1 (skurcze co 5 minut, trwające 1 minutę, przez 1 godzinę).
+            Zapisuj czas trwania skurczów oraz odstępy między kolejnymi pomiarami w spokojnym, przejrzystym stoperze edukacyjnym pomocnym podczas rozmowy telefonicznej z położną lub wybranym szpitalem.
           </p>
         </div>
 

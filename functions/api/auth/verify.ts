@@ -1,6 +1,7 @@
 import {
   createSignedSessionToken,
   formatSessionSetCookie,
+  resolveEdgeSessionSecret,
 } from '../../_shared/session';
 
 interface Env {
@@ -12,14 +13,33 @@ async function verifyMagicTokenAndIssueCookie(
   token: string,
   emailFallback: string,
   env: Env,
+  request: Request,
   host?: string
-): Promise<{ ok: boolean; error?: string; userId?: string; email?: string; setCookie?: string }> {
+): Promise<{
+  ok: boolean;
+  error?: string;
+  statusCode?: number;
+  userId?: string;
+  email?: string;
+  role?: string;
+  setCookie?: string;
+}> {
   if (!token) {
-    return { ok: false, error: 'Brak tokenu weryfikacyjnego.' };
+    return { ok: false, statusCode: 400, error: 'Brak tokenu weryfikacyjnego.' };
+  }
+
+  const secret = resolveEdgeSessionSecret(env, request, host);
+  if (!secret) {
+    return {
+      ok: false,
+      statusCode: 500,
+      error: 'Brak konfiguracji klucza sesji (SESSION_SECRET) na serwerze.',
+    };
   }
 
   let verifiedEmail = emailFallback;
   let userId = `usr_${token.slice(0, 8)}`;
+  let userRole = 'student';
 
   if (env.DB) {
     const tokenRow = await env.DB.prepare(
@@ -33,6 +53,7 @@ async function verifyMagicTokenAndIssueCookie(
     if (!tokenRow) {
       return {
         ok: false,
+        statusCode: 401,
         error: 'Link logowania wygasł lub został już wykorzystany. Wygeneruj nowy link.',
       };
     }
@@ -49,6 +70,7 @@ async function verifyMagicTokenAndIssueCookie(
 
     if (userRow?.id) {
       userId = userRow.id;
+      userRole = userRow.role ? String(userRow.role) : 'student';
     } else {
       userId = crypto.randomUUID();
       const refCode = `MAMA-${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
@@ -61,14 +83,15 @@ async function verifyMagicTokenAndIssueCookie(
   }
 
   const signedCookieToken = await createSignedSessionToken(
-    { userId, email: verifiedEmail, role: 'student' },
-    env.SESSION_SECRET
+    { userId, email: verifiedEmail, role: userRole },
+    secret
   );
 
   return {
     ok: true,
     userId,
     email: verifiedEmail,
+    role: userRole,
     setCookie: formatSessionSetCookie(signedCookieToken, host),
   };
 }
@@ -80,7 +103,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
   const token = (url.searchParams.get('token') || '').trim();
   const email = (url.searchParams.get('email') || '').trim().toLowerCase();
 
-  const res = await verifyMagicTokenAndIssueCookie(token, email, env, host);
+  const res = await verifyMagicTokenAndIssueCookie(token, email, env, request, host);
   if (!res.ok || !res.setCookie) {
     return new Response(null, {
       status: 302,
@@ -109,11 +132,11 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       .trim()
       .toLowerCase();
 
-    const res = await verifyMagicTokenAndIssueCookie(token, emailParam, env, host);
+    const res = await verifyMagicTokenAndIssueCookie(token, emailParam, env, request, host);
     if (!res.ok || !res.setCookie) {
       return new Response(
         JSON.stringify({ success: false, error: res.error || 'Błąd weryfikacji tokenu.' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
+        { status: res.statusCode || 401, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
@@ -121,7 +144,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       JSON.stringify({
         success: true,
         authenticated: true,
-        user: { id: res.userId, email: res.email, role: 'student' },
+        user: { id: res.userId, email: res.email, role: res.role || 'student' },
       }),
       {
         status: 200,

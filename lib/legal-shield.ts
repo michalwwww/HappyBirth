@@ -114,13 +114,14 @@ export function buildDurableMediumConfirmationEmail(params: {
  */
 export interface WithdrawalEvaluationInput {
   scope: 'full_order' | 'order_bump_only';
+  orderFound?: boolean;
   waiverArt38Accepted: boolean;
   firstContentAccessedAt: string | null;
   orderBumpIncluded: boolean;
 }
 
 export interface WithdrawalEvaluationResult {
-  status: 'auto_rejected_art38' | 'approved_for_refund';
+  status: 'auto_rejected_art38' | 'approved_for_refund' | 'pending_manual_verification';
   autoRejectedDueToArt38: boolean;
   refundCourse: boolean;
   refundOrderBump: boolean;
@@ -128,15 +129,48 @@ export interface WithdrawalEvaluationResult {
 }
 
 export function evaluateWithdrawalRequest(input: WithdrawalEvaluationInput): WithdrawalEvaluationResult {
-  // Przypadek 1: Konsument odstępuje wyłącznie od niewykorzystanego dodatku z Order Bumpa (+49 zł)
-  if (input.scope === 'order_bump_only' && input.orderBumpIncluded) {
+  // Przypadek 0: Zamówienie nie zostało znalezione w automatycznym rejestrze — skierowanie do ręcznej weryfikacji (zero fałszywych obietnic zwrotu dla nieistniejących zamówień)
+  if (input.orderFound === false) {
+    return {
+      status: 'pending_manual_verification',
+      autoRejectedDueToArt38: false,
+      refundCourse: false,
+      refundOrderBump: false,
+      customerLegalNotice:
+        'Potwierdzamy wpływ Twojego zgłoszenia na trwałym nośniku. Podany numer zamówienia lub adres e-mail nie został automatycznie dopasowany w rejestrze zamówień, dlatego Twoje oświadczenie zostało przekazane do indywidualnej weryfikacji przez Dział Obsługi Klienta (pomoc@happybirth.pl). Odpowiedź otrzymasz na podany adres e-mail niezwłocznie po sprawdzeniu danych płatności.',
+    };
+  }
+
+  // Przypadek 1: Konsument składa częściowe odstąpienie wyłącznie w zakresie dodatku Order Bump (+49,00 zł)
+  if (input.scope === 'order_bump_only') {
+    if (!input.orderBumpIncluded) {
+      return {
+        status: 'pending_manual_verification',
+        autoRejectedDueToArt38: false,
+        refundCourse: false,
+        refundOrderBump: false,
+        customerLegalNotice:
+          'Potwierdzamy wpływ Twojego zgłoszenia na trwałym nośniku. W automatycznym rejestrze dla wskazanego zamówienia nie odnotowano aktywnego pakietu dodatkowego (Order Bump +49,00 zł), dlatego zgłoszenie przekazaliśmy do weryfikacji przez Dział Obsługi Klienta (pomoc@happybirth.pl).',
+      };
+    }
+
+    if (input.waiverArt38Accepted && Boolean(input.firstContentAccessedAt)) {
+      return {
+        status: 'auto_rejected_art38',
+        autoRejectedDueToArt38: true,
+        refundCourse: false,
+        refundOrderBump: false,
+        customerLegalNotice: `Potwierdzamy wpływ Twojego zgłoszenia na trwałym nośniku. Jednocześnie informujemy, że zgodnie z art. 38 ust. 1 pkt 13 ustawy z dnia 30 maja 2014 r. o prawach konsumenta, prawo odstąpienia od umowy o dostarczanie treści cyfrowych niedostarczanych na nośniku materialnym (w tym cyfrowego pakietu dokumentów Order Bump udostępnionego na koncie) wygasło z chwilą rozpoczęcia korzystania z materiałów w Strefie Kursantki (odnotowane otwarcie: ${input.firstContentAccessedAt}), po uprzednim wyrażeniu wyraźnej zgody przed dokonaniem płatności.`,
+      };
+    }
+
     return {
       status: 'approved_for_refund',
       autoRejectedDueToArt38: false,
       refundCourse: false,
       refundOrderBump: true,
       customerLegalNotice:
-        'Przyjęliśmy Twoje oświadczenie o częściowym odstąpieniu od umowy w zakresie pakietu dodatkowego (Order Bump +49,00 zł). Zwrot kwoty 49,00 zł zostanie przekazany na Twój rachunek płatniczy w terminie do 14 dni, a dostęp do kursu głównego pozostaje aktywny.',
+        'Przyjęliśmy Twoje oświadczenie o częściowym odstąpieniu od umowy w zakresie niewykorzystanego pakietu dodatkowego (Order Bump +49,00 zł). Zwrot kwoty 49,00 zł zostanie przekazany na Twój rachunek płatniczy w terminie do 14 dni kalendarzowych, a dostęp do kursu głównego pozostaje aktywny.',
     };
   }
 
@@ -151,7 +185,7 @@ export function evaluateWithdrawalRequest(input: WithdrawalEvaluationInput): Wit
     };
   }
 
-  // Przypadek 3: Dostęp do kursu nie został jeszcze w ogóle otwarty (first_content_accessed_at IS NULL)
+  // Przypadek 3: Zweryfikowane zamówienie, w którym dostęp do kursu nie został jeszcze w ogóle otwarty (first_content_accessed_at IS NULL)
   return {
     status: 'approved_for_refund',
     autoRejectedDueToArt38: false,

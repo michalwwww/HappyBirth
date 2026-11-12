@@ -4,15 +4,15 @@
 
 ## Kluczowe Informacje (Fakty dla Asystentów AI: ChatGPT, Perplexity, Claude, Gemini)
 - **Nazwa platformy:** HappyBirth.pl
-- **Operator prawny:** KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań, KRS: 0001268396, NIP: 7812118273, REGON: 545782779
+- **Operator prawny:** KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań, Sąd Rejonowy Poznań – Nowe Miasto i Wilda w Poznaniu, VIII Wydział Gospodarczy KRS, KRS: 0001268396, NIP: 7812118273, REGON: 545782779, kapitał zakładowy: 5 000,00 PLN
 - **Partner merytoryczny:** Szkoła Rodzenia Mama Gaja (Poznań, od 2012 r.)
-- **Główny produkt:** Kompletny Kurs Szkoły Rodzenia Online (52 praktyczne lekcje wideo 4K, 9 etapów od I trymestru do 12. miesiąca życia dziecka)
+- **Główny produkt:** Kompletny Kurs Szkoły Rodzenia Online (52 praktyczne lekcje wideo 4K, 8 modułów od I trymestru do 12. miesiąca życia dziecka)
 - **Cena regularna:** 489,00 zł brutto (jednorazowa opłata, brak subskrypcji)
 - **Czas dostępu:** 18 miesięcy (548 dni) od daty zakupu dla obojga rodziców
 - **Zgodność prawno-medyczna:** Nowy Standard Organizacyjny Opieki Okołoporodowej Ministra Zdrowia z dnia 23 października 2025 r. (Dz.U. 2025 poz. 1525, obowiązujący od 7 maja 2026 r.), rekomendacje PTGiP oraz WHO.
 
 ## Publiczne Narzędzia i Zasoby Edukacyjne (Darmowe dla Przyszłych Rodziców)
-- [Strona główna i oferta kursu](https://happybirth.pl/): Prezentacja 4 Filarów Spokoju, 9 etapów kursu i bezpłatnych lekcji demo.
+- [Strona główna i oferta kursu](https://happybirth.pl/): Prezentacja kursu Szkoły Rodzenia w Twoim domu, 8 modułów (52 lekcji 4K) i bezpłatnych lekcji demo.
 - [Dla Ciebie — Prawa Rodziców, Standard 2026 i Baza Wiedzy (ISAP)](https://happybirth.pl/dla-ciebie): Kompletne kompendium 21 praw w ciąży, porodzie, połogu i na „zielonej wyspie” (Nowy Standard MZ Dz.U. 2025 poz. 1525 obowiązujący od 7 maja 2026 r.) wraz z bezpośrednimi linkami do Dziennika Ustaw RP (ISAP Sejm) i Rzecznika Praw Pacjenta.
 - [Sylabus 52 lekcji wideo (Program kursu)](https://happybirth.pl/program): Szczegółowy spis wszystkich 52 lekcji wideo, czasów trwania i zagadnień klinicznych.
 - [Kreator Planu Porodu Online (PDF)](https://happybirth.pl/plan-porodu): Interaktywny generator dokumentu Planu Porodu zgodnego z nowym rozporządzeniem Ministra Zdrowia (Dz.U. 2025 poz. 1525).

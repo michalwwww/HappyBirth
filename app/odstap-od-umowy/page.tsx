@@ -140,7 +140,7 @@ export default function OdstapOdUmowyPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="np. Anna Kowalska"
-                  className="w-full px-4 py-3 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-sm focus:outline-none focus:border-[#DA0271]"
+                  className="w-full px-4 py-3 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-base sm:text-sm focus:outline-none focus:border-[#DA0271]"
                 />
               </div>
 
@@ -154,7 +154,7 @@ export default function OdstapOdUmowyPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="twoj@email.pl"
-                  className="w-full px-4 py-3 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-sm focus:outline-none focus:border-[#DA0271]"
+                  className="w-full px-4 py-3 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-base sm:text-sm focus:outline-none focus:border-[#DA0271]"
                 />
               </div>
             </div>
@@ -169,7 +169,7 @@ export default function OdstapOdUmowyPage() {
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
                 placeholder="np. HB-2026-XXXXXX"
-                className="w-full px-4 py-3 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-sm focus:outline-none focus:border-[#DA0271]"
+                className="w-full px-4 py-3 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-base sm:text-sm focus:outline-none focus:border-[#DA0271]"
               />
             </div>
 
@@ -215,7 +215,7 @@ export default function OdstapOdUmowyPage() {
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Pole nieobowiązkowe"
-                className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-sm focus:outline-none focus:border-[#DA0271]"
+                className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-base sm:text-sm focus:outline-none focus:border-[#DA0271]"
               />
             </div>
 

@@ -91,14 +91,16 @@ export function SosContractionCounter() {
 
   return (
     <div className="w-full bg-white dark:bg-[color:var(--hb-karta)] rounded-3xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] p-6 sm:p-8 shadow-xl">
-      {/* Alert banner when 5-1-1 is met */}
+      {/* Educational notice when 5-1-1 pattern is logged (MDR 2017/745 compliant — zero clinical directives) */}
       {is511Alert && (
-        <div className="mb-6 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border-2 border-rose-500 text-rose-950 dark:text-rose-100 flex items-start space-x-3 animate-bounce">
-          <AlertTriangle className="w-6 h-6 text-rose-600 shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700/70 text-amber-950 dark:text-amber-100 flex items-start space-x-3">
+          <Clock className="w-6 h-6 text-amber-700 dark:text-amber-300 shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-bold text-base">Zasada 5-1-1 osiągnięta: Czas ruszać do szpitala!</h4>
-            <p className="text-xs text-rose-800 mt-1">
-              Twoje skurcze występują regularnie co ok. 5 minut i trwają około minuty. Zachowaj spokój, weź torbę i skierujcie się z partnerem na izbę przyjęć.
+            <h4 className="font-bold text-base">
+              Zarejestrowano 3 regularne pomiary co ok. 5 minut (orientacyjna reguła edukacyjna 5-1-1)
+            </h4>
+            <p className="text-xs text-amber-900 dark:text-amber-200/90 mt-1 leading-relaxed">
+              Twoje ostatnie pomiary powtarzają się w odstępach ok. 3–6 minut i trwają co najmniej 45 sekund. Jeśli czujesz taką potrzebę lub tak ustaliłaś ze swoją położną bądź lekarzem prowadzącym, skonsultuj się telefonicznie z wybranym szpitalem.
             </p>
           </div>
         </div>
@@ -150,16 +152,16 @@ export function SosContractionCounter() {
       </div>
 
       {/* 5-1-1 Explanation Box */}
-      <div className="my-6 p-4 rounded-2xl bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-kosc)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] flex items-center justify-between gap-4">
+      <div className="my-6 p-4 rounded-2xl bg-[color:var(--hb-kosc)] dark:bg-[color:var(--hb-kosc)] border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] text-xs text-[color:var(--hb-ink2)] dark:text-[color:var(--hb-ink2)] flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span className="font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">Reguła szpitalna 5-1-1:</span>
+          <span className="font-bold text-[color:var(--hb-ink)] dark:text-[color:var(--hb-ink)]">Orientacyjna reguła edukacyjna 5-1-1:</span>
           <span className="ml-1 text-[color:var(--hb-ink3)] dark:text-[color:var(--hb-ink3)]">
-            Skurcze co <strong>5 minut</strong>, trwające <strong>1 minutę</strong>, przez co najmniej <strong>1 godzinę</strong>.
+            Skurcze co ok. <strong>5 minut</strong>, trwające ok. <strong>1 minutę</strong>, obserwowane przez ok. <strong>1 godzinę</strong>.
           </span>
         </div>
         <div className="shrink-0">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">
-            <CheckCircle2 className="w-3 h-3 mr-1" /> Zgodne z wytycznymi PTGiP
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-semibold text-[11px]">
+            <CheckCircle2 className="w-3 h-3 mr-1" /> Materiał edukacyjny zgodny z PTGiP
           </span>
         </div>
       </div>
@@ -220,6 +222,9 @@ export function SosContractionCounter() {
             <li>Silny, nieustępujący ból podbrzusza między skurczami</li>
           </ul>
         </div>
+        <p className="mt-3 text-[11px] text-[color:var(--hb-ink3)] leading-relaxed">
+          Informacja edukacyjna (Rozporządzenie UE MDR 2017/745): Powyższy licznik stanowi wyłącznie cyfrowy notatnik pomiaru czasu o charakterze edukacyjnym. Nie jest wyrobem medycznym, nie stawia diagnozy klinicznej i nie zastępuje indywidualnej konsultacji z położną lub lekarzem.
+        </p>
       </div>
     </div>
   );

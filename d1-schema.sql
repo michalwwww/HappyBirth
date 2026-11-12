@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS withdrawal_requests (
     order_number TEXT NOT NULL,
     scope TEXT NOT NULL DEFAULT 'full_order', -- 'full_order' lub 'order_bump_only'
     reason TEXT,
-    status TEXT NOT NULL DEFAULT 'received', -- 'received', 'auto_rejected_art38', 'approved_for_refund'
+    status TEXT NOT NULL DEFAULT 'received', -- 'received', 'pending_manual_verification', 'auto_rejected_art38', 'approved_for_refund'
     auto_rejected_due_to_art38 INTEGER NOT NULL DEFAULT 0,
     decision_explanation TEXT,
     confirmation_email_sent_at TEXT,
@@ -251,3 +251,34 @@ CREATE TABLE IF NOT EXISTS leads (
 );
 
 CREATE INDEX IF NOT EXISTS idx_leads_email ON leads(email);
+
+-- 14. USTAWIENIA ROZLICZENIOWE PARTNERÓW AFILIACYJNYCH (B2B / Działalność Nierejestrowana / Osoba Prywatna)
+CREATE TABLE IF NOT EXISTS affiliate_settings (
+    affiliate_id TEXT PRIMARY KEY,
+    settlement_type TEXT NOT NULL DEFAULT 'private_person', -- 'b2b_invoice', 'unregistered_business', 'private_person'
+    legal_name TEXT,
+    nip TEXT,
+    iban TEXT,
+    address TEXT,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (affiliate_id) REFERENCES affiliates(id) ON DELETE CASCADE
+);
+
+-- 15. HISTORIA WYPŁAT PROWIZJI AFILIACYJNYCH
+CREATE TABLE IF NOT EXISTS affiliate_payouts (
+    id TEXT PRIMARY KEY,
+    affiliate_id TEXT NOT NULL,
+    amount_gross_minor INTEGER NOT NULL,
+    settlement_type TEXT NOT NULL,
+    legal_name TEXT NOT NULL,
+    nip TEXT,
+    iban TEXT NOT NULL,
+    invoice_number TEXT,
+    status TEXT NOT NULL DEFAULT 'PROCESSING', -- 'PROCESSING', 'PAID', 'REJECTED'
+    requested_at TEXT NOT NULL DEFAULT (datetime('now')),
+    paid_at TEXT,
+    FOREIGN KEY (affiliate_id) REFERENCES affiliates(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_affiliate_payouts_affiliate ON affiliate_payouts(affiliate_id);
+CREATE INDEX IF NOT EXISTS idx_affiliate_payouts_status ON affiliate_payouts(status);

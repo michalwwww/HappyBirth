@@ -1,8 +1,17 @@
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
 
-const SESSION_SECRET = process.env.SESSION_SECRET || 'happybirth-secret-encryption-key-2026';
 const COOKIE_NAME = 'hb_session';
+const LOCAL_DEV_FALLBACK_SECRET = 'happybirth-local-dev-only-secret-2026';
+
+function resolveNodeSessionSecret(): string | null {
+  const configured = process.env.SESSION_SECRET?.trim();
+  if (configured) return configured;
+  if (process.env.NODE_ENV !== 'production') {
+    return LOCAL_DEV_FALLBACK_SECRET;
+  }
+  return null;
+}
 
 export interface SessionPayload {
   userId: string;
@@ -13,11 +22,15 @@ export interface SessionPayload {
 
 // Generowanie bezpiecznego tokenu HMAC dla ciasteczka sesyjnego
 export function signSession(payload: Omit<SessionPayload, 'exp'>, daysValid: number = 30): string {
+  const secret = resolveNodeSessionSecret();
+  if (!secret) {
+    throw new Error('Brak zmiennej środowiskowej SESSION_SECRET w środowisku produkcyjnym.');
+  }
   const exp = Math.floor(Date.now() / 1000) + daysValid * 24 * 60 * 60;
   const fullPayload: SessionPayload = { ...payload, exp };
   const encoded = Buffer.from(JSON.stringify(fullPayload)).toString('base64url');
   const signature = crypto
-    .createHmac('sha256', SESSION_SECRET)
+    .createHmac('sha256', secret)
     .update(encoded)
     .digest('base64url');
   return `${encoded}.${signature}`;
@@ -26,11 +39,14 @@ export function signSession(payload: Omit<SessionPayload, 'exp'>, daysValid: num
 // Weryfikacja i dekodowanie ciasteczka sesyjnego
 export function verifySession(token: string): SessionPayload | null {
   try {
+    const secret = resolveNodeSessionSecret();
+    if (!secret || !token) return null;
+
     const [encoded, signature] = token.split('.');
     if (!encoded || !signature) return null;
 
     const expectedSignature = crypto
-      .createHmac('sha256', SESSION_SECRET)
+      .createHmac('sha256', secret)
       .update(encoded)
       .digest('base64url');
 

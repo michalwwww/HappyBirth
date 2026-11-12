@@ -1,6 +1,7 @@
 import {
   createSignedSessionToken,
   formatSessionSetCookie,
+  resolveEdgeSessionSecret,
 } from '../../_shared/session';
 
 interface Env {
@@ -98,14 +99,16 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
     const fullName = String(sessionData.customer_details?.name || 'Kursantka HappyBirth').trim();
     const orderBumpIncluded = sessionData.metadata?.order_bump_included === 'true' ? 1 : 0;
     let userId = `usr_${sessionId.slice(-10)}`;
+    let userRole = 'student';
 
     if (env.DB && email) {
       try {
-        const existingUser = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
+        const existingUser = await env.DB.prepare('SELECT id, role FROM users WHERE email = ?')
           .bind(email)
           .first();
         if (existingUser?.id) {
           userId = existingUser.id;
+          userRole = existingUser.role ? String(existingUser.role) : 'student';
         } else {
           userId = crypto.randomUUID();
           const refCode = `MAMA-${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
@@ -134,11 +137,22 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       }
     }
 
-    const signedCookieToken = await createSignedSessionToken(
-      { userId, email: email || 'student@happybirth.pl', role: 'student' },
-      env.SESSION_SECRET
-    );
     const host = request.headers.get('host') || undefined;
+    const secret = resolveEdgeSessionSecret(env, request, host);
+    if (!secret) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Brak konfiguracji klucza sesji (SESSION_SECRET) na serwerze.',
+        }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const signedCookieToken = await createSignedSessionToken(
+      { userId, email: email || 'student@happybirth.pl', role: userRole },
+      secret
+    );
 
     return new Response(
       JSON.stringify({

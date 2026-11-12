@@ -53,11 +53,19 @@ export function CloudflarePlayer({
 
   // [C2] Auto-Resume state & Signed Token
   const [savedPositionSeconds, setSavedPositionSeconds] = useState<number>(0);
-  const [signedTokenOrUid, setSignedTokenOrUid] = useState<string>(lesson.cloudflareUid || '');
+  const [signedTokenOrUid, setSignedTokenOrUid] = useState<string>(
+    lesson.isFreePreview ? lesson.cloudflareUid || '' : ''
+  );
   const lastSavedSecRef = useRef<number>(0);
 
-  const isUnlockedLocally =
+  const isLocalDevHost =
     typeof window !== 'undefined' &&
+    ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
+
+  // Odblokowanie czysto lokalne (localStorage) działa wyłącznie w środowisku developerskim (localhost),
+  // natomiast na domenach produkcyjnych dostęp do płatnych lekcji zawsze weryfikuje serwer (/api/auth/me).
+  const isUnlockedLocally =
+    isLocalDevHost &&
     (localStorage.getItem('hb_unlocked') === 'true' ||
       localStorage.getItem('hb_current_role') === 'student' ||
       localStorage.getItem('hb_current_role') === 'partner' ||
@@ -71,7 +79,7 @@ export function CloudflarePlayer({
 
   // Wczytaj zapisaną sekundę odtwarzania z localStorage oraz serwera ([C2] Auto-Resume)
   useEffect(() => {
-    setSignedTokenOrUid(lesson.cloudflareUid || '');
+    setSignedTokenOrUid(lesson.isFreePreview ? lesson.cloudflareUid || '' : '');
     if (typeof window === 'undefined') return;
     const localPos = parseInt(localStorage.getItem(`hb_pos_${lesson.id}`) || '0', 10);
     if (localPos > 5) {
@@ -93,10 +101,16 @@ export function CloudflarePlayer({
         }
       })
       .catch(() => {});
-  }, [lesson.id, lesson.cloudflareUid]);
+  }, [lesson.id, lesson.cloudflareUid, lesson.isFreePreview]);
 
   useEffect(() => {
-    if (lesson.isFreePreview || role === 'student' || role === 'partner' || isUnlockedLocally) {
+    if (lesson.isFreePreview) {
+      setHasServerAccess(true);
+      setLoadingAccess(false);
+      return;
+    }
+
+    if (isLocalDevHost && (role === 'student' || role === 'partner' || isUnlockedLocally)) {
       setHasServerAccess(true);
       setLoadingAccess(false);
       return;
@@ -124,18 +138,30 @@ export function CloudflarePlayer({
         if (
           data.authenticated &&
           (data.user?.hasActiveCourse ||
+            data.user?.role === 'admin' ||
             data.user?.role === 'student' ||
             data.user?.role === 'partner')
         ) {
           setHasServerAccess(true);
+        } else {
+          setHasServerAccess(false);
+          if (!isLocalDevHost) {
+            try {
+              localStorage.removeItem('hb_unlocked');
+            } catch {}
+          }
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        setHasServerAccess(false);
+      })
       .finally(() => setLoadingAccess(false));
-  }, [lesson.isFreePreview, role, searchParams, isUnlockedLocally]);
+  }, [lesson.isFreePreview, isLocalDevHost, role, searchParams, isUnlockedLocally]);
 
   const isUnlocked = Boolean(
-    lesson.isFreePreview || hasServerAccess || role === 'student' || role === 'partner' || isUnlockedLocally
+    lesson.isFreePreview ||
+      hasServerAccess ||
+      (isLocalDevHost && (role === 'student' || role === 'partner' || isUnlockedLocally))
   );
 
   // [C2] Pobierz 120-minutowy Signed Token URL oraz zarejestruj first_content_accessed_at ([E1])
@@ -152,13 +178,22 @@ export function CloudflarePlayer({
         lang,
       }),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.token) {
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data?.token) {
           setSignedTokenOrUid(data.token);
+        } else if (!lesson.isFreePreview && !isLocalDevHost && (res.status === 401 || res.status === 403)) {
+          setHasServerAccess(false);
+          setSignedTokenOrUid('');
+        } else if (isLocalDevHost && lesson.cloudflareUid) {
+          setSignedTokenOrUid(lesson.cloudflareUid);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (isLocalDevHost && lesson.cloudflareUid) {
+          setSignedTokenOrUid(lesson.cloudflareUid);
+        }
+      });
 
     // Zapisz znacznik pierwszego dostępu do treści cyfrowej (Art. 38 ust. 1 pkt 13 u.p.k.)
     if (!lesson.isFreePreview) {
@@ -304,8 +339,12 @@ export function CloudflarePlayer({
     streamParams.set('defaultTextTrack', lang);
   }
 
-  const activeStreamUid = signedTokenOrUid || lesson.cloudflareUid;
-  const streamUrl = `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${activeStreamUid}/iframe?${streamParams.toString()}`;
+  const activeStreamUid = lesson.isFreePreview
+    ? signedTokenOrUid || lesson.cloudflareUid
+    : signedTokenOrUid;
+  const streamUrl = activeStreamUid
+    ? `https://${CLOUDFLARE_CUSTOMER_DOMAIN}/${activeStreamUid}/iframe?${streamParams.toString()}`
+    : '';
 
   const formatMmSs = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -350,7 +389,7 @@ export function CloudflarePlayer({
             <p className="text-xs text-[#E8DEF0]/80">Weryfikacja dostępu do lekcji...</p>
           </div>
         ) : isUnlocked ? (
-          lesson.cloudflareUid ? (
+          lesson.cloudflareUid && activeStreamUid ? (
             <>
               <iframe
                 key={`${lesson.id}-${shouldAutoplay}`}

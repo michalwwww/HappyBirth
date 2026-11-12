@@ -11,6 +11,9 @@ const TEAM_WHITELIST_EMAILS = new Set([
   'kontakt@happybirth.pl',
   'pomoc@happybirth.pl',
   'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
 ]);
 
 export async function onRequestGet(context: { request: Request; env: Env }): Promise<Response> {
@@ -89,6 +92,14 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         expired = true;
         hasActiveCourse = false;
       } else if (enrollmentRow?.expires_at && new Date(enrollmentRow.expires_at).getTime() < Date.now()) {
+        expired = true;
+        hasActiveCourse = false;
+      } else if (
+        !isTeamEmail &&
+        !enrollmentRow &&
+        orderRow?.created_at &&
+        new Date(orderRow.created_at).getTime() + ACCESS_DURATION_DAYS * 24 * 60 * 60 * 1000 < Date.now()
+      ) {
         expired = true;
         hasActiveCourse = false;
       } else if (!isTeamEmail && !enrollmentRow && !orderRow) {

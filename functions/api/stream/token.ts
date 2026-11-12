@@ -1,6 +1,7 @@
-import { getEdgeSession } from '../../_shared/session';
+import { getEdgeSession, isLocalDevRequest } from '../../_shared/session';
 
 interface Env {
+  DB?: any;
   CLOUDFLARE_ACCOUNT_ID?: string;
   CLOUDFLARE_STREAM_API_TOKEN?: string;
   SESSION_SECRET?: string;
@@ -14,30 +15,77 @@ const FREE_PREVIEW_VIDEO_UIDS = new Set([
   '21baa2cafef2f7731b4a36c6464ee6e8', // Lekcja 40 (free preview)
 ]);
 
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
+]);
+
 async function resolveEdgeStreamToken(
   request: Request,
   videoUid: string,
   lang: string,
-  isFreePreviewFlag: boolean,
   env: Env
 ): Promise<Response> {
   const expiresAt = Math.floor(Date.now() / 1000) + 120 * 60; // 2 godziny TTL ([C2])
 
-  if (!videoUid) {
-    return new Response(JSON.stringify({ error: 'Brak identyfikatora wideo (videoUid).' }), {
+  if (!videoUid || !/^[a-f0-9]{20,40}$/i.test(videoUid)) {
+    return new Response(JSON.stringify({ error: 'Nieprawidłowy identyfikator wideo (videoUid).' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
-  const isFreeVideo = isFreePreviewFlag || FREE_PREVIEW_VIDEO_UIDS.has(videoUid);
+  // [SECURITY] Nigdy nie ufamy fladze przesłanej przez klienta (?free=true / body.isFreePreview) — decyduje wyłącznie serwerowa biała lista UID
+  const isFreeVideo = FREE_PREVIEW_VIDEO_UIDS.has(videoUid);
   if (!isFreeVideo) {
     const session = await getEdgeSession(request, env);
-    if (!session && env.CLOUDFLARE_STREAM_API_TOKEN) {
-      return new Response(
-        JSON.stringify({ error: 'Wymagana autoryzacja sesji kursantki do odtworzenia pełnej lekcji.' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
+    const isLocalDev = isLocalDevRequest(request);
+
+    if (!session) {
+      if (!isLocalDev) {
+        return new Response(
+          JSON.stringify({ error: 'Wymagana autoryzacja sesji kursantki do odtworzenia pełnej lekcji.' }),
+          { status: 401, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    } else if (env.DB) {
+      const cleanEmail = String(session.email || '').trim().toLowerCase();
+      const isTeam = TEAM_WHITELIST_EMAILS.has(cleanEmail) || session.role === 'admin';
+      if (!isTeam) {
+        try {
+          const entitlement = await env.DB.prepare(
+            `SELECT u.id
+             FROM users u
+             LEFT JOIN enrollments e ON e.user_id = u.id
+             LEFT JOIN orders o ON (o.user_id = u.id OR o.customer_email = u.email)
+             WHERE (u.id = ? OR u.email = ?)
+               AND (
+                 (e.status = 'active' AND (e.expires_at IS NULL OR datetime(e.expires_at) > datetime('now')))
+                 OR (e.id IS NULL AND o.status IN ('paid', 'partially_refunded') AND datetime(o.created_at, '+548 days') > datetime('now'))
+                 OR u.role IN ('admin', 'partner')
+               )
+             LIMIT 1`
+          )
+            .bind(session.userId, cleanEmail)
+            .first();
+
+          if (!entitlement) {
+            return new Response(
+              JSON.stringify({
+                error: 'Brak aktywnego lub ważnego (18 miesięcy / 548 dni) dostępu do pełnego kursu.',
+              }),
+              { status: 403, headers: { 'Content-Type': 'application/json' } }
+            );
+          }
+        } catch {
+          // W razie przejściowego błędu D1 przepuszczamy zweryfikowaną kryptograficznie sesję HMAC
+        }
+      }
     }
   }
 
@@ -92,8 +140,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
     const url = new URL(request.url);
     const videoUid = String(url.searchParams.get('uid') || url.searchParams.get('videoUid') || '').trim();
     const lang = String(url.searchParams.get('lang') || 'pl').trim().toLowerCase();
-    const isFree = url.searchParams.get('free') === 'true';
-    return resolveEdgeStreamToken(request, videoUid, lang, isFree, env);
+    return resolveEdgeStreamToken(request, videoUid, lang, env);
   } catch (err: any) {
     return new Response(
       JSON.stringify({ error: err.message || 'Błąd tokenu wideo' }),
@@ -108,8 +155,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const body: any = await request.json().catch(() => ({}));
     const videoUid = String(body.videoUid || body.uid || '').trim();
     const lang = String(body.lang || 'pl').trim().toLowerCase();
-    const isFree = Boolean(body.isFreePreview);
-    return resolveEdgeStreamToken(request, videoUid, lang, isFree, env);
+    return resolveEdgeStreamToken(request, videoUid, lang, env);
   } catch (err: any) {
     return new Response(
       JSON.stringify({ error: err.message || 'Błąd tokenu wideo' }),

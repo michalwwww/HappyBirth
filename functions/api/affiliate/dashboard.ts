@@ -2,6 +2,7 @@ import {
   getEdgeSession,
   createSignedSessionToken,
   formatSessionSetCookie,
+  resolveEdgeSessionSecret,
 } from '../../_shared/session';
 import {
   generateSmartPartnerCodeCandidates,
@@ -15,7 +16,6 @@ interface Env {
   RESEND_FROM?: string;
 }
 
-const DEFAULT_SECRET = 'happybirth-edge-secret-key-2026-klarsolutions-production';
 const TEAM_WHITELIST_EMAILS = new Set([
   'mwspace@gmail.com',
   'kontakt@happybirth.pl',
@@ -287,13 +287,19 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
 
     const magicToken = url.searchParams.get('token');
     const brokerParam = url.searchParams.get('zaprasza') || url.searchParams.get('broker');
-    const secret = env.SESSION_SECRET || DEFAULT_SECRET;
+    const secret = resolveEdgeSessionSecret(env, request, host || undefined);
 
     let session = await getEdgeSession(request, env);
     let setCookieHeader: string | null = null;
 
     // Obsługa logowania bezpośredniego z tokenu Magic Link (?token=...) na subdomenie afiliacji
     if (magicToken) {
+      if (!secret) {
+        return new Response(
+          JSON.stringify({ error: 'Brak konfiguracji klucza sesji (SESSION_SECRET) na serwerze.' }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
       let verifiedEmail: string | null = null;
       if (env.DB) {
         try {
@@ -315,20 +321,22 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
 
       if (verifiedEmail) {
         let userId = `usr_${verifiedEmail.replace(/[^a-z0-9]/g, '')}`;
+        let userRole = 'student';
         if (env.DB) {
           try {
-            const u = await env.DB.prepare(`SELECT id FROM users WHERE email = ?`)
+            const u = await env.DB.prepare(`SELECT id, role FROM users WHERE email = ?`)
               .bind(verifiedEmail)
               .first();
             if (u?.id) userId = u.id;
+            if (u?.role) userRole = String(u.role);
           } catch {}
         }
         const jwt = await createSignedSessionToken(
-          { userId, email: verifiedEmail, role: 'student' },
+          { userId, email: verifiedEmail, role: userRole },
           secret
         );
         setCookieHeader = formatSessionSetCookie(jwt, host || undefined);
-        session = { userId, email: verifiedEmail, role: 'student', exp: Math.floor(Date.now() / 1000) + 30 * 86400 };
+        session = { userId, email: verifiedEmail, role: userRole, exp: Math.floor(Date.now() / 1000) + 30 * 86400 };
       }
     }
 
