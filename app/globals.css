@@ -161,6 +161,7 @@ html.dark .pasek b {
 /* Pasek nawigacyjny w dark mode */
 html.dark .nav {
   background: rgba(18, 3, 17, 0.96) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.2) !important;
   backdrop-filter: blur(16px) saturate(1.2) !important;
   border-bottom: 1px solid #3D0E39 !important;
 }
@@ -473,6 +474,24 @@ html.a11y-font-115 {
 
 html.a11y-font-130 {
   zoom: 1.30;
+}
+
+@supports not (zoom: 1.15) {
+  html.a11y-font-115 {
+    font-size: 115%;
+  }
+  html.a11y-font-130 {
+    font-size: 130%;
+  }
+}
+
+/* Zapobieganie automatycznemu przybliżaniu (auto-zoom) na iOS Safari dla pól formularzy < 16px */
+@media (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 /* 2. Wysoki kontrast (żółć i biel na czerni). Strony w systemie v3 (.hb-site) dostają go z tokenów

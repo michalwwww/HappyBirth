@@ -20,11 +20,20 @@ export function SosContractionCounter() {
     let interval: NodeJS.Timeout;
     if (isActive) {
       interval = setInterval(() => {
-        setSeconds((prev) => prev + 1);
+        setSeconds(activeStartTime ? Math.max(0, Math.round((Date.now() - activeStartTime.getTime()) / 1000)) : (prev) => prev + 1);
       }, 1000);
     }
-    return () => clearInterval(interval);
-  }, [isActive]);
+    const syncOnVisibility = () => {
+      if (isActive && activeStartTime && document.visibilityState === 'visible') {
+        setSeconds(Math.max(0, Math.round((Date.now() - activeStartTime.getTime()) / 1000)));
+      }
+    };
+    document.addEventListener('visibilitychange', syncOnVisibility);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', syncOnVisibility);
+    };
+  }, [isActive, activeStartTime]);
 
   const handleStartStop = () => {
     if (!isActive) {
@@ -37,7 +46,7 @@ export function SosContractionCounter() {
       setIsActive(false);
       const now = new Date();
       const start = activeStartTime || now;
-      const duration = seconds;
+      const duration = activeStartTime ? Math.max(1, Math.round((now.getTime() - activeStartTime.getTime()) / 1000)) : seconds;
 
       // Calculate interval from previous contraction start
       let intervalMin: number | undefined;
@@ -84,7 +93,7 @@ export function SosContractionCounter() {
     <div className="w-full bg-white dark:bg-[color:var(--hb-karta)] rounded-3xl border border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)] p-6 sm:p-8 shadow-xl">
       {/* Alert banner when 5-1-1 is met */}
       {is511Alert && (
-        <div className="mb-6 p-4 rounded-2xl bg-rose-50 border-2 border-rose-500 text-rose-950 flex items-start space-x-3 animate-bounce">
+        <div className="mb-6 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border-2 border-rose-500 text-rose-950 dark:text-rose-100 flex items-start space-x-3 animate-bounce">
           <AlertTriangle className="w-6 h-6 text-rose-600 shrink-0 mt-0.5" />
           <div>
             <h4 className="font-bold text-base">Zasada 5-1-1 osiągnięta: Czas ruszać do szpitala!</h4>
@@ -192,7 +201,7 @@ export function SosContractionCounter() {
 
       {/* Emergency 112 Red Flags */}
       <div className="mt-8 pt-6 border-t border-[color:var(--hb-linia)] dark:border-[color:var(--hb-linia)]">
-        <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 text-amber-950 text-xs">
+        <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-950 dark:text-amber-100 text-xs">
           <div className="flex items-center justify-between gap-2 mb-2">
             <span className="font-bold flex items-center gap-1 text-amber-900 uppercase tracking-wider">
               <AlertTriangle className="w-4 h-4 text-amber-600" /> Czerwone Flagi (Kiedy natychmiast dzwonisz pod 112)

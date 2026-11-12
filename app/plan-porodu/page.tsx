@@ -177,7 +177,7 @@ export default function PublicPlanPoroduLeadPage() {
                   placeholder="np. Anna"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-base sm:text-sm"
                 />
               </div>
 
@@ -191,7 +191,7 @@ export default function PublicPlanPoroduLeadPage() {
                   placeholder="twoj.mail@domena.pl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-base sm:text-sm"
                 />
               </div>
 
@@ -243,8 +243,8 @@ export default function PublicPlanPoroduLeadPage() {
           </div>
         ) : (
           /* Faza 2: Sterylny Szablon A4 do druku + przejście do pełnego kreatora w Strefie Kursantki */
-          <div className="space-y-8">
-            <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex flex-wrap items-center justify-between gap-4 print:hidden">
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-100 flex flex-wrap items-center justify-between gap-4 print:hidden">
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
                 <div className="text-xs sm:text-sm">

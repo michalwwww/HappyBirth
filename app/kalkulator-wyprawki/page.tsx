@@ -206,7 +206,7 @@ export default function KalkulatorWyprawkiPage() {
                     placeholder="np. Kasia"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-sm focus:outline-none focus:border-[#DA0271]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-base sm:text-sm focus:outline-none focus:border-[#DA0271]"
                   />
                 </div>
 
@@ -220,7 +220,7 @@ export default function KalkulatorWyprawkiPage() {
                     placeholder="twoj@email.pl"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-sm focus:outline-none focus:border-[#DA0271]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-base sm:text-sm focus:outline-none focus:border-[#DA0271]"
                   />
                 </div>
               </div>
@@ -232,7 +232,7 @@ export default function KalkulatorWyprawkiPage() {
                 <select
                   value={season}
                   onChange={(e) => setSeason(e.target.value as any)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-sm focus:outline-none focus:border-[#DA0271]"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[color:var(--hb-linia)] bg-[color:var(--hb-kosc)] text-[color:var(--hb-ink)] text-base sm:text-sm focus:outline-none focus:border-[#DA0271]"
                 >
                   <option value="jesien_zima">Jesień / Zima (ciepły śpiworek do fotelika i wełna merino)</option>
                   <option value="wiosna_lato">Wiosna / Lato (lekki muślin i oddychający bambus)</option>
@@ -283,8 +283,8 @@ export default function KalkulatorWyprawkiPage() {
           </div>
         ) : (
           <div className="space-y-8">
-            <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 flex flex-wrap items-center justify-between gap-4 print:hidden">
-              <div className="flex items-center gap-3 text-xs sm:text-sm text-emerald-950">
+            <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex flex-wrap items-center justify-between gap-4 print:hidden">
+              <div className="flex items-center gap-3 text-xs sm:text-sm text-emerald-950 dark:text-emerald-100">
                 <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
                 <div>
                   <strong>Lista wyprawkowa dla {name || 'Ciebie'} ({season === 'jesien_zima' ? 'Jesień / Zima' : 'Wiosna / Lato'}) została wygenerowana!</strong> Zaznacz skompletowane pozycje i zapisz listę jako PDF.
@@ -310,9 +310,9 @@ export default function KalkulatorWyprawkiPage() {
                     className={`p-5 rounded-2xl border transition-all cursor-pointer flex items-start justify-between gap-4 ${
                       item.essentialOnStart
                         ? isChecked
-                          ? 'bg-emerald-50/70 border-emerald-300'
+                          ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700/60'
                           : 'bg-[color:var(--hb-karta)] border-[color:var(--hb-linia)]'
-                        : 'bg-amber-50/60 border-amber-200'
+                        : 'bg-amber-50/60 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50'
                     }`}
                   >
                     <div className="flex items-start gap-3">
