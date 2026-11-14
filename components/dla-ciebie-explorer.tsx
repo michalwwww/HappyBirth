@@ -424,7 +424,7 @@ export function DlaCiebieExplorer({ entries, categories }: DlaCiebieExplorerProp
                   {entry.lessons.map((les) => (
                     <Link
                       key={les.num}
-                      href={les.isFree ? '/#bezplatna-lekcja' : `/program#lekcja-${les.num}`}
+                      href={les.isFree ? `/?lekcja=${les.num}#bezplatna-lekcja` : `/program#lekcja-${les.num}`}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FBF8F4] dark:bg-[#270B25] hover:bg-[#FAE3EB] dark:hover:bg-[#3A1038] border border-[#EAE3DB] dark:border-[#3A1038] text-xs font-semibold text-[#250A24] dark:text-[#EAD5E5] transition-colors"
                     >
                       <CheckCircle2 className="w-3 h-3 text-[#DA0271]" />

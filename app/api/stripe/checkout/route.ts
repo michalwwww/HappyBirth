@@ -222,8 +222,6 @@ export async function POST(req: NextRequest) {
     const sessionParams: any = {
       mode: 'payment',
       line_items: lineItems,
-      invoice_creation: { enabled: true },
-      tax_id_collection: { enabled: true },
       metadata,
       locale: activeLocale,
       success_url: `${origin}/strefa?session_id={CHECKOUT_SESSION_ID}&payment=success`,

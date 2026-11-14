@@ -76,7 +76,7 @@ export function buildDurableMediumConfirmationEmail(params: {
       </div>
 
       <div style="background: #ffffff; border: 1px solid #EAE3DB; border-radius: 14px; padding: 16px; margin-bottom: 18px; font-size: 13px; line-height: 1.6;">
-        <h3 style="margin: 0 0 10px 0; font-size: 14px; color: #1A1512;">1. Specyfikacja zamówienia i faktury VAT (23%)</h3>
+        <h3 style="margin: 0 0 10px 0; font-size: 14px; color: #1A1512;">1. Specyfikacja zamówienia i płatności (w tym VAT 23%)</h3>
         <div><strong>Numer zamówienia:</strong> ${params.orderNumber}</div>
         <div><strong>Produkt główny:</strong> Kurs Szkoły Rodzenia Online HappyBirth.pl (52 lekcje 4K w 8 modułach, 288 min + Notatnik Rodzica PDF + dostęp dla partnera)</div>
         ${params.orderBumpIncluded ? '<div><strong>Dodatek do zamówienia (Order Bump):</strong> Indywidualny Pakiet Dokumentów Szpitalnych i Kreator Planu Porodu + Checklista Wyprawkowa PDF (+49,00 zł brutto)</div>' : ''}

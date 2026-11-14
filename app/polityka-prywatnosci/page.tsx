@@ -62,7 +62,7 @@ export default function PolitykaPrywatnosciPage() {
               <strong>Realizacja zamówienia i dostęp do Strefy Kursantki</strong> (art. 6 ust. 1 lit. b RODO – niezbędność do wykonania umowy): przetwarzamy Twój adres e-mail, imię, dane transakcji oraz rejestr dowodowy zgód konsumenckich w celu udostępnienia kursu na okres <strong>18 miesięcy (548 dni) od momentu zakupu</strong>.
             </li>
             <li>
-              <strong>Wypełnienie obowiązków prawno-podatkowych (w tym VAT OSS / Stripe Tax)</strong> (art. 6 ust. 1 lit. c RODO): wystawianie faktur, prowadzenie księgowości i archiwizacja dokumentów rozliczeniowych.
+              <strong>Wypełnienie obowiązków prawno-podatkowych (w tym VAT OSS / Stripe Tax)</strong> (art. 6 ust. 1 lit. c RODO): prowadzenie księgowości, ewidencji sprzedaży i archiwizacja dokumentów rozliczeniowych.
             </li>
             <li>
               <strong>Obsługa zapytań i wsparcie techniczne</strong> (art. 6 ust. 1 lit. f RODO – prawnie uzasadniony interes Administratora): kontakt w sprawach związanych z obsługą konta lub zgłoszeniami reklamacyjnymi.
@@ -101,7 +101,7 @@ export default function PolitykaPrywatnosciPage() {
           <ul className="list-disc pl-5 space-y-1.5">
             <li><strong>Cloudflare Inc.</strong> (USA / UE) – bezpieczny hosting na serwerach Cloudflare Pages oraz streaming wideo Cloudflare Stream (z zachowaniem Standardowych Klauzul Umownych SCC);</li>
             <li><strong>Operatorzy płatności elektronicznych</strong> (Stripe Payments Europe Ltd.) – w celu bezpiecznego procesowania transakcji BLIK, kart płatniczych, Klarna, Apple Pay i Google Pay;</li>
-            <li><strong>Biuro rachunkowo-księgowe</strong> – w celu obsługi faktur i rozliczeń podatkowych.</li>
+            <li><strong>Biuro rachunkowo-księgowe</strong> – w celu obsługi księgowości i rozliczeń podatkowych.</li>
           </ul>
         </section>
 

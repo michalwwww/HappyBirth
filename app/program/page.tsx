@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { ArrowLeft, Clock, BookOpen, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Clock, BookOpen, ShieldCheck, Play } from 'lucide-react';
 import { lessons } from '@/lib/course-data';
 import { Logo } from '@/components/logo';
 
@@ -248,7 +248,8 @@ export default function ProgramPage() {
                 {mod.lessons.map((lesson) => (
                   <div
                     key={lesson.id}
-                    className="flex items-start sm:items-center justify-between gap-4 p-3.5 rounded-2xl bg-[#FBF8F4] dark:bg-[#260A24] border border-[#EAE3DB]/80 dark:border-[#461643] text-sm"
+                    id={`lekcja-${lesson.lessonNumber}`}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 rounded-2xl bg-[#FBF8F4] dark:bg-[#260A24] border border-[#EAE3DB]/80 dark:border-[#461643] text-sm scroll-mt-24"
                   >
                     <div className="flex items-start sm:items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-white dark:bg-[#1A0619] border border-[#EAE3DB] dark:border-[#461643] text-xs font-bold flex items-center justify-center shrink-0 text-[#DA0271]">
@@ -264,9 +265,20 @@ export default function ProgramPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-xs font-mono font-medium text-[#867A72] dark:text-[#A2958C] shrink-0">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{lesson.durationFormatted}</span>
+                    <div className="flex flex-wrap items-center gap-2.5 text-xs font-mono font-medium text-[#867A72] dark:text-[#A2958C] shrink-0 pl-11 sm:pl-0">
+                      {lesson.isFreePreview && (
+                        <Link
+                          href={`/?lekcja=${lesson.lessonNumber}#bezplatna-lekcja`}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FECB22] hover:bg-[#f3be0f] text-[#1A1512] text-[11px] font-sans font-bold transition-colors"
+                        >
+                          <Play className="w-3 h-3 fill-current" />
+                          <span>BEZPŁATNA · Obejrzyj</span>
+                        </Link>
+                      )}
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{lesson.durationFormatted}</span>
+                      </span>
                     </div>
                   </div>
                 ))}

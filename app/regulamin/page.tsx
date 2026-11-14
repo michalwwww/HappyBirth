@@ -143,7 +143,7 @@ export default function RegulaminPage() {
             2. W przypadku zastosowania autoryzowanego kodu rabatowego (np. <strong>-10%</strong> od położnej, partnera lub koleżanki, obniżającego cenę kursu do <strong>440,10 zł brutto</strong>), obok ceny promocyjnej zawsze prezentowana jest informacja o najniższej cenie z 30 dni przed obniżką zgodnie z Dyrektywą Omnibus.
           </p>
           <p>
-            3. Płatności realizowane są za pośrednictwem operatora Stripe (BLIK, karty płatnicze, szybkie przelewy, Klarna, Apple Pay, Google Pay). Po opłaceniu zamówienia Klient otrzymuje potwierdzenie zawarcia umowy na trwałym nośniku (wiadomość e-mail) wraz z fakturą VAT.
+            3. Płatności realizowane są za pośrednictwem operatora Stripe (BLIK, karty płatnicze, szybkie przelewy, Klarna, Apple Pay, Google Pay). Po opłaceniu zamówienia Klient otrzymuje potwierdzenie zawarcia umowy oraz płatności na trwałym nośniku (wiadomość e-mail).
           </p>
           <p>
             4. <strong>Sprzedaż międzynarodowa, cennik wielowalutowy i rozliczenia podatkowe (VAT OSS / Stripe Tax):</strong> Dla Klientek przebywających poza terytorium Rzeczypospolitej Polskiej Platforma umożliwia rozliczenie w walucie lokalnej za pośrednictwem Stripe Checkout (ceny brutto zawierające właściwy podatek pośredni VAT / GST zgodnie z krajem zamieszkania Konsumenta w procedurze unijnej <strong>VAT OSS</strong> lub eksporcie usług cyfrowych B2C):

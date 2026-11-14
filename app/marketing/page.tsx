@@ -694,8 +694,6 @@ export default function MarketingPage() {
             </span>
             <span>·</span>
             <span>Dostęp natychmiastowy 24/7 dla dwojga</span>
-            <span>·</span>
-            <span>Faktura VAT 23% na życzenie</span>
           </div>
 
           <p className="text-[11px] text-[#EAD5E5]/60 max-w-md mx-auto">

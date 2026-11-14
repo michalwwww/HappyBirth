@@ -321,8 +321,8 @@ const DICT: Record<Language, DictContent> = {
         {
           id: 'pytanie-10',
           category: 'Zakup, prawo i edukacja',
-          q: 'Kto jest sprzedawcą kursu i czy otrzymamy fakturę VAT?',
-          a: 'Operatorem prawnym i sprzedawcą jest polska spółka KLARSOLUTIONS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ z siedzibą w Poznaniu (ul. Śląska 14, 60-614 Poznań, KRS: 0001268396, NIP: 7812118273, REGON: 545782779, kapitał zakładowy 5 000,00 PLN). Po każdym zakupie automatycznie wystawiamy i przesyłamy na e-mail potwierdzenie zawarcia umowy na trwałym nośniku oraz dokument sprzedaży (w tym fakturę VAT 23%).',
+          q: 'Kto jest operatorem i sprzedawcą kursu HappyBirth?',
+          a: 'Operatorem prawnym i sprzedawcą jest polska spółka KLARSOLUTIONS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ z siedzibą w Poznaniu (ul. Śląska 14, 60-614 Poznań, KRS: 0001268396, NIP: 7812118273, REGON: 545782779, kapitał zakładowy 5 000,00 PLN). Po każdym zakupie automatycznie przesyłamy na e-mail potwierdzenie zawarcia umowy oraz płatności na trwałym nośniku.',
           linkHref: '/regulamin',
           linkLabel: 'Zobacz pełne dane sprzedawcy w Regulaminie →',
         },

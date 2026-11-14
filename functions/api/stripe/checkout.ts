@@ -211,8 +211,6 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     } else {
       params.append('allow_promotion_codes', has10Discount || isStandaloneOrderBump ? 'false' : 'true');
     }
-    params.append('invoice_creation[enabled]', 'true');
-    params.append('tax_id_collection[enabled]', 'true');
     params.append(
       'success_url',
       'https://strefa.happybirth.pl/?session_id={CHECKOUT_SESSION_ID}&payment=success'

@@ -392,8 +392,8 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
           a: 'HappyBirth to program edukacyjny i szkoleniowy przygotowujący do roli rodzica. Uzupełnia standardową opiekę medyczną o praktyczną wiedzę, spokój i techniki domowe.',
         },
         {
-          q: 'Jak wygląda płatność i czy otrzymam fakturę?',
-          a: 'Płatność jest jednorazowa przez bezpieczne systemy Stripe, BLIK lub kartę. Natychmiast po opłaceniu otrzymujesz dostęp do platformy oraz automatyczną fakturę.',
+          q: 'Jak wygląda płatność i kiedy otrzymam dostęp do kursu?',
+          a: 'Płatność jest jednorazowa przez bezpieczne systemy Stripe, BLIK lub kartę. Natychmiast po opłaceniu otrzymujesz dostęp do platformy oraz potwierdzenie zamówienia na e-mail.',
         },
       ],
     },
@@ -647,8 +647,8 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
           a: 'HappyBirth is an educational e-learning program preparing you for parenthood. It complements healthcare with practical skills and domestic calm.',
         },
         {
-          q: 'How does payment work and do I get an invoice?',
-          a: 'Payment is one-time via secure Stripe, Apple Pay, Google Pay, or card. You get immediate access to all modules and an automatic invoice.',
+          q: 'How does payment work and when do I get access?',
+          a: 'Payment is one-time via secure Stripe, Apple Pay, Google Pay, or card. You get immediate access to all modules and an email order confirmation.',
         },
       ],
     },
@@ -902,8 +902,8 @@ export const marketingTranslations: Record<Language, MarketingContent> = {
           a: 'HappyBirth — это обучающая программа подготовки к родительству. Она дополняет медицинскую помощь практическими навыками и домашним спокойствием.',
         },
         {
-          q: 'Как проходит оплата и получу ли я чек/счет?',
-          a: 'Оплата единоразовая через Stripe, Apple Pay, Google Pay или карту. Доступ ко всем урокам открывается моментально, чек формируется автоматически.',
+          q: 'Как проходит оплата и когда открывается доступ?',
+          a: 'Оплата единоразовая через Stripe, Apple Pay, Google Pay или карту. Доступ ко всем урокам открывается моментально, подтверждение заказа приходит на e-mail.',
         },
       ],
     },
