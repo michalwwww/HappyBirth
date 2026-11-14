@@ -1,11 +1,10 @@
-import { formatClearSessionCookie } from '../../_shared/session';
+import { appendClearSessionCookies } from '../../_shared/session';
 
-export async function onRequestPost(): Promise<Response> {
+export async function onRequestPost(context: { request: Request }): Promise<Response> {
+  const headers = new Headers({ 'Content-Type': 'application/json' });
+  appendClearSessionCookies(headers, context.request.headers.get('host') || '');
   return new Response(JSON.stringify({ success: true }), {
     status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'Set-Cookie': formatClearSessionCookie(),
-    },
+    headers,
   });
 }

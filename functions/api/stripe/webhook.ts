@@ -1,3 +1,5 @@
+import { escapeHtml, timingSafeEqualHex } from '../../_shared/session';
+
 interface Env {
   DB?: any;
   STRIPE_SECRET_KEY?: string;
@@ -10,6 +12,7 @@ const CHECKBOX_2_ART38_WAIVER_TEXT =
   'Żądam natychmiastowego rozpoczęcia dostarczania treści cyfrowych przed upływem 14-dniowego terminu do odstąpienia od umowy i przyjmuję do wiadomości, że z chwilą uzyskania dostępu do platformy kursowej tracę prawo do odstąpienia od umowy (art. 38 ust. 1 pkt 13 u.p.k.).';
 
 const TERMS_VERSION_SHA256 = 'a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447';
+const WEBHOOK_TOLERANCE_SECONDS = 300;
 
 async function verifyStripeSignature(
   rawBody: string,
@@ -18,14 +21,30 @@ async function verifyStripeSignature(
 ): Promise<boolean> {
   if (!sigHeader || !webhookSecret) return false;
   try {
-    const parts = sigHeader.split(',').reduce<Record<string, string>>((acc, item) => {
-      const [k, v] = item.split('=');
-      if (k && v) acc[k.trim()] = v.trim();
-      return acc;
-    }, {});
-    const timestamp = parts['t'];
-    const signature = parts['v1'];
-    if (!timestamp || !signature) return false;
+    let timestamp = '';
+    const v1Signatures: string[] = [];
+
+    for (const item of sigHeader.split(',')) {
+      const idx = item.indexOf('=');
+      if (idx === -1) continue;
+      const k = item.slice(0, idx).trim();
+      const v = item.slice(idx + 1).trim();
+      if (k === 't' && v) {
+        timestamp = v;
+      } else if (k === 'v1' && v) {
+        v1Signatures.push(v);
+      }
+    }
+
+    if (!timestamp || v1Signatures.length === 0) return false;
+
+    const tsNum = Number(timestamp);
+    if (
+      !Number.isFinite(tsNum) ||
+      Math.abs(Math.floor(Date.now() / 1000) - tsNum) > WEBHOOK_TOLERANCE_SECONDS
+    ) {
+      return false;
+    }
 
     const signedPayload = `${timestamp}.${rawBody}`;
     const enc = new TextEncoder();
@@ -40,7 +59,8 @@ async function verifyStripeSignature(
     const expectedSig = Array.from(new Uint8Array(sigBuf))
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('');
-    return expectedSig === signature;
+
+    return v1Signatures.some((sig) => timingSafeEqualHex(expectedSig, sig));
   } catch {
     return false;
   }
@@ -48,17 +68,24 @@ async function verifyStripeSignature(
 
 export async function onRequestPost(context: { request: Request; env: Env }): Promise<Response> {
   const { request, env } = context;
+
+  if (!env.STRIPE_WEBHOOK_SECRET) {
+    console.error('Brak skonfigurowanego STRIPE_WEBHOOK_SECRET na Edge.');
+    return new Response(JSON.stringify({ error: 'Stripe webhook secret not configured' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const rawBody = await request.text();
   const sigHeader = request.headers.get('stripe-signature');
 
-  if (env.STRIPE_WEBHOOK_SECRET) {
-    const valid = await verifyStripeSignature(rawBody, sigHeader, env.STRIPE_WEBHOOK_SECRET);
-    if (!valid) {
-      return new Response(JSON.stringify({ error: 'Invalid Stripe webhook signature' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+  const valid = await verifyStripeSignature(rawBody, sigHeader, env.STRIPE_WEBHOOK_SECRET);
+  if (!valid) {
+    return new Response(JSON.stringify({ error: 'Invalid Stripe webhook signature' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   let event: any;
@@ -88,6 +115,10 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     }
 
     const sessionId = String(session.id || '');
+    const paymentIntentId =
+      typeof session.payment_intent === 'string'
+        ? session.payment_intent
+        : String(session.payment_intent?.id || '').trim();
     const customerEmail = String(
       session.customer_details?.email || session.customer_email || ''
     )
@@ -102,7 +133,12 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const sessionCurrency = String(session.currency || metadata.currency || 'PLN').toUpperCase();
     const orderBumpIncluded = metadata.order_bump_included === 'true' ? 1 : 0;
     const isOnlyOrderBump = metadata.only_order_bump === 'true';
-    const promoCode = String(metadata.promo_code || '').toUpperCase();
+    const promoCode = String(metadata.promo_code || '').trim().toUpperCase();
+    const promoSourceType = String(metadata.promo_source_type || '').trim();
+    const isDiagnosticTest =
+      promoSourceType === 'diagnostic_test' ||
+      promoCode === 'DIAGNOSTIC_TEST' ||
+      amountTotal <= 500;
     const refCookie = String(metadata.affiliate_ref_cookie || '');
     const buyerIp = String(metadata.buyer_ip || '0.0.0.0');
     const waiverTimestamp = String(metadata.waiver_art38_timestamp || new Date().toISOString());
@@ -125,7 +161,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         }
 
         // 2. Użytkownik w tabeli users
-        let userRow = await env.DB.prepare('SELECT id, referral_code FROM users WHERE email = ?')
+        const userRow = await env.DB.prepare('SELECT id, referral_code FROM users WHERE email = ?')
           .bind(customerEmail)
           .first();
         const userId = userRow?.id || crypto.randomUUID();
@@ -142,14 +178,35 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         }
 
         // 3. Dostęp 18 miesięcy (548 dni) w tabeli enrollments ([C1])
-        await env.DB.prepare(
-          `INSERT OR IGNORE INTO enrollments (
-             id, user_id, course_id, stripe_session_id, status, order_bump_included,
-             granted_at, expires_at
-           ) VALUES (?, ?, 'kurs-glowny-happybirth', ?, 'active', ?, datetime('now'), datetime('now', '+548 days'))`
-        )
-          .bind(crypto.randomUUID(), userId, sessionId, orderBumpIncluded)
-          .run();
+        if (!isOnlyOrderBump) {
+          const existingEnrollment = await env.DB.prepare(
+            'SELECT id FROM enrollments WHERE user_id = ? LIMIT 1'
+          )
+            .bind(userId)
+            .first();
+
+          if (!existingEnrollment) {
+            await env.DB.prepare(
+              `INSERT OR IGNORE INTO enrollments (
+                 id, user_id, course_id, stripe_session_id, status, order_bump_included,
+                 granted_at, expires_at
+               ) VALUES (?, ?, 'kurs-glowny-happybirth', ?, 'active', ?, datetime('now'), datetime('now', '+548 days'))`
+            )
+              .bind(crypto.randomUUID(), userId, sessionId, orderBumpIncluded)
+              .run();
+          } else {
+            await env.DB.prepare(
+              `UPDATE enrollments
+               SET status = 'active',
+                   stripe_session_id = ?,
+                   expires_at = datetime('now', '+548 days'),
+                   order_bump_included = MAX(COALESCE(order_bump_included, 0), ?)
+               WHERE user_id = ?`
+            )
+              .bind(sessionId, orderBumpIncluded, userId)
+              .run();
+          }
+        }
 
         if (orderBumpIncluded) {
           await env.DB.prepare('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?')
@@ -161,16 +218,17 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         const orderId = crypto.randomUUID();
         await env.DB.prepare(
           `INSERT INTO orders (
-             id, order_number, stripe_session_id, user_id, customer_email, customer_name,
+             id, order_number, stripe_session_id, stripe_payment_intent, user_id, customer_email, customer_name,
              amount_total, currency, order_bump_included, promo_code,
              waiver_art38_accepted, waiver_art38_timestamp, buyer_ip,
              waiver_checkbox_text, terms_sha256, durable_medium_sent_at, status
-           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, datetime('now'), 'paid')`
+           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, datetime('now'), 'paid')`
         )
           .bind(
             orderId,
             orderNumber,
             sessionId,
+            paymentIntentId || null,
             userId,
             customerEmail,
             customerName,
@@ -185,14 +243,17 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           )
           .run();
 
-        // 5. [C4] Jeśli użyto kodu polecającego innej kursantki (MAMA-XXXX) -> natychmiast odblokuj jej e-book PDF
-        if (promoCode.startsWith('MAMA-')) {
+        // 5. [C4] Jeśli użyto kodu polecającego innej kursantki (MAMA-XXXX) -> natychmiast odblokuj jej e-book PDF (pomijane dla transakcji testowych i samego Order Bumpa)
+        if (!isDiagnosticTest && !isOnlyOrderBump && promoCode.startsWith('MAMA-')) {
           const referrerUser = await env.DB.prepare(
-            'SELECT id FROM users WHERE referral_code = ?'
+            'SELECT id, email FROM users WHERE referral_code = ?'
           )
             .bind(promoCode)
             .first();
-          if (referrerUser?.id) {
+          if (
+            referrerUser?.id &&
+            String(referrerUser.email || '').trim().toLowerCase() !== customerEmail
+          ) {
             await env.DB.prepare(
               `INSERT OR IGNORE INTO student_referrals (
                  id, referrer_user_id, referrer_code, referred_email, stripe_session_id, reward_unlocked
@@ -203,7 +264,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           }
         }
 
-        // 6. [D1b] + [D2] Rozliczenie prowizji afiliacyjnej (Kod rabatowy nadrzędny wobec ?ref= cookie + blokada self-referral + blokada VIP100/0 PLN)
+        // 6. [D1b] + [D2] Rozliczenie prowizji afiliacyjnej (Kod rabatowy nadrzędny wobec ?ref= cookie + blokada self-referral + blokada VIP100/0 PLN/testów)
         const bumpMinorByCurrency: Record<string, number> = {
           PLN: 4900,
           EUR: 1200,
@@ -215,6 +276,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           : 0;
         const courseNetBase = Math.max(0, amountTotal - bumpMinor);
         const isFreeOrTestCode =
+          isDiagnosticTest ||
           courseNetBase <= 0 ||
           promoCode === 'TEST' ||
           promoCode === 'TEST100' ||
@@ -278,7 +340,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           .run();
 
         if (env.RESEND_API_KEY) {
-          const loginUrl = `https://strefa.happybirth.pl/login?token=${magicToken}&email=${encodeURIComponent(customerEmail)}`;
+          const loginUrl = `https://strefa.happybirth.pl/login?token=${encodeURIComponent(magicToken)}&email=${encodeURIComponent(customerEmail)}`;
           await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -292,17 +354,17 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
               html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px;">
                   <h1 style="font-size: 20px; color: #20071E;">Dziękujemy za zakup kursu HappyBirth.pl!</h1>
-                  <p style="font-size: 14px; color: #544A44;">Twoje zamówienie <strong>${orderNumber}</strong> zostało opłacone. Twój dostęp do wszystkich 52 lekcji 4K jest aktywny przez <strong>18 miesięcy (548 dni)</strong>.</p>
+                  <p style="font-size: 14px; color: #544A44;">Twoje zamówienie <strong>${escapeHtml(orderNumber)}</strong> zostało opłacone. Twój dostęp do wszystkich 52 lekcji 4K jest aktywny przez <strong>18 miesięcy (548 dni)</strong>.</p>
                   <div style="margin: 20px 0; text-align: center;">
-                    <a href="${loginUrl}" style="background: #DA0271; color: #ffffff; text-decoration: none; padding: 13px 26px; border-radius: 9999px; font-weight: bold; font-size: 14px; display: inline-block;">
+                    <a href="${escapeHtml(loginUrl)}" style="background: #DA0271; color: #ffffff; text-decoration: none; padding: 13px 26px; border-radius: 9999px; font-weight: bold; font-size: 14px; display: inline-block;">
                       Wejdź do Strefy Rodziców (1 kliknięcie) &rarr;
                     </a>
                   </div>
                   <div style="background: #ffffff; border: 1px solid #EAE3DB; border-radius: 12px; padding: 14px; font-size: 12px; color: #544A44;">
                     <strong>Potwierdzenie zawarcia umowy na trwałym nośniku (art. 38 ust. 1 pkt 13 u.p.k.):</strong><br/>
-                    • Data i czas zgody UTC: ${waiverTimestamp}<br/>
-                    • Treść zgody: „${CHECKBOX_2_ART38_WAIVER_TEXT}”<br/>
-                    • Suma kontrolna Regulaminu SHA-256: ${TERMS_VERSION_SHA256}<br/>
+                    • Data i czas zgody UTC: ${escapeHtml(waiverTimestamp)}<br/>
+                    • Treść zgody: „${escapeHtml(CHECKBOX_2_ART38_WAIVER_TEXT)}”<br/>
+                    • Suma kontrolna Regulaminu SHA-256: ${escapeHtml(TERMS_VERSION_SHA256)}<br/>
                     • Operator: KLARSOLUTIONS Sp. z o.o., ul. Śląska 14, 60-614 Poznań (KRS 0001268396, NIP 7812118273)
                   </div>
                 </div>
@@ -316,9 +378,13 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     }
   }
 
-  // [A7] + [D2] + [D5a] Obsługa zwrotów (charge.refunded) — rozróżnienie zwrotu częściowego (Order Bump 49 zł) od pełnego zwrotu kursu
+  // [A7] + [D2] + [D5a] Obsługa zwrotów (charge.refunded) — rozróżnienie zwrotu częściowego / samodzielnego Order Bumpa od pełnego zwrotu kursu
   if (event.type === 'charge.refunded') {
     const charge = event.data?.object || {};
+    const paymentIntentId =
+      typeof charge.payment_intent === 'string'
+        ? charge.payment_intent
+        : String(charge.payment_intent?.id || '').trim();
     const customerEmail = String(
       charge.billing_details?.email || charge.receipt_email || ''
     )
@@ -332,52 +398,108 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
 
     if (env.DB) {
       try {
-        if (isPartialRefund) {
-          // [D5a] Częściowy zwrot (np. 14-dniowy zwrot Order Bumpa +49 zł) — ZACHOWAJ dostęp do 52 lekcji kursu głównego!
-          if (customerEmail) {
-            const userRow = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
-              .bind(customerEmail)
-              .first();
-            if (userRow?.id) {
-              await env.DB.prepare(
-                'UPDATE enrollments SET order_bump_included = 0 WHERE user_id = ?'
-              )
-                .bind(userRow.id)
-                .run();
-              await env.DB.prepare(
-                "UPDATE orders SET order_bump_included = 0, status = 'partially_refunded' WHERE user_id = ? OR customer_email = ?"
-              )
-                .bind(userRow.id, customerEmail)
-                .run();
-            } else {
-              await env.DB.prepare(
-                "UPDATE orders SET order_bump_included = 0, status = 'partially_refunded' WHERE customer_email = ?"
-              )
-                .bind(customerEmail)
-                .run();
-            }
+        let matchedOrder: any = null;
+        if (paymentIntentId) {
+          matchedOrder = await env.DB.prepare(
+            `SELECT id, user_id, customer_email, amount_total, order_bump_included
+             FROM orders
+             WHERE stripe_payment_intent = ?
+             LIMIT 1`
+          )
+            .bind(paymentIntentId)
+            .first();
+        }
+        if (!matchedOrder && customerEmail) {
+          matchedOrder = await env.DB.prepare(
+            `SELECT id, user_id, customer_email, amount_total, order_bump_included
+             FROM orders
+             WHERE LOWER(customer_email) = ?
+             ORDER BY created_at DESC
+             LIMIT 1`
+          )
+            .bind(customerEmail)
+            .first();
+        }
+
+        const targetEmail = String(matchedOrder?.customer_email || customerEmail || '')
+          .trim()
+          .toLowerCase();
+        let targetUserId = String(matchedOrder?.user_id || '').trim();
+        if (!targetUserId && targetEmail) {
+          const userRow = await env.DB.prepare('SELECT id FROM users WHERE LOWER(email) = ?')
+            .bind(targetEmail)
+            .first();
+          targetUserId = String(userRow?.id || '').trim();
+        }
+
+        const isStandaloneBumpOrder = Boolean(
+          matchedOrder &&
+            Number(matchedOrder.amount_total || 0) >= 1500 &&
+            Number(matchedOrder.amount_total || 0) <= 6000 &&
+            Number(matchedOrder.order_bump_included) === 1
+        );
+
+        if (isPartialRefund || isStandaloneBumpOrder) {
+          // [D5a] Częściowy zwrot lub samodzielny zwrot Order Bumpa — ZACHOWAJ dostęp do 52 lekcji kursu głównego
+          if (targetUserId) {
+            await env.DB.prepare(
+              'UPDATE enrollments SET order_bump_included = 0 WHERE user_id = ?'
+            )
+              .bind(targetUserId)
+              .run();
+          }
+          const bumpStatus = isPartialRefund ? 'partially_refunded' : 'refunded';
+          if (matchedOrder?.id) {
+            await env.DB.prepare(
+              'UPDATE orders SET order_bump_included = 0, status = ? WHERE id = ?'
+            )
+              .bind(bumpStatus, matchedOrder.id)
+              .run();
+          } else if (targetUserId || targetEmail) {
+            await env.DB.prepare(
+              'UPDATE orders SET order_bump_included = 0, status = ? WHERE user_id = ? OR LOWER(customer_email) = ?'
+            )
+              .bind(bumpStatus, targetUserId || '__NONE__', targetEmail || '__NONE__')
+              .run();
           }
         } else {
-          // Pełny zwrot zamówienia — wycofanie dostępu i anulowanie prowizji afiliacyjnych
-          if (customerEmail) {
-            const userRow = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
-              .bind(customerEmail)
-              .first();
-            if (userRow?.id) {
+          // Pełny zwrot zamówienia (w tym 100/200 gr transakcji diagnostycznej) — wycofanie dostępu i anulowanie prowizji
+          if (matchedOrder?.id) {
+            await env.DB.prepare("UPDATE orders SET status = 'refunded' WHERE id = ?")
+              .bind(matchedOrder.id)
+              .run();
+
+            if (targetUserId) {
+              const remainingActiveOrder = await env.DB.prepare(
+                `SELECT id FROM orders
+                 WHERE user_id = ? AND status IN ('paid', 'partially_refunded') AND id != ?
+                 LIMIT 1`
+              )
+                .bind(targetUserId, matchedOrder.id)
+                .first();
+
+              if (!remainingActiveOrder) {
+                await env.DB.prepare("UPDATE enrollments SET status = 'refunded' WHERE user_id = ?")
+                  .bind(targetUserId)
+                  .run();
+              }
+            }
+          } else if (targetUserId || targetEmail) {
+            if (targetUserId) {
               await env.DB.prepare("UPDATE enrollments SET status = 'refunded' WHERE user_id = ?")
-                .bind(userRow.id)
-                .run();
-              await env.DB.prepare("UPDATE orders SET status = 'refunded' WHERE user_id = ? OR customer_email = ?")
-                .bind(userRow.id, customerEmail)
-                .run();
-            } else {
-              await env.DB.prepare("UPDATE orders SET status = 'refunded' WHERE customer_email = ?")
-                .bind(customerEmail)
+                .bind(targetUserId)
                 .run();
             }
+            await env.DB.prepare(
+              "UPDATE orders SET status = 'refunded' WHERE user_id = ? OR LOWER(customer_email) = ?"
+            )
+              .bind(targetUserId || '__NONE__', targetEmail || '__NONE__')
+              .run();
           }
+
           await env.DB.prepare(
-            `UPDATE affiliate_commissions SET status = 'CANCELLED'
+            `UPDATE affiliate_commissions
+             SET status = 'CANCELLED', tier1_status = 'CANCELLED', tier2_status = 'CANCELLED'
              WHERE order_id IN (SELECT id FROM orders WHERE status = 'refunded')`
           ).run();
         }

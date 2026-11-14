@@ -10,9 +10,9 @@ export function getStoredCompletedLessons(): string[] {
   if (typeof window === 'undefined') return [];
   try {
     const data = localStorage.getItem(COMPLETED_LESSONS_KEY);
-    return data ? JSON.parse(data) : ['lekcja-01']; // default 1st completed for demo
+    return data ? JSON.parse(data) : [];
   } catch {
-    return ['lekcja-01'];
+    return [];
   }
 }
 
@@ -36,7 +36,7 @@ export function saveCompletedLesson(lessonId: string, isCompleted: boolean = tru
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ lessonId, completed: isCompleted }),
     }).catch(() => {
-      // Offline lub niezalogowany - zachowaj w localStorage
+      // Offline lub brak sesji - zachowaj lokalnie
     });
   } catch (e) {
     console.error('Failed to save progress', e);
@@ -49,34 +49,44 @@ export function useCourseProgress() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // 1. Natychmiast załaduj z localStorage (domyślnie 'guest', lub 'student' jeśli hb_unlocked)
     const localLessons = getStoredCompletedLessons();
     setCompletedLessons(localLessons);
-    // Wolny dostęp zespołu: domyślna rola to student
-    const storedRole = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || 'student';
+    const storedRole = (localStorage.getItem(CURRENT_ROLE_KEY) as UserRole) || 'guest';
     setRole(storedRole);
     setIsLoaded(true);
 
-    // Weryfikacja ze stanem serwera
+    // Bezwzględna weryfikacja uprawnień po stronie serwera (brak domyślnego trybu studenta)
     fetch('/api/auth/me')
       .then((res) => res.json())
       .then((data) => {
-        if (data.authenticated && (data.user?.hasActiveCourse || data.user?.role === 'student' || data.user?.role === 'partner')) {
-          const validRole = (data.user.role as UserRole) || 'student';
+        if (data?.authenticated && data?.user?.hasActiveCourse === true) {
+          const validRole: UserRole =
+            data.user.role === 'partner' ? 'partner' : 'student';
           setRole(validRole);
-          localStorage.setItem(CURRENT_ROLE_KEY, validRole);
+          try {
+            localStorage.setItem(CURRENT_ROLE_KEY, validRole);
+            localStorage.setItem('hb_unlocked', 'true');
+          } catch {}
+        } else {
+          setRole('guest');
+          try {
+            localStorage.removeItem(CURRENT_ROLE_KEY);
+            localStorage.removeItem('hb_unlocked');
+          } catch {}
         }
       })
       .catch(() => {});
 
-    // 2. Pobierz postępy z Cloudflare D1 i połącz
+    // Pobierz postępy z Cloudflare D1 i połącz
     fetch('/api/progress')
       .then((res) => res.json())
       .then((data) => {
-        if (data.completedLessons && Array.isArray(data.completedLessons) && data.completedLessons.length > 0) {
+        if (data?.completedLessons && Array.isArray(data.completedLessons) && data.completedLessons.length > 0) {
           const merged = Array.from(new Set([...localLessons, ...data.completedLessons]));
           setCompletedLessons(merged);
-          localStorage.setItem(COMPLETED_LESSONS_KEY, JSON.stringify(merged));
+          try {
+            localStorage.setItem(COMPLETED_LESSONS_KEY, JSON.stringify(merged));
+          } catch {}
         }
       })
       .catch(() => {});
@@ -108,7 +118,9 @@ export function useCourseProgress() {
   const changeRole = (newRole: UserRole) => {
     setRole(newRole);
     if (typeof window !== 'undefined') {
-      localStorage.setItem(CURRENT_ROLE_KEY, newRole);
+      try {
+        localStorage.setItem(CURRENT_ROLE_KEY, newRole);
+      } catch {}
       window.dispatchEvent(new Event('hb_role_updated'));
     }
   };

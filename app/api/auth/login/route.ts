@@ -4,6 +4,16 @@ import { d1First, d1Run } from '@/lib/d1';
 
 export const runtime = 'nodejs';
 
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
+]);
+
 export async function POST(req: NextRequest) {
   try {
     const { email } = await req.json();
@@ -14,11 +24,33 @@ export async function POST(req: NextRequest) {
 
     const cleanEmail = email.trim().toLowerCase();
 
-    // 1. Sprawdź, czy użytkownik ma konto lub wykupiony dostęp w Cloudflare D1
-    const user = await d1First<{ id: string; email: string }>(
-      'SELECT id, email FROM users WHERE email = ?',
-      [cleanEmail]
-    );
+    // 1. Sprawdź, czy użytkownik ma aktywny dostęp (enrollment lub biała lista zespołu)
+    let entitled = TEAM_WHITELIST_EMAILS.has(cleanEmail);
+    if (!entitled) {
+      const user = await d1First<{ id: string; email: string }>(
+        'SELECT id, email FROM users WHERE LOWER(email) = ? LIMIT 1',
+        [cleanEmail]
+      );
+      if (user?.id) {
+        const enrollment = await d1First<{ status: string; expires_at?: string }>(
+          'SELECT status, expires_at FROM enrollments WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+          [user.id]
+        );
+        const expired =
+          enrollment?.expires_at && new Date(enrollment.expires_at).getTime() < Date.now();
+        entitled = Boolean(enrollment && enrollment.status === 'active' && !expired);
+      }
+    }
+
+    if (!entitled) {
+      return NextResponse.json(
+        {
+          error:
+            'Nie znaleźliśmy aktywnego pakietu kursu dla tego adresu e-mail. Użyj adresu z zamówienia lub wykup dostęp na stronie głównej.',
+        },
+        { status: 403 }
+      );
+    }
 
     // 2. Wygeneruj jednorazowy token logowania (Magic Link)
     const token = crypto.randomBytes(32).toString('hex');
@@ -31,8 +63,6 @@ export async function POST(req: NextRequest) {
 
     const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const magicLinkUrl = `${origin}/api/auth/verify?token=${token}`;
-
-    console.log(`🔑 [Magic Link] Wygenerowano link logowania dla ${cleanEmail}: ${magicLinkUrl}`);
 
     // 3. Jeśli podpięty jest RESEND_API_KEY, wyślij prawdziwy e-mail
     if (process.env.RESEND_API_KEY) {
@@ -69,7 +99,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Link logowania został wysłany.',
-      // W środowisku dev zwracamy magic link do natychmiastowego testowania
       devMagicLink: process.env.NODE_ENV !== 'production' ? magicLinkUrl : undefined,
     });
   } catch (error: any) {

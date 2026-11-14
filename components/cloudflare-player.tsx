@@ -15,10 +15,8 @@ import { Lesson } from '@/lib/types';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { CLOUDFLARE_CUSTOMER_DOMAIN } from '@/lib/course-data';
-import { useCourseProgress } from '@/lib/progress';
 import { useI18n } from '@/lib/i18n';
 import { BuyCourseButton } from '@/components/buy-button';
-import { is100PercentPromo, activateStudentAccessLocally, isCourseUnlockedLocally } from '@/lib/promo';
 
 interface CloudflarePlayerProps {
   lesson: Lesson;
@@ -43,25 +41,14 @@ export function CloudflarePlayer({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const prefix = pathname.startsWith('/strefa') ? '/strefa' : '';
-  const { role, changeRole } = useCourseProgress();
   const { lang } = useI18n();
   const [hasServerAccess, setHasServerAccess] = useState(Boolean(lesson.isFreePreview));
   const [loadingAccess, setLoadingAccess] = useState(!lesson.isFreePreview);
-  const [playerPromoInput, setPlayerPromoInput] = useState('');
-  const [playerPromoError, setPlayerPromoError] = useState<string | null>(null);
-  const [showPlayerPromo, setShowPlayerPromo] = useState(false);
 
   // [C2] Auto-Resume state & Signed Token
   const [savedPositionSeconds, setSavedPositionSeconds] = useState<number>(0);
   const [signedTokenOrUid, setSignedTokenOrUid] = useState<string>(lesson.cloudflareUid || '');
   const lastSavedSecRef = useRef<number>(0);
-
-  const isUnlockedLocally =
-    typeof window !== 'undefined' &&
-    (localStorage.getItem('hb_unlocked') === 'true' ||
-      localStorage.getItem('hb_current_role') === 'student' ||
-      localStorage.getItem('hb_current_role') === 'partner' ||
-      isCourseUnlockedLocally());
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
@@ -96,47 +83,61 @@ export function CloudflarePlayer({
   }, [lesson.id, lesson.cloudflareUid]);
 
   useEffect(() => {
-    if (lesson.isFreePreview || role === 'student' || role === 'partner' || isUnlockedLocally) {
+    let cancelled = false;
+    if (lesson.isFreePreview) {
       setHasServerAccess(true);
       setLoadingAccess(false);
       return;
     }
 
+    setLoadingAccess(true);
     const sessionId = searchParams?.get('session_id');
-    if (sessionId) {
+    if (sessionId && sessionId.startsWith('cs_')) {
       fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`)
         .then((res) => res.json())
         .then((data) => {
-          if (data.success) {
+          if (cancelled) return;
+          if (data?.success) {
             setHasServerAccess(true);
-            setLoadingAccess(false);
             window.dispatchEvent(new Event('hb_progress_updated'));
+          } else {
+            setHasServerAccess(false);
           }
         })
-        .catch(() => {})
-        .finally(() => setLoadingAccess(false));
-      return;
+        .catch(() => {
+          if (!cancelled) setHasServerAccess(false);
+        })
+        .finally(() => {
+          if (!cancelled) setLoadingAccess(false);
+        });
+      return () => {
+        cancelled = true;
+      };
     }
 
     fetch('/api/auth/me')
       .then((res) => res.json())
       .then((data) => {
-        if (
-          data.authenticated &&
-          (data.user?.hasActiveCourse ||
-            data.user?.role === 'student' ||
-            data.user?.role === 'partner')
-        ) {
+        if (cancelled) return;
+        if (data?.authenticated && data?.user?.hasActiveCourse === true) {
           setHasServerAccess(true);
+        } else {
+          setHasServerAccess(false);
         }
       })
-      .catch(() => {})
-      .finally(() => setLoadingAccess(false));
-  }, [lesson.isFreePreview, role, searchParams, isUnlockedLocally]);
+      .catch(() => {
+        if (!cancelled) setHasServerAccess(false);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingAccess(false);
+      });
 
-  const isUnlocked = Boolean(
-    lesson.isFreePreview || hasServerAccess || role === 'student' || role === 'partner' || isUnlockedLocally
-  );
+    return () => {
+      cancelled = true;
+    };
+  }, [lesson.isFreePreview, searchParams]);
+
+  const isUnlocked = Boolean(lesson.isFreePreview || hasServerAccess);
 
   // [C2] Pobierz 120-minutowy Signed Token URL oraz zarejestruj first_content_accessed_at ([E1])
   useEffect(() => {
@@ -152,7 +153,15 @@ export function CloudflarePlayer({
         lang,
       }),
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (res.status === 401 || res.status === 403) {
+          if (!lesson.isFreePreview) {
+            setHasServerAccess(false);
+          }
+          return null;
+        }
+        return res.json();
+      })
       .then((data) => {
         if (data?.token) {
           setSignedTokenOrUid(data.token);
@@ -430,7 +439,7 @@ export function CloudflarePlayer({
                 </BuyCourseButton>
 
                 <Link
-                  href="/strefa/login"
+                  href={`${prefix}/login`}
                   className="w-full sm:w-auto px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold border border-white/15 transition-colors"
                 >
                   Masz już konto? Zaloguj się

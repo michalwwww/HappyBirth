@@ -2,18 +2,15 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/logo';
 import { useCourseProgress } from '@/lib/progress';
 import { BuyCourseButton } from '@/components/buy-button';
-import { 
-  Mail, 
-  ArrowRight, 
-  ShieldCheck, 
-  Heart, 
-  Sparkles, 
-  CheckCircle2, 
-  AlertCircle 
+import {
+  Mail,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 
 export default function StrefaLoginPage() {
@@ -21,7 +18,6 @@ export default function StrefaLoginPage() {
   const [sent, setSent] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const router = useRouter();
   const { changeRole } = useCourseProgress();
 
   React.useEffect(() => {
@@ -34,6 +30,11 @@ export default function StrefaLoginPage() {
 
     const token = params.get('token');
     const emailParam = params.get('email') || '';
+    const redirectParam = params.get('redirect') || '';
+    const isSafeRedirect = redirectParam.startsWith('/') && !redirectParam.startsWith('//');
+    const isStrefaHost = window.location.hostname.startsWith('strefa.');
+    const defaultTarget = isStrefaHost ? '/' : '/strefa';
+
     if (token) {
       setLoadingProvider('email');
       fetch('/api/auth/verify', {
@@ -48,7 +49,7 @@ export default function StrefaLoginPage() {
             try {
               localStorage.setItem('hb_unlocked', 'true');
             } catch {}
-            router.push('/strefa?payment=success');
+            window.location.href = isSafeRedirect ? redirectParam : defaultTarget;
           } else {
             setErrorMessage(data.error || 'Link logowania wygasł lub został już wykorzystany.');
             setLoadingProvider(null);
@@ -77,7 +78,7 @@ export default function StrefaLoginPage() {
       if (!res.ok) {
         setErrorMessage(data.error || 'Wystąpił błąd podczas wysyłania linku.');
       } else {
-        if (data.devMagicLink) {
+        if (data.devMagicLink && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
           window.location.href = data.devMagicLink;
           return;
         }
@@ -90,43 +91,26 @@ export default function StrefaLoginPage() {
     }
   };
 
-  const handleQuickDemo = async (role: 'student' | 'partner') => {
-    changeRole(role);
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: role === 'partner' ? 'partner@happybirth.pl' : 'mwspace@gmail.com' }),
-      });
-      const data = await res.json();
-      if (data.devMagicLink) {
-        window.location.href = data.devMagicLink;
-        return;
-      }
-    } catch {}
-    router.push('/strefa');
-  };
-
   return (
     <div className="min-h-[85vh] flex flex-col items-center justify-center px-4 sm:px-6 py-12">
       <div className="w-full max-w-md space-y-8">
         {/* Brand */}
         <div className="text-center space-y-3">
-          <Link href="/" className="inline-block">
+          <a href="https://happybirth.pl/" className="inline-block">
             <Logo className="h-12 w-auto mx-auto object-contain" priority />
-          </Link>
-          <h1 className="font-semibold text-3xl text-[#4A3A5E]">
+          </a>
+          <h1 className="font-semibold text-3xl text-[#4A3A5E] dark:text-[#FBF8F4]">
             Strefa Rodziców
           </h1>
-          <p className="text-sm text-[#544A44]">
-            Zaloguj się, aby uzyskać dostęp do 52 lekcji VOD, personalizowanego harmonogramu i Kreatora Planu Porodu.
+          <p className="text-sm text-[#544A44] dark:text-[#D7CCC3]">
+            Zaloguj się adresem e-mail z zamówienia, aby uzyskać dostęp do 52 lekcji VOD 4K i narzędzi okołoporodowych.
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-[#FFFDFA] rounded-3xl p-8 border border-[#EADFD3] shadow-lg space-y-6">
+        <div className="bg-[#FFFDFA] dark:bg-[#1C081A] rounded-3xl p-8 border border-[#EADFD3] dark:border-[#3D0E39] shadow-lg space-y-6">
           {errorMessage && (
-            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 flex items-start gap-2">
+            <div className="p-3.5 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-2xl text-xs text-rose-700 dark:text-rose-200 flex items-start gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
@@ -137,27 +121,28 @@ export default function StrefaLoginPage() {
               <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <h3 className="font-semibold text-xl text-[#4A3A5E]">
+              <h3 className="font-semibold text-xl text-[#4A3A5E] dark:text-[#FBF8F4]">
                 Sprawdź swoją skrzynkę!
               </h3>
-              <p className="text-xs sm:text-sm text-[#544A44] leading-relaxed">
-                Wysłaliśmy bezpieczny Magic Link na adres <strong>{email}</strong>. Kliknij w link w mailu, aby natychmiast wejść do kursu bez podawania hasła.
+              <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
+                Wysłaliśmy bezpieczny jednorazowy link logowania na adres <strong>{email}</strong>. Kliknij w link w wiadomości, aby wejść do kursu bez podawania hasła.
               </p>
-              <div className="pt-2">
-                <button
-                  onClick={() => handleQuickDemo('student')}
-                  className="w-full py-3 rounded-full bg-[#DA0271] hover:bg-[#B90260] text-white text-xs font-semibold transition-all shadow-md shadow-[#DA0271]/25"
-                >
-                  Wejdź od razu do panelu (Demo)
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSent(false);
+                  setErrorMessage(null);
+                }}
+                className="text-xs font-semibold text-[#DA0271] hover:underline cursor-pointer"
+              >
+                Wpisz inny adres e-mail
+              </button>
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Formularz Magic Link */}
               <form onSubmit={handleMagicLink} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#544A44] dark:text-[#D7CCC3] mb-1.5">
                     Adres e-mail z zamówienia
                   </label>
                   <div className="relative">
@@ -168,7 +153,7 @@ export default function StrefaLoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="twoj-email@example.com"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#EADFD3] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-sm text-[#2A2421] bg-[#FDFAF6]"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#EADFD3] dark:border-[#3D0E39] focus:outline-none focus:ring-2 focus:ring-[#DA0271] text-sm text-[#2A2421] dark:text-white bg-[#FDFAF6] dark:bg-[#250A24]"
                     />
                   </div>
                 </div>
@@ -188,38 +173,10 @@ export default function StrefaLoginPage() {
                   )}
                 </button>
               </form>
-
-              {/* Szybki Dostęp Demo */}
-              <div className="pt-4 border-t border-[#EADFD3] space-y-2">
-                <div className="text-[11px] text-[#867A72] text-center relative">
-                  <span className="bg-[#FFFDFA] px-2 relative z-10 font-medium uppercase tracking-wider">SZYBKI PODGLĄD DEMO</span>
-                  <div className="absolute inset-0 top-1/2 border-t border-[#EADFD3]" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickDemo('student')}
-                    className="py-2.5 px-3 rounded-xl bg-[#FCF4F6] hover:bg-[#DA0271] text-[#DA0271] hover:text-white border border-[#DD7C9D]/40 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <Heart className="w-3.5 h-3.5" />
-                    <span>Dla Mamy</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickDemo('partner')}
-                    className="py-2.5 px-3 rounded-xl bg-[#FDF9EE] hover:bg-[#E9C46A] text-[#4A3A5E] hover:text-[#1E1A17] border border-[#E9C46A]/50 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Dla Taty</span>
-                  </button>
-                </div>
-              </div>
             </div>
           )}
 
-          <div className="pt-4 border-t border-[#EADFD3] flex items-center justify-between text-xs text-[#867A72]">
+          <div className="pt-4 border-t border-[#EADFD3] dark:border-[#3D0E39] flex items-center justify-between text-xs text-[#867A72] dark:text-[#C4ADC0]">
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>Bezpieczne szyfrowanie SSL</span>
@@ -228,6 +185,15 @@ export default function StrefaLoginPage() {
             <BuyCourseButton className="text-[#DA0271] font-semibold hover:underline bg-transparent border-0 p-0 text-xs cursor-pointer shadow-none">
               Kup kurs (489 zł) &rarr;
             </BuyCourseButton>
+          </div>
+
+          <div className="text-center">
+            <Link
+              href="https://happybirth.pl/#bezplatna-lekcja"
+              className="text-xs text-[#867A72] dark:text-[#C4ADC0] hover:text-[#DA0271] underline"
+            >
+              Chcesz najpierw zobaczyć bezpłatną lekcję próbną? Przejdź na happybirth.pl &rarr;
+            </Link>
           </div>
         </div>
       </div>

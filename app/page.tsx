@@ -25,7 +25,7 @@ import { useI18n, Language } from '@/lib/i18n';
 import {
   is100PercentPromo,
   is10PercentAffiliatePromo,
-  activateStudentAccessLocally,
+  isDiagnosticTestPromoAsync,
   OMNIBUS_LOWEST_30D_NOTICE_PL,
   ORDER_BUMP_TITLE_PL,
   ORDER_BUMP_DESC_PL,
@@ -604,6 +604,7 @@ export default function RootPage() {
   const [promoCodeInput, setPromoCodeInput] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
   const [appliedDiscountPercent, setAppliedDiscountPercent] = useState<0 | 10 | 100>(0);
+  const [isDiagnosticPromo, setIsDiagnosticPromo] = useState(false);
   const [promoError, setPromoError] = useState<string | null>(null);
   const [showPromoInput, setShowPromoInput] = useState(false);
 
@@ -635,7 +636,7 @@ export default function RootPage() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
-    const promoParam = params.get('promo');
+    const promoParam = params.get('promo') || params.get('kod');
     if (promoParam) {
       const normalized = promoParam.trim().toUpperCase();
       setPromoCodeInput(normalized);
@@ -643,14 +644,26 @@ export default function RootPage() {
       if (is10PercentAffiliatePromo(normalized)) {
         setAppliedPromo(normalized);
         setAppliedDiscountPercent(10);
+        setIsDiagnosticPromo(false);
       } else if (is100PercentPromo(normalized)) {
         setAppliedPromo(normalized);
         setAppliedDiscountPercent(100);
+        setIsDiagnosticPromo(false);
+      } else {
+        isDiagnosticTestPromoAsync(normalized).then((ok) => {
+          if (ok) {
+            setAppliedPromo(normalized);
+            setAppliedDiscountPercent(0);
+            setIsDiagnosticPromo(true);
+            setSelectedCurrency('pln');
+            setPromoError(null);
+          }
+        });
       }
     }
   }, []);
 
-  const handleApplyPromo = () => {
+  const handleApplyPromo = async () => {
     const code = promoCodeInput.trim().toUpperCase();
     if (!code) {
       setPromoError(lang === 'pl' ? 'Wpisz kod rabatowy.' : 'Enter promo code.');
@@ -660,6 +673,7 @@ export default function RootPage() {
     if (is10PercentAffiliatePromo(code)) {
       setAppliedPromo(code);
       setAppliedDiscountPercent(10);
+      setIsDiagnosticPromo(false);
       setPromoError(null);
       return;
     }
@@ -667,12 +681,23 @@ export default function RootPage() {
     if (is100PercentPromo(code)) {
       setAppliedPromo(code);
       setAppliedDiscountPercent(100);
+      setIsDiagnosticPromo(false);
+      setPromoError(null);
+      return;
+    }
+
+    if (await isDiagnosticTestPromoAsync(code)) {
+      setAppliedPromo(code);
+      setAppliedDiscountPercent(0);
+      setIsDiagnosticPromo(true);
+      setSelectedCurrency('pln');
       setPromoError(null);
       return;
     }
 
     setAppliedPromo(null);
     setAppliedDiscountPercent(0);
+    setIsDiagnosticPromo(false);
     setPromoError(
       lang === 'pl'
         ? 'Nieprawidłowy kod rabatowy.'
@@ -681,14 +706,19 @@ export default function RootPage() {
   };
 
   const activeCurrencyConfig = GLOBAL_PRICING_CONFIG[selectedCurrency] || GLOBAL_PRICING_CONFIG.pln;
-  const baseCourseMajor =
-    appliedDiscountPercent === 100
+  const diagnosticCourseMajor = includeOrderBump ? 1 : 2;
+  const baseCourseMajor = isDiagnosticPromo
+    ? diagnosticCourseMajor
+    : appliedDiscountPercent === 100
       ? 0
       : appliedDiscountPercent === 10
         ? activeCurrencyConfig.discounted10MinorUnits / 100
         : activeCurrencyConfig.baseMinorUnits / 100;
-  const orderBumpMajor =
-    includeOrderBump && appliedDiscountPercent !== 100
+  const orderBumpMajor = isDiagnosticPromo
+    ? includeOrderBump
+      ? 1
+      : 0
+    : includeOrderBump && appliedDiscountPercent !== 100
       ? activeCurrencyConfig.orderBumpMinorUnits / 100
       : 0;
   const finalTotalMajor = baseCourseMajor + orderBumpMajor;
@@ -704,8 +734,9 @@ export default function RootPage() {
   };
 
   const formattedFinalPrice = formatAmountForCurrency(finalTotalMajor, selectedCurrency);
-  const formattedOrderBumpBadge =
-    selectedCurrency === 'pln'
+  const formattedOrderBumpBadge = isDiagnosticPromo
+    ? '+1 zł (test)'
+    : selectedCurrency === 'pln'
       ? '+49 zł'
       : `+${activeCurrencyConfig.displayOrderBump}`;
 
@@ -724,12 +755,6 @@ export default function RootPage() {
     try {
       setLoading(true);
       const currentPromo = (appliedPromo || promoCodeInput).trim().toUpperCase();
-
-      try {
-        if (includeOrderBump) {
-          localStorage.setItem('hb_order_bump_unlocked', 'true');
-        }
-      } catch (_) {}
 
       const utmParams: Record<string, string> = {};
       if (typeof window !== 'undefined') {
@@ -1269,7 +1294,11 @@ export default function RootPage() {
                   <p className="kwota">
                     {formattedFinalPrice}
                     <small>
-                      {appliedDiscountPercent === 10
+                      {isDiagnosticPromo
+                        ? includeOrderBump
+                          ? 'test Live (kurs + karty PDF)'
+                          : 'test Live (min. Stripe PLN)'
+                        : appliedDiscountPercent === 10
                         ? 'z kodem -10%'
                         : includeOrderBump
                         ? 'kurs + karty PDF'
@@ -1414,7 +1443,11 @@ export default function RootPage() {
                       {appliedPromo && (
                         <p className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold flex items-center gap-1.5">
                           <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                          <span>Kod {appliedPromo} (-{appliedDiscountPercent}%) aktywny!</span>
+                          <span>
+                            {isDiagnosticPromo
+                              ? 'Tryb testowy Live aktywny (płatność diagnostyczna PLN)'
+                              : `Kod ${appliedPromo} (-${appliedDiscountPercent}%) aktywny!`}
+                          </span>
                         </p>
                       )}
 

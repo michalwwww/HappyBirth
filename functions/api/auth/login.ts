@@ -1,3 +1,11 @@
+import {
+  checkRateLimitD1,
+  extractClientIp,
+  hasActiveCourseEntitlementD1,
+  isLocalDevRequest,
+  isTeamWhitelistedEmail,
+} from '../../_shared/session';
+
 interface Env {
   DB?: any;
   RESEND_API_KEY?: string;
@@ -12,10 +20,37 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       .trim()
       .toLowerCase();
 
-    if (!email || !email.includes('@')) {
+    if (!email || !email.includes('@') || email.length > 254) {
       return new Response(
         JSON.stringify({ error: 'Podaj poprawny adres e-mail użyty podczas zakupu kursu.' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const clientIp = extractClientIp(request);
+    if (env.DB) {
+      const ipAllowed = await checkRateLimitD1(env.DB, `auth_login_ip:${clientIp}`, 8, 15);
+      const emailAllowed = await checkRateLimitD1(env.DB, `auth_login_email:${email}`, 5, 15);
+      if (!ipAllowed || !emailAllowed) {
+        return new Response(
+          JSON.stringify({
+            error: 'Zbyt wiele prób logowania. Odczekaj 15 minut i spróbuj ponownie.',
+          }),
+          { status: 429, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    const entitled =
+      isTeamWhitelistedEmail(email) || (await hasActiveCourseEntitlementD1(env.DB, null, email));
+
+    if (!entitled) {
+      return new Response(
+        JSON.stringify({
+          error:
+            'Nie znaleźliśmy aktywnego pakietu kursu dla tego adresu e-mail. Użyj adresu z zamówienia lub wykup dostęp na stronie głównej.',
+        }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
@@ -31,10 +66,18 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           .run();
       } catch (e) {
         console.error('Błąd zapisu auth_tokens w D1:', e);
+        return new Response(
+          JSON.stringify({ error: 'Nie udało się zapisać tokenu logowania.' }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
       }
     }
 
-    const magicLink = `https://strefa.happybirth.pl/login?token=${token}&email=${encodeURIComponent(email)}`;
+    const url = new URL(request.url);
+    const isLocal = isLocalDevRequest(request);
+    const magicLink = isLocal
+      ? `${url.origin}/strefa/login?token=${token}&email=${encodeURIComponent(email)}`
+      : `https://strefa.happybirth.pl/login?token=${token}&email=${encodeURIComponent(email)}`;
 
     if (env.RESEND_API_KEY) {
       await fetch('https://api.resend.com/emails', {
@@ -67,6 +110,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       JSON.stringify({
         success: true,
         message: 'Wysłaliśmy jednorazowy link logowania na podany adres e-mail.',
+        ...(isLocal ? { devMagicLink: magicLink } : {}),
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );

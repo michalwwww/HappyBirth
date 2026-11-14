@@ -26,9 +26,7 @@ import { FinalQuizAndCertificate } from '@/components/final-quiz-certificate';
 import { openPrintableLessonWorksheet } from '@/lib/printable-worksheets';
 import {
   activateStudentAccessLocally,
-  is100PercentPromo,
   detectClientOrderBumpEdition,
-  isOrderBumpUnlockedLocally,
 } from '@/lib/promo';
 import { Lesson, Stage } from '@/lib/types';
 import {
@@ -50,6 +48,7 @@ import {
 
 function StrefaDashboardContent() {
   const { role, changeRole, completedLessons, percentCompleted, toggleLessonCompletion } = useCourseProgress();
+  const [authChecked, setAuthChecked] = useState(false);
   const [pregnancyProfile, setPregnancyProfile] = useState<PregnancyProfile | null>(null);
   const [accountInfo, setAccountInfo] = useState<{
     email?: string;
@@ -71,9 +70,6 @@ function StrefaDashboardContent() {
   const handleBuyStandaloneOrderBump = async () => {
     try {
       setBuyingOrderBump(true);
-      try {
-        localStorage.setItem('hb_order_bump_unlocked', 'true');
-      } catch (_) {}
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -91,9 +87,9 @@ function StrefaDashboardContent() {
         window.location.href = data.url;
         return;
       }
-      window.location.href = '/#cena';
+      window.location.href = 'https://happybirth.pl/#cena';
     } catch {
-      window.location.href = '/#cena';
+      window.location.href = 'https://happybirth.pl/#cena';
     } finally {
       setBuyingOrderBump(false);
     }
@@ -107,25 +103,35 @@ function StrefaDashboardContent() {
   const [shouldAutoplay, setShouldAutoplay] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+    let scrollTimer: ReturnType<typeof setTimeout> | null = null;
+
     const localProfile = getSavedPregnancyProfile();
     setPregnancyProfile(localProfile);
 
-    if (typeof window !== 'undefined') {
-      const savedOverride = localStorage.getItem('hb_order_bump_edition_override');
-      const detected = detectClientOrderBumpEdition({
-        manualEditionOverride: savedOverride,
-      });
-      setSmartOrderBump(detected);
-      if (isOrderBumpUnlockedLocally()) {
-        setHasOrderBump(true);
-      }
+    if (typeof window === 'undefined') return;
+
+    const savedOverride = localStorage.getItem('hb_order_bump_edition_override');
+    const detected = detectClientOrderBumpEdition({
+      manualEditionOverride: savedOverride,
+    });
+    setSmartOrderBump(detected);
+
+    const loginUrl = window.location.hostname.startsWith('strefa.') ? '/login' : '/strefa/login';
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = (params.get('session_id') || '').trim();
+    const autoplayParam = params.get('autoplay');
+
+    if (autoplayParam === 'true') {
+      setShouldAutoplay(true);
     }
 
-    // Pobierz dane konta i profil ciąży z Cloudflare D1 (/api/auth/me)
-    fetch('/api/auth/me')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.user) {
+    const hydrateFromMe = async (): Promise<boolean> => {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        if (cancelled) return false;
+        if (data?.authenticated && data?.user?.hasActiveCourse === true) {
           setAccountInfo({
             email: data.user.email,
             fullName: data.user.fullName,
@@ -135,85 +141,90 @@ function StrefaDashboardContent() {
             daysRemaining: data.user.daysRemaining,
             referralCode: data.user.referralCode,
           });
-          if (data.user.orderBumpIncluded) {
-            setHasOrderBump(true);
-            try {
+          setHasOrderBump(Boolean(data.user.orderBumpIncluded));
+          try {
+            localStorage.setItem('hb_unlocked', 'true');
+            if (data.user.orderBumpIncluded) {
               localStorage.setItem('hb_order_bump_unlocked', 'true');
-            } catch (_) {}
-          }
+            } else {
+              localStorage.removeItem('hb_order_bump_unlocked');
+            }
+          } catch (_) {}
           if (data.user.pregnancy?.dueDate && !localProfile?.dueDate) {
             setPregnancyProfile(data.user.pregnancy);
             savePregnancyProfile(data.user.pregnancy);
           }
+          setAuthChecked(true);
+          return true;
         }
-      })
-      .catch(() => {});
-
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const sessionId = params.get('session_id');
-      const payment = params.get('payment');
-      const promo = params.get('promo');
-      const lessonParam = params.get('lesson');
-      const autoplayParam = params.get('autoplay');
-
-      const isPromoOrSuccess =
-        (sessionId && (sessionId.startsWith('promo_') || sessionId.startsWith('demo_') || sessionId.toLowerCase().includes('test') || sessionId.toLowerCase().includes('promo'))) ||
-        payment === 'success' ||
-        Boolean(promo) ||
-        is100PercentPromo(promo);
-
-      // Natychmiastowe odblokowanie dostępu lokalnie
-      if (isPromoOrSuccess) {
-        activateStudentAccessLocally(promo || 'TEST100');
-        changeRole('student');
-        setPaymentSuccess(true);
+      } catch {
+        // Fallback poniżej
       }
+      return false;
+    };
 
-      if (sessionId) {
-        fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`)
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.success) {
-              const bumpUnlocked = Boolean(data.orderBumpIncluded || data.user?.orderBumpIncluded);
-              activateStudentAccessLocally(promo || 'TEST100', bumpUnlocked);
-              if (bumpUnlocked) setHasOrderBump(true);
-              changeRole('student');
-              setPaymentSuccess(true);
-              window.dispatchEvent(new Event('hb_progress_updated'));
-            }
-          })
-          .catch((err) => console.error('Błąd weryfikacji płatności:', err));
-      } else if (payment === 'success') {
-        activateStudentAccessLocally(promo || 'TEST100');
-        changeRole('student');
-        setPaymentSuccess(true);
-        window.dispatchEvent(new Event('hb_progress_updated'));
-      }
-
-      // Ustaw aktywną lekcję z parametru lub pierwszą nieukończoną
-      if (lessonParam && lessons.some((l) => l.id === lessonParam)) {
-        setActiveLessonId(lessonParam);
-      } else {
-        const nextUncompleted = lessons.find((l) => !completedLessons.includes(l.id));
-        if (nextUncompleted) {
-          setActiveLessonId(nextUncompleted.id);
-        }
-      }
-
-      // Autoplay po płatności lub parametrze
-      if (isPromoOrSuccess || autoplayParam === 'true') {
-        setShouldAutoplay(true);
-      }
-
-      // Automatyczne płynne wycentrowanie ekranu na filmie po zapłaceniu / zniżce
-      if (isPromoOrSuccess || payment === 'success' || sessionId) {
-        const timer = setTimeout(() => {
-          if (playerSectionRef.current) {
-            playerSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const verifyAccess = async () => {
+      if (sessionId.startsWith('cs_')) {
+        try {
+          const res = await fetch(`/api/stripe/verify-session?session_id=${encodeURIComponent(sessionId)}`);
+          const data = await res.json();
+          if (cancelled) return;
+          if (data?.success) {
+            const bumpUnlocked = Boolean(data.orderBumpIncluded || data.user?.orderBumpIncluded);
+            activateStudentAccessLocally('', bumpUnlocked);
+            if (bumpUnlocked) setHasOrderBump(true);
+            changeRole('student');
+            setPaymentSuccess(true);
+            setShouldAutoplay(true);
+            window.dispatchEvent(new Event('hb_progress_updated'));
+            await hydrateFromMe();
+            setAuthChecked(true);
+            scrollTimer = setTimeout(() => {
+              if (playerSectionRef.current) {
+                playerSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }, 300);
+            return;
           }
-        }, 300);
-        return () => clearTimeout(timer);
+        } catch (err) {
+          console.error('Błąd weryfikacji płatności:', err);
+        }
+        if (!cancelled) {
+          window.location.href = loginUrl;
+        }
+        return;
+      }
+
+      const ok = await hydrateFromMe();
+      if (cancelled) return;
+      if (!ok) {
+        try {
+          localStorage.removeItem('hb_unlocked');
+          localStorage.removeItem('hb_current_role');
+          localStorage.removeItem('hb_order_bump_unlocked');
+        } catch (_) {}
+        window.location.href = `${loginUrl}?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+      }
+    };
+
+    verifyAccess();
+
+    return () => {
+      cancelled = true;
+      if (scrollTimer) clearTimeout(scrollTimer);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const lessonParam = params.get('lesson');
+    if (lessonParam && lessons.some((l) => l.id === lessonParam)) {
+      setActiveLessonId(lessonParam);
+    } else {
+      const nextUncompleted = lessons.find((l) => !completedLessons.includes(l.id));
+      if (nextUncompleted) {
+        setActiveLessonId(nextUncompleted.id);
       }
     }
   }, [completedLessons]);
@@ -259,6 +270,15 @@ function StrefaDashboardContent() {
   const formattedExpiresDate = accountInfo?.expiresAt
     ? new Date(accountInfo.expiresAt).toLocaleDateString('pl-PL')
     : null;
+
+  if (!authChecked) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center text-[#867A72] dark:text-[#C4ADC0]">
+        <div className="w-10 h-10 border-4 border-[#DA0271]/30 border-t-[#DA0271] rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-sm">Weryfikacja dostępu do Strefy Rodziców...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">

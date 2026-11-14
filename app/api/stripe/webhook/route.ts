@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
     const orderBumpIncluded = session.metadata?.order_bump_included === 'true';
     const isOnlyOrderBump = session.metadata?.only_order_bump === 'true';
     const promoCode = (session.metadata?.promo_code || '').trim().toUpperCase();
+    const promoSourceType = (session.metadata?.promo_source_type || '').trim();
     const refCookie = (session.metadata?.affiliate_ref_cookie || session.metadata?.ref || '').trim();
     const waiverTimestamp = session.metadata?.waiver_art38_timestamp || new Date().toISOString();
     const buyerIp = session.metadata?.buyer_ip || '0.0.0.0';
@@ -52,6 +53,14 @@ export async function POST(req: NextRequest) {
       session.amount_total !== undefined && session.amount_total !== null
         ? session.amount_total
         : 48900;
+    const isDiagnosticTest =
+      promoSourceType === 'diagnostic_test' ||
+      promoCode === 'DIAGNOSTIC_TEST' ||
+      amountTotalGrosze <= 500;
+    const paymentIntentId =
+      typeof session.payment_intent === 'string'
+        ? session.payment_intent
+        : String((session.payment_intent as any)?.id || '').trim();
     const sessionCurrency = (session.currency || session.metadata?.currency || 'PLN').toUpperCase();
 
     console.log(
@@ -86,16 +95,18 @@ export async function POST(req: NextRequest) {
         }
 
         // 2. [A5] + [C1] Nadaj dostęp na 18 miesięcy (548 dni od momentu zakupu)
-        const enrollmentId = crypto.randomUUID();
         const expiresAt = new Date(Date.now() + ACCESS_DURATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
-        const stripeCustomerId = typeof session.customer === 'string' ? session.customer : null;
+        if (!isOnlyOrderBump) {
+          const enrollmentId = crypto.randomUUID();
+          const stripeCustomerId = typeof session.customer === 'string' ? session.customer : null;
 
-        await d1Run(
-          `INSERT INTO enrollments (id, user_id, course_id, stripe_session_id, stripe_customer_id, status, order_bump_included, granted_at, expires_at)
-           VALUES (?, ?, ?, ?, ?, 'active', ?, datetime('now'), ?)
-           ON CONFLICT(stripe_session_id) DO UPDATE SET status = 'active', order_bump_included = excluded.order_bump_included, expires_at = excluded.expires_at`,
-          [enrollmentId, userId, courseId, session.id, stripeCustomerId, orderBumpIncluded ? 1 : 0, expiresAt]
-        );
+          await d1Run(
+            `INSERT INTO enrollments (id, user_id, course_id, stripe_session_id, stripe_customer_id, status, order_bump_included, granted_at, expires_at)
+             VALUES (?, ?, ?, ?, ?, 'active', ?, datetime('now'), ?)
+             ON CONFLICT(stripe_session_id) DO UPDATE SET status = 'active', order_bump_included = excluded.order_bump_included, expires_at = excluded.expires_at`,
+            [enrollmentId, userId, courseId, session.id, stripeCustomerId, orderBumpIncluded ? 1 : 0, expiresAt]
+          );
+        }
 
         if (orderBumpIncluded) {
           await d1Run('UPDATE enrollments SET order_bump_included = 1 WHERE user_id = ?', [userId]);
@@ -107,16 +118,17 @@ export async function POST(req: NextRequest) {
 
         await d1Run(
           `INSERT INTO orders (
-             id, order_number, stripe_session_id, user_id, customer_email, customer_name,
+             id, order_number, stripe_session_id, stripe_payment_intent, user_id, customer_email, customer_name,
              amount_total, currency, order_bump_included, promo_code,
              waiver_art38_accepted, waiver_art38_timestamp, buyer_ip,
              waiver_checkbox_text, terms_sha256, durable_medium_sent_at, status
-           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, datetime('now'), 'paid')
+           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, datetime('now'), 'paid')
            ON CONFLICT(stripe_session_id) DO NOTHING`,
           [
             orderId,
             orderNumber,
             session.id,
+            paymentIntentId || null,
             userId,
             customerEmail,
             customerName,
@@ -132,7 +144,7 @@ export async function POST(req: NextRequest) {
         );
 
         // 4. [C4] Obsługa Boksu Poleceń Koleżeńskich (Kod MAMA-XXXX) -> Natychmiastowe (0 dni) odblokowanie Prezentu PDF
-        if (promoCode.startsWith('MAMA-')) {
+        if (!isDiagnosticTest && !isOnlyOrderBump && promoCode.startsWith('MAMA-')) {
           const referrerUser = await d1First<{ id: string; email: string }>(
             'SELECT id, email FROM users WHERE referral_code = ?',
             [promoCode]
@@ -148,8 +160,8 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        // 5. [D1b] + [D2] + [D2a] Atrybucja Afiliacyjna 2-Tier Capped CPA (nadrzędność kodu nad ?ref=, pomijana przy samym Order Bumpie)
-        if (!isOnlyOrderBump && !promoCode.startsWith('MAMA-') && (promoCode || refCookie)) {
+        // 5. [D1b] + [D2] + [D2a] Atrybucja Afiliacyjna 2-Tier Capped CPA (nadrzędność kodu nad ?ref=, pomijana przy samym Order Bumpie i testach)
+        if (!isDiagnosticTest && !isOnlyOrderBump && !promoCode.startsWith('MAMA-') && (promoCode || refCookie)) {
           const partnerByPromo = promoCode
             ? await d1First<any>('SELECT * FROM affiliates WHERE promo_code = ? AND status = ?', [promoCode, 'active'])
             : null;
@@ -263,7 +275,7 @@ export async function POST(req: NextRequest) {
         const metaPixelId = process.env.META_PIXEL_ID;
         const metaToken = process.env.META_CAPI_ACCESS_TOKEN;
 
-        if (metaPixelId && metaToken) {
+        if (!isDiagnosticTest && metaPixelId && metaToken) {
           try {
             const hashedEmail = crypto.createHash('sha256').update(customerEmail).digest('hex');
             const eventTime = Math.floor(Date.now() / 1000);
@@ -313,7 +325,11 @@ export async function POST(req: NextRequest) {
   // ============================================================================
   if (event.type === 'charge.refunded') {
     const charge = event.data.object as Stripe.Charge;
-    const customerEmail = charge.billing_details?.email?.trim().toLowerCase();
+    const paymentIntentId =
+      typeof charge.payment_intent === 'string'
+        ? charge.payment_intent
+        : String((charge.payment_intent as any)?.id || '').trim();
+    const customerEmail = charge.billing_details?.email?.trim().toLowerCase() || '';
     const chargeAmount = Number(charge.amount || 0);
     const amountRefunded = Number(charge.amount_refunded || 0);
     const isPartialRefund =
@@ -325,29 +341,96 @@ export async function POST(req: NextRequest) {
     );
 
     try {
-      if (isPartialRefund) {
+      let matchedOrder: any = null;
+      if (paymentIntentId) {
+        matchedOrder = await d1First<any>(
+          `SELECT id, user_id, customer_email, amount_total, order_bump_included
+           FROM orders
+           WHERE stripe_payment_intent = ?
+           LIMIT 1`,
+          [paymentIntentId]
+        );
+      }
+      if (!matchedOrder && customerEmail) {
+        matchedOrder = await d1First<any>(
+          `SELECT id, user_id, customer_email, amount_total, order_bump_included
+           FROM orders
+           WHERE LOWER(customer_email) = ?
+           ORDER BY created_at DESC
+           LIMIT 1`,
+          [customerEmail]
+        );
+      }
+
+      const targetEmail = String(matchedOrder?.customer_email || customerEmail || '')
+        .trim()
+        .toLowerCase();
+      let targetUserId = String(matchedOrder?.user_id || '').trim();
+      if (!targetUserId && targetEmail) {
+        const user = await d1First<{ id: string }>('SELECT id FROM users WHERE LOWER(email) = ?', [
+          targetEmail,
+        ]);
+        targetUserId = String(user?.id || '').trim();
+      }
+
+      const isStandaloneBumpOrder = Boolean(
+        matchedOrder &&
+          Number(matchedOrder.amount_total || 0) >= 1500 &&
+          Number(matchedOrder.amount_total || 0) <= 6000 &&
+          Number(matchedOrder.order_bump_included) === 1
+      );
+
+      if (isPartialRefund || isStandaloneBumpOrder) {
         // [D5a] Częściowy zwrot (np. 14-dniowy zwrot Order Bumpa +49 zł) — ZACHOWAJ dostęp do 52 lekcji kursu głównego!
-        if (customerEmail) {
-          const user = await d1First<{ id: string }>('SELECT id FROM users WHERE email = ?', [customerEmail]);
-          if (user?.id) {
-            await d1Run('UPDATE enrollments SET order_bump_included = 0 WHERE user_id = ?', [user.id]);
-            await d1Run(
-              "UPDATE orders SET order_bump_included = 0, status = 'partially_refunded' WHERE user_id = ?",
-              [user.id]
-            );
-          }
+        if (targetUserId) {
+          await d1Run('UPDATE enrollments SET order_bump_included = 0 WHERE user_id = ?', [
+            targetUserId,
+          ]);
+        }
+        const bumpStatus = isPartialRefund ? 'partially_refunded' : 'refunded';
+        if (matchedOrder?.id) {
+          await d1Run('UPDATE orders SET order_bump_included = 0, status = ? WHERE id = ?', [
+            bumpStatus,
+            matchedOrder.id,
+          ]);
+        } else if (targetUserId || targetEmail) {
+          await d1Run(
+            'UPDATE orders SET order_bump_included = 0, status = ? WHERE user_id = ? OR LOWER(customer_email) = ?',
+            [bumpStatus, targetUserId || '__NONE__', targetEmail || '__NONE__']
+          );
         }
       } else {
-        if (customerEmail) {
-          const user = await d1First<{ id: string }>('SELECT id FROM users WHERE email = ?', [customerEmail]);
-          if (user?.id) {
-            await d1Run("UPDATE enrollments SET status = 'refunded' WHERE user_id = ?", [user.id]);
-            await d1Run("UPDATE orders SET status = 'refunded' WHERE user_id = ?", [user.id]);
+        if (matchedOrder?.id) {
+          await d1Run("UPDATE orders SET status = 'refunded' WHERE id = ?", [matchedOrder.id]);
+          if (targetUserId) {
+            const remainingActiveOrder = await d1First<{ id: string }>(
+              `SELECT id FROM orders
+               WHERE user_id = ? AND status IN ('paid', 'partially_refunded') AND id != ?
+               LIMIT 1`,
+              [targetUserId, matchedOrder.id]
+            );
+            if (!remainingActiveOrder) {
+              await d1Run("UPDATE enrollments SET status = 'refunded' WHERE user_id = ?", [
+                targetUserId,
+              ]);
+            }
           }
+        } else if (targetUserId || targetEmail) {
+          if (targetUserId) {
+            await d1Run("UPDATE enrollments SET status = 'refunded' WHERE user_id = ?", [
+              targetUserId,
+            ]);
+          }
+          await d1Run(
+            "UPDATE orders SET status = 'refunded' WHERE user_id = ? OR LOWER(customer_email) = ?",
+            [targetUserId || '__NONE__', targetEmail || '__NONE__']
+          );
         }
+
         // Anuluj prowizje afiliacyjne powiązane ze zwróconym zamówieniem
         await d1Run(
-          `UPDATE affiliate_commissions SET status = 'CANCELLED'
+          `UPDATE affiliate_commissions
+           SET status = 'CANCELLED', tier1_status = 'CANCELLED', tier2_status = 'CANCELLED'
            WHERE order_id IN (SELECT id FROM orders WHERE status = 'refunded')`
         );
       }

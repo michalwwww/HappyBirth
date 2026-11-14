@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { stripe } from '@/lib/stripe';
 import {
   validatePromoCode,
   is100PercentPromo,
+  DIAGNOSTIC_PROMO_SHA256,
   BASE_COURSE_PRICE_GROSZE,
   ORDER_BUMP_PRICE_GROSZE,
   resolvePricingForCurrency,
@@ -66,7 +68,27 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const promoResult = validatePromoCode(cleanPromo);
+    const promoSha = cleanPromo
+      ? crypto.createHash('sha256').update(cleanPromo).digest('hex')
+      : '';
+    const isDiagnosticPromo = Boolean(
+      cleanPromo &&
+        (promoSha === DIAGNOSTIC_PROMO_SHA256 ||
+          (process.env.DIAGNOSTIC_PROMO_CODE &&
+            cleanPromo === process.env.DIAGNOSTIC_PROMO_CODE.trim().toUpperCase()))
+    );
+
+    const promoResult = isDiagnosticPromo
+      ? {
+          valid: true,
+          code: 'DIAGNOSTIC_TEST',
+          discountPercent: 0,
+          basePricePln: 489,
+          discountedCoursePricePln: 1,
+          omnibusNotice: '',
+          sourceType: 'dev_test' as const,
+        }
+      : validatePromoCode(cleanPromo);
     if (cleanPromo && !promoResult.valid) {
       return NextResponse.json(
         {
@@ -78,17 +100,24 @@ export async function POST(req: NextRequest) {
       );
     }
     const isVip100 = cleanPromo === 'VIP100';
-    const pricing = resolvePricingForCurrency(currency, promoResult.valid && promoResult.discountPercent === 10);
+    const pricing = resolvePricingForCurrency(
+      isDiagnosticPromo ? 'pln' : currency,
+      promoResult.valid && promoResult.discountPercent === 10
+    );
     const isPln = pricing.currency === 'pln';
-    const activeLocale = (locale || pricing.stripeLocale || 'pl').toString();
-    const activeCourseAmountGrosze = isPln
-      ? promoResult.valid && promoResult.discountPercent === 10
-        ? 44010
-        : BASE_COURSE_PRICE_GROSZE // 440,10 zł lub 489,00 zł brutto
-      : pricing.activeCourseMinorUnits;
-    const activeOrderBumpMinorUnits = isPln
-      ? ORDER_BUMP_PRICE_GROSZE // 49,00 zł brutto
-      : pricing.orderBumpMinorUnits;
+    const activeLocale = isDiagnosticPromo ? 'pl' : (locale || pricing.stripeLocale || 'pl').toString();
+    const activeCourseAmountGrosze = isDiagnosticPromo
+      ? 100
+      : isPln
+        ? promoResult.valid && promoResult.discountPercent === 10
+          ? 44010
+          : BASE_COURSE_PRICE_GROSZE
+        : pricing.activeCourseMinorUnits;
+    const activeOrderBumpMinorUnits = isDiagnosticPromo
+      ? 100
+      : isPln
+        ? ORDER_BUMP_PRICE_GROSZE
+        : pricing.orderBumpMinorUnits;
 
     // Pobierz adres IP kupującego, kraj (Cloudflare IP Country) oraz ciasteczko afiliacyjne hb_aff_ref ([D2] & [E1] & [TECH-03])
     const buyerIp =
@@ -115,68 +144,14 @@ export async function POST(req: NextRequest) {
 
     const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID;
 
-    // 1. Pozycja główna: Kurs HappyBirth 489,00 zł brutto (lub 440,10 zł z kodem -10%), 18 miesięcy (548 dni) od zakupu (lub waluta międzynarodowa GBP/EUR/USD/AUD/AED)
-    const mainCourseLineItem =
-      priceId && !promoResult.valid && isPln
-        ? { price: priceId, quantity: 1 }
-        : {
-            price_data: {
-              currency: pricing.currency,
-              product_data: {
-                name: isPln
-                  ? promoResult.valid
-                    ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${promoResult.code})`
-                    : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)'
-                  : promoResult.valid
-                    ? `HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons · -10%: ${promoResult.code})`
-                    : 'HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons for Two)',
-                description: isPln
-                  ? 'Dostęp na 18 miesięcy (548 dni) od momentu zakupu dla dwojga: 52 lekcje 4K w 8 modułach (288 min), Notatnik Rodzica PDF i checklisty.'
-                  : '18-month (548 days) full access for both parents: 52 4K VOD lessons (288 min), Interactive Birth Plan, Contraction Timer & Partner Toolkit PDF.',
-                tax_code: 'txcd_10000000',
-              },
-              unit_amount: activeCourseAmountGrosze,
-              tax_behavior: 'inclusive' as const,
-            },
-            quantity: 1,
-          };
-
     const isStandaloneOrderBump = Boolean(onlyOrderBump);
     const shouldIncludeBumpItem = Boolean(includeOrderBump || isStandaloneOrderBump);
-    const lineItems: any[] = isStandaloneOrderBump ? [] : [mainCourseLineItem];
 
-    // 2. [B3] Jednoklikowy dodatek w koszyku lub samodzielny Post-Purchase Upsell w Strefie (Order Bump +49,00 zł brutto / £15 / €17 / $27) z edycją krajową
     const requestedEditionKey = String(body.orderBumpEdition || utm?.order_bump_edition || 'pl')
       .trim()
       .toLowerCase();
     const matchedBumpEdition =
       ORDER_BUMP_GLOBAL_CATALOG[requestedEditionKey] || ORDER_BUMP_GLOBAL_CATALOG.pl;
-
-    if (shouldIncludeBumpItem) {
-      lineItems.push({
-        price_data: {
-          currency: pricing.currency,
-          product_data: {
-            name:
-              requestedEditionKey !== 'pl'
-                ? `${matchedBumpEdition.title} (${matchedBumpEdition.targetMarket})`
-                : isPln
-                  ? 'Pakiet Dokumentów Szpitalnych i Kart na Porodówkę dla Taty (Edycja Polska MZ 2026)'
-                  : matchedBumpEdition.title,
-            description:
-              requestedEditionKey !== 'pl'
-                ? matchedBumpEdition.description
-                : isPln
-                  ? 'Dodatek komplementarny (Order Bump): 4 karty dla Taty, matryca B.R.A.I.N., protokół siary (37 tyg.) i system 3 reklamówek PDF.'
-                  : matchedBumpEdition.description,
-            tax_code: 'txcd_10000000',
-          },
-          unit_amount: activeOrderBumpMinorUnits,
-          tax_behavior: 'inclusive' as const,
-        },
-        quantity: 1,
-      });
-    }
 
     // [D2] Reguła Nadrzędności Kodu nad linkiem ?ref= oraz [E1] Rejestr dowodowy w metadanych
     const metadata: Record<string, string> = {
@@ -219,15 +194,89 @@ export async function POST(req: NextRequest) {
       if (utm.fbclid) metadata.fbclid = String(utm.fbclid).slice(0, 100);
     }
 
-    const sessionParams: any = {
-      mode: 'payment',
-      line_items: lineItems,
-      metadata,
-      locale: activeLocale,
-      success_url: `${origin}/strefa?session_id={CHECKOUT_SESSION_ID}&payment=success`,
-      cancel_url: isStandaloneOrderBump ? `${origin}/strefa` : `${origin}/#cena`,
+    const buildSessionPayload = (courseAmt: number, bumpAmt: number): any => {
+      const mainItem =
+        priceId && !promoResult.valid && !isDiagnosticPromo && isPln
+          ? { price: priceId, quantity: 1 }
+          : {
+              price_data: {
+                currency: pricing.currency,
+                product_data: {
+                  name: isDiagnosticPromo
+                    ? 'Kurs Szkoły Rodzenia Online HappyBirth.pl (Transakcja Testowa Live)'
+                    : isPln
+                      ? promoResult.valid
+                        ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${promoResult.code})`
+                        : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)'
+                      : promoResult.valid
+                        ? `HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons · -10%: ${promoResult.code})`
+                        : 'HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons for Two)',
+                  description: isPln
+                    ? 'Dostęp na 18 miesięcy (548 dni) od momentu zakupu dla dwojga: 52 lekcje 4K w 8 modułach (288 min), Notatnik Rodzica PDF i checklisty.'
+                    : '18-month (548 days) full access for both parents: 52 4K VOD lessons (288 min), Interactive Birth Plan, Contraction Timer & Partner Toolkit PDF.',
+                  tax_code: 'txcd_10000000',
+                },
+                unit_amount: courseAmt,
+                tax_behavior: 'inclusive' as const,
+              },
+              quantity: 1,
+            };
+
+      const items: any[] = isStandaloneOrderBump ? [] : [mainItem];
+      if (shouldIncludeBumpItem) {
+        items.push({
+          price_data: {
+            currency: pricing.currency,
+            product_data: {
+              name: isDiagnosticPromo
+                ? `Pakiet Kart na Porodówkę dla Taty PDF · Test Live (${matchedBumpEdition.editionKey.toUpperCase()})`
+                : requestedEditionKey !== 'pl'
+                  ? `${matchedBumpEdition.title} (${matchedBumpEdition.targetMarket})`
+                  : isPln
+                    ? 'Pakiet Dokumentów Szpitalnych i Kart na Porodówkę dla Taty (Edycja Polska MZ 2026)'
+                    : matchedBumpEdition.title,
+              description:
+                requestedEditionKey !== 'pl'
+                  ? matchedBumpEdition.description
+                  : isPln
+                    ? 'Dodatek komplementarny (Order Bump): 4 karty dla Taty, matryca B.R.A.I.N., protokół siary (37 tyg.) i system 3 reklamówek PDF.'
+                    : matchedBumpEdition.description,
+              tax_code: 'txcd_10000000',
+            },
+            unit_amount: bumpAmt,
+            tax_behavior: 'inclusive' as const,
+          },
+          quantity: 1,
+        });
+      }
+
+      const payload: any = {
+        mode: 'payment',
+        line_items: items,
+        metadata: {
+          ...metadata,
+          promo_source_type: isDiagnosticPromo ? 'diagnostic_test' : metadata.promo_source_type,
+          attribution_priority: isDiagnosticPromo ? 'diagnostic_test' : metadata.attribution_priority,
+          affiliate_ref_cookie: isDiagnosticPromo ? '' : metadata.affiliate_ref_cookie,
+        },
+        locale: activeLocale,
+        success_url: `${origin}/strefa?session_id={CHECKOUT_SESSION_ID}&payment=success`,
+        cancel_url: isStandaloneOrderBump ? `${origin}/strefa` : `${origin}/#cena`,
+      };
+
+      if (vipPromoId) {
+        payload.discounts = [{ promotion_code: vipPromoId }];
+      } else {
+        payload.allow_promotion_codes = !promoResult.valid && !isStandaloneOrderBump && !isDiagnosticPromo;
+      }
+
+      if (email && typeof email === 'string' && email.includes('@')) {
+        payload.customer_email = email.trim();
+      }
+      return payload;
     };
 
+    let vipPromoId: string | null = null;
     if (isVip100) {
       const promoLookupRes = await fetch(
         'https://api.stripe.com/v1/promotion_codes?code=VIP100&active=true&limit=1',
@@ -250,24 +299,36 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      sessionParams.discounts = [{ promotion_code: foundPromo.id }];
-    } else {
-      sessionParams.allow_promotion_codes = !promoResult.valid && !isStandaloneOrderBump;
+      vipPromoId = foundPromo.id;
     }
 
-    if (email && typeof email === 'string' && email.includes('@')) {
-      sessionParams.customer_email = email.trim();
+    let session: any;
+    try {
+      session = await stripe.checkout.sessions.create(
+        buildSessionPayload(activeCourseAmountGrosze, activeOrderBumpMinorUnits)
+      );
+    } catch (stripeErr: any) {
+      if (
+        isDiagnosticPromo &&
+        (stripeErr?.code === 'amount_too_small' ||
+          /at least|minimum|2[.,]00/i.test(String(stripeErr?.message || '')))
+      ) {
+        const retryCourse = shouldIncludeBumpItem && !isStandaloneOrderBump ? 100 : 200;
+        const retryBump = isStandaloneOrderBump ? 200 : 100;
+        session = await stripe.checkout.sessions.create(
+          buildSessionPayload(retryCourse, retryBump)
+        );
+      } else {
+        throw stripeErr;
+      }
     }
-
-    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({
       url: session.url,
       sessionId: session.id,
       currency: pricing.currency.toUpperCase(),
-      amountGrossGrosze: isStandaloneOrderBump
-        ? activeOrderBumpMinorUnits
-        : activeCourseAmountGrosze + (shouldIncludeBumpItem ? activeOrderBumpMinorUnits : 0),
+      amountTotalGrosze: session.amount_total,
+      diagnosticMode: isDiagnosticPromo,
     });
   } catch (error: any) {
     console.error('Błąd podczas tworzenia sesji Stripe Checkout:', error);

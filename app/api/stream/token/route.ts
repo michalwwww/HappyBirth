@@ -1,11 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { getSession } from '@/lib/auth';
+import { d1First } from '@/lib/d1';
 import { CLOUDFLARE_CUSTOMER_DOMAIN } from '@/lib/course-data';
 
 export const runtime = 'nodejs';
 
 const JWT_TTL_SECONDS = 120 * 60; // [C2] Kryptograficzny token JWT ważny przez 120 minut (7200 s)
+
+const FREE_PREVIEW_STREAM_UIDS = new Set([
+  'f8d8d8f24b917a32961efea785c9324b', // Lekcja #1
+  'ab0d90bf8a42fcf4d7e4debf10509f73', // Lekcja #6
+  'ea898b3a4f5e4b7e23d212d595b13f47', // Lekcja #26
+  '21baa2cafef2f7731b4a36c6464ee6e8', // Lekcja #40
+]);
+
+const TEAM_WHITELIST_EMAILS = new Set([
+  'mwspace@gmail.com',
+  'kontakt@happybirth.pl',
+  'pomoc@happybirth.pl',
+  'partner@happybirth.pl',
+  'admin@happybirth.pl',
+  'michal@happybirth.pl',
+  'maciej@happybirth.pl',
+]);
 
 function base64UrlEncode(input: Buffer | string): string {
   const buf = typeof input === 'string' ? Buffer.from(input, 'utf8') : input;
@@ -18,6 +36,29 @@ async function issueStreamTokenResponse(uid: string, lang: string = 'pl') {
   }
 
   const session = await getSession();
+  const isFreePreview = FREE_PREVIEW_STREAM_UIDS.has(uid);
+
+  if (!isFreePreview) {
+    if (!session) {
+      return NextResponse.json({ error: 'Wymagane zalogowanie do Strefy Rodziców.' }, { status: 401 });
+    }
+    const cleanEmail = session.email.trim().toLowerCase();
+    if (!TEAM_WHITELIST_EMAILS.has(cleanEmail)) {
+      const enrollment = await d1First<{ status: string; expires_at?: string }>(
+        `SELECT status, expires_at FROM enrollments WHERE user_id = ? ORDER BY created_at DESC LIMIT 1`,
+        [session.userId]
+      );
+      const expired =
+        enrollment?.expires_at && new Date(enrollment.expires_at).getTime() < Date.now();
+      if (!enrollment || enrollment.status !== 'active' || expired) {
+        return NextResponse.json(
+          { error: 'Brak aktywnego dostępu do pełnego pakietu kursu.' },
+          { status: 403 }
+        );
+      }
+    }
+  }
+
   const signingKeyId = process.env.CLOUDFLARE_STREAM_SIGNING_KEY_ID;
   const signingKeySecret = process.env.CLOUDFLARE_STREAM_SIGNING_KEY_SECRET;
   const cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID;
@@ -92,8 +133,7 @@ async function issueStreamTokenResponse(uid: string, lang: string = 'pl') {
     }
   }
 
-  // 3. Bezpieczny fallback do bezpośredniego UID Cloudflare Stream (gdy requireSignedURLs = false)
-  // Uwaga [TECH-01]: pole `token` MUSI zwracać `uid`, aby iframe Cloudflare Stream nie podstawiał lokalnego HMAC w ścieżce URL.
+  // 3. Fallback do bezpośredniego UID Cloudflare Stream (wyłącznie po pozytywnej autoryzacji lub dla free preview)
   const appSecret = process.env.AUTH_SECRET || 'happybirth-stream-jwt-secret-2026';
   const header = { alg: 'HS256', typ: 'JWT' };
   const payload = { sub: uid, exp: expSec, iat: nowSec, ttlMinutes: 120 };
@@ -116,9 +156,6 @@ async function issueStreamTokenResponse(uid: string, lang: string = 'pl') {
   });
 }
 
-/**
- * [C2] & [TECH-01] Obsługa GET oraz POST dla odtwarzacza Cloudflare Stream (4K HLS + Multi-Audio/Subtitles)
- */
 export async function GET(req: NextRequest) {
   const uid = (req.nextUrl.searchParams.get('uid') || req.nextUrl.searchParams.get('videoUid') || '').trim();
   const lang = (req.nextUrl.searchParams.get('lang') || 'pl').trim().toLowerCase();

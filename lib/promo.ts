@@ -525,6 +525,26 @@ export function detectClientOrderBumpEdition(options?: {
   };
 }
 
+export const DIAGNOSTIC_PROMO_SHA256 =
+  '65980e215899e8a49847d21404dd645a76e30a3719e005413b819fee10007440';
+
+export async function isDiagnosticTestPromoAsync(rawCode?: string | null): Promise<boolean> {
+  const clean = (rawCode || '').trim().toUpperCase();
+  if (!clean || typeof window === 'undefined' || !window.crypto?.subtle) {
+    return false;
+  }
+  try {
+    const enc = new TextEncoder().encode(clean);
+    const digest = await window.crypto.subtle.digest('SHA-256', enc);
+    const hex = Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+    return hex === DIAGNOSTIC_PROMO_SHA256;
+  } catch {
+    return false;
+  }
+}
+
 export function is10PercentAffiliatePromo(code?: string | null): boolean {
   const res = validatePromoCode(code);
   return res.valid && res.discountPercent === 10;

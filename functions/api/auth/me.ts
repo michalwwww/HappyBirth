@@ -1,4 +1,8 @@
-import { getEdgeSession } from '../../_shared/session';
+import {
+  getEdgeSession,
+  hasActiveCourseEntitlementD1,
+  isTeamWhitelistedEmail,
+} from '../../_shared/session';
 
 interface Env {
   DB?: any;
@@ -17,7 +21,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         authenticated: false,
         user: null,
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } }
     );
   }
 
@@ -26,6 +30,8 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
   let orderRow: any = null;
   let referralRewardRow: any = null;
   let expired = false;
+  const cleanSessionEmail = String(session.email || '').trim().toLowerCase();
+  const isWhitelisted = isTeamWhitelistedEmail(cleanSessionEmail);
 
   if (env.DB) {
     try {
@@ -34,10 +40,10 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
                 due_date, due_date_source, lmp_date, baby_name, baby_gender,
                 partner_name, parity, planned_birth_type, city, hospital
          FROM users
-         WHERE id = ? OR email = ?
+         WHERE id = ? OR LOWER(email) = ?
          LIMIT 1`
       )
-        .bind(session.userId, session.email)
+        .bind(session.userId, cleanSessionEmail)
         .first();
 
       const effectiveUserId = userRow?.id || session.userId;
@@ -60,12 +66,12 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
         .first();
 
       orderRow = await env.DB.prepare(
-        `SELECT order_number, amount_total, order_bump_included, promo_code, created_at
+        `SELECT order_number, amount_total, order_bump_included, promo_code, status, created_at
          FROM orders
-         WHERE user_id = ? OR customer_email = ?
+         WHERE user_id = ? OR LOWER(customer_email) = ?
          ORDER BY created_at DESC LIMIT 1`
       )
-        .bind(effectiveUserId, session.email)
+        .bind(effectiveUserId, cleanSessionEmail)
         .first();
 
       referralRewardRow = await env.DB.prepare(
@@ -85,6 +91,27 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
     }
   }
 
+  const hasValidEnrollment = Boolean(
+    enrollmentRow && enrollmentRow.status === 'active' && !expired
+  );
+  const hasValidPaidOrder = Boolean(
+    !enrollmentRow &&
+      orderRow &&
+      (orderRow.status === 'paid' || orderRow.status === 'partially_refunded')
+  );
+  const hasActiveCourse = isWhitelisted || hasValidEnrollment || hasValidPaidOrder;
+
+  if (!hasActiveCourse) {
+    return new Response(
+      JSON.stringify({
+        authenticated: false,
+        expired,
+        user: null,
+      }),
+      { status: 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } }
+    );
+  }
+
   const defaultExpiresAt = new Date(Date.now() + ACCESS_DURATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
   const expiresAtIso = enrollmentRow?.expires_at || defaultExpiresAt;
   const expiresTime = new Date(expiresAtIso).getTime();
@@ -94,15 +121,15 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
 
   return new Response(
     JSON.stringify({
-      authenticated: !expired,
-      expired,
+      authenticated: true,
+      expired: false,
       user: {
         id: userRow?.id || session.userId,
-        email: userRow?.email || session.email,
+        email: userRow?.email || cleanSessionEmail,
         fullName: userRow?.full_name || '',
         avatarUrl: userRow?.avatar_url || '',
         role: userRow?.role || session.role || 'student',
-        hasActiveCourse: !expired,
+        hasActiveCourse: true,
         expiresAt: expiresAtIso,
         daysRemaining,
         firstContentAccessedAt: enrollmentRow?.first_content_accessed_at || null,
@@ -128,7 +155,7 @@ export async function onRequestGet(context: { request: Request; env: Env }): Pro
       },
       enrollment: enrollmentRow,
     }),
-    { status: 200, headers: { 'Content-Type': 'application/json' } }
+    { status: 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } }
   );
 }
 
@@ -137,11 +164,26 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const { request, env } = context;
     const session = await getEdgeSession(request, env);
 
-    if (!session || !env.DB) {
-      return new Response(
-        JSON.stringify({ success: true, mode: 'local_fallback' }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      );
+    if (!session) {
+      return new Response(JSON.stringify({ error: 'Brak autoryzacji' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const entitled = await hasActiveCourseEntitlementD1(env.DB, session.userId, session.email);
+    if (!entitled) {
+      return new Response(JSON.stringify({ error: 'Brak aktywnego dostępu do kursu' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!env.DB) {
+      return new Response(JSON.stringify({ success: true, mode: 'local_only' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     const body: any = await request.json().catch(() => ({}));
@@ -173,7 +215,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
          city = ?,
          hospital = ?,
          updated_at = datetime('now')
-       WHERE id = ? OR email = ?`
+       WHERE id = ? OR LOWER(email) = ?`
     )
       .bind(
         fullName ? String(fullName).trim() : null,
@@ -188,7 +230,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         city || null,
         hospital || null,
         session.userId,
-        session.email
+        String(session.email || '').trim().toLowerCase()
       )
       .run();
 
