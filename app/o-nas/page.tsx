@@ -139,6 +139,41 @@ export default function AboutPage() {
           </p>
         </div>
 
+        {/* Filozofia i analogowe kadry editorial */}
+        <div className="space-y-6">
+          <blockquote className="rounded-3xl border border-[#EAE3DB] dark:border-[#3A1038] bg-white dark:bg-[#1E081C] px-6 py-7 sm:px-10 text-center space-y-2 shadow-sm">
+            <p className="font-brand-serif italic text-xl sm:text-2xl text-[#250A24] dark:text-[#FBF8F4]">
+              „Cudów nie obiecujemy. Doświadczenie mamy.”
+            </p>
+            <footer className="text-xs sm:text-sm text-[#544A44] dark:text-[#C5B5C3]">
+              Każde narodziny rodzą więcej niż dziecko — rodzi się mama, rodzi się tata, rodzi się nowa rodzina.
+            </footer>
+          </blockquote>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <figure className="hb-kadr-editorial hb-kadr-ramka aspect-[4/3]">
+              <img
+                src="/img/editorial/hb-para-dlonie-serce-sweter.jpg"
+                alt="Czułe dłonie przyszłych rodziców w ciepłym swetrze"
+                className="w-full h-full object-cover"
+                loading="lazy"
+                width={1200}
+                height={900}
+              />
+            </figure>
+            <figure className="hb-kadr-editorial hb-kadr-ramka aspect-[4/3]">
+              <img
+                src="/img/editorial/hb-mama-odpoczynek-fotel-bujany.jpg"
+                alt="Spokojny odpoczynek przyszłej mamy w fotelu bujanym w domowym zaciszu"
+                className="w-full h-full object-cover"
+                loading="lazy"
+                width={1200}
+                height={900}
+              />
+            </figure>
+          </div>
+        </div>
+
         {/* 3 filary zaufania */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="rounded-3xl border border-[#EAE3DB] dark:border-[#3A1038] bg-white dark:bg-[#1E081C] p-6 space-y-3">

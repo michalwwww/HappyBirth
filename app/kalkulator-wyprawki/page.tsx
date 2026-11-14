@@ -13,7 +13,6 @@ import {
   Printer,
   ArrowLeft,
   Loader2,
-  Building2,
 } from 'lucide-react';
 
 interface LayetteItem {
@@ -29,7 +28,7 @@ const LAYETTE_ITEMS: LayetteItem[] = [
   {
     id: 'dok-1',
     category: 'torba_mama',
-    name: 'Teczka z dokumentami (Karta ciąży, grupa krwi z Rh, GBS, ostatnie USG, Plan Porodu)',
+    name: 'Teczka z dokumentami (Karta ciąży, oryginał wyniku grupy i czynnika Rh, GBS, ostatnie USG, Plan Porodu)',
     qty: '1 kpl.',
     midwifeNote: 'Położna Mama Gaja: Miej ją zawsze na samej górze torby porodowej.',
     essentialOnStart: true,
@@ -115,7 +114,6 @@ const LAYETTE_ITEMS: LayetteItem[] = [
 export default function KalkulatorWyprawkiPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [dueDate, setDueDate] = useState('');
   const [season, setSeason] = useState<'wiosna_lato' | 'jesien_zima'>('jesien_zima');
   const [rodoConsent, setRodoConsent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -149,7 +147,7 @@ export default function KalkulatorWyprawkiPage() {
         body: JSON.stringify({
           name,
           email,
-          dueDate,
+          season,
           rodoConsent,
           toolSource: 'kalkulator-wyprawki',
         }),
@@ -206,123 +204,127 @@ export default function KalkulatorWyprawkiPage() {
         </div>
 
         {!unlocked ? (
-          <div className="max-w-xl mx-auto bg-white rounded-3xl p-6 sm:p-10 border border-[#EAE3DB] shadow-xl space-y-6">
-            <div className="space-y-2 border-b border-[#EAE3DB] pb-5">
-              <h2 className="font-brand-display font-bold text-xl text-[#250A24]">
-                Odblokuj spersonalizowany Kalkulator Wyprawki i Torby PDF
-              </h2>
-              <p className="text-xs text-[#867A72]">
-                Podaj adres e-mail oraz przewidywany termin porodu (lub porę roku), aby dopasować listę ubranek i otrzymać mikro-poradnik położnej dla Twojego tygodnia ciąży.
-              </p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-5 space-y-4">
+              <div className="hb-kadr-editorial hb-kadr-ramka aspect-[4/3]">
+                <img
+                  src="/img/editorial/hb-mama-pakowanie-torby-wyprawka.jpg"
+                  alt="Przyszła mama spokojnie przygotowuje torbę i pierwsze ubranka dla dziecka"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-4 rounded-2xl bg-white border border-[#EAE3DB] text-xs text-[#544A44] leading-relaxed">
+                Dobrze ułożona wyprawka to spokój w domu i oszczędność budżetu. Pełną listę ubranek i przygotowania torby omawiamy krok po kroku w Module 4 kursu (52 lekcje · 18 miesięcy / 548 dni dostępu · 489,00 zł).
+              </div>
             </div>
 
-            <form onSubmit={handleUnlock} className="space-y-4">
-              {errorMsg && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
-                  {errorMsg}
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-[#544A44] block mb-1.5">
-                    Twoje Imię
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="np. Kasia"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-[#544A44] block mb-1.5">
-                    Adres e-mail (do wysyłki PDF)
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="twoj@email.pl"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
-                  />
-                </div>
+            <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-10 border border-[#EAE3DB] shadow-xl space-y-6">
+              <div className="space-y-2 border-b border-[#EAE3DB] pb-5">
+                <h2 className="font-brand-display font-bold text-xl text-[#250A24]">
+                  Odblokuj spersonalizowany Kalkulator Wyprawki i Torby PDF
+                </h2>
+                <p className="text-xs text-[#867A72]">
+                  Podaj adres e-mail i wybierz porę roku, aby dopasować grubość ubranek i odblokować listę do druku w 3 strefach. Nie zbieramy danych o zdrowiu ani daty porodu.
+                </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-[#544A44] block mb-1.5">
-                    Przewidywany termin porodu
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm text-[#544A44] focus:outline-none focus:border-[#DA0271]"
-                  />
+              <form onSubmit={handleUnlock} className="space-y-4">
+                {errorMsg && (
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
+                    {errorMsg}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-[#544A44] block mb-1.5">
+                      Twoje Imię
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="np. Kasia"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-[#544A44] block mb-1.5">
+                      Adres e-mail (do wysyłki PDF)
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="twoj@email.pl"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm focus:outline-none focus:border-[#DA0271]"
+                    />
+                  </div>
                 </div>
 
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-[#544A44] block mb-1.5">
-                    Pora roku narodzin
+                    Pora roku na pierwsze spacery
                   </label>
                   <select
                     value={season}
-                    onChange={(e) => setSeason(e.target.value as any)}
+                    onChange={(e) => setSeason(e.target.value as 'wiosna_lato' | 'jesien_zima')}
                     className="w-full px-4 py-2.5 rounded-xl border border-[#EAE3DB] text-sm bg-white focus:outline-none focus:border-[#DA0271]"
                   >
-                    <option value="jesien_zima">Jesień / Zima (ciepły śpiworek do fotelika)</option>
-                    <option value="wiosna_lato">Wiosna / Lato (lekki muślin i bambus)</option>
+                    <option value="jesien_zima">Jesień / Zima (ciepły śpiworek do fotelika i warstwy)</option>
+                    <option value="wiosna_lato">Wiosna / Lato (lekki muślin, bawełna i bambus)</option>
                   </select>
                 </div>
-              </div>
 
-              <div className="pt-2 flex items-start gap-2.5">
-                <input
-                  type="checkbox"
-                  id="wyprawka-rodo"
-                  checked={rodoConsent}
-                  onChange={(e) => setRodoConsent(e.target.checked)}
-                  required
-                  className="mt-0.5 rounded text-[#DA0271] focus:ring-[#DA0271]"
-                />
-                <label htmlFor="wyprawka-rodo" className="text-[11px] text-[#544A44] leading-relaxed">
-                  Wyrażam wyraźną zgodę na przetwarzanie mojego adresu e-mail oraz podanego terminu porodu przez KLARSOLUTIONS Sp. z o.o. w celu wygenerowania spersonalizowanego Kalkulatora Wyprawki PDF oraz przesyłania dopasowanych do tygodnia ciąży wskazówek edukacyjno-handlowych zgodnie z <Link href="/polityka-prywatnosci" className="underline">Polityką Prywatności</Link>.
-                </label>
-              </div>
+                <div className="pt-2 flex items-start gap-2.5">
+                  <input
+                    type="checkbox"
+                    id="wyprawka-rodo"
+                    checked={rodoConsent}
+                    onChange={(e) => setRodoConsent(e.target.checked)}
+                    required
+                    className="mt-0.5 rounded text-[#DA0271] focus:ring-[#DA0271]"
+                  />
+                  <label htmlFor="wyprawka-rodo" className="text-[11px] text-[#544A44] leading-relaxed">
+                    Wyrażam wyraźną zgodę na przetwarzanie mojego adresu e-mail przez KLARSOLUTIONS Sp. z o.o. w celu wygenerowania spersonalizowanego Kalkulatora Wyprawki PDF oraz przesłania materiałów edukacyjnych zgodnie z{' '}
+                    <Link href="/polityka-prywatnosci" className="underline">
+                      Polityką Prywatności
+                    </Link>
+                    .
+                  </label>
+                </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 rounded-full bg-[#DA0271] hover:bg-[#B8005F] text-white font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Generowanie spersonalizowanej listy...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Otwórz Kalkulator Wyprawki i Torby PDF</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-full bg-[#DA0271] hover:bg-[#B8005F] text-white font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Generowanie spersonalizowanej listy...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Otwórz Kalkulator Wyprawki i Torby PDF</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
 
-              <div className="pt-2 flex items-center justify-center gap-4 text-[11px] text-[#867A72]">
-                <span className="flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> 100% Bezpłatnie
-                </span>
-                <span className="flex items-center gap-1">
-                  <Lock className="w-3.5 h-3.5 text-emerald-600" /> Chronione RODO (zero pikseli)
-                </span>
-              </div>
-            </form>
+                <div className="pt-2 flex items-center justify-center gap-4 text-[11px] text-[#867A72]">
+                  <span className="flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> 100% Bezpłatnie
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Lock className="w-3.5 h-3.5 text-emerald-600" /> Chronione RODO (zero pikseli)
+                  </span>
+                </div>
+              </form>
+            </div>
           </div>
         ) : (
           <div className="space-y-8">
@@ -408,6 +410,21 @@ export default function KalkulatorWyprawkiPage() {
           </div>
         )}
       </main>
+
+      <footer className="border-t border-[#EAE3DB] bg-white/80 py-6 px-4 text-center text-[11px] text-[#867A72] space-y-1.5 print:hidden">
+        <p>
+          HappyBirth.pl — edukacyjny kurs szkoły rodzenia online (PKD 85.59.B), 52 lekcje 4K · 489,00 zł brutto · 18 miesięcy (548 dni) dostępu. Sprawdź też{' '}
+          <Link href="/kalkulator-macierzynski" className="underline hover:text-[#DA0271]">
+            Kalkulator Urlopu i Zasiłku Macierzyńskiego 2026
+          </Link>
+          .
+        </p>
+        <p>
+          Usługodawca: <strong>KLARSOLUTIONS SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</strong>, ul. Śląska 14, 60-614 Poznań · KRS: 0001268396 · NIP: 7812118273 · REGON: 545782779 · kapitał zakładowy: 5 000,00 PLN ·{' '}
+          <Link href="/regulamin" className="underline hover:text-[#DA0271]">Regulamin</Link> ·{' '}
+          <Link href="/polityka-prywatnosci" className="underline hover:text-[#DA0271]">Polityka prywatności</Link>
+        </p>
+      </footer>
     </div>
   );
 }

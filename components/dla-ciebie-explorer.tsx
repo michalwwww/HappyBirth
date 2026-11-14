@@ -16,6 +16,8 @@ import {
   HeartHandshake,
 } from 'lucide-react';
 
+export type VerificationStamp = 'FAKT' | 'MIT' | 'SPÓR' | 'NIE WIADOMO';
+
 export interface KnowledgeLessonLink {
   num: number;
   publicTitle: string;
@@ -26,6 +28,8 @@ export interface KnowledgeEntry {
   id: string;
   number: number;
   category: string;
+  stamp?: VerificationStamp;
+  sourceCitation?: string;
   badge2026?: 'NOWE 2026' | 'ZMIANA 2026';
   title: string;
   summary: string;
@@ -44,8 +48,31 @@ interface DlaCiebieExplorerProps {
 
 const STORAGE_KEY = 'hb_saved_rights_v1';
 
+const STAMP_META: Record<
+  VerificationStamp,
+  { className: string; shortDesc: string }
+> = {
+  FAKT: {
+    className: 'hb-stempel hb-stempel-fakt',
+    shortDesc: 'Potwierdzone w przepisach prawa lub wytycznych naukowych',
+  },
+  MIT: {
+    className: 'hb-stempel hb-stempel-mit',
+    shortDesc: 'Popularny mit niezgodny ze współczesną wiedzą',
+  },
+  SPÓR: {
+    className: 'hb-stempel hb-stempel-spor',
+    shortDesc: 'Stanowiska eksperckie nie są w 100% zgodne — decyzja zależy od sytuacji',
+  },
+  'NIE WIADOMO': {
+    className: 'hb-stempel hb-stempel-niewiadomo',
+    shortDesc: 'Brak jednoznacznych badań rozstrzygających dokładny próg',
+  },
+};
+
 export function DlaCiebieExplorer({ entries, categories }: DlaCiebieExplorerProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('Wszystkie');
+  const [selectedStamp, setSelectedStamp] = useState<'Wszystkie' | VerificationStamp>('Wszystkie');
   const [only2026, setOnly2026] = useState<boolean>(false);
   const [onlySaved, setOnlySaved] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -77,7 +104,11 @@ export function DlaCiebieExplorer({ entries, categories }: DlaCiebieExplorerProp
 
   const filteredEntries = useMemo(() => {
     return entries.filter((item) => {
+      const itemStamp: VerificationStamp = item.stamp || 'FAKT';
       if (selectedCategory !== 'Wszystkie' && item.category !== selectedCategory) {
+        return false;
+      }
+      if (selectedStamp !== 'Wszystkie' && itemStamp !== selectedStamp) {
         return false;
       }
       if (only2026 && !item.badge2026) {
@@ -96,7 +127,7 @@ export function DlaCiebieExplorer({ entries, categories }: DlaCiebieExplorerProp
       }
       return true;
     });
-  }, [entries, selectedCategory, only2026, onlySaved, searchQuery, savedIds]);
+  }, [entries, selectedCategory, selectedStamp, only2026, onlySaved, searchQuery, savedIds]);
 
   return (
     <div className="space-y-8">
@@ -185,29 +216,79 @@ export function DlaCiebieExplorer({ entries, categories }: DlaCiebieExplorerProp
           </div>
         </div>
 
+        {/* Pasek 4 stempli weryfikacji Macieja */}
+        <div className="space-y-2 pt-2 border-t border-[#F2ECE4] dark:border-[#2E0C2C]">
+          <div className="text-xs font-semibold text-[#6E625A] dark:text-[#C5B5C3]">
+            Stempel statusu wiedzy:
+          </div>
+          <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Stemple statusu wiedzy">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={selectedStamp === 'Wszystkie'}
+              onClick={() => setSelectedStamp('Wszystkie')}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
+                selectedStamp === 'Wszystkie'
+                  ? 'bg-[#250A24] dark:bg-[#FECB22] text-white dark:text-[#1A1512] border-transparent'
+                  : 'bg-[#FBF8F4] dark:bg-[#140513] text-[#544A44] dark:text-[#EAD5E5] border-[#EAE3DB] dark:border-[#3A1038] hover:border-[#DA0271]'
+              }`}
+            >
+              Wszystkie stemple ({entries.length})
+            </button>
+            {(['FAKT', 'MIT', 'SPÓR', 'NIE WIADOMO'] as VerificationStamp[]).map((stampKey) => {
+              const active = selectedStamp === stampKey;
+              const count = entries.filter((e) => (e.stamp || 'FAKT') === stampKey).length;
+              return (
+                <button
+                  key={stampKey}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  title={STAMP_META[stampKey].shortDesc}
+                  onClick={() => setSelectedStamp(stampKey)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer border ${
+                    active
+                      ? 'ring-2 ring-[#250A24] dark:ring-[#FECB22] bg-white dark:bg-[#270B25] border-[#250A24]/30'
+                      : 'bg-white/70 dark:bg-[#140513] border-[#EAE3DB] dark:border-[#3A1038] hover:border-[#DA0271]'
+                  }`}
+                >
+                  <span className={STAMP_META[stampKey].className}>{stampKey}</span>
+                  <span className="text-[#6E625A] dark:text-[#C5B5C3] font-semibold">({count})</span>
+                </button>
+              );
+            })}
+          </div>
+          {selectedStamp !== 'Wszystkie' && (
+            <p className="text-[11px] text-[#544A44] dark:text-[#C5B5C3]">
+              <strong>{selectedStamp}:</strong> {STAMP_META[selectedStamp].shortDesc}.
+            </p>
+          )}
+        </div>
+
         <p className="text-[11px] text-[#867A72] dark:text-[#A2958C]">
           Twoje zakładki („Moja lista”) zapisują się wyłącznie w pamięci Twojej przeglądarki. Żadne wybory nie są wysyłane na serwer ani udostępniane podmiotom zewnętrznym.
         </p>
       </div>
 
-      {/* Lista 21 haseł E-E-A-T */}
+      {/* Lista haseł E-E-A-T */}
       {filteredEntries.length === 0 ? (
         <div className="bg-white dark:bg-[#1E081D] rounded-3xl p-10 text-center border border-[#EAE3DB] dark:border-[#3A1038] space-y-3">
           <p className="font-brand-display font-bold text-lg text-[#250A24] dark:text-white">
             Brak haseł spełniających wybrane kryteria
           </p>
           <p className="text-sm text-[#6E625A] dark:text-[#C5B5C3]">
-            Spróbuj wyczyścić pole wyszukiwania lub przełączyć kategorię na „Wszystkie”.
+            Spróbuj wyczyścić pole wyszukiwania lub przełączyć kategorię i stempel na „Wszystkie”.
           </p>
           <button
             type="button"
             onClick={() => {
               setSelectedCategory('Wszystkie');
+              setSelectedStamp('Wszystkie');
               setOnly2026(false);
               setOnlySaved(false);
               setSearchQuery('');
             }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#DA0271] text-white text-xs font-bold"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#DA0271] text-white text-xs font-bold cursor-pointer"
           >
             Pokaż wszystkie {entries.length} haseł
           </button>
@@ -216,17 +297,25 @@ export function DlaCiebieExplorer({ entries, categories }: DlaCiebieExplorerProp
         <div className="grid grid-cols-1 gap-5">
           {filteredEntries.map((entry) => {
             const isSaved = savedIds.includes(entry.id);
+            const itemStamp: VerificationStamp = entry.stamp || 'FAKT';
+            const isInternalLink = entry.isapUrl.startsWith('/');
             return (
               <article
                 key={entry.id}
                 id={entry.id}
                 className="bg-white dark:bg-[#1E081D] rounded-3xl p-6 sm:p-8 border border-[#EAE3DB] dark:border-[#3A1038] shadow-sm hover:border-[#DA0271]/50 transition-all space-y-5 scroll-mt-24"
               >
-                {/* Górna belka karty: numer, kategoria, odznaka 2026, przycisk zakładki */}
+                {/* Górna belka karty: numer, stempel, kategoria, odznaka 2026, przycisk zakładki */}
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F2ECE4] dark:border-[#2E0C2C] pb-4">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#250A24] text-[#FECB22] text-xs font-bold">
                       {String(entry.number).padStart(2, '0')}
+                    </span>
+                    <span
+                      className={STAMP_META[itemStamp].className}
+                      title={STAMP_META[itemStamp].shortDesc}
+                    >
+                      {itemStamp}
                     </span>
                     <span className="px-3 py-1 rounded-full bg-[#FBF8F4] dark:bg-[#270B25] border border-[#EAE3DB] dark:border-[#3A1038] text-xs font-semibold text-[#544A44] dark:text-[#EAD5E5]">
                       {entry.category}
@@ -286,13 +375,13 @@ export function DlaCiebieExplorer({ entries, categories }: DlaCiebieExplorerProp
                   </div>
                 </div>
 
-                {/* Rozwijana podstawa prawna (Sterylna parafraza + link do ISAP) */}
+                {/* Rozwijana podstawa prawna lub naukowa */}
                 <details className="group rounded-2xl border border-[#EAE3DB] dark:border-[#3A1038] bg-[#FDFCFB] dark:bg-[#180617] overflow-hidden">
                   <summary className="px-4 py-3 text-xs sm:text-sm font-bold text-[#250A24] dark:text-[#EAD5E5] flex items-center justify-between cursor-pointer select-none hover:bg-[#F5EFE8] dark:hover:bg-[#240922] transition-colors">
                     <span className="inline-flex items-center gap-2">
                       <Scale className="w-4 h-4 text-[#0097DB] shrink-0" />
                       <span>
-                        Zobacz podstawę prawną: {entry.legalAct} ({entry.legalSection})
+                        {entry.sourceCitation || 'Zobacz źródło / podstawę'}: {entry.legalAct} ({entry.legalSection})
                       </span>
                     </span>
                     <ChevronDown className="w-4 h-4 text-[#867A72] transition-transform group-open:rotate-180" />
@@ -300,15 +389,28 @@ export function DlaCiebieExplorer({ entries, categories }: DlaCiebieExplorerProp
                   <div className="px-4 pb-4 pt-2 text-xs sm:text-sm text-[#544A44] dark:text-[#C5B5C3] border-t border-[#EAE3DB] dark:border-[#3A1038] space-y-2.5">
                     <p className="leading-relaxed">{entry.legalParaphrase}</p>
                     <div className="flex flex-wrap items-center gap-4 pt-1 text-xs">
-                      <a
-                        href={entry.isapUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-bold text-[#0078AD] dark:text-[#58C4F6] hover:underline"
-                      >
-                        <span>Tekst urzędowy w ISAP Sejm RP</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
+                      {isInternalLink ? (
+                        <Link
+                          href={entry.isapUrl}
+                          className="inline-flex items-center gap-1 font-bold text-[#0078AD] dark:text-[#58C4F6] hover:underline"
+                        >
+                          <span>Przejdź do kalkulatora i szczegółów →</span>
+                        </Link>
+                      ) : (
+                        <a
+                          href={entry.isapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-bold text-[#0078AD] dark:text-[#58C4F6] hover:underline"
+                        >
+                          <span>
+                            {entry.isapUrl.includes('isap.sejm.gov.pl')
+                              ? 'Tekst urzędowy w ISAP Sejm RP'
+                              : 'Zobacz źródło wytycznych / dokument'}
+                          </span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
                     </div>
                   </div>
                 </details>

@@ -13,6 +13,8 @@ import {
   FileText,
   Luggage,
   Gift,
+  Calculator,
+  Heart,
   ChevronDown,
   AlertCircle,
 } from 'lucide-react';
@@ -853,6 +855,7 @@ export default function RootPage() {
               <Link href="/o-nas">{t.nav.experts}</Link>
               <Link href="/plan-porodu">Plan Porodu PDF</Link>
               <Link href="/kalkulator-wyprawki">Kalkulator Wyprawki PDF</Link>
+              <Link href="/kalkulator-macierzynski">Kalkulator Macierzyńskiego 2026</Link>
               <a href="#pytania">{t.nav.faq}</a>
               <a href="https://strefa.happybirth.pl" rel="nofollow">{t.nav.zone}</a>
               <a href="#cena">{t.nav.cta}</a>
@@ -904,24 +907,22 @@ export default function RootPage() {
               </ul>
             </div>
 
-            <div aria-label="Kadry z kursu HappyBirth" aria-roledescription="karuzela" className="kar" data-karuzela="" id="karuzela">
-              <figure aria-label="Kadr 1 z 4" className="kar-slajd akt">
+            <div aria-label="Kadry z kursu HappyBirth" aria-roledescription="karuzela" className="kar hb-hero-mgla" data-karuzela="" id="karuzela">
+              <figure aria-label="Kadr 1 z 4" className="kar-slajd hb-kadr-editorial akt">
                 <img
-                  alt="Kobieta w ciąży odpoczywa i ogląda lekcję na tablecie"
+                  alt="Przyszli rodzice wspólnie oglądają lekcję kursu HappyBirth na kanapie"
                   decoding="async"
                   fetchPriority="high"
                   height={853}
                   sizes="(max-width: 920px) 100vw, 48vw"
-                  src="/img/kar-1-para-1280.webp"
-                  srcSet="/img/kar-1-para-640.webp 640w, /img/kar-1-para-800.webp 800w, /img/kar-1-para-960.webp 960w, /img/kar-1-para-1280.webp 1280w, /img/kar-1-para-1600.webp 1600w"
+                  src="/img/editorial/hb-para-kurs-online-telefon-kanapa.jpg"
                   width={1280}
                 />
               </figure>
-              <figure aria-label="Kadr 2 z 4" className="kar-slajd" hidden>
+              <figure aria-label="Kadr 2 z 4" className="kar-slajd hb-kadr-editorial" hidden>
                 <img
-                  alt="Partner wspiera przyszłą mamę"
-                  data-src="/img/kar-2-oddech-1280.webp"
-                  data-srcset="/img/kar-2-oddech-640.webp 640w, /img/kar-2-oddech-800.webp 800w, /img/kar-2-oddech-960.webp 960w, /img/kar-2-oddech-1280.webp 1280w, /img/kar-2-oddech-1600.webp 1600w"
+                  alt="Partner obejmuje i wspiera przyszłą mamę przy oknie w ciepłym świetle"
+                  data-src="/img/editorial/hb-para-wsparcie-przy-oknie.jpg"
                   decoding="async"
                   fetchPriority="low"
                   height={853}
@@ -929,11 +930,10 @@ export default function RootPage() {
                   width={1280}
                 />
               </figure>
-              <figure aria-label="Kadr 3 z 4" className="kar-slajd" hidden>
+              <figure aria-label="Kadr 3 z 4" className="kar-slajd hb-kadr-editorial" hidden>
                 <img
-                  alt="Tata trzyma śpiące niemowlę"
-                  data-src="/img/kar-3-tata-1280.webp"
-                  data-srcset="/img/kar-3-tata-640.webp 640w, /img/kar-3-tata-800.webp 800w, /img/kar-3-tata-960.webp 960w, /img/kar-3-tata-1280.webp 1280w, /img/kar-3-tata-1600.webp 1600w"
+                  alt="Przyszła mama odpoczywa na kanapie z pierwszymi bucikami dla maluszka"
+                  data-src="/img/editorial/hb-mama-kanapa-buciki-spokoj.jpg"
                   decoding="async"
                   fetchPriority="low"
                   height={853}
@@ -941,11 +941,10 @@ export default function RootPage() {
                   width={1280}
                 />
               </figure>
-              <figure aria-label="Kadr 4 z 4" className="kar-slajd" hidden>
+              <figure aria-label="Kadr 4 z 4" className="kar-slajd hb-kadr-editorial" hidden>
                 <img
-                  alt="Spokojna nauka wieczorem"
-                  data-src="/img/kar-4-wieczor-1280.webp"
-                  data-srcset="/img/kar-4-wieczor-640.webp 640w, /img/kar-4-wieczor-800.webp 800w, /img/kar-4-wieczor-960.webp 960w, /img/kar-4-wieczor-1280.webp 1280w, /img/kar-4-wieczor-1600.webp 1600w"
+                  alt="Bliskość i spokojny wieczór przyszłych rodziców w domu"
+                  data-src="/img/editorial/hb-para-bliskosc-wieczor-razem.jpg"
                   decoding="async"
                   fetchPriority="low"
                   height={853}
@@ -1114,8 +1113,8 @@ export default function RootPage() {
               ))}
             </div>
 
-            {/* 2 kompaktowe kafelki bezpłatnych narzędzi PDF ([F3]) */}
-            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* 3 kompaktowe kafelki bezpłatnych narzędzi ([F3]) */}
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
               <Link
                 href="/plan-porodu"
                 className="p-5 rounded-2xl bg-white dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-all flex items-center justify-between gap-4 group"
@@ -1145,6 +1144,86 @@ export default function RootPage() {
                 </div>
                 <ArrowRight className="w-5 h-5 text-[#DA0271] shrink-0 group-hover:translate-x-1 transition-transform" />
               </Link>
+
+              <Link
+                href="/kalkulator-macierzynski"
+                className="p-5 rounded-2xl bg-white dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] hover:border-[#DA0271] transition-all flex items-center justify-between gap-4 group"
+              >
+                <div className="space-y-1">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#0078AD] dark:text-[#58C4F6]">
+                    <Calculator className="w-3.5 h-3.5" /> Bezpłatne narzędzie #3
+                  </span>
+                  <h3 className="font-brand-display font-bold text-base sm:text-lg text-[#250A24] dark:text-[#FBF8F4] group-hover:text-[#DA0271]">
+                    Kalkulator Macierzyńskiego 2026 (81,5% / 100%+70%)
+                  </h3>
+                </div>
+                <ArrowRight className="w-5 h-5 text-[#DA0271] shrink-0 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* 4B. FILOZOFIA MARKI + PREZENT OD DZIADKÓW I BLISKICH */}
+        <section aria-labelledby="prezent-filozofia-tyt" className="sek" id="prezent">
+          <div className="wrap">
+            <div className="naglowek">
+              <p className="kicker">DLA RODZICÓW I BLISKICH · PREZENT Z SENSEM</p>
+              <h2 className="h2" id="prezent-filozofia-tyt">
+                Każde narodziny rodzą więcej niż dziecko.{' '}
+                <span className="kursywa mniejsza">
+                  Rodzi się mama. Rodzi się tata. Rodzi się babcia.
+                </span>
+              </h2>
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-7 p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#1C081A] border border-[#EAE3DB] dark:border-[#3D0E39] shadow-sm space-y-5">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAE3EB] dark:bg-[#3A1038] text-xs font-bold text-[#DA0271] dark:text-[#FF85C0]">
+                  <Heart className="w-3.5 h-3.5" />
+                  <span>Cudów nie obiecujemy. Doświadczenie mamy — od 2012 r.</span>
+                </div>
+
+                <p className="font-brand-serif italic text-xl sm:text-2xl text-[#250A24] dark:text-[#FBF8F4] leading-snug">
+                  „Happy birthday mówi się co roku — happy birth raz.”
+                </p>
+
+                <p className="text-sm sm:text-base text-[#544A44] dark:text-[#D7CCC3] leading-relaxed">
+                  To jeden z najmądrzejszych prezentów na baby shower lub radosną nowinę od przyszłych dziadków i przyjaciół. Jedna jednorazowa opłata <strong>489,00 zł brutto</strong> daje przyszłym rodzicom pełne <strong>52 lekcje wideo 4K i dostęp na aż 18 miesięcy (548 dni)</strong> — od ciąży, przez poród, aż po pierwszy rok życia dziecka.
+                </p>
+
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <a className="btn kup" href="#cena">
+                    <Gift className="w-4 h-4 mr-1.5 inline" />
+                    Podaruj lub wykup dostęp (489 zł)
+                  </a>
+                  <Link className="btn duch" href="/dla-ciebie">
+                    Ściąga dla dziadków i baza wiedzy →
+                  </Link>
+                </div>
+              </div>
+
+              <div className="lg:col-span-5 grid grid-cols-2 gap-4">
+                <figure className="hb-kadr-editorial hb-kadr-ramka aspect-[4/5]">
+                  <img
+                    src="/img/editorial/hb-para-troska-cieply-koc-prezent.jpg"
+                    alt="Przyszli rodzice otuleni ciepłym kocem przy spokojnym wspólnym przygotowaniu w domu"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    width={800}
+                    height={1000}
+                  />
+                </figure>
+                <figure className="hb-kadr-editorial hb-kadr-ramka aspect-[4/5]">
+                  <img
+                    src="/img/editorial/hb-domowe-przygotowania-buciki.jpg"
+                    alt="Spokojne domowe przygotowania do powitania maluszka i pierwsze buciki"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    width={800}
+                    height={1000}
+                  />
+                </figure>
+              </div>
             </div>
           </div>
         </section>
@@ -1524,17 +1603,17 @@ export default function RootPage() {
                     Kompendium Edukacyjno-Prawne E-E-A-T · Od 7 maja 2026 r.
                   </span>
                   <h3 className="font-brand-display font-bold text-lg sm:text-xl text-[#250A24] dark:text-white">
-                    Chcecie poznać wszystkie 21 praw ze Standardu Opieki Okołoporodowej 2026?
+                    Chcecie poznać wszystkie 33 hasła: prawa Standardu 2026 oraz fakty i mity?
                   </h3>
                   <p className="text-xs sm:text-sm text-[#544A44] dark:text-[#C5B5C3] leading-relaxed">
-                    Sprawdźcie naszą Bazę Wiedzy dla Rodziców: każde hasło wyjaśnione prostym językiem, z podstawą prawną w ISAP Sejm RP (Dz.U. 2025 poz. 1525) oraz wskazówką praktyczną dla dwojga.
+                    Sprawdźcie naszą Bazę Wiedzy dla Rodziców: 21 praw w ISAP Sejm RP (Dz.U. 2025 poz. 1525) oraz 12 praktycznych haseł o ruchu, urlopach i opiece z 4 stemplami weryfikacji (FAKT, MIT, SPÓR, NIE WIADOMO).
                   </p>
                 </div>
                 <Link
                   href="/dla-ciebie"
                   className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#250A24] hover:bg-[#DA0271] text-white text-xs sm:text-sm font-bold transition-colors shrink-0"
                 >
-                  <span>Otwórz Bazę Wiedzy (21 haseł) →</span>
+                  <span>Otwórz Bazę Wiedzy (33 hasła) →</span>
                 </Link>
               </div>
             )}
@@ -1563,6 +1642,7 @@ export default function RootPage() {
                 <li><a href="#bezplatna-lekcja">{t.nav.trailer}</a></li>
                 <li><Link href="/plan-porodu">Plan Porodu PDF</Link></li>
                 <li><Link href="/kalkulator-wyprawki">Kalkulator Wyprawki PDF</Link></li>
+                <li><Link href="/kalkulator-macierzynski">Kalkulator Macierzyńskiego 2026</Link></li>
                 <li><a href="https://strefa.happybirth.pl" rel="nofollow">{t.nav.zone}</a></li>
               </ul>
             </div>

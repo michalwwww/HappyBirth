@@ -13,10 +13,11 @@
 
 ## Publiczne Narzędzia i Zasoby Edukacyjne (Darmowe dla Przyszłych Rodziców)
 - [Strona główna i oferta kursu](https://happybirth.pl/): Prezentacja 4 Filarów Spokoju, 9 etapów kursu i bezpłatnych lekcji demo.
-- [Dla Ciebie — Prawa Rodziców, Standard 2026 i Baza Wiedzy (ISAP)](https://happybirth.pl/dla-ciebie): Kompletne kompendium 21 praw w ciąży, porodzie, połogu i na „zielonej wyspie” (Nowy Standard MZ Dz.U. 2025 poz. 1525 obowiązujący od 7 maja 2026 r.) wraz z bezpośrednimi linkami do Dziennika Ustaw RP (ISAP Sejm) i Rzecznika Praw Pacjenta.
+- [Dla Ciebie — Prawa Rodziców, Standard 2026 i Baza Wiedzy (ISAP)](https://happybirth.pl/dla-ciebie): Kompletne kompendium 33 haseł: 21 praw w ciąży, porodzie, połogu i na „zielonej wyspie” (Nowy Standard MZ Dz.U. 2025 poz. 1525 obowiązujący od 7 maja 2026 r.) wraz z bezpośrednimi linkami do Dziennika Ustaw RP (ISAP Sejm) i Rzecznika Praw Pacjenta oraz 12 haseł praktycznych oznaczonych 4 stemplami wiedzy (FAKT, MIT, SPÓR, NIE WIADOMO).
 - [Sylabus 52 lekcji wideo (Program kursu)](https://happybirth.pl/program): Szczegółowy spis wszystkich 52 lekcji wideo, czasów trwania i zagadnień klinicznych.
 - [Kreator Planu Porodu Online (PDF)](https://happybirth.pl/plan-porodu): Interaktywny generator dokumentu Planu Porodu zgodnego z nowym rozporządzeniem Ministra Zdrowia (Dz.U. 2025 poz. 1525).
 - [Kalkulator Torby do Szpitala i Wyprawki (PDF)](https://happybirth.pl/kalkulator-wyprawki): Praktyczna lista wyprawkowa w 3 strefach (poród, oddział położniczy, wyprawka domowa).
+- [Kalkulator Urlopu i Zasiłku Macierzyńskiego 2026 (PDF)](https://happybirth.pl/kalkulator-macierzynski): Interaktywne porównanie wariantów 81,5% oraz 100%/70%, 9 tygodni urlopu rodzicielskiego dla drugiego rodzica i harmonogram wniosków ZUS/kadry.
 - [Zespół Ekspertek i Rada Merytoryczna](https://happybirth.pl/o-nas): Sylwetki położnych, fizjoterapeutek uroginekologicznych i doradczyń laktacyjnych ze szkoły Mama Gaja.
 
 ## Najczęściej Zadawane Pytania (Q&A dla Wyszukiwarek AI)

@@ -28,10 +28,12 @@ function buildEmailFooter(): string {
  * - Mail #3 (+96h): Pierwsze 72 godziny w domu z noworodkiem, laktacja bez bólu i kąpiel 37°C
  * - Mail #4 (+168h): Spokojne podsumowanie 52 lekcji 4K (489,00 zł brutto / 18 miesięcy dostępu)
  */
+type LeadToolSource = 'plan-porodu' | 'kalkulator-wyprawki' | 'kalkulator-macierzynski';
+
 function buildFourEmailCrmSequence(params: {
   name: string;
   gestationalWeek: number | null;
-  toolSource: 'plan-porodu' | 'kalkulator-wyprawki';
+  toolSource: LeadToolSource;
   nowMs?: number;
 }): CrmSequenceEmail[] {
   const week = params.gestationalWeek || 20;
@@ -42,7 +44,12 @@ function buildFourEmailCrmSequence(params: {
   let stageBody =
     'W drugim trymestrze warto zadbać o odciążenie miednicy i kręgosłupa oraz spokojny sen. W Module 3 kursu HappyBirth nasze fizjoterapeutki pokazują krok po kroku bezpieczne ćwiczenia na macie i piłce.';
 
-  if (week <= 13) {
+  if (params.toolSource === 'kalkulator-macierzynski') {
+    stageBadge = 'Formalności Rodzicielskie 2026';
+    stageHeadline = 'Zasiłek 81,5% czy 100% + 70%, 21 dni na wniosek i 9 tygodni dla drugiego rodzica';
+    stageBody =
+      'Zapamiętaj kluczowy termin: tzw. długi wniosek o zasiłek 81,5% składasz w ciągu 21 dni po narodzinach dziecka, a 9 z 41 tygodni urlopu rodzicielskiego przysługuje wyłącznie drugiemu rodzicowi (nie można ich przekazać mamie). W każdej chwili wrócisz do wyliczeń w naszym kalkulatorze lokalnym, a kod PLAN10 daje Ci -10% na pełny kurs (52 lekcje 4K, 18 miesięcy / 548 dni dostępu).';
+  } else if (week <= 13) {
     stageBadge = 'Etap I (Tydz. 1–13 · „Dwie kreski”)';
     stageHeadline = 'Twój mikro-poradnik z Modułów 1–2: Kalendarz badań, spokój i 18 miesięcy dostępu';
     stageBody =
@@ -60,9 +67,26 @@ function buildFourEmailCrmSequence(params: {
   }
 
   const toolTitle =
-    params.toolSource === 'kalkulator-wyprawki'
+    params.toolSource === 'kalkulator-macierzynski'
+      ? 'Kalkulator Urlopu i Zasiłku Macierzyńskiego 2026 (81,5% vs 100%/70%)'
+      : params.toolSource === 'kalkulator-wyprawki'
       ? 'Interaktywny Kalkulator Wyprawki i Torby do Szpitala PDF'
       : 'Generator Planu Porodu PDF (zgodny ze Standardem Opieki Okołoporodowej 2026)';
+
+  const toolShortName =
+    params.toolSource === 'kalkulator-macierzynski'
+      ? 'Kalkulator Macierzyńskiego 2026'
+      : params.toolSource === 'kalkulator-wyprawki'
+      ? 'Kalkulator Wyprawki PDF'
+      : 'Plan Porodu PDF';
+
+  const toolReturnLink =
+    params.toolSource === 'kalkulator-macierzynski'
+      ? `<p style="font-size: 13.5px; color: #544A44; margin: 12px 0;">
+          <a href="https://happybirth.pl/kalkulator-macierzynski" style="color: #0097DB; font-weight: bold; text-decoration: underline;">Otwórz ponownie Kalkulator Macierzyńskiego 2026 &rarr;</a> ·
+          <a href="https://happybirth.pl/#bezplatna-lekcja" style="color: #DA0271; font-weight: bold; text-decoration: underline;">Obejrzyj bezpłatną lekcję demo &rarr;</a>
+        </p>`
+      : '';
 
   const mail1Html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 26px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px;">
@@ -76,6 +100,7 @@ function buildFourEmailCrmSequence(params: {
         <p style="font-size: 13.5px; color: #544A44; line-height: 1.6; margin-bottom: 14px;">
           ${stageBody}
         </p>
+        ${toolReturnLink}
         <div style="padding: 12px; background: #FAE3EB; border-radius: 10px; font-size: 13px; color: #541235;">
           <strong>Pełny kurs Szkoły Rodzenia Online HappyBirth.pl:</strong> 52 lekcje 4K w 8 modułach (288 min) z położnymi Mama Gaja, bezpłatny dostęp dla partnera i aż <strong>18 miesięcy (548 dni) dostępu od zakupu</strong> w jednorazowej cenie <strong>489,00 zł brutto</strong>.
         </div>
@@ -161,7 +186,7 @@ function buildFourEmailCrmSequence(params: {
   return [
     {
       step: 1,
-      subject: `${stageBadge}: Twój ${params.toolSource === 'kalkulator-wyprawki' ? 'Kalkulator Wyprawki PDF' : 'Plan Porodu PDF'} i wskazówki położnej`,
+      subject: `${stageBadge}: Twój ${toolShortName} i wskazówki HappyBirth`,
       html: mail1Html,
     },
     {
@@ -191,6 +216,7 @@ export async function POST(req: NextRequest) {
     const {
       email,
       name,
+      firstName,
       dueDate,
       gestationalWeek,
       rodoConsent = true,
@@ -212,7 +238,8 @@ export async function POST(req: NextRequest) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const cleanName = typeof name === 'string' && name.trim() ? name.trim() : 'Przyszła Mamo';
+    const rawName = typeof name === 'string' && name.trim() ? name : typeof firstName === 'string' ? firstName : '';
+    const cleanName = rawName.trim() ? rawName.trim() : 'Przyszła Mamo';
     const cleanDueDate = typeof dueDate === 'string' && dueDate.trim() ? dueDate.trim() : null;
 
     // Wylicz tydzień ciąży na podstawie dueDate lub podanego gestationalWeek ([F4])
@@ -248,10 +275,17 @@ export async function POST(req: NextRequest) {
       ]);
     }
 
+    const resolvedToolSource: LeadToolSource =
+      toolSource === 'kalkulator-macierzynski'
+        ? 'kalkulator-macierzynski'
+        : toolSource === 'kalkulator-wyprawki'
+        ? 'kalkulator-wyprawki'
+        : 'plan-porodu';
+
     const sequence = buildFourEmailCrmSequence({
       name: cleanName,
       gestationalWeek: computedWeek,
-      toolSource: toolSource === 'kalkulator-wyprawki' ? 'kalkulator-wyprawki' : 'plan-porodu',
+      toolSource: resolvedToolSource,
     });
 
     const emailsToSchedule = isNewLead ? sequence : [sequence[0]];

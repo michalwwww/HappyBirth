@@ -115,6 +115,12 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/kalkulator-macierzynski" className="hover:text-[#FCD705] transition-colors flex items-center gap-1 font-medium">
+                  <FileText className="w-3.5 h-3.5 text-[#FCD705]" />
+                  <span>Kalkulator Macierzyńskiego 2026</span>
+                </Link>
+              </li>
+              <li>
                 <a href={strefaUrl} rel="nofollow" className="hover:text-[#EC008C] transition-colors font-semibold text-white">
                   {t.nav.zoneBtn}
                 </a>

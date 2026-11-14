@@ -10,13 +10,13 @@ interface LogoProps {
 
 export function Logo({
   className = "h-11 w-auto object-contain",
-  width = 144,
+  width = 124,
   height = 100,
   priority = false,
 }: LogoProps) {
   return (
     <Image
-      src="/logoHB.png"
+      src="/logo.svg"
       alt="HappyBirth — Szkoła Rodzenia Online"
       width={width}
       height={height}

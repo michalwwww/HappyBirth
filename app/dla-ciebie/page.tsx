@@ -16,6 +16,7 @@ import {
   PhoneCall,
   Users,
   Info,
+  Calculator,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import {
@@ -26,7 +27,7 @@ import {
 export const metadata: Metadata = {
   title: 'Wiedza dla Rodziców: Prawa i Standard Organizacyjny 2026 · HappyBirth.pl',
   description:
-    'Kompendium edukacyjno-prawne dla przyszłych rodziców: 21 praw i zasad ze Standardu Organizacyjnego Opieki Okołoporodowej (w brzmieniu od 7 maja 2026 r., Dz.U. 2025 poz. 1525) oraz Ustawy o prawach pacjenta. Opracowanie ekspertek Szkoły Rodzenia Mama Gaja (od 2012 r.).',
+    'Kompendium edukacyjno-prawne i baza 33 haseł dla przyszłych rodziców i bliskich: 21 praw ze Standardu Organizacyjnego Opieki Okołoporodowej (od 7 maja 2026 r., Dz.U. 2025 poz. 1525) oraz 12 haseł praktycznych ze stemplami weryfikacji (FAKT, MIT, SPÓR, NIE WIADOMO).',
   category: 'education',
   alternates: {
     canonical: 'https://happybirth.pl/dla-ciebie',
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Wiedza dla Rodziców: Prawa i Standard Organizacyjny 2026 · HappyBirth.pl',
     description:
-      '21 praw i zasad organizacyjnych obowiązujących od 7 maja 2026 r. wyjaśnionych prostym językiem, z podstawą prawną ISAP i praktycznymi wskazówkami dla dwojga.',
+      '33 hasła dla rodziców i bliskich: 21 praw ze Standardu 2026 oraz 12 haseł praktycznych ze stemplami wiedzy (FAKT, MIT, SPÓR, NIE WIADOMO).',
     url: 'https://happybirth.pl/dla-ciebie',
     siteName: 'HappyBirth Edukacja Online',
     locale: 'pl_PL',
@@ -56,6 +57,9 @@ const CATEGORIES: string[] = [
   'Karmienie',
   'Połóg',
   'Dostępność',
+  'Ruch, forma i żywienie',
+  'Urlopy i zasiłki 2026',
+  'Ściąga dla dziadków',
 ];
 
 const ISAP_STANDARD_2018 = 'https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=WDU20180001756';
@@ -480,6 +484,258 @@ const KNOWLEDGE_ENTRIES: KnowledgeEntry[] = [
       { num: 27, publicTitle: 'Torba do szpitala – pakowanie w 3 strefach bez zbędnego stresu' },
     ],
   },
+  {
+    id: 'ruch-150-minut-w-ciazy',
+    number: 22,
+    category: 'Ruch, forma i żywienie',
+    stamp: 'FAKT',
+    sourceCitation: 'PTGiP & PTMS 2023 · WHO 2020',
+    title: 'Minimum 150 minut umiarkowanego ruchu tygodniowo w ciąży bez przeciwwskazań',
+    summary:
+      'Zdrowym kobietom w prawidłowo przebiegającej ciąży zaleca się co najmniej 150 minut aktywności tlenowej o umiarkowanej intensywności tygodniowo (np. po 30 minut przez 5 dni) — w tym szybki marsz, pływanie, pilates czy ćwiczenia z piłką.',
+    practicalTip:
+      'Jeśli przed ciążą nie trenowałaś regularnie, zacznij spokojnie i nie podkręcaj tempa — świetnie sprawdza się „test mowy”: podczas ruchu powinnaś móc swobodnie prowadzić rozmowę bez zadyszki.',
+    legalAct: 'Wytyczne PTGiP i PTMS (2023) oraz WHO (2020)',
+    legalSection: 'Rekomendacje aktywności fizycznej w okresie okołoporodowym',
+    legalParaphrase:
+      'Systematyczny, umiarkowany wysiłek w ciąży fizjologicznej wspiera kondycję układu krążenia, łagodzi dolegliwości pleców i nie zwiększa ryzyka przedwczesnego zakończenia ciąży.',
+    isapUrl: 'https://www.who.int/publications/i/item/9789240015128',
+    lessons: [
+      { num: 16, publicTitle: 'Ulga dla kręgosłupa – bezpieczne ćwiczenia i rozluźnianie pleców' },
+      { num: 17, publicTitle: 'Czas dla siebie – relaks, spacery i bezpieczne podróże' },
+    ],
+  },
+  {
+    id: 'mit-jedzenia-za-dwoje-i-limitu-140',
+    number: 23,
+    category: 'Ruch, forma i żywienie',
+    stamp: 'MIT',
+    sourceCitation: 'ACOG Opinion No. 804 · EFSA',
+    title: 'Mit: W ciąży trzeba jeść za dwoje, a puls nie może przekroczyć 140 uderzeń/min',
+    summary:
+      'Oba popularne przekonania są nieaktualne. Zapotrzebowanie energetyczne rośnie nie razy dwa, lecz o ok. 340 kcal dziennie w II trymestrze i ok. 450 kcal w III trymestrze — liczy się gęstość odżywcza dla dwojga. Z kolei sztywny limit tętna 140 bpm został wycofany z wytycznych ACOG na rzecz subiektywnej oceny wysiłku.',
+    practicalTip:
+      'Zamiast drugiej porcji obiadu postaw na odżywczą przekąskę bogatą w białko i kwasy omega-3, a podczas spacerów i ćwiczeń na piłce kontroluj komfort oddechu zamiast obsesyjnie patrzeć na zegarek.',
+    legalAct: 'ACOG Committee Opinion No. 804 & EFSA',
+    legalSection: 'Stanowisko ds. aktywności fizycznej i norm żywienia',
+    legalParaphrase:
+      'Amerykańskie Kolegium Położników i Ginekologów rekomenduje ocenę intensywności wysiłku za pomocą skali RPE i testu mowy zamiast sztywnego limitu tętna 140/min, a normy EFSA potwierdzają umiarkowany wzrost kaloryczności w II i III trymestrze.',
+    isapUrl: 'https://www.acog.org/clinical/clinical-guidance/committee-opinion/articles/2020/04/physical-activity-and-exercise-during-pregnancy-and-the-postpartum-period',
+    lessons: [
+      { num: 2, publicTitle: 'II Trymestr – Czas energii, zmysłów i pierwszych ruchów' },
+      { num: 16, publicTitle: 'Ulga dla kręgosłupa – bezpieczne ćwiczenia i rozluźnianie pleców' },
+    ],
+  },
+  {
+    id: 'mit-podnoszenia-rak-i-plywania',
+    number: 24,
+    category: 'Ruch, forma i żywienie',
+    stamp: 'MIT',
+    sourceCitation: 'WHO 2020 · PTGiP & PTMS 2023',
+    title: 'Mit: Pływanie, joga lub podnoszenie rąk do góry szkodzi prawidłowej ciąży',
+    summary:
+      'Umiarkowany ruch, pływanie czy sięganie rękami w górę podczas codziennych czynności nie zagraża prawidłowo przebiegającej ciąży. Wykluczamy jedynie dyscypliny z ryzykiem upadku lub urazu brzucha (sporty kontaktowe, jazda konna, narty), nurkowanie głębinowe oraz dłuższe leżenie płasko na plecach w III trymestrze.',
+    practicalTip:
+      'Wybierajcie wspólne spacery, basen i bezpieczną ergonomię domu z naszego modułu fizjoterapii, a cięższe zakupy i przenoszenie walizek przekazuj partnerowi.',
+    legalAct: 'WHO Guidelines on Physical Activity & PTGiP 2023',
+    legalSection: 'Bezpieczne formy ruchu i przeciwskazane dyscypliny',
+    legalParaphrase:
+      'Wytyczne międzynarodowe oraz polskie rekomendacje kliniczne potwierdzają bezpieczeństwo codziennego ruchu w ciąży fizjologicznej, wskazując jako przeciwwskazane wyłącznie aktywności urazowe, kontaktowe i przegrzewające.',
+    isapUrl: 'https://www.who.int/publications/i/item/9789240015128',
+    lessons: [
+      { num: 17, publicTitle: 'Czas dla siebie – relaks, spacery i bezpieczne podróże' },
+      { num: 18, publicTitle: 'Domowa przestrzeń – jak dbać o swoje siły i kręgosłup' },
+    ],
+  },
+  {
+    id: 'nawodnienie-suplementacja-i-bezpieczna-kuchnia',
+    number: 25,
+    category: 'Ruch, forma i żywienie',
+    stamp: 'FAKT',
+    sourceCitation: 'PTGiP & NCEZ PZH-PIB · EFSA',
+    title: 'Nawodnienie, kluczowe składniki odżywcze i bezpieczna obróbka posiłków',
+    summary:
+      'W okresie oczekiwania na dziecko zapotrzebowanie na wodę rośnie do ok. 2,3–2,5 litra płynów na dobę, a podstawą profilaktyki są foliany, witamina D, jod i kwasy DHA w dawce dobranej z lekarzem. W kuchni kluczowe jest dokładne mycie warzyw, wybór pasteryzowanego nabiału oraz unikanie surowego mięsa, surowych jaj i niepasteryzowanych serów.',
+    practicalTip:
+      'Postawcie w domu dzbanek filtrowanej wody w zasięgu ręki, a podczas wizyty kontrolnej poproście o zapisanie dokładnych dawek witaminy D i DHA dopasowanych do wyników badań.',
+    legalAct: 'Rekomendacje PTGiP & Narodowe Centrum Edukacji Żywieniowej',
+    legalSection: 'Profilaktyka żywieniowa i suplementacja kobiet w ciąży',
+    legalParaphrase:
+      'Polskie Towarzystwo Ginekologów i Położników wskazuje na celowaną suplementację kwasem foliowym, witaminą D, jodem i DHA, a NCEZ PZH-PIB podkreśla znaczenie nawodnienia oraz higieny obróbki żywności.',
+    isapUrl: 'https://ncez.pzh.gov.pl/',
+    lessons: [
+      { num: 2, publicTitle: 'II Trymestr – Czas energii, zmysłów i pierwszych ruchów' },
+      { num: 11, publicTitle: 'Spokojna ciąża – kalendarz zalecanych badań i spotkań' },
+    ],
+  },
+  {
+    id: 'powrot-do-biegania-po-porodzie',
+    number: 26,
+    category: 'Ruch, forma i żywienie',
+    stamp: 'NIE WIADOMO',
+    sourceCitation: 'Goom, Donnelly, Brockwell 2019',
+    title: 'Kiedy dokładnie wrócić do biegania i skoków po porodzie? Plan indywidualny',
+    summary:
+      'Nauka nie podaje jednego uniwersalnego dnia powrotu do sportów dynamicznych dla każdej mamy. Międzynarodowy konsensus fizjoterapeutek uroginekologicznych wskazuje, aby nie zaczynać biegania przed upływem ok. 12 tygodni po narodzinach i uzależnia ten krok od indywidualnej oceny siły mięśni głębokich, dna miednicy oraz powłok brzucha.',
+    practicalTip:
+      'Po zakończonym połogu umów wizytę u fizjoterapeutki uroginekologicznej. Do dynamicznych treningów przechodź stopniowo dopiero wtedy, gdy bez trudu zaliczysz testy stabilizacji i brak jest uczucia ciężkości.',
+    legalAct: 'Goom T., Donnelly G., Brockwell E. (2019)',
+    legalSection: 'Returning to running postnatal – clinical guidelines',
+    legalParaphrase:
+      'Wytyczne międzynarodowe zastępują sztywne daty kalendarzowe indywidualną oceną funkcjonalną po ok. 12 tygodniach regeneracji tkanek, podkreślając luki w badaniach dla uniwersalnych terminów powrotu do sportu wyczynowego.',
+    isapUrl: 'https://www.who.int/publications/i/item/9789240015128',
+    lessons: [
+      { num: 16, publicTitle: 'Ulga dla kręgosłupa – bezpieczne ćwiczenia i rozluźnianie pleców' },
+      { num: 18, publicTitle: 'Domowa przestrzeń – jak dbać o swoje siły i kręgosłup' },
+    ],
+  },
+  {
+    id: 'urlop-macierzynski-rodzicielski-i-9-tygodni',
+    number: 27,
+    category: 'Urlopy i zasiłki 2026',
+    stamp: 'FAKT',
+    sourceCitation: 'Kodeks pracy · Art. 180, Art. 182¹ᵃ, Art. 182³',
+    title: 'Urlop macierzyński, 41 tygodni rodzicielskiego i 9 tygodni tylko dla drugiego rodzica',
+    summary:
+      'W aktualnym stanie prawnym przy narodzinach jednego dziecka przysługuje 20 tygodni urlopu macierzyńskiego oraz 41 tygodni urlopu rodzicielskiego do wykorzystania przez oboje rodziców. Spośród tych 41 tygodni aż 9 tygodni ma charakter niezbywalny wyłącznie dla drugiego rodzica (płatne 70%), a tata ma dodatkowo 2 tygodnie urlopu ojcowskiego (100%) do 12. miesiąca życia malucha.',
+    practicalTip:
+      'Sprawdźcie wspólnie nasz Kalkulator Macierzyńskiego 2026: zaplanujcie z wyprzedzeniem daty wniosków do kadr i sprawdźcie, kiedy tata odbierze swoje 9 tygodni opieki.',
+    legalAct: 'Ustawa – Kodeks pracy (stan prawny 2026)',
+    legalSection: 'Art. 180, Art. 182¹ᵃ oraz Art. 182³',
+    legalParaphrase:
+      'Kodeks pracy określa wymiar urlopu macierzyńskiego (20 tyg. przy jednym dziecku) oraz rodzicielskiego (41 tyg., z wyłącznym prawem każdego rodzica do nieprzenoszalnych 9 tygodni tego urlopu).',
+    isapUrl: '/kalkulator-macierzynski',
+    lessons: [
+      { num: 6, publicTitle: 'Szkoła rodzenia online – Twój bezpieczny i wygodny start', isFree: true },
+      { num: 26, publicTitle: 'Twój Plan Porodu – jak stworzyć dokument wspierający Twoje wybory', isFree: true },
+    ],
+  },
+  {
+    id: 'mit-81-5-procent-zabiera-urlop-tacie',
+    number: 28,
+    category: 'Urlopy i zasiłki 2026',
+    stamp: 'MIT',
+    sourceCitation: 'Ustawa zasiłkowa · Art. 30a ZUS',
+    title: 'Mit: Wybór stałej stawki 81,5% dla mamy odbiera drugiemu rodzicowi 9 tygodni urlopu',
+    summary:
+      'Złożenie w ciągu 21 dni od porodu jednego wniosku o zasiłek macierzyński w wysokości 81,5% przez cały okres macierzyńskiego i rodzicielskiego (32 tygodnie rodzicielskiego dla mamy) NIE zamyka tacie drogi do jego 9 tygodni. Drugi rodzic zachowuje swoje wyłączne 9 tygodni urlopu rodzicielskiego wypłacanych w ZUS na poziomie 70%.',
+    practicalTip:
+      'Pamiętajcie jedynie o terminie 21 dni po narodzinach na złożenie „długiego wniosku” u pracodawcy lub w ZUS (PUE ZUS przy JDG), jeśli chcecie skorzystać z równej stawki 81,5%.',
+    legalAct: 'Ustawa o świadczeniach pieniężnych z ubezpieczenia społecznego',
+    legalSection: 'Art. 30a · zasady wypłaty zasiłku 81,5% i 70%',
+    legalParaphrase:
+      'Przepisy zasiłkowe pozwalają matce pobierać uśrednione 81,5% przez pierwsze 52 tygodnie, zachowując równolegle odrębne prawo ojca do nieprzenoszalnej części 9 tygodni na stawce 70%.',
+    isapUrl: '/kalkulator-macierzynski',
+    lessons: [
+      { num: 6, publicTitle: 'Szkoła rodzenia online – Twój bezpieczny i wygodny start', isFree: true },
+      { num: 27, publicTitle: 'Torba do szpitala – pakowanie w 3 strefach bez zbędnego stresu' },
+    ],
+  },
+  {
+    id: 'spor-81-5-procent-czy-100-plus-70',
+    number: 29,
+    category: 'Urlopy i zasiłki 2026',
+    stamp: 'SPÓR',
+    sourceCitation: 'Kodeks pracy Art. 182¹ᵃ · Symulacja ZUS 2026',
+    title: 'Wariant 81,5% od pierwszego dnia czy 100% przez 20 tygodni + 70% potem?',
+    summary:
+      'W perspektywie pełnych 52 tygodni dla jednej osoby suma obu wariantów jest niemal identyczna (średnio ok. 81,54% przy opcji 100%+70% vs równe 81,5%). Spór praktyczny dotyczy płynności budżetu: wariant 100% + 70% daje wyższe wypłaty w pierwszych 5 miesiącach (albo przy podziale urlopu z lepiej zarabiającym partnerem), a 81,5% chroni przed nagłym spadkiem budżetu pod koniec roku.',
+    practicalTip:
+      'Przeliczcie w naszym kalkulatorze swoje realne wynagrodzenie netto na etacie lub podstawę składek JDG, aby sprawdzić oba scenariusze miesiąc po miesiącu.',
+    legalAct: 'Analiza porównawcza wariantów ZUS (2026)',
+    legalSection: 'Art. 31 ustawy zasiłkowej · wybór stawki zasiłku',
+    legalParaphrase:
+      'Wybór pomiędzy stałą stawką 81,5% a stawkami zmiennymi 100%/70% zależy od planowanego podziału opieki między obojga rodziców oraz indywidualnej strategii domowego budżetu.',
+    isapUrl: '/kalkulator-macierzynski',
+    lessons: [
+      { num: 6, publicTitle: 'Szkoła rodzenia online – Twój bezpieczny i wygodny start', isFree: true },
+      { num: 24, publicTitle: 'Kompletna wyprawka domowa – ubranka, otulacze i tekstylia' },
+    ],
+  },
+  {
+    id: 'mit-przegrzewania-24-stopnie-i-czapeczka',
+    number: 30,
+    category: 'Ściąga dla dziadków',
+    stamp: 'MIT',
+    sourceCitation: 'AAP Safe Sleep 2022 · PTP',
+    title: 'Mit: Noworodek musi spać w 24°C, mieć czapeczkę w domu i czekać miesiąc na spacer',
+    summary:
+      'Babcie i dziadkowie często pamiętają zalecenia sprzed dekad o szczelnym opatulaniu maluszka. Współczesna pediatria podkreśla, że przegrzanie jest dużo bardziej niebezpieczne niż lekki chłód: idealna temperatura do snu w pokoju to 18–20°C (w dzień ok. 20–21°C), w ogrzewanym mieszkaniu dziecko nie nosi czapeczki, a pierwszy spacer przy dobrej pogodzie można odbyć już w pierwszym tygodniu.',
+    practicalTip:
+      'Zamiast sprawdzać chłodne rączki lub stópki (u noworodka to naturalne), dotknij delikatnie karku dziecka — jeśli jest ciepły i suchy, maluch ma dokładnie właściwą temperaturę.',
+    legalAct: 'American Academy of Pediatrics & Polskie Towarzystwo Pediatryczne',
+    legalSection: 'Zalecenia termoregulacji i komfortu termicznego niemowląt',
+    legalParaphrase:
+      'Unikanie przegrzewania sypialni (zalecane 18–20°C), rezygnacja z czapeczek w domu oraz dostosowanie ubioru warstwowego do pogody zamiast wielotygodniowej izolacji domowej stanowią aktualny standard opieki.',
+    isapUrl: 'https://pacjent.gov.pl/',
+    lessons: [
+      { num: 22, publicTitle: 'Bezpieczne łóżeczko – materac i zasady spokojnego snu maluszka' },
+      { num: 24, publicTitle: 'Kompletna wyprawka domowa – ubranka, otulacze i tekstylia' },
+    ],
+  },
+  {
+    id: 'bezpieczny-sen-niemowlecia-abc',
+    number: 31,
+    category: 'Ściąga dla dziadków',
+    stamp: 'FAKT',
+    sourceCitation: 'AAP 2022 Safe Sleep · WHO',
+    title: 'Tylko na plecach, na twardym materacu i w pustym łóżeczku — złote zasady snu',
+    summary:
+      'Dawniej dzieci układano często na brzuszku lub otaczano miękkimi poduszkami i ochraniaczami na szczebelki. Dziś każde towarzystwo pediatryczne zaleca zasadę bezpiecznego snu: układamy niemowlę wyłącznie na plecach, na płaskim i twardym materacu, bez poduszek, luźnych kocyków, ochraniaczy, kokonów i pluszaków (zamiast kołderki wybieramy dopasowany śpiworek).',
+    practicalTip:
+      'Pokażcie tę krótką zasadę bliskim, którzy będą pomagać w opiece lub usypiać wnuka w pierwszym roku życia — w pustym łóżeczku maluszek śpi najbezpieczniej.',
+    legalAct: 'AAP Policy Statement: Safe Infant Sleeping Environment (2022)',
+    legalSection: 'Zasada ABC bezpiecznego snu niemowląt',
+    legalParaphrase:
+      'Współczesne wytyczne pediatryczne zalecają spanie na plecach (Back), na oddzielnym płaskim i twardym podłożu bez miękkich obiektów w strefie snu (Bare Crib) oraz pokój rodziców przez co najmniej pierwsze 6 miesięcy.',
+    isapUrl: 'https://pacjent.gov.pl/',
+    lessons: [
+      { num: 22, publicTitle: 'Bezpieczne łóżeczko – materac i zasady spokojnego snu maluszka' },
+      { num: 42, publicTitle: 'Bezpieczny sen maluszka – złote zasady spokojnej nocy' },
+    ],
+  },
+  {
+    id: 'odwiedziny-bliskich-i-ochrona-noworodka',
+    number: 32,
+    category: 'Ściąga dla dziadków',
+    stamp: 'SPÓR',
+    sourceCitation: 'Standard 2026 · Profilaktyka zakażeń niemowląt',
+    title: 'Pierwsze odwiedziny rodziny po powrocie do domu i całowanie maluszka',
+    summary:
+      'W wielu rodzinach ścierają się dwie potrzeby: chęć natychmiastowego powitania wnuka przez dziadków oraz potrzeba spokoju i ochrony niedojrzałego układu odpornościowego noworodka. Standard bezpieczeństwa jest prosty: odwiedziny odbywają się za zgodą rodziców, wyłącznie w pełnym zdrowiu (bez najmniejszego kataru czy opryszczki), po dokładnym umyciu rąk i bez całowania rączek oraz buzi dziecka.',
+    practicalTip:
+      'Podpowiedzcie dziadkom najlepszy prezent pierwszego tygodnia: ciepły domowy obiad przyniesiony w pojemnikach pod drzwi lub 20 minut pomocy przy zakupach zamiast długich posiedzeń przy łóżeczku.',
+    legalAct: 'Profilaktyka zdrowotna noworodka w domu (Standard 2026)',
+    legalSection: 'Ochrona adaptacyjna i higiena pierwszych tygodni życia',
+    legalParaphrase:
+      'Pierwsze tygodnie po narodzinach wymagają wyciszenia bodźców oraz ograniczania ekspozycji na drobnoustroje przenoszone drogą kropelkową i przez kontakt bezpośredni z dorosłymi.',
+    isapUrl: ISAP_NOWELIZACJA_2025,
+    lessons: [
+      { num: 27, publicTitle: 'Torba do szpitala – pakowanie w 3 strefach bez zbędnego stresu' },
+      { num: 46, publicTitle: 'Pierwsze dni w domu – naturalne adaptacje noworodka bez paniki' },
+    ],
+  },
+  {
+    id: 'dopajanie-woda-i-herbatki-koperkowe',
+    number: 33,
+    category: 'Ściąga dla dziadków',
+    stamp: 'NIE WIADOMO',
+    sourceCitation: 'WHO · PTGHiŻD · EMA',
+    title: 'Czy podawać noworodkowi wodę lub herbatkę koperkową przy karmieniu piersią?',
+    summary:
+      'Babcie często pamiętają dopajanie wodą z glukozą lub herbatkami ziołowymi. Tymczasem przy wyłącznym karmieniu piersią w pierwszych 6 miesiącach mleko mamy składa się w ok. 87% z wody i w pełni zaspokaja pragnienie nawet latem. Natomiast dla naparów z kopru włoskiego u niemowląt brak ustalonych bezpiecznych dawek ze względu na obecność naturalnego estragolu, dlatego nie podaje się ich maluchom bez wskazania lekarza.',
+    practicalTip:
+      'W upalne dni po prostu przystawiaj dziecko do piersi częściej — mleko z początku karmienia ma rzadszą konsystencję i świetnie gasi pragnienie bez dodatkowych butelek z wodą czy ziołami.',
+    legalAct: 'WHO Infant Feeding & Polskie Towarzystwo Gastroenterologii Dziecięcej',
+    legalSection: 'Stanowisko w sprawie wyłącznego karmienia piersią do 6. miesiąca',
+    legalParaphrase:
+      'WHO oraz towarzystwa pediatryczne potwierdzają brak potrzeby podawania wody czy herbatek zdrowym niemowlętom karmionym wyłącznie piersią w pierwszym półroczu życia, a Europejska Agencja Leków (EMA) wskazuje na brak wystarczających danych o bezpieczeństwie estragolu z kopru włoskiego u małych dzieci.',
+    isapUrl: 'https://www.who.int/health-topics/breastfeeding',
+    lessons: [
+      { num: 49, publicTitle: 'Czułe karmienie piersią – technika, pozycje i prawidłowy chwyt' },
+      { num: 51, publicTitle: 'Akcesoria do karmienia – laktatory, butelki i spokojne karmienie' },
+    ],
+  },
 ];
 
 const FAQ_ITEMS = [
@@ -581,7 +837,7 @@ export default function DlaCiebieKnowledgePage() {
       {
         '@type': 'DefinedTermSet',
         '@id': 'https://happybirth.pl/dla-ciebie#kompendium-21-hasel',
-        name: '21 haseł ze Standardu Organizacyjnego Opieki Okołoporodowej 2026',
+        name: '33 hasła: Standard Opieki Okołoporodowej 2026 oraz Baza Wiedzy ze Stemplami Weryfikacji',
         hasDefinedTerm: KNOWLEDGE_ENTRIES.map((entry) => ({
           '@type': 'DefinedTerm',
            '@id': `https://happybirth.pl/dla-ciebie#${entry.id}`,
@@ -674,22 +930,37 @@ export default function DlaCiebieKnowledgePage() {
         </nav>
 
         {/* Sekcja Hero */}
-        <section className="space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FAE3EB] dark:bg-[#3A1038] border border-[#F3CAD9] dark:border-[#5D1A59] text-xs font-bold text-[#DA0271] dark:text-[#FF85C0]">
-            <Scale className="w-3.5 h-3.5" />
-            <span>Kompendium Edukacyjno-Prawne · Stan prawny od 7 maja 2026 r.</span>
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="lg:col-span-7 space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FAE3EB] dark:bg-[#3A1038] border border-[#F3CAD9] dark:border-[#5D1A59] text-xs font-bold text-[#DA0271] dark:text-[#FF85C0]">
+              <Scale className="w-3.5 h-3.5" />
+              <span>Kompendium Edukacyjno-Prawne · Stan prawny od 7 maja 2026 r.</span>
+            </div>
+
+            <h1 className="font-brand-display font-bold text-3xl sm:text-5xl lg:text-6xl text-[#250A24] dark:text-white tracking-tight leading-[1.08]">
+              Dużo przydatnej wiedzy.{' '}
+              <span className="font-brand-serif italic font-normal text-[#DA0271]">
+                Twoje prawa i standard 2026 prostym językiem.
+              </span>
+            </h1>
+
+            <p className="text-base sm:text-lg text-[#544A44] dark:text-[#EAD5E5] leading-relaxed max-w-3xl">
+              Zebraliśmy w jednym miejscu <strong>21 praw ze Standardu Organizacyjnego Opieki Okołoporodowej</strong> (obowiązującego od <strong>7 maja 2026 roku</strong>, Dz.U. 2025 poz. 1525) oraz <strong>12 praktycznych haseł</strong> z naszego cyklu sprawdzania faktów i mitów (oznaczonych 4 stemplami: <strong>FAKT, MIT, SPÓR, NIE WIADOMO</strong>) — łącznie 33 hasła dla rodziców i bliskich.
+            </p>
           </div>
 
-          <h1 className="font-brand-display font-bold text-3xl sm:text-5xl lg:text-6xl text-[#250A24] dark:text-white tracking-tight leading-[1.08]">
-            Dużo przydatnej wiedzy.{' '}
-            <span className="font-brand-serif italic font-normal text-[#DA0271]">
-              Twoje prawa i standard 2026 prostym językiem.
-            </span>
-          </h1>
-
-          <p className="text-base sm:text-lg text-[#544A44] dark:text-[#EAD5E5] leading-relaxed max-w-3xl">
-            Zebraliśmy w jednym miejscu <strong>21 najważniejszych praw i zasad organizacyjnych</strong> ze Standardu Organizacyjnego Opieki Okołoporodowej w brzmieniu obowiązującym od <strong>7 maja 2026 roku</strong> (Dz.U. 2025 poz. 1525) oraz z Ustawy o prawach pacjenta. Każde hasło wyjaśniamy przystępnym językiem dla dwojga, ze wskazaniem oficjalnego źródła w ISAP Sejm RP oraz lekcji wideo w naszym kursie.
-          </p>
+          <div className="lg:col-span-5">
+            <figure className="hb-kadr-editorial hb-kadr-ramka aspect-[4/3]">
+              <img
+                src="/img/editorial/hb-mama-poranna-herbata-dom.jpg"
+                alt="Przyszła mama spokojnie czyta poradnik przy porannej herbacie w domu"
+                className="w-full h-full object-cover"
+                loading="eager"
+                width={1200}
+                height={900}
+              />
+            </figure>
+          </div>
         </section>
 
         {/* Box TL;DR (Answer-First dla GEO / AEO / AI Overviews i szybkiego skanowania przez rodziców) */}
@@ -904,17 +1175,17 @@ export default function DlaCiebieKnowledgePage() {
           </div>
         </section>
 
-        {/* Interaktywna Encyklopedia 21 Haseł (SSR + Client Filtering) */}
+        {/* Interaktywna Encyklopedia 33 Haseł (SSR + Client Filtering) */}
         <section aria-labelledby="encyklopedia-heading" className="space-y-6">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-[#DA0271]">
-              Encyklopedia Praw i Standardu Organizacyjnego
+              Encyklopedia Praw, Standardu 2026 i Stempla Wiedzy
             </span>
             <h2
               id="encyklopedia-heading"
               className="font-brand-display font-bold text-2xl sm:text-4xl text-[#250A24] dark:text-white"
             >
-              21 haseł w 9 kategoriach — od pierwszej wizyty do powrotu do domu
+              33 hasła w 12 kategoriach — prawo 2026 i 4 stemple weryfikacji wiedzy
             </h2>
             <p className="text-sm sm:text-base text-[#544A44] dark:text-[#C5B5C3]">
               Filtrujcie hasła według kategorii, wyszukujcie interesujące Was sytuacje i zapisujcie najważniejsze punkty na własnej liście podręcznej.
@@ -944,7 +1215,7 @@ export default function DlaCiebieKnowledgePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             <Link
               href="/plan-porodu"
               className="group p-6 rounded-2xl bg-[#FBF8F4] dark:bg-[#140513] border border-[#EAE3DB] dark:border-[#3A1038] hover:border-[#DA0271] transition-all space-y-3 flex flex-col justify-between"
@@ -982,6 +1253,26 @@ export default function DlaCiebieKnowledgePage() {
               </div>
               <span className="text-xs font-bold text-[#DA0271] inline-flex items-center gap-1 pt-2">
                 <span>Sprawdź listę do szpitala →</span>
+              </span>
+            </Link>
+
+            <Link
+              href="/kalkulator-macierzynski"
+              className="group p-6 rounded-2xl bg-[#FBF8F4] dark:bg-[#140513] border border-[#EAE3DB] dark:border-[#3A1038] hover:border-[#DA0271] transition-all space-y-3 flex flex-col justify-between"
+            >
+              <div className="space-y-2.5">
+                <div className="w-10 h-10 rounded-xl bg-[#E0F2FE] text-[#0369A1] flex items-center justify-center">
+                  <Calculator className="w-5 h-5" />
+                </div>
+                <h3 className="font-brand-display font-bold text-lg text-[#250A24] dark:text-white group-hover:text-[#DA0271] transition-colors">
+                  Kalkulator Macierzyńskiego 2026
+                </h3>
+                <p className="text-xs text-[#544A44] dark:text-[#C5B5C3] leading-relaxed">
+                  Porównajcie wariant 81,5% oraz 100% + 70%, sprawdźcie 9 tygodni dla taty i pobierzcie harmonogram PDF.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-[#DA0271] inline-flex items-center gap-1 pt-2">
+                <span>Oblicz zasiłek i urlop →</span>
               </span>
             </Link>
 
