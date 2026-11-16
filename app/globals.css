@@ -701,3 +701,198 @@ html.a11y-reduce-motion .pasek-tor {
   opacity: 0.65;
   cursor: not-allowed;
 }
+
+/* -------------------------------------------------------------
+   FILTRY REDAKCYJNE ZDJĘĆ DLA LANDING PAGE'A (/landing, /wariant-1, /v1)
+   ------------------------------------------------------------- */
+.hb-kadr-editorial,
+.kar-slajd,
+.foto,
+.plansza {
+  overflow: hidden;
+  border-radius: 26px;
+  isolation: isolate;
+  background: #EFE6DC;
+}
+
+.hb-kadr-editorial:not(.kar-slajd),
+.foto,
+.plansza {
+  position: relative;
+}
+
+.kar-slajd.hb-kadr-editorial {
+  position: absolute;
+}
+
+.hb-kadr-editorial img,
+.kar-slajd img,
+.foto img,
+.plansza img {
+  filter: sepia(0.08) saturate(1.06) contrast(1.03) brightness(1.01);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease;
+}
+
+@media (hover: hover) {
+  .hb-kadr-editorial:hover img,
+  .kar:hover .kar-slajd.akt img,
+  .foto:hover img {
+    transform: scale(1.018);
+  }
+}
+
+.hb-kadr-editorial::before,
+.kar-slajd::before,
+.foto::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(254, 203, 34, 0.10) 0%,
+      rgba(232, 115, 34, 0.05) 52%,
+      rgba(218, 2, 113, 0.05) 100%
+    ),
+    radial-gradient(circle at 18% 18%, rgba(253, 250, 246, 0.18), transparent 58%);
+  mix-blend-mode: soft-light;
+}
+
+.hb-kadr-editorial::after,
+.kar-slajd::after,
+.foto::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+.hb-kadr-ramka {
+  border: 2.5px solid #2D1A2B;
+  box-shadow: 0 18px 40px -22px rgba(37, 10, 36, 0.28);
+}
+
+html.dark .hb-kadr-ramka {
+  border-color: #541B4F;
+  box-shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.65);
+}
+
+.hb-hero-mgla {
+  position: relative;
+}
+
+@media (min-width: 921px) {
+  .hb-hero-mgla::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 16%;
+    z-index: 3;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(251, 248, 244, 0.42) 0%, rgba(251, 248, 244, 0) 100%);
+  }
+
+  html.dark .hb-hero-mgla::after {
+    background: linear-gradient(90deg, rgba(18, 3, 17, 0.48) 0%, rgba(18, 3, 17, 0) 100%);
+  }
+}
+
+.kar-kropki {
+  z-index: 5 !important;
+}
+
+html.a11y-high-contrast .hb-kadr-editorial::before,
+html.a11y-high-contrast .hb-kadr-editorial::after,
+html.a11y-high-contrast .kar-slajd::before,
+html.a11y-high-contrast .kar-slajd::after,
+html.a11y-high-contrast .foto::before,
+html.a11y-high-contrast .foto::after,
+html.a11y-high-contrast .hb-hero-mgla::after {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-kadr-editorial:hover img,
+  .kar:hover .kar-slajd.akt img,
+  .foto:hover img {
+    transform: none !important;
+  }
+}
+
+html.a11y-reduce-motion .hb-kadr-editorial:hover img,
+html.a11y-reduce-motion .kar:hover .kar-slajd.akt img,
+html.a11y-reduce-motion .foto:hover img {
+  transform: none !important;
+}
+
+/* 4 stemple weryfikacji wiedzy */
+.hb-stempel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-width: 1.5px;
+  border-style: solid;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  line-height: 1.2;
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+
+.hb-stempel-fakt {
+  color: #0F5E3F;
+  background-color: #E7F6EF;
+  border-color: #84D1AE;
+}
+
+html.dark .hb-stempel-fakt {
+  color: #6EE7B7;
+  background-color: rgba(16, 185, 129, 0.15);
+  border-color: rgba(110, 231, 183, 0.4);
+}
+
+.hb-stempel-mit {
+  color: #9E134E;
+  background-color: #FCE7F1;
+  border-color: #F29EC2;
+}
+
+html.dark .hb-stempel-mit {
+  color: #F9A8D4;
+  background-color: rgba(218, 2, 113, 0.2);
+  border-color: rgba(249, 168, 212, 0.45);
+}
+
+.hb-stempel-spor {
+  color: #8A4B08;
+  background-color: #FEF3C7;
+  border-color: #F5C451;
+}
+
+html.dark .hb-stempel-spor {
+  color: #FDE68A;
+  background-color: rgba(245, 158, 11, 0.18);
+  border-color: rgba(253, 230, 138, 0.45);
+}
+
+.hb-stempel-niewiadomo {
+  color: #0C4A6E;
+  background-color: #E0F2FE;
+  border-color: #7DD3FC;
+}
+
+html.dark .hb-stempel-niewiadomo {
+  color: #7DD3FC;
+  background-color: rgba(0, 151, 219, 0.2);
+  border-color: rgba(125, 211, 252, 0.45);
+}

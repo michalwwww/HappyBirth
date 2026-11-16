@@ -168,6 +168,11 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const isOnlyOrderBump = metadata.only_order_bump === 'true';
     const orderBumpIncluded = metadata.order_bump_included === 'true' || isOnlyOrderBump ? 1 : 0;
     const promoCode = String(metadata.promo_code || '').toUpperCase();
+    const promoSourceType = String(metadata.promo_source_type || '').trim();
+    const isDiagnosticTest =
+      promoSourceType === 'diagnostic_test' ||
+      promoCode === 'DIAGNOSTIC_TEST' ||
+      amountTotal <= 500;
     const refCookie = String(metadata.affiliate_ref_cookie || '');
     const buyerIp = String(metadata.buyer_ip || '0.0.0.0');
     const waiverTimestamp = String(metadata.waiver_art38_timestamp || new Date().toISOString());
@@ -272,8 +277,8 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           await cancelScheduledCrmEmailsEdge(env.DB, customerEmail, env.RESEND_API_KEY);
         }
 
-        // 5. [C4] Jeśli użyto kodu polecającego innej kursantki (MAMA-XXXX) -> natychmiast odblokuj jej e-book PDF (tylko dla kursu głównego)
-        if (!isOnlyOrderBump && promoCode.startsWith('MAMA-')) {
+        // 5. [C4] Jeśli użyto kodu polecającego innej kursantki (MAMA-XXXX) -> natychmiast odblokuj jej e-book PDF (tylko dla kursu głównego i nigdy dla testów)
+        if (!isDiagnosticTest && !isOnlyOrderBump && promoCode.startsWith('MAMA-')) {
           const referrerUser = await env.DB.prepare(
             'SELECT id, email FROM users WHERE referral_code = ?'
           )
@@ -304,6 +309,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           : 0;
         const courseNetBase = Math.max(0, amountTotal - bumpMinor);
         const isFreeOrTestCode =
+          isDiagnosticTest ||
           courseNetBase <= 0 ||
           promoCode === 'TEST' ||
           promoCode === 'TEST100' ||

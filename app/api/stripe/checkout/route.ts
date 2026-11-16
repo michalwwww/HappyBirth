@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { stripe } from '@/lib/stripe';
 import { getSession } from '@/lib/auth';
 import { d1First } from '@/lib/d1';
 import {
   validatePromoCode,
   is100PercentPromo,
+  DIAGNOSTIC_PROMO_SHA256,
   BASE_COURSE_PRICE_GROSZE,
   ORDER_BUMP_PRICE_GROSZE,
   resolvePricingForCurrency,
@@ -112,9 +114,29 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const promoSha = cleanPromo
+      ? crypto.createHash('sha256').update(cleanPromo).digest('hex')
+      : '';
+    const isDiagnosticPromo = Boolean(
+      cleanPromo &&
+        (promoSha === DIAGNOSTIC_PROMO_SHA256 ||
+          (process.env.DIAGNOSTIC_PROMO_CODE &&
+            cleanPromo === process.env.DIAGNOSTIC_PROMO_CODE.trim().toUpperCase()))
+    );
+
     const isVip100 = cleanPromo === 'VIP100';
     let promoResult = validatePromoCode(cleanPromo);
-    if (cleanPromo && !isVip100 && !promoResult.valid) {
+    if (isDiagnosticPromo) {
+      promoResult = {
+        valid: true,
+        code: 'DIAGNOSTIC_TEST',
+        discountPercent: 0,
+        basePricePln: 2,
+        discountedCoursePricePln: 2,
+        omnibusNotice: promoResult.omnibusNotice,
+        sourceType: 'affiliate',
+      };
+    } else if (cleanPromo && !isVip100 && !promoResult.valid) {
       // Weryfikacja imiennych kodów partnerów i poleceń Mam w Cloudflare D1
       const aff = await d1First<{ id: string }>(
         `SELECT id FROM affiliates WHERE (UPPER(promo_code) = ? OR UPPER(ref_slug) = ?) AND status = 'active' LIMIT 1`,
@@ -139,7 +161,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (cleanPromo && !isVip100 && !promoResult.valid) {
+    if (cleanPromo && !isVip100 && !isDiagnosticPromo && !promoResult.valid) {
       return NextResponse.json(
         {
           error:
@@ -149,17 +171,29 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const pricing = resolvePricingForCurrency(currency, promoResult.valid && promoResult.discountPercent === 10);
+    const shouldIncludeBumpItem = Boolean(includeOrderBump || isStandaloneOrderBump);
+    const pricing = resolvePricingForCurrency(
+      isDiagnosticPromo ? 'pln' : currency,
+      !isDiagnosticPromo && promoResult.valid && promoResult.discountPercent === 10
+    );
     const isPln = pricing.currency === 'pln';
-    const activeLocale = (locale || pricing.stripeLocale || 'pl').toString();
-    const activeCourseAmountGrosze = isPln
-      ? promoResult.valid && promoResult.discountPercent === 10
-        ? 44010
-        : BASE_COURSE_PRICE_GROSZE // 440,10 zł lub 489,00 zł brutto
-      : pricing.activeCourseMinorUnits;
-    const activeOrderBumpMinorUnits = isPln
-      ? ORDER_BUMP_PRICE_GROSZE // 49,00 zł brutto
-      : pricing.orderBumpMinorUnits;
+    const activeLocale = isDiagnosticPromo ? 'pl' : (locale || pricing.stripeLocale || 'pl').toString();
+    const activeCourseAmountGrosze = isDiagnosticPromo
+      ? shouldIncludeBumpItem && !isStandaloneOrderBump
+        ? 100
+        : 200
+      : isPln
+        ? promoResult.valid && promoResult.discountPercent === 10
+          ? 44010
+          : BASE_COURSE_PRICE_GROSZE // 440,10 zł lub 489,00 zł brutto
+        : pricing.activeCourseMinorUnits;
+    const activeOrderBumpMinorUnits = isDiagnosticPromo
+      ? isStandaloneOrderBump
+        ? 200
+        : 100
+      : isPln
+        ? ORDER_BUMP_PRICE_GROSZE // 49,00 zł brutto
+        : pricing.orderBumpMinorUnits;
 
     // Pobierz adres IP kupującego, kraj (Cloudflare IP Country) oraz ciasteczko afiliacyjne hb_aff_ref ([D2] & [E1] & [TECH-03])
     const buyerIp =
@@ -188,19 +222,21 @@ export async function POST(req: NextRequest) {
 
     // 1. Pozycja główna: Kurs HappyBirth 489,00 zł brutto (lub 440,10 zł z kodem -10%), 18 miesięcy (548 dni) od zakupu (lub waluta międzynarodowa GBP/EUR/USD/AUD/AED)
     const mainCourseLineItem =
-      priceId && !promoResult.valid && isPln
+      priceId && !promoResult.valid && !isDiagnosticPromo && isPln
         ? { price: priceId, quantity: 1 }
         : {
             price_data: {
               currency: pricing.currency,
               product_data: {
-                name: isPln
-                  ? promoResult.valid
-                    ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${promoResult.code})`
-                    : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)'
-                  : promoResult.valid
-                    ? `HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons · -10%: ${promoResult.code})`
-                    : 'HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons for Two)',
+                name: isDiagnosticPromo
+                  ? 'Kurs Szkoły Rodzenia Online HappyBirth.pl (Transakcja Testowa Live)'
+                  : isPln
+                    ? promoResult.valid
+                      ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${promoResult.code})`
+                      : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)'
+                    : promoResult.valid
+                      ? `HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons · -10%: ${promoResult.code})`
+                      : 'HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons for Two)',
                 description: isPln
                   ? 'Dostęp na 18 miesięcy (548 dni) od momentu zakupu dla dwojga: 52 lekcje 4K w 8 modułach (288 min), Notatnik Rodzica PDF i checklisty.'
                   : '18-month (548 days) full access for both parents: 52 4K VOD lessons (288 min), Interactive Birth Plan, Contraction Timer & Partner Toolkit PDF.',
@@ -212,7 +248,6 @@ export async function POST(req: NextRequest) {
             quantity: 1,
           };
 
-    const shouldIncludeBumpItem = Boolean(includeOrderBump || isStandaloneOrderBump);
     const lineItems: any[] = isStandaloneOrderBump ? [] : [mainCourseLineItem];
 
     // 2. [B3] Jednoklikowy dodatek w koszyku lub samodzielny Post-Purchase Upsell w Strefie (Order Bump +49,00 zł brutto / £15 / €17 / $27) z edycją krajową
@@ -262,16 +297,26 @@ export async function POST(req: NextRequest) {
       order_bump_included: shouldIncludeBumpItem ? 'true' : 'false',
       only_order_bump: isStandaloneOrderBump ? 'true' : 'false',
       order_bump_edition: matchedBumpEdition.editionKey,
-      promo_code: promoResult.valid && !isStandaloneOrderBump ? promoResult.code : '',
-      promo_source_type: promoResult.valid && !isStandaloneOrderBump ? promoResult.sourceType : 'none',
-      affiliate_ref_cookie: isStandaloneOrderBump ? '' : String(cookieRef).slice(0, 80),
-      attribution_priority: isStandaloneOrderBump
-        ? 'post_purchase_upsell'
-        : promoResult.valid
-          ? 'promo_code'
-          : cookieRef
-            ? 'ref_cookie'
-            : 'direct',
+      promo_code: isDiagnosticPromo
+        ? 'DIAGNOSTIC_TEST'
+        : promoResult.valid && !isStandaloneOrderBump
+          ? promoResult.code
+          : '',
+      promo_source_type: isDiagnosticPromo
+        ? 'diagnostic_test'
+        : promoResult.valid && !isStandaloneOrderBump
+          ? promoResult.sourceType
+          : 'none',
+      affiliate_ref_cookie: isStandaloneOrderBump || isDiagnosticPromo ? '' : String(cookieRef).slice(0, 80),
+      attribution_priority: isDiagnosticPromo
+        ? 'diagnostic_test'
+        : isStandaloneOrderBump
+          ? 'post_purchase_upsell'
+          : promoResult.valid
+            ? 'promo_code'
+            : cookieRef
+              ? 'ref_cookie'
+              : 'direct',
       waiver_art38_accepted: 'true',
       waiver_art38_timestamp: waiverTimestamp,
       buyer_ip: String(buyerIp).slice(0, 64),

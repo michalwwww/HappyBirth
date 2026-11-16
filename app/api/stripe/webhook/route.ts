@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
     const isOnlyOrderBump = session.metadata?.only_order_bump === 'true';
     const orderBumpIncluded = session.metadata?.order_bump_included === 'true' || isOnlyOrderBump;
     const promoCode = (session.metadata?.promo_code || '').trim().toUpperCase();
+    const promoSourceType = (session.metadata?.promo_source_type || '').trim();
     const refCookie = (session.metadata?.affiliate_ref_cookie || session.metadata?.ref || '').trim();
     const waiverTimestamp = session.metadata?.waiver_art38_timestamp || new Date().toISOString();
     const buyerIp = session.metadata?.buyer_ip || '0.0.0.0';
@@ -59,6 +60,10 @@ export async function POST(req: NextRequest) {
       session.amount_total !== undefined && session.amount_total !== null
         ? session.amount_total
         : 48900;
+    const isDiagnosticTest =
+      promoSourceType === 'diagnostic_test' ||
+      promoCode === 'DIAGNOSTIC_TEST' ||
+      amountTotalGrosze <= 500;
     const sessionCurrency = (session.currency || session.metadata?.currency || 'PLN').toUpperCase();
 
     console.log(
@@ -176,8 +181,8 @@ export async function POST(req: NextRequest) {
           } catch {}
         }
 
-        // 4. [C4] Obsługa Boksu Poleceń Koleżeńskich (Kod MAMA-XXXX) -> Natychmiastowe odblokowanie Prezentu PDF (tylko dla kursu głównego)
-        if (!isOnlyOrderBump && promoCode.startsWith('MAMA-')) {
+        // 4. [C4] Obsługa Boksu Poleceń Koleżeńskich (Kod MAMA-XXXX) -> Natychmiastowe odblokowanie Prezentu PDF (tylko dla kursu głównego i nigdy dla testów)
+        if (!isDiagnosticTest && !isOnlyOrderBump && promoCode.startsWith('MAMA-')) {
           const referrerUser = await d1First<{ id: string; email: string }>(
             'SELECT id, email FROM users WHERE referral_code = ?',
             [promoCode]
@@ -193,8 +198,8 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        // 5. [D1b] + [D2] + [D2a] Atrybucja Afiliacyjna 2-Tier Capped CPA (nadrzędność kodu nad ?ref=, pomijana przy samym Order Bumpie)
-        if (!isOnlyOrderBump && !promoCode.startsWith('MAMA-') && (promoCode || refCookie)) {
+        // 5. [D1b] + [D2] + [D2a] Atrybucja Afiliacyjna 2-Tier Capped CPA (nadrzędność kodu nad ?ref=, pomijana przy samym Order Bumpie i testach)
+        if (!isDiagnosticTest && !isOnlyOrderBump && !promoCode.startsWith('MAMA-') && (promoCode || refCookie)) {
           const partnerByPromo = promoCode
             ? await d1First<any>('SELECT * FROM affiliates WHERE promo_code = ? AND status = ?', [promoCode, 'active'])
             : null;

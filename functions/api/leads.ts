@@ -66,7 +66,7 @@ function buildEmailFooter(unsubscribeUrl: string): string {
 function buildFourEmailCrmSequence(params: {
   name: string;
   gestationalWeek: number | null;
-  toolSource: 'plan-porodu' | 'kalkulator-wyprawki';
+  toolSource: 'plan-porodu' | 'kalkulator-wyprawki' | 'kalkulator-macierzynski';
   unsubscribeUrl: string;
   nowMs?: number;
 }): CrmSequenceEmail[] {
@@ -97,9 +97,11 @@ function buildFourEmailCrmSequence(params: {
   }
 
   const toolTitle =
-    params.toolSource === 'kalkulator-wyprawki'
-      ? 'Interaktywny Kalkulator Wyprawki i Torby do Szpitala PDF'
-      : 'Generator Planu Porodu PDF (zgodny ze Standardem Opieki Okołoporodowej 2026)';
+    params.toolSource === 'kalkulator-macierzynski'
+      ? 'Kalkulator Urlopu i Zasiłku Macierzyńskiego 2026 (81,5% vs 100%+70%)'
+      : params.toolSource === 'kalkulator-wyprawki'
+        ? 'Interaktywny Kalkulator Wyprawki i Torby do Szpitala PDF'
+        : 'Generator Planu Porodu PDF (zgodny ze Standardem Opieki Okołoporodowej 2026)';
 
   const mail1Html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 26px; color: #1A1512; background: #FBF8F4; border: 1px solid #EAE3DB; border-radius: 16px;">
@@ -198,7 +200,13 @@ function buildFourEmailCrmSequence(params: {
   return [
     {
       step: 1,
-      subject: `${stageBadge}: Twój ${params.toolSource === 'kalkulator-wyprawki' ? 'Kalkulator Wyprawki PDF' : 'Plan Porodu PDF'} i wskazówki położnej`,
+      subject: `${stageBadge}: Twój ${
+        params.toolSource === 'kalkulator-macierzynski'
+          ? 'Kalkulator Macierzyńskiego 2026'
+          : params.toolSource === 'kalkulator-wyprawki'
+            ? 'Kalkulator Wyprawki PDF'
+            : 'Plan Porodu PDF'
+      } i wskazówki położnej`,
       html: mail1Html,
     },
     {
@@ -237,6 +245,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const {
       email,
       name,
+      firstName,
       rodoConsent = false,
       toolSource = 'plan-porodu',
     } = body;
@@ -256,7 +265,8 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const cleanName = typeof name === 'string' && name.trim() ? name.trim().slice(0, 80) : 'Przyszła Mamo';
+    const rawName = name || firstName;
+    const cleanName = typeof rawName === 'string' && rawName.trim() ? rawName.trim().slice(0, 80) : 'Przyszła Mamo';
     const ipAddress = extractClientIp(request);
 
     const allowed = await checkRateLimitD1(env.DB, `leads:${ipAddress}`, 10, 15);
@@ -306,7 +316,11 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
           .bind(
             cleanEmail,
             cleanName,
-            toolSource === 'kalkulator-wyprawki' ? 'kalkulator_wyprawki' : 'plan_porodu_pdf',
+            toolSource === 'kalkulator-macierzynski'
+              ? 'kalkulator_macierzynski'
+              : toolSource === 'kalkulator-wyprawki'
+                ? 'kalkulator_wyprawki'
+                : 'plan_porodu_pdf',
             existingLead?.unsubscribed_at ? 0 : 1,
             ipAddress
           )
@@ -339,7 +353,12 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const sequence = buildFourEmailCrmSequence({
       name: cleanName,
       gestationalWeek: null,
-      toolSource: toolSource === 'kalkulator-wyprawki' ? 'kalkulator-wyprawki' : 'plan-porodu',
+      toolSource:
+        toolSource === 'kalkulator-macierzynski'
+          ? 'kalkulator-macierzynski'
+          : toolSource === 'kalkulator-wyprawki'
+            ? 'kalkulator-wyprawki'
+            : 'plan-porodu',
       unsubscribeUrl,
     });
 

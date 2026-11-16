@@ -1,14 +1,26 @@
 import {
   buildEdgeCorsHeaders,
   getEdgeSession,
+  timingSafeEqualHex,
 } from '../../_shared/session';
 
 interface Env {
   DB?: any;
   STRIPE_SECRET_KEY?: string;
   SESSION_SECRET?: string;
+  DIAGNOSTIC_PROMO_CODE?: string;
   NEXT_PUBLIC_STRIPE_PRICE_ID?: string;
   NEXT_PUBLIC_APP_URL?: string;
+}
+
+const DIAGNOSTIC_PROMO_SHA256 =
+  '65980e215899e8a49847d21404dd645a76e30a3719e005413b819fee10007440';
+
+async function sha256HexEdge(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 const CHECKBOX_2_ART38_WAIVER_TEXT =
@@ -221,9 +233,19 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       );
     }
 
+    const promoSha = cleanPromo ? await sha256HexEdge(cleanPromo) : '';
+    const isDiagnosticPromo = Boolean(
+      cleanPromo &&
+        (timingSafeEqualHex(promoSha, DIAGNOSTIC_PROMO_SHA256) ||
+          (env.DIAGNOSTIC_PROMO_CODE && cleanPromo === env.DIAGNOSTIC_PROMO_CODE.trim().toUpperCase()))
+    );
+
     const isVip100 = cleanPromo === 'VIP100';
-    const has10Discount = cleanPromo && !isVip100 ? await isAuthorized10PercentPromo(cleanPromo, env.DB) : false;
-    if (cleanPromo && !has10Discount && !isVip100) {
+    const has10Discount =
+      cleanPromo && !isVip100 && !isDiagnosticPromo
+        ? await isAuthorized10PercentPromo(cleanPromo, env.DB)
+        : false;
+    if (cleanPromo && !has10Discount && !isVip100 && !isDiagnosticPromo) {
       return new Response(
         JSON.stringify({
           error: 'Podany kod rabatowy jest nieaktywny lub nieprawidłowy. Sprawdź pisownię kodu.',
@@ -268,13 +290,26 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
       vipPromoStripeId = foundPromo.id;
     }
 
-    const normCurrency = (String(currency || 'pln').trim().toLowerCase() as EdgeCurrency);
+    const normCurrency = isDiagnosticPromo
+      ? 'pln'
+      : (String(currency || 'pln').trim().toLowerCase() as EdgeCurrency);
     const activePricing = EDGE_PRICING_TABLE[normCurrency] || EDGE_PRICING_TABLE.pln;
     const activeCurrency: EdgeCurrency = EDGE_PRICING_TABLE[normCurrency] ? normCurrency : 'pln';
     const isPln = activeCurrency === 'pln';
-    const activeLocale = String(locale || activePricing.locale || 'pl');
-    const activeCourseAmount = has10Discount ? activePricing.discounted10 : activePricing.base; // Domyślnie PLN: 44010 lub 48900 (440,10 zł lub 489,00 zł brutto)
-    const activeBumpAmount = activePricing.bump; // Domyślnie PLN: 4900 (49,00 zł brutto)
+    const activeLocale = isDiagnosticPromo ? 'pl' : String(locale || activePricing.locale || 'pl');
+    const shouldIncludeBumpItem = Boolean(includeOrderBump || isStandaloneOrderBump);
+    const activeCourseAmount = isDiagnosticPromo
+      ? shouldIncludeBumpItem && !isStandaloneOrderBump
+        ? '100'
+        : '200'
+      : has10Discount
+        ? activePricing.discounted10
+        : activePricing.base; // Domyślnie PLN: 44010 lub 48900 (440,10 zł lub 489,00 zł brutto)
+    const activeBumpAmount = isDiagnosticPromo
+      ? isStandaloneOrderBump
+        ? '200'
+        : '100'
+      : activePricing.bump; // Domyślnie PLN: 4900 (49,00 zł brutto)
 
     const buyerIp =
       request.headers.get('cf-connecting-ip') ||
@@ -283,8 +318,6 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     const buyerCountry = (request.headers.get('cf-ipcountry') || 'PL').toUpperCase();
     const cookieRef = parseCookie(request.headers.get('cookie'), 'hb_aff_ref') || utm?.ref || '';
     const waiverTimestamp = new Date().toISOString();
-
-    const shouldIncludeBumpItem = Boolean(includeOrderBump || isStandaloneOrderBump);
 
     const params = new URLSearchParams();
     params.append('mode', 'payment');
@@ -307,7 +340,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     let lineItemIndex = 0;
 
     if (!isStandaloneOrderBump) {
-      if (priceId && !has10Discount && isPln) {
+      if (priceId && !has10Discount && !isDiagnosticPromo && isPln) {
         params.append(`line_items[${lineItemIndex}][price]`, priceId);
         params.append(`line_items[${lineItemIndex}][quantity]`, '1');
       } else {
@@ -315,13 +348,15 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         params.append(`line_items[${lineItemIndex}][price_data][unit_amount]`, activeCourseAmount);
         params.append(
           `line_items[${lineItemIndex}][price_data][product_data][name]`,
-          isPln
-            ? has10Discount
-              ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${cleanPromo})`
-              : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)'
-            : has10Discount
-              ? `HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons · -10%: ${cleanPromo})`
-              : 'HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons for Two)'
+          isDiagnosticPromo
+            ? 'Kurs Szkoły Rodzenia Online HappyBirth.pl (Transakcja Testowa Live)'
+            : isPln
+              ? has10Discount
+                ? `Kurs Szkoły Rodzenia Online HappyBirth.pl (Rabat -10%: ${cleanPromo})`
+                : 'Kurs Szkoły Rodzenia Online HappyBirth.pl (52 Lekcje 4K dla Dwojga)'
+              : has10Discount
+                ? `HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons · -10%: ${cleanPromo})`
+                : 'HappyBirth Online Antenatal & Childbirth Course (52 4K Lessons for Two)'
         );
         params.append(
           `line_items[${lineItemIndex}][price_data][product_data][description]`,
@@ -372,17 +407,26 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
     params.append('metadata[order_bump_included]', shouldIncludeBumpItem ? 'true' : 'false');
     params.append('metadata[only_order_bump]', isStandaloneOrderBump ? 'true' : 'false');
     params.append('metadata[order_bump_edition]', requestedEditionKey);
-    params.append('metadata[promo_code]', (has10Discount || isVip100) && !isStandaloneOrderBump ? cleanPromo : '');
-    params.append('metadata[affiliate_ref_cookie]', isStandaloneOrderBump ? '' : String(cookieRef).slice(0, 80));
+    params.append(
+      'metadata[promo_code]',
+      isDiagnosticPromo ? 'DIAGNOSTIC_TEST' : (has10Discount || isVip100) && !isStandaloneOrderBump ? cleanPromo : ''
+    );
+    params.append(
+      'metadata[promo_source_type]',
+      isDiagnosticPromo ? 'diagnostic_test' : isVip100 ? 'vip' : has10Discount ? 'promo_code' : 'none'
+    );
+    params.append('metadata[affiliate_ref_cookie]', isStandaloneOrderBump || isDiagnosticPromo ? '' : String(cookieRef).slice(0, 80));
     params.append(
       'metadata[attribution_priority]',
-      isStandaloneOrderBump
-        ? 'post_purchase_upsell'
-        : has10Discount
-          ? 'promo_code'
-          : cookieRef
-            ? 'ref_cookie'
-            : 'direct'
+      isDiagnosticPromo
+        ? 'diagnostic_test'
+        : isStandaloneOrderBump
+          ? 'post_purchase_upsell'
+          : has10Discount
+            ? 'promo_code'
+            : cookieRef
+              ? 'ref_cookie'
+              : 'direct'
     );
     params.append('metadata[waiver_art38_accepted]', 'true');
     params.append('metadata[waiver_art38_timestamp]', waiverTimestamp);

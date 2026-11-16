@@ -18,6 +18,8 @@ import type { HomeCopy } from '@/lib/site-copy';
 import { fill } from '@/lib/site-copy';
 import {
   is10PercentAffiliatePromo,
+  is100PercentPromo,
+  isDiagnosticTestPromoAsync,
   detectClientOrderBumpEdition,
   GLOBAL_PRICING_CONFIG,
   ORDER_BUMP_GLOBAL_CATALOG,
@@ -108,6 +110,7 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
   const [kod, setKod] = useState('');
   const [aktywny, setAktywny] = useState<string | null>(null);
   const [rabat, setRabat] = useState<0 | 10 | 100>(0);
+  const [diagnostic, setDiagnostic] = useState(false);
   // kod spoza wzorców z lib/promo.ts (np. kod polecający z bazy): sprawdza go serwer przy płatności
   const [oczekujacy, setOczekujacy] = useState<string | null>(null);
   const [kodBlad, setKodBlad] = useState<string | null>(null);
@@ -124,9 +127,8 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
     try { localStorage.setItem('hb_detected_edition', wynik.editionKey); } catch { /* brak pamięci */ }
   }, [lang, edycja]);
 
-  // Kod: wzorce z lib/promo.ts dają od razu cenę z rabatem (10%, a w trybie deweloperskim 100%).
-  // Inny kod nie jest odrzucany, bo serwer zna też kody z bazy (afiliacja, polecenia): idzie do
-  // sprawdzenia przy płatności. Zwraca kod, który trafi do /api/stripe/checkout.
+  // Kod: wzorce z lib/promo.ts dają od razu cenę z rabatem (10%), kod z bazy D1 lub tryb diagnostyczny Live.
+  // Zwraca kod, który trafi do /api/stripe/checkout.
   const ocenKod = useCallback(
     (surowy: string, fromManualApply = false): string => {
       const c = surowy.trim().toUpperCase();
@@ -134,30 +136,60 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
       if (!c) {
         setAktywny(null);
         setRabat(0);
+        setDiagnostic(false);
         setOczekujacy(null);
         return '';
       }
       if (is10PercentAffiliatePromo(c)) {
         setAktywny(c);
         setRabat(10);
+        setDiagnostic(false);
         setOczekujacy(null);
+        return c;
+      }
+      if (is100PercentPromo(c)) {
+        setAktywny(c);
+        setRabat(100);
+        setDiagnostic(false);
+        setOczekujacy(null);
+        return c;
+      }
+      if (c === 'VIP100') {
+        setAktywny(null);
+        setRabat(0);
+        setDiagnostic(false);
+        setOczekujacy(c);
         return c;
       }
       setAktywny(null);
       setRabat(0);
+      setDiagnostic(false);
       setOczekujacy(c);
-      fetch(`/api/affiliate/dashboard?validate_code=${encodeURIComponent(c)}`)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d?.valid && d?.discountPercent === 10) {
+      isDiagnosticTestPromoAsync(c)
+        .then((isDiag) => {
+          if (isDiag) {
             setAktywny(c);
-            setRabat(10);
+            setRabat(0);
+            setDiagnostic(true);
+            setWaluta('pln');
             setOczekujacy(null);
             setKodBlad(null);
-          } else if (fromManualApply) {
-            setOczekujacy(null);
-            setKodBlad(t.kod.blad);
+            return;
           }
+          return fetch(`/api/affiliate/dashboard?validate_code=${encodeURIComponent(c)}`)
+            .then((r) => r.json())
+            .then((d) => {
+              if (d?.valid && d?.discountPercent === 10) {
+                setAktywny(c);
+                setRabat(10);
+                setDiagnostic(false);
+                setOczekujacy(null);
+                setKodBlad(null);
+              } else if (fromManualApply) {
+                setOczekujacy(null);
+                setKodBlad(t.kod.blad);
+              }
+            });
         })
         .catch(() => {
           if (fromManualApply) {
@@ -197,9 +229,17 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
   }, []);
 
   const cfg = GLOBAL_PRICING_CONFIG[waluta] || GLOBAL_PRICING_CONFIG.pln;
-  const kursMinor = rabat === 100 ? 0 : rabat === 10 ? cfg.discounted10MinorUnits : cfg.baseMinorUnits;
-  const bumpMinor = cfg.orderBumpMinorUnits;
   const zBumpem = bump && rabat !== 100;
+  const kursMinor = diagnostic
+    ? zBumpem
+      ? 100
+      : 200
+    : rabat === 100
+      ? 0
+      : rabat === 10
+        ? cfg.discounted10MinorUnits
+        : cfg.baseMinorUnits;
+  const bumpMinor = diagnostic ? 100 : cfg.orderBumpMinorUnits;
   const razemMinor = kursMinor + (zBumpem ? bumpMinor : 0);
   const bumpCena = kwotaTekst(bumpMinor, waluta);
 
@@ -214,7 +254,7 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
     ocenKod(kod, true);
   };
 
-  const usunKod = () => { setAktywny(null); setRabat(0); setOczekujacy(null); setKod(''); setKodBlad(null); };
+  const usunKod = () => { setAktywny(null); setRabat(0); setDiagnostic(false); setOczekujacy(null); setKod(''); setKodBlad(null); };
 
   const wybierzEdycje = (key: string) => {
     setEdycja(key);
@@ -364,7 +404,13 @@ export function PriceSection({ t, lang }: { t: HomeCopy['cena']; lang: Language 
               />
               <button className="hb-btn hb-btn-noc" onClick={zastosuj} type="button">{t.kod.zastosuj}</button>
             </div>
-            {aktywny && <p className="hb-komunikat hb-ok" role="status">{fill(rabat === 100 ? t.kod.okZero : t.kod.ok, { kod: aktywny })}</p>}
+            {aktywny && (
+              <p className="hb-komunikat hb-ok" role="status">
+                {diagnostic
+                  ? 'Tryb testowy Live aktywny (płatność diagnostyczna PLN)'
+                  : fill(rabat === 100 ? t.kod.okZero : t.kod.ok, { kod: aktywny })}
+              </p>
+            )}
             {oczekujacy && !kodBlad && <p className="hb-komunikat hb-info" role="status">{fill(t.kod.sprawdzimy, { kod: oczekujacy })}</p>}
             {kodBlad && <p className="hb-komunikat hb-blad" role="alert">{kodBlad}</p>}
             {kod.trim() && <button className="hb-link hb-usun-kod" onClick={usunKod} type="button">{t.kod.usun}</button>}
